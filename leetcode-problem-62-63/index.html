@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>leetcode题解 problem 62 63 Unique Paths I & II – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="A robot is located at the top-left corner of a m x n grid (marked &#39;Start&#39; in the diagram below).
+
+The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked &#39;Finish&#39; in the diagram below).
+
+How many possible unique paths are there?
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+
+    }
+};
+
+题意：
+
+求路径总数，每次只能往右或往下走
+
+题解：
+
+入门级别动态规划题目。
+
+列下状态转移方程：
+
+设sum(i，j)是从pos(0,0)到pos(i,j)的路径总数。
+
+可得：
+
+S(i, j) = S(i - 1, j) + S(i, j - 1)
+
+方程的含义是：
+
+每个格子的路径总数 等于 起点到它左边的格子的路径总数 + 起点到它上方的格子的路径总数。
+
+代码（0ms RunTime)：
+    int uniquePaths(int m, int n) {
+        vector&lt;vector&lt;int&gt;&gt; sum(n);
+        for (int i = 0; i &lt; n; ++i){
+            sum[i].resize(m);
+        }
+        for (int i = 0; i &lt; n; ++i)
+            sum[i][0] = 1;
+        for (int i = 0; i &lt; m; ++i)
+            sum[0][i] = 1;
+
+        for (int i = 1; i &lt; n; ++i)
+            for (int j = 1; j &lt; m; ++j)
+                sum[i][j] = sum[i - 1][j] + sum[i][j - 1];
+        return sum[n - 1][m - 1];
+    }
+
+对于Unique Paths II，改变点是，有些格子变成了障碍物。其实也很简单，上面的代码稍微改下就好了。
+
+代码（4ms RunTime)：
+    int uniquePathsWithObstacles(vector&lt;vector&lt;int&gt;&gt;&amp; obstacleGrid) {
+        int n = obstacleGrid.size();
+        int m = obstacleGrid[0].size();
+        vector&lt;vector&lt;int&gt;&gt; sum(n);
+        for (int i = 0; i &lt; n; ++i){
+            sum[i].resize(m);
+        }
+        if (obstacleGrid[0][0] == 1)
+            sum[0][0] = 0;
+        else
+            sum[0][0] = 1;
+        for (int i = 1; i &lt; n; ++i)
+            if (obstacleGrid[i][0] == 1)
+                sum[i][0] = 0;
+            else
+                sum[i][0] = sum[i-1][0];
+
+        for (int i = 1; i &lt; m; ++i)
+            if (obstacleGrid[0][i] == 1)
+                sum[0][i] = 0;
+            else
+                sum[0][i] = sum[0][i - 1];
+
+        for (int i = 1; i &lt; n; ++i)
+            for (int j = 1; j &lt; m; ++j){
+                if (obstacleGrid[i][j] == 1)
+                    sum[i][j] = 0;
+                else
+                    sum[i][j] = sum[i - 1][j] + sum[i][j - 1];
+            }
+        return sum[n - 1][m - 1];
+    }
+" />
+    <meta property="og:description" content="A robot is located at the top-left corner of a m x n grid (marked &#39;Start&#39; in the diagram below).
+
+The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked &#39;Finish&#39; in the diagram below).
+
+How many possible unique paths are there?
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+
+    }
+};
+
+题意：
+
+求路径总数，每次只能往右或往下走
+
+题解：
+
+入门级别动态规划题目。
+
+列下状态转移方程：
+
+设sum(i，j)是从pos(0,0)到pos(i,j)的路径总数。
+
+可得：
+
+S(i, j) = S(i - 1, j) + S(i, j - 1)
+
+方程的含义是：
+
+每个格子的路径总数 等于 起点到它左边的格子的路径总数 + 起点到它上方的格子的路径总数。
+
+代码（0ms RunTime)：
+    int uniquePaths(int m, int n) {
+        vector&lt;vector&lt;int&gt;&gt; sum(n);
+        for (int i = 0; i &lt; n; ++i){
+            sum[i].resize(m);
+        }
+        for (int i = 0; i &lt; n; ++i)
+            sum[i][0] = 1;
+        for (int i = 0; i &lt; m; ++i)
+            sum[0][i] = 1;
+
+        for (int i = 1; i &lt; n; ++i)
+            for (int j = 1; j &lt; m; ++j)
+                sum[i][j] = sum[i - 1][j] + sum[i][j - 1];
+        return sum[n - 1][m - 1];
+    }
+
+对于Unique Paths II，改变点是，有些格子变成了障碍物。其实也很简单，上面的代码稍微改下就好了。
+
+代码（4ms RunTime)：
+    int uniquePathsWithObstacles(vector&lt;vector&lt;int&gt;&gt;&amp; obstacleGrid) {
+        int n = obstacleGrid.size();
+        int m = obstacleGrid[0].size();
+        vector&lt;vector&lt;int&gt;&gt; sum(n);
+        for (int i = 0; i &lt; n; ++i){
+            sum[i].resize(m);
+        }
+        if (obstacleGrid[0][0] == 1)
+            sum[0][0] = 0;
+        else
+            sum[0][0] = 1;
+        for (int i = 1; i &lt; n; ++i)
+            if (obstacleGrid[i][0] == 1)
+                sum[i][0] = 0;
+            else
+                sum[i][0] = sum[i-1][0];
+
+        for (int i = 1; i &lt; m; ++i)
+            if (obstacleGrid[0][i] == 1)
+                sum[0][i] = 0;
+            else
+                sum[0][i] = sum[0][i - 1];
+
+        for (int i = 1; i &lt; n; ++i)
+            for (int j = 1; j &lt; m; ++j){
+                if (obstacleGrid[i][j] == 1)
+                    sum[i][j] = 0;
+                else
+                    sum[i][j] = sum[i - 1][j] + sum[i][j - 1];
+            }
+        return sum[n - 1][m - 1];
+    }
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="leetcode题解 problem 62 63 Unique Paths I & II" />
+    <meta property="twitter:title" content="leetcode题解 problem 62 63 Unique Paths I & II" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>leetcode题解 problem 62 63 Unique Paths I & II</h1>
+
+  <div class="entry">
+    <p>A robot is located at the top-left corner of a m x n grid (marked &#39;Start&#39; in the diagram below).</p>
+
+<p>The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked &#39;Finish&#39; in the diagram below).</p>
+
+<p>How many possible unique paths are there?</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">uniquePaths</span><span class="p">(</span><span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
+
+<p>求路径总数，每次只能往右或往下走</p>
+
+<h3>题解：</h3>
+
+<p>入门级别动态规划题目。</p>
+
+<p>列下状态转移方程：</p>
+
+<p>设sum(i，j)是从pos(0,0)到pos(i,j)的路径总数。</p>
+
+<p>可得：</p>
+
+<p><strong>S(i, j) = S(i - 1, j) + S(i, j - 1)</strong></p>
+
+<p>方程的含义是：</p>
+
+<p>每个格子的路径总数 等于 起点到它左边的格子的路径总数 + 起点到它上方的格子的路径总数。</p>
+
+<h3>代码（0ms RunTime)：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">uniquePaths</span><span class="p">(</span><span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">sum</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>对于Unique Paths II，改变点是，有些格子变成了障碍物。其实也很简单，上面的代码稍微改下就好了。</p>
+
+<h3>代码（4ms RunTime)：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">uniquePathsWithObstacles</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">obstacleGrid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">obstacleGrid</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="k">else</span>
+                    <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sum</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+</code></pre></div>
+  </div>
+
+  <div class="date">
+    Written on June 27, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

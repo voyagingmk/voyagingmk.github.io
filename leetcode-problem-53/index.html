@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>leetcode题解 problem53 Maximum Subarray – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="Find the contiguous subarray within an array (containing at least one number) which has the largest sum.
+
+For example, given the array [−2,1,−3,4,−1,2,1,−5,4],
+the contiguous subarray [4,−1,2,1] has the largest sum = 6.
+class Solution {
+public:
+    int maxSubArray(vector&lt;int&gt;&amp; nums) {
+
+    }
+};
+
+题意：
+
+求子串和最大值
+
+题解：
+
+经典动态规划题目。
+
+列下状态转移方程：
+
+设数组为T(i), 设S(i)是数组从0到i位置的子串和的最大值。明确一下，S(i)对应的子串的左右2个索引[start,end]，start的取值范围是[0,i],end必然是i，即[start,end]是数组[0,i]段的一个后缀。
+
+可得：
+
+S(i) = T(i) + ( S(i - 1) &gt; 0 ? S(i - 1) : 0 )
+
+方程的含义是：
+求S(i)时，S(i-1)如果大于0，那么说明i-1存在一个后缀（必然是连续的）使得S(i-1)大于0，此时把T[i]也加进去S(i-1)，当然就是S(i)的最长后缀了。（S(i)可能小于等于0）；
+
+S(i-1)如果小于等于0，说明S(i-1)对增大S(i)没有意义了，也即说明S(i)的最长后缀等于[i,i]，S(i) = T(i)。
+
+空间复杂度O(n)，时间复杂度O(n)。
+
+代码：
+    int maxSubArray(vector&lt;int&gt;&amp; nums) {
+        if (nums.size() == 0)
+            return 0;
+        if (nums.size() == 1)
+            return nums[0];
+        vector&lt;int&gt; s(nums.size() + 1);
+        s[0] = 0;
+        int maxS = INT_MIN;
+        for (int i = 1; i &lt;= nums.size(); ++i){
+            s[i] = nums[i - 1] + (s[i - 1] &gt; 0 ? s[i - 1] : 0);
+            if (s[i] &gt; maxS){
+                maxS = s[i];
+            }
+        }
+        return maxS;
+    }
+
+考虑到S(i)数组对于这个题目是多余的，题目只是要求S(i)的max值，那么可以改下代码，把空间复杂度从O(n)降到O(1)。
+    int maxSubArray(vector&lt;int&gt;&amp; nums) {
+        if (nums.size() == 0)
+            return 0;
+        if (nums.size() == 1)
+            return nums[0];
+        int sum = 0, maxS=INT_MIN;
+        for (int i = 1; i &lt;= nums.size(); ++i){
+            sum = nums[i - 1] + sum;
+            if (sum &lt; 0)
+                sum = 0;
+            if (sum &gt; maxS){
+                maxS = sum;
+            }
+        }
+        return maxS;
+    }
+" />
+    <meta property="og:description" content="Find the contiguous subarray within an array (containing at least one number) which has the largest sum.
+
+For example, given the array [−2,1,−3,4,−1,2,1,−5,4],
+the contiguous subarray [4,−1,2,1] has the largest sum = 6.
+class Solution {
+public:
+    int maxSubArray(vector&lt;int&gt;&amp; nums) {
+
+    }
+};
+
+题意：
+
+求子串和最大值
+
+题解：
+
+经典动态规划题目。
+
+列下状态转移方程：
+
+设数组为T(i), 设S(i)是数组从0到i位置的子串和的最大值。明确一下，S(i)对应的子串的左右2个索引[start,end]，start的取值范围是[0,i],end必然是i，即[start,end]是数组[0,i]段的一个后缀。
+
+可得：
+
+S(i) = T(i) + ( S(i - 1) &gt; 0 ? S(i - 1) : 0 )
+
+方程的含义是：
+求S(i)时，S(i-1)如果大于0，那么说明i-1存在一个后缀（必然是连续的）使得S(i-1)大于0，此时把T[i]也加进去S(i-1)，当然就是S(i)的最长后缀了。（S(i)可能小于等于0）；
+
+S(i-1)如果小于等于0，说明S(i-1)对增大S(i)没有意义了，也即说明S(i)的最长后缀等于[i,i]，S(i) = T(i)。
+
+空间复杂度O(n)，时间复杂度O(n)。
+
+代码：
+    int maxSubArray(vector&lt;int&gt;&amp; nums) {
+        if (nums.size() == 0)
+            return 0;
+        if (nums.size() == 1)
+            return nums[0];
+        vector&lt;int&gt; s(nums.size() + 1);
+        s[0] = 0;
+        int maxS = INT_MIN;
+        for (int i = 1; i &lt;= nums.size(); ++i){
+            s[i] = nums[i - 1] + (s[i - 1] &gt; 0 ? s[i - 1] : 0);
+            if (s[i] &gt; maxS){
+                maxS = s[i];
+            }
+        }
+        return maxS;
+    }
+
+考虑到S(i)数组对于这个题目是多余的，题目只是要求S(i)的max值，那么可以改下代码，把空间复杂度从O(n)降到O(1)。
+    int maxSubArray(vector&lt;int&gt;&amp; nums) {
+        if (nums.size() == 0)
+            return 0;
+        if (nums.size() == 1)
+            return nums[0];
+        int sum = 0, maxS=INT_MIN;
+        for (int i = 1; i &lt;= nums.size(); ++i){
+            sum = nums[i - 1] + sum;
+            if (sum &lt; 0)
+                sum = 0;
+            if (sum &gt; maxS){
+                maxS = sum;
+            }
+        }
+        return maxS;
+    }
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="leetcode题解 problem53 Maximum Subarray" />
+    <meta property="twitter:title" content="leetcode题解 problem53 Maximum Subarray" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>leetcode题解 problem53 Maximum Subarray</h1>
+
+  <div class="entry">
+    <p>Find the contiguous subarray within an array (containing at least one number) which has the largest sum.</p>
+
+<p>For example, given the array [−2,1,−3,4,−1,2,1,−5,4],
+the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
+
+<p>求子串和最大值</p>
+
+<h3>题解：</h3>
+
+<p>经典动态规划题目。</p>
+
+<p>列下状态转移方程：</p>
+
+<p>设数组为T(i), 设S(i)是数组从0到i位置的子串和的最大值。明确一下，S(i)对应的子串的左右2个索引[start,end]，start的取值范围是[0,i],end必然是i，即[start,end]是数组[0,i]段的一个后缀。</p>
+
+<p>可得：</p>
+
+<p><strong>S(i) = T(i) + ( S(i - 1) &gt; 0 ? S(i - 1) : 0 )</strong></p>
+
+<p>方程的含义是：
+求S(i)时，S(i-1)如果大于0，那么说明i-1存在一个后缀（必然是连续的）使得S(i-1)大于0，此时把T[i]也加进去S(i-1)，当然就是S(i)的最长后缀了。（S(i)可能小于等于0）；</p>
+
+<p>S(i-1)如果小于等于0，说明S(i-1)对增大S(i)没有意义了，也即说明S(i)的最长后缀等于[i,i]，S(i) = T(i)。</p>
+
+<p>空间复杂度O(n)，时间复杂度O(n)。</p>
+
+<h3>代码：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">maxS</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
+                <span class="n">maxS</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>考虑到S(i)数组对于这个题目是多余的，题目只是要求S(i)的max值，那么可以改下代码，把空间复杂度从O(n)降到O(1)。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxS</span><span class="o">=</span><span class="n">INT_MIN</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
+                <span class="n">maxS</span> <span class="o">=</span> <span class="n">sum</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
+  </div>
+
+  <div class="date">
+    Written on June 26, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>
