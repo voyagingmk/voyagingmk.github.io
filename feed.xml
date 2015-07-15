@@ -7,6 +7,26 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>IndieAce Gamejam 广州站</title>
+        <description>&lt;p&gt;&lt;img src=&quot;../images/2015.7/5.jpg&quot; alt=&quot;5.jpg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;比赛介绍：&lt;a href=&quot;http://www.indieace.com/article-715-1.html&quot; title=&quot;http://www.indieace.com/article-715-1.html&quot;&gt;http://www.indieace.com/article-715-1.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;本次主题：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.7/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;我们组的作品《虐之太空》：
+&lt;a href=&quot;http://wanga.me/45512&quot; title=&quot;http://wanga.me/45512&quot;&gt;http://wanga.me/45512&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.7/4.jpg&quot; alt=&quot;4.jpg&quot;&gt;&lt;/p&gt;
+</description>
+        <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/gamejam/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/gamejam/</guid>
+      </item>
+    
+      <item>
         <title>leetcode题解 problem 142 Linked List Cycle II</title>
         <description>&lt;blockquote&gt;
 &lt;p&gt;Given a linked list, return the node where the cycle begins. If there is no cycle, return null.&lt;/p&gt;
@@ -670,177 +690,6 @@ the contiguous subarray [4,−1,2,1] has the largest sum = 6.&lt;/p&gt;
         <pubDate>Wed, 24 Jun 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/leetcode-problem-198/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-198/</guid>
-      </item>
-    
-      <item>
-        <title>windows 7 下编译 nopoll</title>
-        <description>&lt;h3&gt;编译环境&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;windows 7 64位&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;VS 2013 Ultimate&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;openssl-1.0.2a&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;nopoll-0.2.8.b184&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;编译步骤&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;nopoll官网提供了二进制安装包，不过不知为什么无法直接用（运行时错误，无法debug)，所以还是得手动编译&amp;lt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;nopoll依赖openssl，所以先编译openssl：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;下载&lt;a href=&quot;http://www.openssl.org/source/openssl-1.0.2a.tar.gz&quot;&gt;http://www.openssl.org/source/openssl-1.0.2a.tar.gz&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;安装perl &lt;a href=&quot;http://downloads.activestate.com/ActivePerl/releases/5.20.1.2000/ActivePerl-5.20.1.2000-MSWin32-x64-298557.msi&quot;&gt;http://downloads.activestate.com/ActivePerl/releases/5.20.1.2000/ActivePerl-5.20.1.2000-MSWin32-x64-298557.msi&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;解压后，阅读INSTALL.W64安装说明
-&amp;gt; We loved with a love that was more than love
-&amp;gt; To build for Win64/x64: 
-&amp;gt; perl Configure VC-WIN64A
-&amp;gt; ms\do_win64a
-&amp;gt; nmake -f ms\ntdll.mak
-&amp;gt; cd out32dll
-&amp;gt; ..\ms\test&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;第三步的ms\do_win65a和nmake -f ms\ntdll.mak必须要用vs的控制台程序来执行，否则会出错&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;编译完成通过后，执行nmake -f ms\ntdll.mak install来生成最终发布文件, 生成位置默认是在usr/local/里，但windows下没有这个目录，所以Perl把ssl生成到当前控制台所在分区的根目录了（如源码在d:/openssl/，则会生成到D:/usr/local/)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;用编译好的openssl库来编译Nopoll&lt;/p&gt;
-
-&lt;p&gt;nopoll虽然提供了Makefile.win，但我试了下，发现并不能一键编译，会提示缺少versions.mk和config.mk（这2个文件最后在nopoll的svn仓库里找到），补上这2个文件后再次执行nmake，会提示./prepare-nsh.sh permission denied（win平台执行sh文件？）&lt;/p&gt;
-
-&lt;p&gt;按官方的编译方法失败后，只能自行建工程编译了：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;新建一个vs工程，取名libnopoll&lt;/li&gt;
-&lt;li&gt;添加 nopoll-0.2.8.b184/src目录的源码文件到工程&lt;/li&gt;
-&lt;li&gt;这里要改下nopoll_config.h（此文件应该是自动生成的，我们要手动修改一个出来）&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;  &lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * Nopoll Library nopoll_config.h&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * Platform dependant definitions.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * This is a generated file.  Please modify &amp;#39;configure.in&amp;#39;&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#ifndef __NOPOLL_CONFIG_H__&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define __NOPOLL_CONFIG_H__&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * \addtogroup nopoll_decl_module&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @{&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @brief Allows to convert integer value (including constant values)&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * into a pointer representation.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * Use the oposite function to restore the value from a pointer to a&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * integer: \ref PTR_TO_INT.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @param integer The integer value to cast to pointer.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @return A \ref noPollPtr reference.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#ifndef INT_TO_PTR&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define INT_TO_PTR(integer)   ((noPollPtr) (long) ((int)integer))&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @brief Allows to convert a pointer reference (\ref noPollPtr),&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * which stores an integer that was stored using \ref INT_TO_PTR.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * Use the oposite function to restore the pointer value stored in the&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * integer value.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @param ptr The pointer to cast to a integer value.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @return A int value.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#ifndef PTR_TO_INT&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define PTR_TO_INT(ptr) ((int) (long) (ptr))&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @brief Allows to get current platform configuration. This is used&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * by Nopoll library but could be used by applications built on top of&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * Nopoll to change its configuration based on the platform information.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;//#define NOPOLL_OS_UNIX (1)&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define NOPOLL_OS_WIN32 (1)&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define R_OK 4&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define W_OK 2&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @internal Allows to now if the platform support vasprintf&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * function. Do not use this macro as it is supposed to be for&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * internal use.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;//#define NOPOLL_HAVE_VASPRINTF (1)&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  * @brief Indicates that this platform have support for 64bits.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;  */&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#define NOPOLL_64BIT_PLATFORM (1)&lt;/span&gt;
-  &lt;span class=&quot;cm&quot;&gt;/* @} */&lt;/span&gt;
-  &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;配置编译环境&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/2.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/3.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;添加openssl的include、nopoll的src到包含目录&lt;/li&gt;
-&lt;li&gt;添加上一步生成的ssl/lib目录 到 库目录&lt;/li&gt;
-&lt;li&gt;执行 生成项目，就得到了libnopoll.lib文件&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;测试libnopoll.lib是否可用：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;新建测试项目，一样是    &lt;img src=&quot;/images/2015.4/4.png&quot; alt=&quot;1.png&quot;&gt;&lt;/li&gt;
-&lt;li&gt;添加nopoll官方的example代码，&lt;a href=&quot;https://dolphin.aspl.es/svn/publico/nopoll/trunk/test/nopoll-regression-listener.c&quot;&gt;https://dolphin.aspl.es/svn/publico/nopoll/trunk/test/nopoll-regression-listener.c&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;复制 /test的pem、crt、key文件到工程目录里:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/5.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;然后是附加依赖项：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/6.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;之后就可以编译 运行了：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/7.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;看样子是成功了。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;最后客户端的例子也试着编译下，工程配置和server的一样，咦！！ 编译时出现各种error:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/8.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;照着反馈做即可，在文件头添加一个define &lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;cp&quot;&gt;#define _CRT_SECURE_NO_WARNINGS&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/9.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;unlink改成_unlink呗；&lt;/p&gt;
-
-&lt;p&gt;VERSION可能是要自己定义，也定义一个，之后就顺利编译出来了。&lt;/p&gt;
-
-&lt;p&gt;不过运行的时候又出现报错：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/10.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;问题就是windows下没有linux的diff工具，先把相关的几行代码屏蔽掉先把，再次编译运行：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015.4/11.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;Nice，客户端和服务端协同工作了。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;附&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;编译debug版的openssl :  &lt;a href=&quot;http://blog.csdn.net/wangxvfeng101/article/details/7261264&quot;&gt;http://blog.csdn.net/wangxvfeng101/article/details/7261264&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Tue, 07 Apr 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/nopoll-windows/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/nopoll-windows/</guid>
       </item>
     
   </channel>

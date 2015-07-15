@@ -47,10 +47,22 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a>
+  <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/gamejam/">IndieAce Gamejam 广州站</a></h1>
+
+      <div class="entry">
+        <p><img src="../images/2015.7/5.jpg" alt="5.jpg"></p>
+
+      </div>
+
+      <a href="/gamejam/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 
@@ -65,61 +77,6 @@
 <p>Can you solve it without using extra space?</p>
 </blockquote>
 
-<h3>题意：</h3>
-
-<p>判断一个链表是否有环，有环的话返回环的起始节点，无环的话返回NULL。</p>
-
-<h3>题解：</h3>
-
-<p>Linked List Cycle的升级，不仅要判断有无环，还要求入口。很显然可以在Linked List Cycle的基础上来做。</p>
-
-<p>这里我直接翻译ngcl的<a href="https://leetcode.com/discuss/16567/concise-solution-using-with-detailed-alogrithm-description" title="answer">answer</a>，写得非常好：</p>
-
-<ol>
-<li>用slower和faster方法判断是否有环；</li>
-<li>设链表的头节点是head，环的入口节点是entry，slower和faster2个指针相遇的节点是meeting;</li>
-<li>设L1是head到entry的正向距离，<strong>L2是entry到meeting的正向距离</strong>，C是环的长度，n是faster指针在cycle里遍历的次数(不到一遍算0)；</li>
-</ol>
-
-<p>根据上面的定义，可知：</p>
-
-<ol>
-<li>当slower和faster相遇时，slower已经走了L1 + L2的距离，也即head和meeting的距离;</li>
-<li>当slower和faster相遇时，faster已经走了L1 + L2 + n * C的距离;</li>
-<li>因为slower步进1，而faster步进2，那么当slower和faster第一次相遇时，faster已经走的距离是slower已经走的距离的两倍，即 2* (L1 + L2) = L1 + L2 + n * C =&gt; L1 = (n - 1) * C + (C - L2)</li>
-</ol>
-
-<p><strong>L1 = (n - 1) * C + (C - L2)</strong> 这个等式表明， head和entry的距离(L1)，等于<strong>meeting到entry的正向距离</strong>（链表是有遍历方向的）。</p>
-
-<p>这是因为式子中的 (n - 1) * C相当于走n-1个循环，对一个指向meeting的环内指针来说，走(n - 1) * C等于回到起点，所以式子可以简化成 <strong>L1 = C - L2</strong>。</p>
-
-<p>画成图是这样子：</p>
-
-<p><img src="../images/2015.7/2.png" alt="1.png"></p>
-
-<p>ngcl的代码如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">ListNode</span> <span class="o">*</span><span class="nf">detectCycle</span><span class="p">(</span><span class="n">ListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">head</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
-            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-
-        <span class="n">ListNode</span> <span class="o">*</span><span class="n">slow</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-        <span class="n">ListNode</span> <span class="o">*</span><span class="n">fast</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-        <span class="n">ListNode</span> <span class="o">*</span><span class="n">entry</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-
-        <span class="k">while</span> <span class="p">(</span><span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">&amp;&amp;</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">slow</span> <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-            <span class="n">fast</span> <span class="o">=</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">slow</span> <span class="o">==</span> <span class="n">fast</span><span class="p">)</span> <span class="p">{</span>                      <span class="c1">// there is a cycle</span>
-                <span class="k">while</span><span class="p">(</span><span class="n">slow</span> <span class="o">!=</span> <span class="n">entry</span><span class="p">)</span> <span class="p">{</span>               <span class="c1">// found the entry location</span>
-                    <span class="n">slow</span>  <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-                    <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">return</span> <span class="n">entry</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                                 <span class="c1">// there has no cycle</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-142/" class="read-more">Read More</a>
@@ -138,47 +95,6 @@
 <p>the contiguous subarray [2,3] has the largest product = 6.</p>
 </blockquote>
 
-<h3>题意：</h3>
-
-<p>求数组里最大的连续子序列的乘积。</p>
-
-<h3>题解：</h3>
-
-<p>Maximum Subarray的变形，把求和改成求积了。且有负数。</p>
-
-<p>设DP[i]是以i位置元素为终点的子序列的乘积，那么DP[i]的最大值就是我们要的解。</p>
-
-<p>DP[i] = max( DP[i - 1] * nums[i], nums[i] )</p>
-
-<p>上面的方程是错的，因为没有考虑到负数的情况，比如数组[-10,5,-10]，DP[0] = -10, DP[1] = 5, DP[2] =-10，最大乘积是5。 但实际上最大乘积是 -10 * 5　＊ (-10) = 500。</p>
-
-<p>正确的方程是，记录2个DP数组，一个记乘积最大值，一个记乘积最小值，然后综合2个DP数组的结果，就可以得到真正的最大值。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">DP_max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span> <span class="n">DP_min</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DP_max</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-    <span class="n">DP_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span> <span class="n">DP_min</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DP_max</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</code></pre></div>
-<p>按这个方程组来做的话，需要O(n)的空间，考虑到题目只要求输出最大值，那么可以优化到O(1)的空间消耗。</p>
-
-<p>原理就是，DP_*[i]只和上一个状态以及当前的值有关，那么只需要保存上一个状态的结果，就足够求最大乘积了。</p>
-
-<p>下面是我的代码：（runtime 8 ms）</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxProduct</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">dp_pre_min</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-        <span class="kt">int</span> <span class="n">dp_pre_max</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-        <span class="kt">int</span> <span class="n">dp_max</span> <span class="o">=</span> <span class="n">dp_pre_max</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">len</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="kt">int</span> <span class="n">dp_cur_max</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dp_pre_max</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">dp_pre_min</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-            <span class="kt">int</span> <span class="n">dp_cur_min</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span> <span class="n">min</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dp_pre_max</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">dp_pre_min</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">dp_max</span> <span class="o">&lt;</span> <span class="n">dp_cur_max</span><span class="p">)</span>
-                <span class="n">dp_max</span> <span class="o">=</span> <span class="n">dp_cur_max</span><span class="p">;</span>
-            <span class="n">dp_pre_max</span> <span class="o">=</span> <span class="n">dp_cur_max</span><span class="p">;</span>
-            <span class="n">dp_pre_min</span> <span class="o">=</span> <span class="n">dp_cur_min</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">dp_max</span><span class="p">;</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-152/" class="read-more">Read More</a>
@@ -191,90 +107,8 @@
       <div class="entry">
         <blockquote>
 <p>Given a 2D binary matrix filled with 0&#39;s and 1&#39;s, find the largest square containing all 1&#39;s and return its area.</p>
-
-<p>For example, given the following matrix:</p>
-
-<p>1 0 1 0 0</p>
-
-<p>1 0 1 1 1</p>
-
-<p>1 1 1 1 1</p>
-
-<p>1 0 0 1 0</p>
-
-<p>Return 4.</p>
 </blockquote>
 
-<h3>题意：</h3>
-
-<p>给定一个01矩阵，求矩阵里最大的1字正方形的面积</p>
-
-<h3>题解：</h3>
-
-<p>考虑动态规划来解题。</p>
-
-<p>设DP(i,j)是子矩阵p(0,0)-&gt;p(i,j)里，以p(i,j)为右下顶点的正方形的最大边长(i属于x轴，j属于y轴）。那么DP(i,j)的最大值的平方，就是所要求的解。</p>
-
-<p>以题目的矩阵来说，可以很容易看出DP(i,j)值：</p>
-
-<p>DP(0,0) = <strong>1</strong>  DP(1,0) = <strong>0</strong>  DP(2,0) = <strong>1</strong>  DP(3,0) = <strong>0</strong>  DP(4,0) = <strong>0</strong></p>
-
-<p>DP(0,1) = <strong>1</strong>  DP(1,1) = <strong>0</strong>  DP(2,1) = <strong>1</strong>  DP(3,1) = <strong>1</strong>  DP(4,1) = <strong>1</strong></p>
-
-<p>DP(0,2) = <strong>1</strong>  DP(1,2) = <strong>1</strong>  DP(2,2) = <strong>1</strong>  DP(3,2) = <strong>2</strong>  DP(4,2) = <strong>2</strong></p>
-
-<p>DP(0,3) = <strong>1</strong>  DP(1,3) = <strong>0</strong>  DP(2,3) = <strong>0</strong>  DP(3,3) = <strong>1</strong>  DP(4,3) = <strong>0</strong></p>
-
-<p>DP(i,j)的值很好算，有一些规律存在：（下面是python伪代码）</p>
-
-<p>if j == 0: DP(i,0) = M(i,0)</p>
-
-<p>elif i == 0: DP(0,j) = M(0,j)</p>
-
-<p>elif M(i,j)==0: DP(i,j) = 0</p>
-
-<p>else: DP(i,j) = min( DP(i - 1, j), DP(i, j - 1), DP(i - 1, j - 1)) + 1</p>
-
-<p>前2个if处理了DP(i,j)的边界值问题，后2个if就是DP(i,j)的状态转移方程了。</p>
-
-<p>我的实现代码如下（runtime 12 ms）：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maximalSquare</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;&gt;&amp;</span> <span class="n">matrix</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span><span class="c1">//row col</span>
-        <span class="kt">char</span> <span class="n">result</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">dp</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span><span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span>
-                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-                <span class="k">else</span>
-                <span class="p">{</span>
-                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
-                        <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="k">return</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-221/" class="read-more">Read More</a>
@@ -292,38 +126,6 @@
 In a complete binary tree every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between 1 and 2h nodes inclusive at the last level h.</p>
 </blockquote>
 
-<h3>题意：</h3>
-
-<p>求一颗完全二叉树得节点的数量。</p>
-
-<h3>题解：</h3>
-
-<p>看了这道题的discuss，发现一个挺有意思的解决方案（也可能是最快的方案了），这里分析一下。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">countNodes</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
-
-        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-
-        <span class="kt">int</span> <span class="n">hl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hr</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-
-        <span class="n">TreeNode</span> <span class="o">*</span><span class="n">l</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">root</span><span class="p">;</span>
-
-        <span class="k">while</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span><span class="n">hl</span><span class="o">++</span><span class="p">;</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;}</span>
-
-        <span class="k">while</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span><span class="n">hr</span><span class="o">++</span><span class="p">;</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;}</span>
-
-        <span class="k">if</span><span class="p">(</span><span class="n">hl</span><span class="o">==</span><span class="n">hr</span><span class="p">)</span> <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">hl</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-
-        <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-    <span class="p">}</span>
-</code></pre></div>
-<p>函数内第4、5行，2个while循环，获得了root的最左节点和最右节点的深度，然后判断深度是否一样，一样的话，说明root是一棵满二叉树，于是可以用公式直接返回该子树的节点个数。</p>
-
-<p>再利用分而治之的思想，就可以得到总的节点的个数了：</p>
-
-<p>countNodes(root) = 一棵完全二叉树的节点个数 = 1（即根节点） + countNodes(左子树) + countNodes(右子树)</p>
-
-<p>而因为完全二叉树的性质，可以知道root的左子树和右子树中肯定有一棵是满二叉树。所以这个算法是很快的，当countNodes遇到满二叉树时，一次lgn的迭代运算后，即可以返回该树的节点个数。因为只有满二叉树可以让递归中止，所以总的耗时就是计算各个满二叉树的总耗时。</p>
-
       </div>
 
       <a href="/leetcode-problem-222/" class="read-more">Read More</a>
@@ -339,70 +141,7 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 <p>Note: You may not slant the container.</p>
 </blockquote>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
-<span class="nl">public</span><span class="p">:</span>
-    <span class="kt">int</span> <span class="n">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-<h3>题意：</h3>
-
-<p>有一排竖直放置的、长短不一的圆柱，圆柱之间间隔都是1，问哪2根圆柱（用ai，aj表示)可以组成一个体积（因为是二维空间，其实就是面积）最大的<strong>水容器</strong>。</p>
-
-<p>注意：容器里面放着其他圆柱也是没影响的（奇葩的容器？），ai和aj不要求相邻；因为是水容器，所以最短边决定了容器的容量。</p>
-
-<h3>题解：</h3>
-
-<p>这道题并不是动态规划题， 原因是动态规划的一个条件——无后效性，无法满足。</p>
-
-<blockquote>
-<p>无后效性是这样一种性质：某阶段的状态一旦确定，则此后过程的演变不再受此前各种状态及决策的影响，简单的说，就是“未来与过去无关”，当前的状态是此前历史的一个完整总结。</p>
-</blockquote>
-
-<p>设S(i)是从第0根柱子到第i根柱子这个范围里，所能得到的最大的面积。换一种说法就是说，S(i)是考虑只有前i根柱子存在的情况下的最优解。所以，S(4)就是我们的解。</p>
-
-<p>考虑动态规划的最优化原理——最优策略的任何一部分子策略也必须是最优的。
-S(i)是符合这个定义的，S(i)代表i阶段时的最优结果。</p>
-
-<p>但S(i)并不满足无后效性规则。考虑下面这个情况：</p>
-
-<p><img src="../images/2015.7/1.png" alt="1.png"></p>
-
-<p>S(3)的值是以[1,3]为边界的面积:(3-1)<em>min(4,2) = 4。按照无后效性定义“未来与过去无关”，S(3)是对0,1,2,3这4根柱子的一个总结，那么S(4)呢？容易看出，S(4)的值是以[1,4]为边界的面积：(4-1)</em>min(4,4) = 12。S(4)的值(未来），不仅与3有关系，还与0、1、2有关系，即过去影响了未来。</p>
-
-<p>这道题的真正解法是很简单的。假设T(i,j)代表我们能从整个区间里找的最大容器面积，T(i,j)=(j-i)*min(a[i],[j]) (i&lt;j)，可以证明，在j的右端肯定没有比j更高的柱子了（只可能小于或等于），不然T(i,j)就不成立。</p>
-
-<p>那么可以反过来思考，我们假设0和n-1号柱子组成的面积是最大的，要使这个结论不成立，除非是在[0,n-1]区间里找到了比a[0]和a[n-1]高的柱子，且新的柱子对的面积比目前的最大值还大。</p>
-
-<p>所以可以从两端向中间迭代，直接看代码：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">area</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">){</span>
-            <span class="kt">int</span> <span class="n">curArea</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="n">l</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">curArea</span> <span class="o">&gt;</span> <span class="n">area</span><span class="p">)</span>
-                <span class="n">area</span> <span class="o">=</span> <span class="n">curArea</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
-                <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span>
-                <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]){</span>
-                    <span class="n">k</span><span class="o">++</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
-            <span class="p">}</span>
-            <span class="k">else</span><span class="p">{</span>
-                <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
-                <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
-                    <span class="n">k</span><span class="o">--</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="n">r</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">area</span><span class="p">;</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-11/" class="read-more">Read More</a>
@@ -415,89 +154,6 @@ S(i)是符合这个定义的，S(i)代表i阶段时的最优结果。</p>
       <div class="entry">
         <p>A robot is located at the top-left corner of a m x n grid (marked &#39;Start&#39; in the diagram below).</p>
 
-<p>The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked &#39;Finish&#39; in the diagram below).</p>
-
-<p>How many possible unique paths are there?</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
-<span class="nl">public</span><span class="p">:</span>
-    <span class="kt">int</span> <span class="n">uniquePaths</span><span class="p">(</span><span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-<h3>题意：</h3>
-
-<p>求路径总数，每次只能往右或往下走</p>
-
-<h3>题解：</h3>
-
-<p>入门级别动态规划题目。</p>
-
-<p>列下状态转移方程：</p>
-
-<p>设sum(i，j)是从pos(0,0)到pos(i,j)的路径总数。</p>
-
-<p>可得：</p>
-
-<p><strong>S(i, j) = S(i - 1, j) + S(i, j - 1)</strong></p>
-
-<p>方程的含义是：</p>
-
-<p>每个格子的路径总数 等于 起点到它左边的格子的路径总数 + 起点到它上方的格子的路径总数。</p>
-
-<h3>代码（0ms RunTime)：</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">uniquePaths</span><span class="p">(</span><span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
-                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-        <span class="k">return</span> <span class="n">sum</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-    <span class="p">}</span>
-</code></pre></div>
-<p>对于Unique Paths II，改变点是，有些格子变成了障碍物。其实也很简单，上面的代码稍微改下就好了。</p>
-
-<h3>代码（4ms RunTime)：</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">uniquePathsWithObstacles</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">obstacleGrid</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">obstacleGrid</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-        <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">else</span>
-            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-            <span class="k">else</span>
-                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-            <span class="k">else</span>
-                <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-                <span class="k">else</span>
-                    <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-            <span class="p">}</span>
-        <span class="k">return</span> <span class="n">sum</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-62-63/" class="read-more">Read More</a>
@@ -510,74 +166,6 @@ S(i)是符合这个定义的，S(i)代表i阶段时的最优结果。</p>
       <div class="entry">
         <p>Find the contiguous subarray within an array (containing at least one number) which has the largest sum.</p>
 
-<p>For example, given the array [−2,1,−3,4,−1,2,1,−5,4],
-the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
-<span class="nl">public</span><span class="p">:</span>
-    <span class="kt">int</span> <span class="n">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-<h3>题意：</h3>
-
-<p>求子串和最大值</p>
-
-<h3>题解：</h3>
-
-<p>经典动态规划题目。</p>
-
-<p>列下状态转移方程：</p>
-
-<p>设数组为T(i), 设S(i)是数组从0到i位置的子串和的最大值。明确一下，S(i)对应的子串的左右2个索引[start,end]，start的取值范围是[0,i],end必然是i，即[start,end]是数组[0,i]段的一个后缀。</p>
-
-<p>可得：</p>
-
-<p><strong>S(i) = T(i) + ( S(i - 1) &gt; 0 ? S(i - 1) : 0 )</strong></p>
-
-<p>方程的含义是：
-求S(i)时，S(i-1)如果大于0，那么说明i-1存在一个后缀（必然是连续的）使得S(i-1)大于0，此时把T[i]也加进去S(i-1)，当然就是S(i)的最长后缀了。（S(i)可能小于等于0）；</p>
-
-<p>S(i-1)如果小于等于0，说明S(i-1)对增大S(i)没有意义了，也即说明S(i)的最长后缀等于[i,i]，S(i) = T(i)。</p>
-
-<p>空间复杂度O(n)，时间复杂度O(n)。</p>
-
-<h3>代码：</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">maxS</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
-                <span class="n">maxS</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
-    <span class="p">}</span>
-</code></pre></div>
-<p>考虑到S(i)数组对于这个题目是多余的，题目只是要求S(i)的max值，那么可以改下代码，把空间复杂度从O(n)降到O(1)。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-        <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxS</span><span class="o">=</span><span class="n">INT_MIN</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">sum</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
-                <span class="n">maxS</span> <span class="o">=</span> <span class="n">sum</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-53/" class="read-more">Read More</a>
@@ -590,82 +178,6 @@ the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
       <div class="entry">
         <p>Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.</p>
 
-<p>For example, given the following triangle</p>
-
-<ul>
-<li>[</li>
-<li>........[<strong>2</strong>],</li>
-<li>.......[<strong>3</strong>,4],</li>
-<li>.....[6,<strong>5</strong>,7],</li>
-<li>....[4,<strong>1</strong>,8,3]</li>
-<li>]</li>
-</ul>
-
-<p>The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).</p>
-
-<p>Note:</p>
-
-<p>Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
-<span class="nl">public</span><span class="p">:</span>
-    <span class="kt">int</span> <span class="n">minimumTotal</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">triangle</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-<h3>题意：</h3>
-
-<p>自顶向下寻找一条路径使得路径上每个节点的值的和，是所有路径中最小的。限制条件：每次只能选下一行的邻接节点。</p>
-
-<h3>题解：</h3>
-
-<p>很明显是动态规划方面的题（实际上我就是特地先做动态规划的题=。=）。</p>
-
-<p>列下状态转移方程：</p>
-
-<p>设总共有N层，T=triangle，每个节点的值表示为T(n,i)，从根节点到每个节点的最优路径的值总和为S(n,i)，
-那么可以得到：</p>
-
-<p><strong>S(n,i) = MAX( S(n-1, i-1), S(n-1, i) ) + T(n,i)</strong></p>
-
-<p>初始状态：S(0,0) = T(0,0)</p>
-
-<p>然后自顶向下地迭代一轮，即可求得最下面一层的S(n, i)，遍历这一层，找出S的最小值即可。</p>
-
-<p>空间复杂度O(n)，时间复杂度O(n)</p>
-
-<h3>代码：</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">minimumTotal</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">triangle</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
-        <span class="kt">int</span> <span class="n">maxLayer</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">maxLayer</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-        <span class="kt">int</span> <span class="n">leftPathSum</span><span class="p">,</span> <span class="n">righPathSum</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">layer</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">;</span> <span class="n">layer</span> <span class="o">&lt;</span> <span class="n">maxLayer</span><span class="p">;</span> <span class="o">++</span><span class="n">layer</span><span class="p">){</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">layer</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-                <span class="n">leftPathSum</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="p">;</span>
-                <span class="n">righPathSum</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="p">;</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
-                    <span class="n">leftPathSum</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">layer</span><span class="p">)</span>
-                    <span class="n">righPathSum</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
-                <span class="n">sum</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">leftPathSum</span><span class="p">,</span> <span class="n">righPathSum</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span><span class="p">[</span><span class="n">maxLayer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">result</span><span class="p">)</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">maxLayer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
-    <span class="p">}</span>
-</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-120/" class="read-more">Read More</a>
@@ -693,168 +205,6 @@ the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
 
       <div class="entry">
         <h3>编译环境</h3>
-
-<ul>
-<li><p>windows 7 64位</p></li>
-<li><p>VS 2013 Ultimate</p></li>
-<li><p>openssl-1.0.2a</p></li>
-<li><p>nopoll-0.2.8.b184</p></li>
-</ul>
-
-<h3>编译步骤</h3>
-
-<ol>
-<li>nopoll官网提供了二进制安装包，不过不知为什么无法直接用（运行时错误，无法debug)，所以还是得手动编译&lt;</li>
-<li><p>nopoll依赖openssl，所以先编译openssl：</p>
-
-<ul>
-<li>下载<a href="http://www.openssl.org/source/openssl-1.0.2a.tar.gz">http://www.openssl.org/source/openssl-1.0.2a.tar.gz</a></li>
-<li>安装perl <a href="http://downloads.activestate.com/ActivePerl/releases/5.20.1.2000/ActivePerl-5.20.1.2000-MSWin32-x64-298557.msi">http://downloads.activestate.com/ActivePerl/releases/5.20.1.2000/ActivePerl-5.20.1.2000-MSWin32-x64-298557.msi</a></li>
-<li>解压后，阅读INSTALL.W64安装说明
-&gt; We loved with a love that was more than love
-&gt; To build for Win64/x64: 
-&gt; perl Configure VC-WIN64A
-&gt; ms\do_win64a
-&gt; nmake -f ms\ntdll.mak
-&gt; cd out32dll
-&gt; ..\ms\test</li>
-<li><p>第三步的ms\do_win65a和nmake -f ms\ntdll.mak必须要用vs的控制台程序来执行，否则会出错</p>
-
-<p><img src="/images/2015.4/1.png" alt="1.png"></p></li>
-<li><p>编译完成通过后，执行nmake -f ms\ntdll.mak install来生成最终发布文件, 生成位置默认是在usr/local/里，但windows下没有这个目录，所以Perl把ssl生成到当前控制台所在分区的根目录了（如源码在d:/openssl/，则会生成到D:/usr/local/)</p></li>
-</ul></li>
-<li><p>用编译好的openssl库来编译Nopoll</p>
-
-<p>nopoll虽然提供了Makefile.win，但我试了下，发现并不能一键编译，会提示缺少versions.mk和config.mk（这2个文件最后在nopoll的svn仓库里找到），补上这2个文件后再次执行nmake，会提示./prepare-nsh.sh permission denied（win平台执行sh文件？）</p>
-
-<p>按官方的编译方法失败后，只能自行建工程编译了：</p>
-
-<ul>
-<li>新建一个vs工程，取名libnopoll</li>
-<li>添加 nopoll-0.2.8.b184/src目录的源码文件到工程</li>
-<li>这里要改下nopoll_config.h（此文件应该是自动生成的，我们要手动修改一个出来）</li>
-</ul>
-<div class="highlight"><pre><code class="language-c" data-lang="c">  <span class="cm">/*</span>
-<span class="cm">  * Nopoll Library nopoll_config.h</span>
-<span class="cm">  * Platform dependant definitions.</span>
-<span class="cm">  *</span>
-<span class="cm">  * This is a generated file.  Please modify &#39;configure.in&#39;</span>
-<span class="cm">  */</span>
-  <span class="cp">#ifndef __NOPOLL_CONFIG_H__</span>
-  <span class="cp">#define __NOPOLL_CONFIG_H__</span>
-  <span class="cm">/**</span>
-<span class="cm">  * \addtogroup nopoll_decl_module</span>
-<span class="cm">  * @{</span>
-<span class="cm">  */</span>
-  <span class="cm">/**</span>
-<span class="cm">  * @brief Allows to convert integer value (including constant values)</span>
-<span class="cm">  * into a pointer representation.</span>
-<span class="cm">  *</span>
-<span class="cm">  * Use the oposite function to restore the value from a pointer to a</span>
-<span class="cm">  * integer: \ref PTR_TO_INT.</span>
-<span class="cm">  *</span>
-<span class="cm">  * @param integer The integer value to cast to pointer.</span>
-<span class="cm">  *</span>
-<span class="cm">  * @return A \ref noPollPtr reference.</span>
-<span class="cm">  */</span>
-  <span class="cp">#ifndef INT_TO_PTR</span>
-  <span class="cp">#define INT_TO_PTR(integer)   ((noPollPtr) (long) ((int)integer))</span>
-  <span class="cp">#endif</span>
-  <span class="cm">/**</span>
-<span class="cm">  * @brief Allows to convert a pointer reference (\ref noPollPtr),</span>
-<span class="cm">  * which stores an integer that was stored using \ref INT_TO_PTR.</span>
-<span class="cm">  *</span>
-<span class="cm">  * Use the oposite function to restore the pointer value stored in the</span>
-<span class="cm">  * integer value.</span>
-<span class="cm">  *</span>
-<span class="cm">  * @param ptr The pointer to cast to a integer value.</span>
-<span class="cm">  *</span>
-<span class="cm">  * @return A int value.</span>
-<span class="cm">  */</span>
-  <span class="cp">#ifndef PTR_TO_INT</span>
-  <span class="cp">#define PTR_TO_INT(ptr) ((int) (long) (ptr))</span>
-  <span class="cp">#endif</span>
-  <span class="cm">/**</span>
-<span class="cm">  * @brief Allows to get current platform configuration. This is used</span>
-<span class="cm">  * by Nopoll library but could be used by applications built on top of</span>
-<span class="cm">  * Nopoll to change its configuration based on the platform information.</span>
-<span class="cm">  */</span>
-  <span class="c1">//#define NOPOLL_OS_UNIX (1)</span>
-  <span class="cp">#define NOPOLL_OS_WIN32 (1)</span>
-  <span class="cp">#define R_OK 4</span>
-  <span class="cp">#define W_OK 2</span>
-  <span class="cm">/**</span>
-<span class="cm">  * @internal Allows to now if the platform support vasprintf</span>
-<span class="cm">  * function. Do not use this macro as it is supposed to be for</span>
-<span class="cm">  * internal use.</span>
-<span class="cm">  */</span>
-  <span class="c1">//#define NOPOLL_HAVE_VASPRINTF (1)</span>
-  <span class="cm">/**</span>
-<span class="cm">  * @brief Indicates that this platform have support for 64bits.</span>
-<span class="cm">  */</span>
-  <span class="cp">#define NOPOLL_64BIT_PLATFORM (1)</span>
-  <span class="cm">/* @} */</span>
-  <span class="cp">#endif</span>
-</code></pre></div>
-<ul>
-<li><p>配置编译环境</p>
-
-<p><img src="/images/2015.4/2.png" alt="1.png"></p>
-
-<p><img src="/images/2015.4/3.png" alt="1.png"></p>
-
-<ul>
-<li>添加openssl的include、nopoll的src到包含目录</li>
-<li>添加上一步生成的ssl/lib目录 到 库目录</li>
-<li>执行 生成项目，就得到了libnopoll.lib文件</li>
-</ul></li>
-</ul></li>
-<li><p>测试libnopoll.lib是否可用：</p>
-
-<ul>
-<li>新建测试项目，一样是    <img src="/images/2015.4/4.png" alt="1.png"></li>
-<li>添加nopoll官方的example代码，<a href="https://dolphin.aspl.es/svn/publico/nopoll/trunk/test/nopoll-regression-listener.c">https://dolphin.aspl.es/svn/publico/nopoll/trunk/test/nopoll-regression-listener.c</a></li>
-<li><p>复制 /test的pem、crt、key文件到工程目录里:</p>
-
-<p><img src="/images/2015.4/5.png" alt="1.png"></p></li>
-<li><p>然后是附加依赖项：</p>
-
-<p><img src="/images/2015.4/6.png" alt="1.png"></p></li>
-<li><p>之后就可以编译 运行了：</p>
-
-<p><img src="/images/2015.4/7.png" alt="1.png"></p>
-
-<p>看样子是成功了。</p></li>
-<li><p>最后客户端的例子也试着编译下，工程配置和server的一样，咦！！ 编译时出现各种error:</p>
-
-<p><img src="/images/2015.4/8.png" alt="1.png"></p>
-
-<p>照着反馈做即可，在文件头添加一个define </p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="cp">#define _CRT_SECURE_NO_WARNINGS</span>
-</code></pre></div>
-<p><img src="/images/2015.4/9.png" alt="1.png"></p>
-
-<p>unlink改成_unlink呗；</p>
-
-<p>VERSION可能是要自己定义，也定义一个，之后就顺利编译出来了。</p>
-
-<p>不过运行的时候又出现报错：</p>
-
-<p><img src="/images/2015.4/10.png" alt="1.png"></p>
-
-<p>问题就是windows下没有linux的diff工具，先把相关的几行代码屏蔽掉先把，再次编译运行：</p>
-
-<p><img src="/images/2015.4/11.png" alt="1.png"></p>
-
-<p>Nice，客户端和服务端协同工作了。</p></li>
-</ul></li>
-</ol>
-
-<h3>附</h3>
-
-<ul>
-<li>编译debug版的openssl :  <a href="http://blog.csdn.net/wangxvfeng101/article/details/7261264">http://blog.csdn.net/wangxvfeng101/article/details/7261264</a></li>
-</ul>
 
       </div>
 
