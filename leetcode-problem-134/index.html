@@ -113,7 +113,7 @@ The solution is guaranteed to be unique.</p>
 
 <p>知道起点必然存在后，再利用上面的合并法，可以设起点为i，g<em>left是从1到i-1所有加油站的油的总和，c</em>left是从1到i-1所有加油站的开销的总和，同理g<em>right是i+1到n所有加油站的油的总和，c</em>right是从1+1到n所有加油站的开销的总和。那么问题就降级为3个加油站left、i、right的路径问题。因为i是起点，路径必然是i-&gt;right-&gt;left，i就可以合并到right区域里，那么路径进一步简化，变成right-&gt;left，而我们要求的只是right区间的起始点位置。right和left的关系为，g(right) &gt;= c(right)，g(left) + g(right) &gt;= c(left) + c(right)。</p>
 
-<p>具体代码实现，从1和n向中间扫，计算left和right的gas和cost，当2个指针相遇，且满足g(right)&gt;c(right),则高位指针的位置就是我们的起点。</p>
+<p>具体代码实现，从1和n向中间扫，计算left和right的gas和cost，当2个指针相遇，且满足g(right)&gt;c(right),则高位指针的位置就是我们的起点。（代码后面再写）</p>
 
   </div>
 
