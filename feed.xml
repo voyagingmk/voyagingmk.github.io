@@ -25,13 +25,9 @@ The solution is guaranteed to be unique.&lt;/p&gt;
 
 &lt;h3&gt;题解：&lt;/h3&gt;
 
-&lt;p&gt;举一个例子来分析：&lt;/p&gt;
+&lt;p&gt;设sum-gas是所有加油站的油的总和，sum-cost是汽车走一圈消耗的油的总和，容易知道，当sum-gas&amp;lt;sum-cost时，汽车是不可能遍历所有加油站的，因为油不够。&lt;/p&gt;
 
-&lt;p&gt;gas[i]:  4 4 5 6 7   cost[i]: 10 10 1 1 1&lt;/p&gt;
-
-&lt;p&gt;sum&lt;em&gt;gas是所有加油站的油的总和，sum&lt;/em&gt;cost是汽车走一圈消耗的油的总和，容易知道，当sum&lt;em&gt;gas&amp;lt;sum&lt;/em&gt;cost时，汽车是不可能遍历所有加油站的，因为油不够。&lt;/p&gt;
-
-&lt;p&gt;反过来说，当sum&lt;em&gt;gas&amp;gt;=sum&lt;/em&gt;cost时，是不是一定有一个起点，可以让汽车顺序跑一圈加油站呢？&lt;/p&gt;
+&lt;p&gt;反过来说，当sum-gas&amp;gt;=sum-cost时，是不是一定有一个起点，可以让汽车顺序跑一圈加油站呢？&lt;/p&gt;
 
 &lt;p&gt;证明：
 1）当N=1，g1 &amp;gt;= c1，那么预言正确；&lt;/p&gt;
@@ -44,7 +40,7 @@ The solution is guaranteed to be unique.&lt;/p&gt;
 
 &lt;p&gt;5) 当N&amp;gt;4时，通过上面的合并法，归纳得证。&lt;/p&gt;
 
-&lt;p&gt;所以，&lt;strong&gt;当sum&lt;em&gt;gas&amp;gt;=sum&lt;/em&gt;cost时，一定有一个起点，可以让汽车顺序跑一圈加油站。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;所以，&lt;strong&gt;当sum-gas&amp;gt;=sum-cost时，一定有一个起点，可以让汽车顺序跑一圈加油站。&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;知道起点必然存在后，再利用上面的合并法，可以设起点为i，g&lt;em&gt;left是从1到i-1所有加油站的油的总和，c&lt;/em&gt;left是从1到i-1所有加油站的开销的总和，同理g&lt;em&gt;right是i+1到n所有加油站的油的总和，c&lt;/em&gt;right是从1+1到n所有加油站的开销的总和。那么问题就降级为3个加油站left、i、right的路径问题。因为i是起点，路径必然是i-&amp;gt;right-&amp;gt;left，i就可以合并到right区域里，那么路径进一步简化，变成right-&amp;gt;left，而我们要求的只是right区间的起始点位置。right和left的关系为，g(right) &amp;gt;= c(right)，g(left) + g(right) &amp;gt;= c(left) + c(right)。&lt;/p&gt;
 
@@ -67,7 +63,7 @@ The solution is guaranteed to be unique.&lt;/p&gt;
 
 &lt;p&gt;语言：js&lt;/p&gt;
 
-&lt;p&gt;使用的插件：chipmunk(物理引擎) underscore(js增加函数库）&lt;/p&gt;
+&lt;p&gt;使用的插件：chipmunk(物理引擎) underscore(js增强函数库）&lt;/p&gt;
 
 &lt;p&gt;技术实现：&lt;/p&gt;
 
@@ -98,8 +94,9 @@ The solution is guaranteed to be unique.&lt;/p&gt;
 
 &lt;p&gt;第二和第三个问题，电流移动和转弯，都是用cocos的action功能实现的，移动是cc.moveTo，转弯是cc.callFunc（在回调函数里即时计算旋转角），那么一个电流sprite就是不断执行move-&amp;gt;rotate-&amp;gt;move-&amp;gt;rotate即可。&lt;/p&gt;
 
-&lt;p&gt;但电流转弯又引发新的问题，因为电流是一个绑定了chipmunk&amp;#39;s body的PhysicSprite，body是一个狭长的长方形，转弯的时候会出现这样子的bug：
-&lt;img src=&quot;../images/2015.7/11.png&quot; alt=&quot;11.png&quot;&gt;
+&lt;p&gt;但电流转弯又引发新的问题，因为电流是一个绑定了chipmunk&amp;#39;s body的PhysicSprite，body是一个狭长的长方形，转弯的时候会出现这样子的bug：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.7/11.png&quot; alt=&quot;11.png&quot;&gt;
 &lt;img src=&quot;../images/2015.7/12.png&quot; alt=&quot;12.png&quot;&gt;
 &lt;img src=&quot;../images/2015.7/13.png&quot; alt=&quot;13.png&quot;&gt;
 &lt;img src=&quot;../images/2015.7/14.png&quot; alt=&quot;14.png&quot;&gt;&lt;/p&gt;

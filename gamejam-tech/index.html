@@ -65,7 +65,7 @@
 
 <p>语言：js</p>
 
-<p>使用的插件：chipmunk(物理引擎) underscore(js增加函数库）</p>
+<p>使用的插件：chipmunk(物理引擎) underscore(js增强函数库）</p>
 
 <p>技术实现：</p>
 
@@ -96,8 +96,9 @@
 
 <p>第二和第三个问题，电流移动和转弯，都是用cocos的action功能实现的，移动是cc.moveTo，转弯是cc.callFunc（在回调函数里即时计算旋转角），那么一个电流sprite就是不断执行move-&gt;rotate-&gt;move-&gt;rotate即可。</p>
 
-<p>但电流转弯又引发新的问题，因为电流是一个绑定了chipmunk&#39;s body的PhysicSprite，body是一个狭长的长方形，转弯的时候会出现这样子的bug：
-<img src="../images/2015.7/11.png" alt="11.png">
+<p>但电流转弯又引发新的问题，因为电流是一个绑定了chipmunk&#39;s body的PhysicSprite，body是一个狭长的长方形，转弯的时候会出现这样子的bug：</p>
+
+<p><img src="../images/2015.7/11.png" alt="11.png">
 <img src="../images/2015.7/12.png" alt="12.png">
 <img src="../images/2015.7/13.png" alt="13.png">
 <img src="../images/2015.7/14.png" alt="14.png"></p>
