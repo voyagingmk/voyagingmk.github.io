@@ -7,6 +7,55 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>leetcode题解 problem 134 Gas Station</title>
+        <description>&lt;blockquote&gt;
+&lt;p&gt;There are N gas stations along a circular route, where the amount of gas at station i is gas[i].&lt;/p&gt;
+
+&lt;p&gt;You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.&lt;/p&gt;
+
+&lt;p&gt;Return the starting gas station&amp;#39;s index if you can travel around the circuit once, otherwise return -1.&lt;/p&gt;
+
+&lt;p&gt;Note:
+The solution is guaranteed to be unique.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;题意：&lt;/h3&gt;
+
+&lt;p&gt;有N个加油站，连成环形，每个加油站有gas[i]的油，从第i个加油站到第i+1个加油站需要消耗cost[i]的油。现在有一辆车，它有无限大的油箱，但是是空的。求问这辆车应该从哪个加油站出发，才可以跑一遍所有的加油站，返回该加油站的序号，如果不存在这样的起点，返回-1。&lt;/p&gt;
+
+&lt;h3&gt;题解：&lt;/h3&gt;
+
+&lt;p&gt;举一个例子来分析：&lt;/p&gt;
+
+&lt;p&gt;gas[i]:  4 4 5 6 7   cost[i]: 10 10 1 1 1&lt;/p&gt;
+
+&lt;p&gt;sum&lt;em&gt;gas是所有加油站的油的总和，sum&lt;/em&gt;cost是汽车走一圈消耗的油的总和，容易知道，当sum&lt;em&gt;gas&amp;lt;sum&lt;/em&gt;cost时，汽车是不可能遍历所有加油站的，因为油不够。&lt;/p&gt;
+
+&lt;p&gt;反过来说，当sum&lt;em&gt;gas&amp;gt;=sum&lt;/em&gt;cost时，是不是一定有一个起点，可以让汽车顺序跑一圈加油站呢？&lt;/p&gt;
+
+&lt;p&gt;证明：
+1）当N=1，g1 &amp;gt;= c1，那么预言正确；&lt;/p&gt;
+
+&lt;p&gt;2）当N=2，g1 + g2 &amp;gt;= c1 + c2，若g1 &amp;gt; c1且g2 &amp;gt; c2，则怎么走都可以，所以只要考虑 (g1 &amp;lt; c1 &amp;amp;&amp;amp; g2 &amp;gt; c2) 或者 (g1 &amp;gt; c1 &amp;amp;&amp;amp; g2 &amp;lt; c2) 的情况（实际上2个情况是等同的，只要证明其一即可）。设g1 &amp;lt; c1，因为g1 + g2 &amp;gt; c1 + c2，所以g2 &amp;gt; c2。那么只要从g &amp;gt; c的点出发，必然可以到另一个点。&lt;/p&gt;
+
+&lt;p&gt;3）当N=3，g1 + g2 + g3 &amp;gt;= c1 + c2 + c3，若g1 &amp;gt; c1且g2 &amp;gt; c2且g3 &amp;gt; c3，则怎么走都可以。所以只需要考虑g1 &amp;lt; c1 &amp;amp;&amp;amp; g2 + g3 &amp;gt; c2 + c3 的情况（g1可以换成g2或g3，因为是加油站是环形的)。设g1 &amp;lt; c1，那么不能以1作为起点，分情况考虑：a)当g2 &amp;gt; c2，那么可以从2出发，而因为g2 + g3 &amp;gt; c2 + c3,所以2-&amp;gt;3-&amp;gt;1成立；b)当g2 &amp;lt; c2时，g3 &amp;gt; c3，又可得g3 + g1 &amp;gt; c3 + c1，所以3-&amp;gt;1-&amp;gt;2成立。 所以3个加油站也必然存在一个可走的路径。&lt;/p&gt;
+
+&lt;p&gt;4）当N=4时，g1 + g2 + g3 + g4 &amp;gt;= c1 + c2 + c3 + c4，因为在3)中已经证明3个加油站必然存在一条路径，那么对于4个加油站，可以设 g1 + g2 + g3 &amp;gt;= c1 + c2 + c3（也可以是234、341、412)，那么对于这3个加油站，肯定是有一条路的，那么久可以把这3个加油站合并，变成 g0 &amp;gt;= c0 且 g0 + g4 &amp;gt;= c0 +c4，问题就转化为2)的情况，而2）已经证明是有解的，所以综上可得，N=4也必然有解。&lt;/p&gt;
+
+&lt;p&gt;5) 当N&amp;gt;4时，通过上面的合并法，归纳得证。&lt;/p&gt;
+
+&lt;p&gt;所以，&lt;strong&gt;当sum&lt;em&gt;gas&amp;gt;=sum&lt;/em&gt;cost时，一定有一个起点，可以让汽车顺序跑一圈加油站。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;知道起点必然存在后，再利用上面的合并法，可以设起点为i，g&lt;em&gt;left是从1到i-1所有加油站的油的总和，c&lt;/em&gt;left是从1到i-1所有加油站的开销的总和，同理g&lt;em&gt;right是i+1到n所有加油站的油的总和，c&lt;/em&gt;right是从1+1到n所有加油站的开销的总和。那么问题就降级为3个加油站left、i、right的路径问题。因为i是起点，路径必然是i-&amp;gt;right-&amp;gt;left，i就可以合并到right区域里，那么路径进一步简化，变成right-&amp;gt;left，而我们要求的只是right区间的起始点位置。right和left的关系为，g(right) &amp;gt;= c(right)，g(left) + g(right) &amp;gt;= c(left) + c(right)。&lt;/p&gt;
+
+&lt;p&gt;具体代码实现，从1和n向中间扫，计算left和right的gas和cost，当2个指针相遇，且满足g(right)&amp;gt;c(right),则高位指针的位置就是我们的起点。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/leetcode-problem-134/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-134/</guid>
+      </item>
+    
+      <item>
         <title>Gamejam作品 《虐之太空》 技术分享</title>
         <description>&lt;p&gt;游戏试玩地址：&lt;a href=&quot;http://wanga.me/45512&quot; title=&quot;http://wanga.me/45512&quot;&gt;http://wanga.me/45512&lt;/a&gt;&lt;/p&gt;
 
@@ -609,91 +658,6 @@ the contiguous subarray [4,−1,2,1] has the largest sum = 6.&lt;/p&gt;
         <pubDate>Fri, 26 Jun 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/leetcode-problem-53/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-53/</guid>
-      </item>
-    
-      <item>
-        <title>leetcode题解 problem120 Triangle</title>
-        <description>&lt;p&gt;Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.&lt;/p&gt;
-
-&lt;p&gt;For example, given the following triangle&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;[&lt;/li&gt;
-&lt;li&gt;........[&lt;strong&gt;2&lt;/strong&gt;],&lt;/li&gt;
-&lt;li&gt;.......[&lt;strong&gt;3&lt;/strong&gt;,4],&lt;/li&gt;
-&lt;li&gt;.....[6,&lt;strong&gt;5&lt;/strong&gt;,7],&lt;/li&gt;
-&lt;li&gt;....[4,&lt;strong&gt;1&lt;/strong&gt;,8,3]&lt;/li&gt;
-&lt;li&gt;]&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).&lt;/p&gt;
-
-&lt;p&gt;Note:&lt;/p&gt;
-
-&lt;p&gt;Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Solution&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minimumTotal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;题意：&lt;/h3&gt;
-
-&lt;p&gt;自顶向下寻找一条路径使得路径上每个节点的值的和，是所有路径中最小的。限制条件：每次只能选下一行的邻接节点。&lt;/p&gt;
-
-&lt;h3&gt;题解：&lt;/h3&gt;
-
-&lt;p&gt;很明显是动态规划方面的题（实际上我就是特地先做动态规划的题=。=）。&lt;/p&gt;
-
-&lt;p&gt;列下状态转移方程：&lt;/p&gt;
-
-&lt;p&gt;设总共有N层，T=triangle，每个节点的值表示为T(n,i)，从根节点到每个节点的最优路径的值总和为S(n,i)，
-那么可以得到：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;S(n,i) = MAX( S(n-1, i-1), S(n-1, i) ) + T(n,i)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;初始状态：S(0,0) = T(0,0)&lt;/p&gt;
-
-&lt;p&gt;然后自顶向下地迭代一轮，即可求得最下面一层的S(n, i)，遍历这一层，找出S的最小值即可。&lt;/p&gt;
-
-&lt;p&gt;空间复杂度O(n)，时间复杂度O(n)&lt;/p&gt;
-
-&lt;h3&gt;代码：&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;minimumTotal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxLayer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxLayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;leftPathSum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;righPathSum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxLayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;leftPathSum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;INT_MAX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;righPathSum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;INT_MAX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;leftPathSum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;righPathSum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;leftPathSum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;righPathSum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;INT_MAX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;triangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxLayer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxLayer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-        <pubDate>Thu, 25 Jun 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/leetcode-problem-120/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-120/</guid>
       </item>
     
   </channel>

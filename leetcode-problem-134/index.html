@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>leetcode题解 problem 134 Gas Station – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="
+There are N gas stations along a circular route, where the amount of gas at station i is gas[i].
+
+You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.
+
+Return the starting gas station&#39;s index if you can travel around the circuit once, otherwise return -1.
+
+Note:
+The solution is guaranteed to be unique.
+
+" />
+    <meta property="og:description" content="
+There are N gas stations along a circular route, where the amount of gas at station i is gas[i].
+
+You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.
+
+Return the starting gas station&#39;s index if you can travel around the circuit once, otherwise return -1.
+
+Note:
+The solution is guaranteed to be unique.
+
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="leetcode题解 problem 134 Gas Station" />
+    <meta property="twitter:title" content="leetcode题解 problem 134 Gas Station" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>leetcode题解 problem 134 Gas Station</h1>
+
+  <div class="entry">
+    <blockquote>
+<p>There are N gas stations along a circular route, where the amount of gas at station i is gas[i].</p>
+
+<p>You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.</p>
+
+<p>Return the starting gas station&#39;s index if you can travel around the circuit once, otherwise return -1.</p>
+
+<p>Note:
+The solution is guaranteed to be unique.</p>
+</blockquote>
+
+<h3>题意：</h3>
+
+<p>有N个加油站，连成环形，每个加油站有gas[i]的油，从第i个加油站到第i+1个加油站需要消耗cost[i]的油。现在有一辆车，它有无限大的油箱，但是是空的。求问这辆车应该从哪个加油站出发，才可以跑一遍所有的加油站，返回该加油站的序号，如果不存在这样的起点，返回-1。</p>
+
+<h3>题解：</h3>
+
+<p>举一个例子来分析：</p>
+
+<p>gas[i]:  4 4 5 6 7   cost[i]: 10 10 1 1 1</p>
+
+<p>sum<em>gas是所有加油站的油的总和，sum</em>cost是汽车走一圈消耗的油的总和，容易知道，当sum<em>gas&lt;sum</em>cost时，汽车是不可能遍历所有加油站的，因为油不够。</p>
+
+<p>反过来说，当sum<em>gas&gt;=sum</em>cost时，是不是一定有一个起点，可以让汽车顺序跑一圈加油站呢？</p>
+
+<p>证明：
+1）当N=1，g1 &gt;= c1，那么预言正确；</p>
+
+<p>2）当N=2，g1 + g2 &gt;= c1 + c2，若g1 &gt; c1且g2 &gt; c2，则怎么走都可以，所以只要考虑 (g1 &lt; c1 &amp;&amp; g2 &gt; c2) 或者 (g1 &gt; c1 &amp;&amp; g2 &lt; c2) 的情况（实际上2个情况是等同的，只要证明其一即可）。设g1 &lt; c1，因为g1 + g2 &gt; c1 + c2，所以g2 &gt; c2。那么只要从g &gt; c的点出发，必然可以到另一个点。</p>
+
+<p>3）当N=3，g1 + g2 + g3 &gt;= c1 + c2 + c3，若g1 &gt; c1且g2 &gt; c2且g3 &gt; c3，则怎么走都可以。所以只需要考虑g1 &lt; c1 &amp;&amp; g2 + g3 &gt; c2 + c3 的情况（g1可以换成g2或g3，因为是加油站是环形的)。设g1 &lt; c1，那么不能以1作为起点，分情况考虑：a)当g2 &gt; c2，那么可以从2出发，而因为g2 + g3 &gt; c2 + c3,所以2-&gt;3-&gt;1成立；b)当g2 &lt; c2时，g3 &gt; c3，又可得g3 + g1 &gt; c3 + c1，所以3-&gt;1-&gt;2成立。 所以3个加油站也必然存在一个可走的路径。</p>
+
+<p>4）当N=4时，g1 + g2 + g3 + g4 &gt;= c1 + c2 + c3 + c4，因为在3)中已经证明3个加油站必然存在一条路径，那么对于4个加油站，可以设 g1 + g2 + g3 &gt;= c1 + c2 + c3（也可以是234、341、412)，那么对于这3个加油站，肯定是有一条路的，那么久可以把这3个加油站合并，变成 g0 &gt;= c0 且 g0 + g4 &gt;= c0 +c4，问题就转化为2)的情况，而2）已经证明是有解的，所以综上可得，N=4也必然有解。</p>
+
+<p>5) 当N&gt;4时，通过上面的合并法，归纳得证。</p>
+
+<p>所以，<strong>当sum<em>gas&gt;=sum</em>cost时，一定有一个起点，可以让汽车顺序跑一圈加油站。</strong></p>
+
+<p>知道起点必然存在后，再利用上面的合并法，可以设起点为i，g<em>left是从1到i-1所有加油站的油的总和，c</em>left是从1到i-1所有加油站的开销的总和，同理g<em>right是i+1到n所有加油站的油的总和，c</em>right是从1+1到n所有加油站的开销的总和。那么问题就降级为3个加油站left、i、right的路径问题。因为i是起点，路径必然是i-&gt;right-&gt;left，i就可以合并到right区域里，那么路径进一步简化，变成right-&gt;left，而我们要求的只是right区间的起始点位置。right和left的关系为，g(right) &gt;= c(right)，g(left) + g(right) &gt;= c(left) + c(right)。</p>
+
+<p>具体代码实现，从1和n向中间扫，计算left和right的gas和cost，当2个指针相遇，且满足g(right)&gt;c(right),则高位指针的位置就是我们的起点。</p>
+
+  </div>
+
+  <div class="date">
+    Written on July 15, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>
