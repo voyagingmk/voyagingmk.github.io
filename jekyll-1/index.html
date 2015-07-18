@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>我是这样用jekyll搭建个人博客的 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="好几年前就尝试用github pages服务来搭建github博客，当时也已经用了jekyll，不过由于那时候主要是在windows下工作学习（学图形学），手头也只有一台电脑，在win环境弄jekyll实在是不方便，要装ruby啊gem啊，都感觉没有linux环境顺手，最后还是转去了csdn博客。不过csdn博客在我毕业后也是荒废了。
+" />
+    <meta property="og:description" content="好几年前就尝试用github pages服务来搭建github博客，当时也已经用了jekyll，不过由于那时候主要是在windows下工作学习（学图形学），手头也只有一台电脑，在win环境弄jekyll实在是不方便，要装ruby啊gem啊，都感觉没有linux环境顺手，最后还是转去了csdn博客。不过csdn博客在我毕业后也是荒废了。
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="我是这样用jekyll搭建个人博客的" />
+    <meta property="twitter:title" content="我是这样用jekyll搭建个人博客的" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>我是这样用jekyll搭建个人博客的</h1>
+
+  <div class="entry">
+    <p>好几年前就尝试用github pages服务来搭建github博客，当时也已经用了jekyll，不过由于那时候主要是在windows下工作学习（学图形学），手头也只有一台电脑，在win环境弄jekyll实在是不方便，要装ruby啊gem啊，都感觉没有linux环境顺手，最后还是转去了csdn博客。不过csdn博客在我毕业后也是荒废了。</p>
+
+<p>现在我的解决方案是，用我购买的阿里云vps（在阿里云叫ecs），并把我的博客git整个放到Dropbox，并在vps上面搭建了jekyll服务器，就搞定了测试用的博客服务器了。</p>
+
+<p>写博客的流程就简单了，在win或mac下都可以写，md文件一保存，就会被dropbox同步到云端，然后vps的dropbox文件夹也会即时被更新，而jekyll serve是会自动检测文件状态的，一旦被修改就会重新generate静态网站。那么我就可以直接本地开个浏览器，进入 http://vps地址:jekyll服务器端口/，去预览了。</p>
+
+<p>还有就是，在win和mac下有个叫sourcetree的git客户端，十分好用，完全不用打git指令，点几下按钮就可以把代码push到github，也就进一步简化了写博客的步骤。</p>
+
+<p>另外，我发现jekyll-now是符合github pages规范的jekyll程序，但是功能太不完整了，连文章分类tag功能都没。于是我只能回归普通jekyll的模式，开2个git仓库，一个用来放jekyll代码，一个用来放jekyll生成的网站静态代码（也就是本博客的代码）。要更新博客，只需要提交博客的git即可，jekyll的git倒是随意，反正有dropbox在同步，不怕丢失。</p>
+
+<p>最后的最后，吐槽下坚果云。坚果云的linux版只支持桌面版，没有terminal的版本，导致我在vps上无法用坚果云。Dropbox虽然被墙了，但是Dropbox支持linux terminal，而且安装超级简单，按照官方说明，一下子就搞定了。</p>
+
+  </div>
+
+  <div class="date">
+    Written on July 18, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>
