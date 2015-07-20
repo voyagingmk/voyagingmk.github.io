@@ -104,34 +104,32 @@ Given array A = [2,3,1,1,4]</p>
 
 <p>观察S2和S3的式子可以发现，这个问题是可以用贪心法或者DP处理的。因为每一个阶段的最优解只和上一个阶段有关。</p>
 
-<p>那么对于S(i)，究竟是选D = [S(i - 1) + 1, S(i - 1) + A[S(i - 1)]]这个区间的哪个值呢？ 可以让S(i)逐个取D范围的值， 并计算出 y = MAX( S(i) + A[S(i)] )，那么使得y最大的S(i)，就是局部最优解S了。</p>
+<p>那么对于S(i)，究竟是选D = [S(i - 1) + 1, S(i - 1) + A[S(i - 1)]]这个区间的哪个值呢？ 可以让S(i)逐个取D范围的值， 并计算出 y = MAX( S(i) + A[S(i)] )，那么使得y最大的S(i)，就是局部最优解了。</p>
 
-<p>按照这个思路我实现了下面的代码(runtime 16ms)：
-<code>c
-    int jump(vector&lt;int&gt;&amp; nums){
-        int n = nums.size();
-        if (n == 0 || n == 1)
-            return 0;
-        int depth = 0;
-        int i = 0;
-        int maxStep = i + nums[i];
-        while(i &lt; n){
-            if (maxStep &gt;= (n - 1))
-                break;
-            ++depth;
-            int next = -1;
-            for (int j = i + 1; j &lt;= i + nums[i] &amp;&amp; j &lt; n; ++j){
-                if (j + nums[j] &gt;= maxStep){//在maxStep一样大的情况下，选择最靠右的
-                    maxStep = j + nums[j];
-                    next = j;
-                }
-            }
-            i = next;
-        }
-        return depth + 1;
-    }
-</code></p>
-
+<p>按照这个思路我实现了下面的代码(runtime 16ms)：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">jump</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">maxStep</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">){</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">maxStep</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="o">++</span><span class="n">depth</span><span class="p">;</span>
+            <span class="kt">int</span> <span class="n">next</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">maxStep</span><span class="p">){</span><span class="c1">//在maxStep一样大的情况下，选择最靠右的</span>
+                    <span class="n">maxStep</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+                    <span class="n">next</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
   </div>
 
   <div class="date">
