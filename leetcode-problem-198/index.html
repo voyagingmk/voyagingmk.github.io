@@ -129,26 +129,24 @@ Given a list of non-negative integers representing the amount of money of each h
 </code></pre></div>
 <p>又因为，我们只需要求f[n]，并不需要输出整个F数组，那么可以改下代码，降低空间复杂度。</p>
 
-<p>代码如下(leetcode RunTime 0ms)：
-<code>c
-class Solution {
-public:
-    int rob(vector&lt;int&gt;&amp; nums) {
-        if (nums.size() == 0)
-            return 0;
-        if (nums.size() == 1)
-            return nums[0];
-        int pre = 0, cur = 0, temp = -1;
-        for (int i = 0, size = nums.size(); i &lt; size; ++i){
-            temp = cur;
-            cur = max(nums[i] + pre, cur);
-            pre = temp;
-        }
-        return cur;
-    }
-};
-</code></p>
-
+<p>代码如下(leetcode RunTime 0ms)：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">cur</span><span class="p">;</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pre</span><span class="p">,</span> <span class="n">cur</span><span class="p">);</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">cur</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
   </div>
 
   <div class="date">
