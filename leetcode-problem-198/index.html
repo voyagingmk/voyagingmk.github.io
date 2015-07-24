@@ -127,6 +127,28 @@ Given a list of non-negative integers representing the amount of money of each h
     <span class="p">}</span>
 <span class="p">};</span>
 </code></pre></div>
+<p>又因为，我们只需要求f[n]，并不需要输出整个F数组，那么可以改下代码，降低空间复杂度。</p>
+
+<p>代码如下(leetcode RunTime 0ms)：
+<code>c
+class Solution {
+public:
+    int rob(vector&lt;int&gt;&amp; nums) {
+        if (nums.size() == 0)
+            return 0;
+        if (nums.size() == 1)
+            return nums[0];
+        int pre = 0, cur = 0, temp = -1;
+        for (int i = 0, size = nums.size(); i &lt; size; ++i){
+            temp = cur;
+            cur = max(nums[i] + pre, cur);
+            pre = temp;
+        }
+        return cur;
+    }
+};
+</code></p>
+
   </div>
 
   <div class="date">
