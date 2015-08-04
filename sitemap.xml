@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://www.qiujiawei.com/raytrace/</loc>
+    <lastmod>2015-08-04T00:00:00+08:00</lastmod>
+  </url>
+  <url>
     <loc>http://www.qiujiawei.com/leetcode-problem-87/</loc>
     <lastmod>2015-07-24T00:00:00+08:00</lastmod>
   </url>
@@ -95,5 +99,11 @@
   </url>
   <url>
     <loc>http://www.qiujiawei.com/tag/math.html</loc>
+  </url>
+  <url>
+    <loc>http://www.qiujiawei.com/tag/c++.html</loc>
+  </url>
+  <url>
+    <loc>http://www.qiujiawei.com/tag/raytrace.html</loc>
   </url>
 </urlset>
