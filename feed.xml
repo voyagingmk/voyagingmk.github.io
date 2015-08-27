@@ -7,6 +7,213 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>&lt;复习向&gt;线性代数之矩阵与行列式(1)</title>
+        <description>&lt;h2&gt;矩阵的基本性质&lt;/h2&gt;
+
+&lt;p&gt;我对矩阵的定义：一个含有x个元素的数组(x&amp;gt;=1)，以n个数为一段，将把这个数组按顺序分成m段，并按顺序排成m行，就构成了一个矩阵。&lt;strong&gt;数组&lt;/strong&gt;和&lt;strong&gt;分段&lt;/strong&gt;是构成一个矩阵的充分必要条件。&lt;/p&gt;
+
+&lt;p&gt;这个定义是从程序实现角度考虑的。一个矩阵可以用二维数组Array[m][n]来存放，也可以用一维数组Array[m*n]来存放，在不考虑实现语言之前，我更倾向于使用一维数组。&lt;/p&gt;
+
+&lt;p&gt;矩阵的定义虽然不复杂，但是聪明的数学家对矩阵进行了各种研究，导致产生了非常多的概念、术语、定理、推论：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;当m == n时，矩阵可以被称为&lt;strong&gt;n阶矩阵&lt;/strong&gt;，或&lt;strong&gt;n阶方阵&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;矩阵A的m、n和矩阵B的m、n相等时，称A和B为&lt;strong&gt;同阶矩阵&lt;/strong&gt;或&lt;strong&gt;同型矩阵&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;大写字母&lt;strong&gt;O&lt;/strong&gt;代表元素全为0的矩阵&lt;/li&gt;
+&lt;li&gt;矩阵的加法运算满足以下运算律:
+
+&lt;ol&gt;
+&lt;li&gt;交换律 &lt;strong&gt;A + B = B + A&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;结合律 &lt;strong&gt;( A + B ) + C = A + ( B + C )&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;A + O = O + A&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;A + (-A) = (-A) + A = O&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;矩阵的数乘运算满足以下运算律:
+
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;k ( A + B ) = kA + kB&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;( k + t ) A = kA + tA&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k ( tA ) = ( kt ) A&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;1 * A = A&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;矩阵的加法和数乘运算统称为矩阵的&lt;strong&gt;线性运算&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;矩阵之间允许乘法运算：C = AB。但有一个前提：
+左矩阵A的列数必须等于右矩阵B的行数&lt;/li&gt;
+&lt;li&gt;做矩阵相乘运算要注意的一些特性：
+
+&lt;ol&gt;
+&lt;li&gt;AB 有意义时， BA 不一定有意义&lt;/li&gt;
+&lt;li&gt;AB 和 BA 都有意义时，并不意味着 AB = BA（不满足交换律），但存在使得此等式成立的2个矩阵&lt;/li&gt;
+&lt;li&gt;不满足消除率。两个非零矩阵的乘积可能是零矩阵，即 AB = O 成立时，并不能推出 A = O 或 B = O&lt;/li&gt;
+&lt;li&gt;满足结合律：
+
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;( AB ) C = A ( BC )&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k ( AB ) = ( kA ) B = A ( kB )&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;A ( B + C ) = AB + AC&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;( B + C ) A = BA + CA&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;矩阵可以做幂运算：
+
+&lt;ol&gt;
+&lt;li&gt;\( \mathbf{ A^{k}A^{t} = A^{k+t} } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ (A^{k})^{t} = A^{kt} } \)&lt;/li&gt;
+&lt;li&gt;若 AB = BA，则 \( \mathbf{ (AB)^{k} = A^{k}B^{k} } \)&lt;/li&gt;
+&lt;li&gt;注意，即使 \( \mathbf{ A^{k} = O } \)，也并不意味着\( \mathbf{  A = O } \)&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;矩阵的转置&lt;/h2&gt;
+
+&lt;p&gt;将\( m\times n \)矩阵 A = \( a_{ij} \)的行和列互换，得到的\( n\times m \)矩阵，称为矩阵A的转置矩阵，简称A的转置，记为\( A^{T} \)。&lt;/p&gt;
+
+&lt;p&gt;矩阵的转置有以下性质：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;\( \mathbf{ (A^{T})^{T} = A }  \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ (A+B)^{T}=A^{T}+B^{T} } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ (kA)^{T}=kA^{T} } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ (AB)^{T}=B^{T}A^{T} } \)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;方阵的行列式&lt;/h2&gt;
+
+&lt;p&gt;定义行列式之前，先定义2个概念：排列和逆序数&lt;/p&gt;
+
+&lt;h3&gt;排列&lt;/h3&gt;
+
+&lt;p&gt;由n个不同的数1,2,···,n组成的一个有序数组\( i_{1}i_{2}\cdots i_{n} \)称为一个n级排列,简称为排列&lt;/p&gt;
+
+&lt;p&gt;由数1,2,···,n构成的不同的n级排列共有\( n! \)个。&lt;/p&gt;
+
+&lt;p&gt;例:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1234、3421是4级排列&lt;/li&gt;
+&lt;li&gt;25314是5级排列&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;逆序数&lt;/h3&gt;
+
+&lt;p&gt;在一个n级排列\( i_{1}i_{2}\cdots i_{n} \)中，若数\( i_{t}&amp;gt;i_{s} \)，则称数\( i_{t} \) 与 \( i_{s} \)构成一个逆序，一个n级排序中逆数的总数称为该排列的逆序数，记为
+\( \gamma (i_{1}i_{2}\cdots i_{n}) \)&lt;/p&gt;
+
+&lt;p&gt;例:&lt;/p&gt;
+
+&lt;p&gt;5级排列25314的逆序数:&lt;/p&gt;
+
+&lt;p&gt;\( \gamma (25314) \) = 0 + 0 + 1 + 3 + 1 = 5&lt;/p&gt;
+
+&lt;p&gt;逆序数为奇数的排列称为&lt;strong&gt;奇排列&lt;/strong&gt;，逆序数为偶数的排列称为&lt;strong&gt;偶排列&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;相关定理：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;n个不同的数1,2,···,n的n！个n级排列中，奇偶排列各占一半&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;交换一个排列中某2个不同的元素，称为一次&lt;strong&gt;对换&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;例：&lt;/p&gt;
+
+&lt;p&gt;\( 31542\overset{(5,2)}{\longrightarrow}31245 \)&lt;/p&gt;
+
+&lt;p&gt;相关定理：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;任意一个排列经过一次对换后，奇偶性改变&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;行列式&lt;/h3&gt;
+
+&lt;p&gt;定义：由 \( n^{2} \)个元素\( a_{ij} \) 排成n行n列组成的式子：&lt;/p&gt;
+
+&lt;p&gt;\( \left| \begin{matrix} a_{11}\ a_{12}\ \ldots\ a_{1n}\\ a_{21}\ a_{22}\ \ldots\ a_{2n}\\ \vdots\ \ \ \ \ \vdots\ \ \ \ \ \vdots\ \ \ \ \ \vdots\ \ \ \ \\ a_{n1}\ a_{n2}\ \ldots\ a_{nn}\\ \end{matrix} \right| \)
+\( = \sum _{ j_{1}j_{2}\ldots j_{n} }(-1)^{\gamma (j_{1}j_{2}\ldots j_{n} ) }a_{1 j_{1}}a_{2 j_{2} }\ldots a_{n j_{n} } \)&lt;/p&gt;
+
+&lt;p&gt;它的计算结果被称为行列式(Determinant)。&lt;/p&gt;
+
+&lt;p&gt;注意，行列式是一个数，而不是一个矩阵。
+这个式子也被称为行列式的展开式。&lt;/p&gt;
+
+&lt;p&gt;行列式的性质：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;\( D^{T} = D \)&lt;/li&gt;
+&lt;li&gt;交换行列式的两行(列)，行列式变号&lt;/li&gt;
+&lt;li&gt;用数k乘行列式的某一行(列)，等于用数k乘此行列式&lt;/li&gt;
+&lt;li&gt;若行列式有一行(列)的元素全为零，则行列式等于零&lt;/li&gt;
+&lt;li&gt;若行列式有两行(列)的对应元素成比例，则行列式等于零&lt;/li&gt;
+&lt;li&gt;若行列式的某一行(列)各元素都是两数之和，即 \( a_{ij} = b_{ij} + c_{ij} \)，则 \( D_{a} = D_{b} + D_{c} \)&lt;/li&gt;
+&lt;li&gt;将行列式某一行(列)所有元素都乘以数k后加到另一行(列)对应位置的元素上，行列式的值不变&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;行列式按某一行(列)展开:&lt;/p&gt;
+
+&lt;p&gt;代数余子式的定义:&lt;/p&gt;
+
+&lt;p&gt;在n阶行列式 D = det( \( a_{ij} \) )中，划去元素\( a_{ij} \)所在的第i行和第j列后，余下的元素按原来的相对位置构成的n-1阶行列式，称为D中元素\( a_{ij} \)的余子式，记为\( M_{ij} \)。&lt;/p&gt;
+
+&lt;p&gt;再记\( A_{ij} =(-1)^{i+j}M_{ij} \)，称\( A_{ij} \)为元素\( a_{ij} \)的代数余子式。&lt;/p&gt;
+
+&lt;p&gt;引理:&lt;/p&gt;
+
+&lt;p&gt;若n阶行列式 D = det( \( a_{ij} \) )中，第i行除\( a_{ij} \)外的其他元素都为零，则该行列式等于\( a_{ij} \)与它的代数余子式的乘积，即：&lt;/p&gt;
+
+&lt;p&gt;\[ D = det( a_{ij} ) = a_{ij}A_{ij} \] &lt;/p&gt;
+
+&lt;p&gt;行列式的展开:&lt;/p&gt;
+
+&lt;p&gt;n阶行列式 D = det( \( a_{ij} \) )等于它的任意一行(列)的各元素与其对应的代数余子式乘积之和，即&lt;/p&gt;
+
+&lt;p&gt;\[ D = a_{i1}A_{i1} + a_{i2}A_{i2} + \cdots + a_{in}A_{in} \] &lt;/p&gt;
+
+&lt;p&gt;\[ D = a_{1j}A_{1j} + a_{2j}A_{2j} + \cdots + a_{nj}A_{nj} \]&lt;/p&gt;
+
+&lt;h2&gt;行列式与转置矩阵之间的一些公式：&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;\( \mathbf{ A^{T} = |A| } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ |kA| = k^{n}|A| } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ |AB| = |A||B| } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ |AB| = |BA| } \)&lt;/li&gt;
+&lt;li&gt;\( \mathbf{ |A^{n}| = |A|^{n} } \)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;线性方程组与行列式&lt;/h2&gt;
+
+&lt;p&gt;含有n个未知量、n个方程的线性方程组&lt;/p&gt;
+
+&lt;p&gt;\[ a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n} = b_{1} \]
+\[ a_{21}x_{1} + a_{22}x_{2} + \cdots + a_{2n}x_{n} = b_{2} \]
+\[ \cdots\cdots \]
+\[ a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n} = b_{n} \]&lt;/p&gt;
+
+&lt;p&gt;系数\( a_{ij} \)构成的行列式称为该方程组的系数行列式D&lt;/p&gt;
+
+&lt;p&gt;克拉默(Cramer)法则：若系数行列式 \( D\neq 0 \)，则方程组有唯一解，其解为：
+\[ x_{i} = \dfrac {D_{j}} {D} \]&lt;/p&gt;
+
+&lt;p&gt;\( D_{j} \)是将系数行列式D中第j列的元素\( a_{1j},a_{2j},\cdots a_{nj} \)对应地换成方程组右端的常数项\( b_{1j},b_{2j},\cdots b_{nj} \)，而其余各列保持不变得到的行列式。&lt;/p&gt;
+
+&lt;p&gt;当\( b_{i} \)=0时，上面的线性方程组为：&lt;/p&gt;
+
+&lt;p&gt;\[ a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n} = 0 \]
+\[ a_{21}x_{1} + a_{22}x_{2} + \cdots + a_{2n}x_{n} = 0 \]
+\[ \cdots\cdots \]
+\[ a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n} = 0 \]&lt;/p&gt;
+
+&lt;p&gt;称为&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。齐次线性方程组必然有零解( \( x_{i} = 0 \) ）。&lt;/p&gt;
+
+&lt;p&gt;定理：若齐次线性方程组的系数行列式 \( D\neq 0 \)，则只有零解； 若有非零解，则\( D = 0 \)。&lt;/p&gt;
+</description>
+        <pubDate>Tue, 25 Aug 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra/</guid>
+      </item>
+    
+      <item>
         <title>实现了一个C++11 Based的光线追踪渲染器demo</title>
         <description>&lt;p&gt;本demo是根据Milo的一篇文章实现的：&lt;a href=&quot;http://www.cnblogs.com/miloyip/archive/2010/03/29/1698953.html&quot;&gt;用JavaScript玩转计算机图形学1，光线追踪入门&lt;/a&gt;。&lt;/p&gt;
 
@@ -474,76 +681,6 @@ The solution is guaranteed to be unique.&lt;/p&gt;
         <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/gamejam/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/gamejam/</guid>
-      </item>
-    
-      <item>
-        <title>leetcode题解 problem 142 Linked List Cycle II</title>
-        <description>&lt;blockquote&gt;
-&lt;p&gt;Given a linked list, return the node where the cycle begins. If there is no cycle, return null.&lt;/p&gt;
-
-&lt;p&gt;Follow up:&lt;/p&gt;
-
-&lt;p&gt;Can you solve it without using extra space?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3&gt;题意：&lt;/h3&gt;
-
-&lt;p&gt;判断一个链表是否有环，有环的话返回环的起始节点，无环的话返回NULL。&lt;/p&gt;
-
-&lt;h3&gt;题解：&lt;/h3&gt;
-
-&lt;p&gt;Linked List Cycle的升级，不仅要判断有无环，还要求入口。很显然可以在Linked List Cycle的基础上来做。&lt;/p&gt;
-
-&lt;p&gt;这里我直接翻译ngcl的&lt;a href=&quot;https://leetcode.com/discuss/16567/concise-solution-using-with-detailed-alogrithm-description&quot; title=&quot;answer&quot;&gt;answer&lt;/a&gt;，写得非常好：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;用slower和faster方法判断是否有环；&lt;/li&gt;
-&lt;li&gt;设链表的头节点是head，环的入口节点是entry，slower和faster2个指针相遇的节点是meeting;&lt;/li&gt;
-&lt;li&gt;设L1是head到entry的正向距离，&lt;strong&gt;L2是entry到meeting的正向距离&lt;/strong&gt;，C是环的长度，n是faster指针在cycle里遍历的次数(不到一遍算0)；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;根据上面的定义，可知：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;当slower和faster相遇时，slower已经走了L1 + L2的距离，也即head和meeting的距离;&lt;/li&gt;
-&lt;li&gt;当slower和faster相遇时，faster已经走了L1 + L2 + n * C的距离;&lt;/li&gt;
-&lt;li&gt;因为slower步进1，而faster步进2，那么当slower和faster第一次相遇时，faster已经走的距离是slower已经走的距离的两倍，即 2* (L1 + L2) = L1 + L2 + n * C =&amp;gt; L1 = (n - 1) * C + (C - L2)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;L1 = (n - 1) * C + (C - L2)&lt;/strong&gt; 这个等式表明， head和entry的距离(L1)，等于&lt;strong&gt;meeting到entry的正向距离&lt;/strong&gt;（链表是有遍历方向的）。&lt;/p&gt;
-
-&lt;p&gt;这是因为式子中的 (n - 1) * C相当于走n-1个循环，对一个指向meeting的环内指针来说，走(n - 1) * C等于回到起点，所以式子可以简化成 &lt;strong&gt;L1 = C - L2&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;画成图是这样子：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.7/2.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;ngcl的代码如下：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;n&quot;&gt;ListNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;detectCycle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ListNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-        &lt;span class=&quot;n&quot;&gt;ListNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;ListNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fast&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;ListNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;fast&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fast&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;                      &lt;span class=&quot;c1&quot;&gt;// there is a cycle&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;               &lt;span class=&quot;c1&quot;&gt;// found the entry location&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;                                 &lt;span class=&quot;c1&quot;&gt;// there has no cycle&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-        <pubDate>Wed, 08 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/leetcode-problem-142/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-142/</guid>
       </item>
     
   </channel>
