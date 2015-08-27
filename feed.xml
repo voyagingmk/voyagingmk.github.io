@@ -83,9 +83,9 @@
 
 &lt;h3&gt;排列&lt;/h3&gt;
 
-&lt;p&gt;由n个不同的数1,2,···,n组成的一个有序数组\( i_{1}i_{2}\cdots i_{n} \)称为一个n级排列,简称为排列&lt;/p&gt;
+&lt;p&gt;由n个不同的数\(1,2,\cdots,n\)组成的一个有序数组\( i_{1}i_{2}\cdots i_{n} \)称为一个n级排列,简称为排列&lt;/p&gt;
 
-&lt;p&gt;由数1,2,···,n构成的不同的n级排列共有\( n! \)个。&lt;/p&gt;
+&lt;p&gt;由数\(1,2,\cdots,n\)构成的不同的n级排列共有\( n! \)个。&lt;/p&gt;
 
 &lt;p&gt;例:&lt;/p&gt;
 
@@ -110,7 +110,7 @@
 &lt;p&gt;相关定理：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;n个不同的数1,2,···,n的n！个n级排列中，奇偶排列各占一半&lt;/li&gt;
+&lt;li&gt;n个不同的数\(1,2,\cdots,n\)的n！个n级排列中，奇偶排列各占一半&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;交换一个排列中某2个不同的元素，称为一次&lt;strong&gt;对换&lt;/strong&gt;。&lt;/p&gt;
