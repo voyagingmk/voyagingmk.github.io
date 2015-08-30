@@ -70,6 +70,74 @@
   
     <article class="post">
 
+      <h1><a href="/linear-algebra-2/"><复习向>线性代数之矩阵与行列式(2)</a></h1>
+
+      <div class="entry">
+        <h3>行列式的意义</h3>
+
+<p>貌似一般的线性代数教科书并没有告诉读者行列式的实际意义，只是教会了读者行列式的定义和计算方法。（起码我所阅读的线性代数课本没有提及）</p>
+
+<p>那么在这里我简单地介绍一下。</p>
+
+<h2>一阶行列式</h2>
+
+<p>要说行列式的意义，得先从行列式的&quot;|&quot;符号谈起。下面是一阶方阵的行列式：</p>
+
+<p>\[ |x| = x \]</p>
+
+<p>是不是想到什么？一阶方阵，其实就是一个数，且它的行列式等于这个数。且，一阶方列式的写法，恰好就是高中数学里的绝对值写法！</p>
+
+<p>想一下绝对值的<strong>几何意义</strong>：指明了一个实数（这里不提虚数）距离数轴原点的大小。</p>
+
+<h2>二阶行列式</h2>
+
+<p>现在看一下二阶行列式：</p>
+
+<p>\( \left| \begin{matrix} x_{0}\ x_{1}\\ y_{0}\ y_{1}\\ \end{matrix} \right| \)</p>
+
+<p>再变成用向量来表示：</p>
+
+<p>\( |\ \alpha\ \beta\ | \)</p>
+
+<p>于是，二阶行列式等于2个向量的&quot;绝对值&quot;。那么，对于2个向量，这个绝对值是什么？</p>
+
+<p>首先，搬出向量的夹角公式：</p>
+
+<p>\[ cos\theta = \dfrac {\alpha \cdot\ \beta } {|\alpha |\times|\beta |} \]</p>
+
+<p>从上面的式子可以推出：</p>
+
+<p>\[ sin\theta = \sqrt{1 - \dfrac {(\alpha \cdot\ \beta )^{2}} {|\alpha |^{2}\times |\beta |^{2}} } \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ |\alpha |^{2} \times |\beta |^{2} - (\alpha \cdot\ \beta )^{2} } \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ (x_{0}^{2} + y_{0}^{2})\times (x_{1}^{2} + y_{1}^{2}) - (x_{0}x_{1}+y_{0}y_{1})^{2} } \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ x_{0}^{2}x_{1}^{2} + x_{0}^{2}y_{1}^{2} + y_{0}^{2}x_{1}^{2} + y_{0}^{2}y_{1}^{2} - x_{0}^{2}x_{1}^{2} - x_{0}x_{1}y_{0}y_{1} - y_{0}^{2}y_{1}^{2} } \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ x_{0}^{2}y_{1}^{2} + x_{1}^{2}y_{0}^{2} - 2x_{0}x_{1}y_{0}y_{1} } \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ (x_{0}y_{1} - x_{1}y_{0})^{2} } \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta = x_{0}y_{1} - x_{1}y_{0} \]</p>
+
+<p>\[ |\alpha |\times |\beta |\times sin\theta =     \left| \begin{matrix} x_{0}\ x_{1}\\ y_{0}\ y_{1}\\ \end{matrix} \right| = |\ \alpha\ \beta\ | \]</p>
+
+<p>注意到了吗，这个式子的左边，赫然是平行四边形的面积公式！</p>
+
+<p>所以，二阶行列式的几何意义就是<strong>2个向量组成的平行四边形的面积</strong>。</p>
+
+<p><img src="../images/2015.8/parallelogram.svg" alt="parallelogram.png"></p>
+
+<h2>三阶行列式</h2>
+
+      </div>
+
+      <a href="/linear-algebra-2/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
       <h1><a href="/linear-algebra/"><复习向>线性代数之矩阵与行列式(1)</a></h1>
 
       <div class="entry">

@@ -7,6 +7,71 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>&lt;复习向&gt;线性代数之矩阵与行列式(2)</title>
+        <description>&lt;h3&gt;行列式的意义&lt;/h3&gt;
+
+&lt;p&gt;貌似一般的线性代数教科书并没有告诉读者行列式的实际意义，只是教会了读者行列式的定义和计算方法。（起码我所阅读的线性代数课本没有提及）&lt;/p&gt;
+
+&lt;p&gt;那么在这里我简单地介绍一下。&lt;/p&gt;
+
+&lt;h2&gt;一阶行列式&lt;/h2&gt;
+
+&lt;p&gt;要说行列式的意义，得先从行列式的&amp;quot;|&amp;quot;符号谈起。下面是一阶方阵的行列式：&lt;/p&gt;
+
+&lt;p&gt;\[ |x| = x \]&lt;/p&gt;
+
+&lt;p&gt;是不是想到什么？一阶方阵，其实就是一个数，且它的行列式等于这个数。且，一阶方列式的写法，恰好就是高中数学里的绝对值写法！&lt;/p&gt;
+
+&lt;p&gt;想一下绝对值的&lt;strong&gt;几何意义&lt;/strong&gt;：指明了一个实数（这里不提虚数）距离数轴原点的大小。&lt;/p&gt;
+
+&lt;h2&gt;二阶行列式&lt;/h2&gt;
+
+&lt;p&gt;现在看一下二阶行列式：&lt;/p&gt;
+
+&lt;p&gt;\( \left| \begin{matrix} x_{0}\ x_{1}\\ y_{0}\ y_{1}\\ \end{matrix} \right| \)&lt;/p&gt;
+
+&lt;p&gt;再变成用向量来表示：&lt;/p&gt;
+
+&lt;p&gt;\( |\ \alpha\ \beta\ | \)&lt;/p&gt;
+
+&lt;p&gt;于是，二阶行列式等于2个向量的&amp;quot;绝对值&amp;quot;。那么，对于2个向量，这个绝对值是什么？&lt;/p&gt;
+
+&lt;p&gt;首先，搬出向量的夹角公式：&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta = \dfrac {\alpha \cdot\ \beta } {|\alpha |\times|\beta |} \]&lt;/p&gt;
+
+&lt;p&gt;从上面的式子可以推出：&lt;/p&gt;
+
+&lt;p&gt;\[ sin\theta = \sqrt{1 - \dfrac {(\alpha \cdot\ \beta )^{2}} {|\alpha |^{2}\times |\beta |^{2}} } \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ |\alpha |^{2} \times |\beta |^{2} - (\alpha \cdot\ \beta )^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ (x_{0}^{2} + y_{0}^{2})\times (x_{1}^{2} + y_{1}^{2}) - (x_{0}x_{1}+y_{0}y_{1})^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ x_{0}^{2}x_{1}^{2} + x_{0}^{2}y_{1}^{2} + y_{0}^{2}x_{1}^{2} + y_{0}^{2}y_{1}^{2} - x_{0}^{2}x_{1}^{2} - x_{0}x_{1}y_{0}y_{1} - y_{0}^{2}y_{1}^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ x_{0}^{2}y_{1}^{2} + x_{1}^{2}y_{0}^{2} - 2x_{0}x_{1}y_{0}y_{1} } \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta = \sqrt{ (x_{0}y_{1} - x_{1}y_{0})^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta = x_{0}y_{1} - x_{1}y_{0} \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\alpha |\times |\beta |\times sin\theta =     \left| \begin{matrix} x_{0}\ x_{1}\\ y_{0}\ y_{1}\\ \end{matrix} \right| = |\ \alpha\ \beta\ | \]&lt;/p&gt;
+
+&lt;p&gt;注意到了吗，这个式子的左边，赫然是平行四边形的面积公式！&lt;/p&gt;
+
+&lt;p&gt;所以，二阶行列式的几何意义就是&lt;strong&gt;2个向量组成的平行四边形的面积&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.8/parallelogram.svg&quot; alt=&quot;parallelogram.png&quot;&gt;&lt;/p&gt;
+
+&lt;h2&gt;三阶行列式&lt;/h2&gt;
+</description>
+        <pubDate>Sat, 29 Aug 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-2/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-2/</guid>
+      </item>
+    
+      <item>
         <title>&lt;复习向&gt;线性代数之矩阵与行列式(1)</title>
         <description>&lt;h2&gt;矩阵的基本性质&lt;/h2&gt;
 
@@ -661,26 +726,6 @@ The solution is guaranteed to be unique.&lt;/p&gt;
         <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/gamejam-tech/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/gamejam-tech/</guid>
-      </item>
-    
-      <item>
-        <title>IndieAce Gamejam 广州站</title>
-        <description>&lt;p&gt;&lt;img src=&quot;../images/2015.7/5.jpg&quot; alt=&quot;5.jpg&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;比赛介绍：&lt;a href=&quot;http://www.indieace.com/article-715-1.html&quot; title=&quot;http://www.indieace.com/article-715-1.html&quot;&gt;http://www.indieace.com/article-715-1.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;本次主题：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.7/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;我们组的作品《虐之太空》：
-&lt;a href=&quot;http://wanga.me/45512&quot; title=&quot;http://wanga.me/45512&quot;&gt;http://wanga.me/45512&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.7/4.jpg&quot; alt=&quot;4.jpg&quot;&gt;&lt;/p&gt;
-</description>
-        <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/gamejam/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/gamejam/</guid>
       </item>
     
   </channel>
