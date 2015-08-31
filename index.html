@@ -70,6 +70,83 @@
   
     <article class="post">
 
+      <h1><a href="/linear-algebra-3/"><复习向>线性代数之矩阵与行列式(3)</a></h1>
+
+      <div class="entry">
+        <h1>行列式的求解</h1>
+
+<p>从行列式的定义出发去求行列式，是一个简单但低效的方法。而实际上，解决数学问题的途径往往有多种。这里，我将介绍其中一种比较常见的快速解法：<strong>PLU分解</strong>。</p>
+
+<h2>PLU的LU</h2>
+
+<p>要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：<a href="">https://www.youtube.com/watch?v=UlWcofkUDDU</a> 能翻墙的同学就直接看吧。)</p>
+
+<p>LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。</p>
+
+<p>下面手动演示下LU分解过程：</p>
+
+<p>设A：</p>
+
+<p>\[ A =  \left[ \begin{matrix} 9\ 6\ 0\\ 6\ 5\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] \]</p>
+
+<p>要把A分解成LU，第一步是先用高斯消元法，把A变成阶梯型矩阵U：</p>
+
+<ul>
+<li>\( R2 -= R1 * a_{10}/a_{00} = R1 * 6/9 \)</li>
+</ul>
+
+<p>\[ A_{0} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] = E_{0}A =  \left[ \begin{matrix} 1\ 0\ 0\\ -6/9\ 1\ 0\\ 0\ 0\ 1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9\ 6\ 0\\ 6\ 5\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] \]</p>
+
+<ul>
+<li>\( R3 -= R1 * a_{20}/a_{00} = R1 * 3/9 \)</li>
+</ul>
+
+<p>\[ A_{1} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 2\ 10\\ \end{matrix} \right] = E_{1}A_{0} =  \left[ \begin{matrix} 1\ 0\ 0\\ 0\ 1\ 0\\ -3/9\ 0\ 1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 3\ 4\ 10\\ \end{matrix} \right]  \]</p>
+
+<ul>
+<li>\( R3 -= R2 * a_{21}/a_{11} = R1 * 2/1 \)</li>
+</ul>
+
+<p>\[ U = A_{2} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 0\ 2\\ \end{matrix} \right] = E_{2}A_{1} =  \left[ \begin{matrix} 1\ 0\ 0\\ 0\ 1\ 0\\ 0\ -2/1\ 1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 2\ 10\\ \end{matrix} \right]  \]</p>
+
+<ul>
+<li><p>因此得：\( U = E_{2}A_{1} = E_{2}E_{1}A_{0} = E_{2}E_{1}E_{0}A \)</p></li>
+<li><p>再调换下，得到：\( A = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1}U \)</p></li>
+<li><p>所以， \( L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} \)</p></li>
+</ul>
+
+<h2>PLU的P</h2>
+
+<p>这里的P，指的是Permutation Matrix，置换矩阵。</p>
+
+<p>何谓置换矩阵？其实就是经过一系列初等变换的单位矩阵，且元素\( a_{ij} = 0 or 1 \)。</p>
+
+<p>置换矩阵的作用，是用来交换某个矩阵的行（列）顺序。</p>
+
+<p>比如：</p>
+
+<p>\[ P =  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]\ \  A =  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right] \]</p>
+
+<p>\[ PA =  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right] =  \left[ \begin{matrix} 1\ 2\ 9\\ 0\ 5\ 6\\ 3\ 4\ 0\\ \end{matrix} \right] \]</p>
+
+<p>\[ AP =  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right]  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]  =  \left[ \begin{matrix} 0\ 3\ 4\\ 9\ 1\ 2\\ 6\ 0\ 5\\ \end{matrix} \right] \]</p>
+
+<p>从这个例子就可以看出，P左乘A时，改变了A的行的顺序；P右乘A时，改变了A的列的顺序。</p>
+
+<p>https://www.youtube.com/watch?v=wTlAUfv_O4s</p>
+
+<p>已经有人证明了，任何方阵都存在它的PLU分解:<a href="">http://arxiv.org/pdf/math/0506382v1.pdf</a>。</p>
+
+      </div>
+
+      <a href="/linear-algebra-3/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
       <h1><a href="/linear-algebra-2/"><复习向>线性代数之矩阵与行列式(2)</a></h1>
 
       <div class="entry">

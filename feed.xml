@@ -7,6 +7,80 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>&lt;复习向&gt;线性代数之矩阵与行列式(3)</title>
+        <description>&lt;h1&gt;行列式的求解&lt;/h1&gt;
+
+&lt;p&gt;从行列式的定义出发去求行列式，是一个简单但低效的方法。而实际上，解决数学问题的途径往往有多种。这里，我将介绍其中一种比较常见的快速解法：&lt;strong&gt;PLU分解&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h2&gt;PLU的LU&lt;/h2&gt;
+
+&lt;p&gt;要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：&lt;a href=&quot;&quot;&gt;https://www.youtube.com/watch?v=UlWcofkUDDU&lt;/a&gt; 能翻墙的同学就直接看吧。)&lt;/p&gt;
+
+&lt;p&gt;LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。&lt;/p&gt;
+
+&lt;p&gt;下面手动演示下LU分解过程：&lt;/p&gt;
+
+&lt;p&gt;设A：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 9\ 6\ 0\\ 6\ 5\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;要把A分解成LU，第一步是先用高斯消元法，把A变成阶梯型矩阵U：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( R2 -= R1 * a_{10}/a_{00} = R1 * 6/9 \)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ A_{0} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] = E_{0}A =  \left[ \begin{matrix} 1\ 0\ 0\\ -6/9\ 1\ 0\\ 0\ 0\ 1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9\ 6\ 0\\ 6\ 5\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( R3 -= R1 * a_{20}/a_{00} = R1 * 3/9 \)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ A_{1} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 2\ 10\\ \end{matrix} \right] = E_{1}A_{0} =  \left[ \begin{matrix} 1\ 0\ 0\\ 0\ 1\ 0\\ -3/9\ 0\ 1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 3\ 4\ 10\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( R3 -= R2 * a_{21}/a_{11} = R1 * 2/1 \)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ U = A_{2} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 0\ 2\\ \end{matrix} \right] = E_{2}A_{1} =  \left[ \begin{matrix} 1\ 0\ 0\\ 0\ 1\ 0\\ 0\ -2/1\ 1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 2\ 10\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;因此得：\( U = E_{2}A_{1} = E_{2}E_{1}A_{0} = E_{2}E_{1}E_{0}A \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;再调换下，得到：\( A = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1}U \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;所以， \( L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;PLU的P&lt;/h2&gt;
+
+&lt;p&gt;这里的P，指的是Permutation Matrix，置换矩阵。&lt;/p&gt;
+
+&lt;p&gt;何谓置换矩阵？其实就是经过一系列初等变换的单位矩阵，且元素\( a_{ij} = 0 or 1 \)。&lt;/p&gt;
+
+&lt;p&gt;置换矩阵的作用，是用来交换某个矩阵的行（列）顺序。&lt;/p&gt;
+
+&lt;p&gt;比如：&lt;/p&gt;
+
+&lt;p&gt;\[ P =  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]\ \  A =  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ PA =  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right] =  \left[ \begin{matrix} 1\ 2\ 9\\ 0\ 5\ 6\\ 3\ 4\ 0\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ AP =  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right]  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]  =  \left[ \begin{matrix} 0\ 3\ 4\\ 9\ 1\ 2\\ 6\ 0\ 5\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;从这个例子就可以看出，P左乘A时，改变了A的行的顺序；P右乘A时，改变了A的列的顺序。&lt;/p&gt;
+
+&lt;p&gt;https://www.youtube.com/watch?v=wTlAUfv_O4s&lt;/p&gt;
+
+&lt;p&gt;已经有人证明了，任何方阵都存在它的PLU分解:&lt;a href=&quot;&quot;&gt;http://arxiv.org/pdf/math/0506382v1.pdf&lt;/a&gt;。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 31 Aug 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-3/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-3/</guid>
+      </item>
+    
+      <item>
         <title>&lt;复习向&gt;线性代数之矩阵与行列式(2)</title>
         <description>&lt;h1&gt;行列式的意义&lt;/h1&gt;
 
@@ -670,82 +744,6 @@ The solution is guaranteed to be unique.&lt;/p&gt;
         <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/leetcode-problem-134/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-134/</guid>
-      </item>
-    
-      <item>
-        <title>Gamejam作品 《虐之太空》 技术分享</title>
-        <description>&lt;p&gt;游戏试玩地址：&lt;a href=&quot;http://wanga.me/45512&quot; title=&quot;http://wanga.me/45512&quot;&gt;http://wanga.me/45512&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;技术架构：&lt;/p&gt;
-
-&lt;p&gt;平台：web、mobile&lt;/p&gt;
-
-&lt;p&gt;引擎：cocos2d&lt;/p&gt;
-
-&lt;p&gt;语言：js&lt;/p&gt;
-
-&lt;p&gt;使用的插件：chipmunk(物理引擎) underscore(js增强函数库）&lt;/p&gt;
-
-&lt;p&gt;技术实现：&lt;/p&gt;
-
-&lt;p&gt;这游戏的技术难点是&lt;strong&gt;电网&lt;/strong&gt;的实现。&lt;/p&gt;
-
-&lt;p&gt;电网的特点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;电流在电网上移动（路径固定，会循环）&lt;/li&gt;
-&lt;li&gt;电流可能有多条，电流会转向，可以设置电流的长度、速度&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;实际上这个游戏的核心创意是我提出的，提出之后，大家一起围绕这个核心玩法开了各种脑洞。可惜因时间关系，只来得及完成这个核心玩法。&lt;/p&gt;
-
-&lt;p&gt;技术永远是跟着需求走的。需求确定的情况下，只要选一个成本最低、最简单的实现方案即可。若改了需求，任何程序员都不能保证既有代码实现可以完全不改动。&lt;/p&gt;
-
-&lt;p&gt;对于这个电网来说，我主要处理几个难点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;电流和导弹的碰撞的实现&lt;/li&gt;
-&lt;li&gt;电流移动问题&lt;/li&gt;
-&lt;li&gt;电流转弯问题&lt;/li&gt;
-&lt;li&gt;电流动画问题&lt;/li&gt;
-&lt;li&gt;电流和发电器整体移动的问题&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;第一个问题是用物理引擎chipmunk解决的，为什么不是box2d？因为我在公司刚好也在做一款物理类游戏，而chipmunk是能跨android和ios的引擎（box2d暂时不支持ios）。But，引入chipmunk后，又引发新的问题，下面会说到。&lt;/p&gt;
-
-&lt;p&gt;第二和第三个问题，电流移动和转弯，都是用cocos的action功能实现的，移动是cc.moveTo，转弯是cc.callFunc（在回调函数里即时计算旋转角），那么一个电流sprite就是不断执行move-&amp;gt;rotate-&amp;gt;move-&amp;gt;rotate即可。&lt;/p&gt;
-
-&lt;p&gt;但电流转弯又引发新的问题，因为电流是一个绑定了chipmunk&amp;#39;s body的PhysicSprite，body是一个狭长的长方形，转弯的时候会出现这样子的bug：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.7/11.png&quot; alt=&quot;11.png&quot;&gt;
-&lt;img src=&quot;../images/2015.7/12.png&quot; alt=&quot;12.png&quot;&gt;
-&lt;img src=&quot;../images/2015.7/13.png&quot; alt=&quot;13.png&quot;&gt;
-&lt;img src=&quot;../images/2015.7/14.png&quot; alt=&quot;14.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;即电流的body会超出路径限定的范围。于是我做了一个细分的操作，把一条电流切成N截，每一截都是一个PhsicalSprite，那么只要让他们在路径上移动时有前后顺序，就会变成：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.7/15.png&quot; alt=&quot;15.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这里有个实现技巧：要生成N个速度为v的小电流，且他们的总长度为s，可以做一个createCurrent()函数，然后用某种延时机制，在0、 1/N *(s/v)、2/N *(s/v)、···、N/N *(s/v)时刻，各执行一次createCurrent函数，每次执行函数都会在路径起点生成一截小电流。执行N次后，就得到了一条会拐弯的大电流。&lt;/p&gt;
-
-&lt;p&gt;第四个问题，电流动画，因为没做过类似的需求，在处理这个问题时总感觉不对，最后出来的效果也不太好。我的做法是，让每截小电流都播放同一个cc.animation帧动画。最后发现效果不是很理想，因为每截小电流太小了，导致动画的细节少了很多。但勉强可以作为demo演示用。&lt;/p&gt;
-
-&lt;p&gt;第五个问题，电流和发电器整体移动的问题。按照chipmunk的物理规则，一个PhysicSprite的移动应该是被动的，cp.body移动从而导致PhysicSprite移动。但我是用cc.moveTo来移动的，也就是反过来实现了。不过这个细节也没什么影响。对于这第五个问题，一开始想到的方案是，通过改变所有电流Sprite的父节点的位置，从而整体移动整个电网。&lt;/p&gt;
-
-&lt;p&gt;但实际上会出bug：电网是整体偏移了，但是Sprite的body没有偏移，这是因为chipmunk的实现和cocos的node树的实现是完全分开的。所以就还要让body也跟着偏移。&lt;/p&gt;
-
-&lt;p&gt;最后我的实现方法是：如果电网会移动，那么久解除PhysicSprite和body的连接，从而可以分别操作sprite和body的位置而又不会互相影响，这样只要2边的位置能对上，就OK了。具体实现这里不提。&lt;/p&gt;
-
-&lt;p&gt;其他问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;电流角度的计算&lt;/li&gt;
-&lt;li&gt;关卡配表问题&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/gamejam-tech/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/gamejam-tech/</guid>
       </item>
     
   </channel>
