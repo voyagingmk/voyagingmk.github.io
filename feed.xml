@@ -8,7 +8,7 @@
     
       <item>
         <title>&lt;复习向&gt;线性代数之矩阵与行列式(2)</title>
-        <description>&lt;h3&gt;行列式的意义&lt;/h3&gt;
+        <description>&lt;h1&gt;行列式的意义&lt;/h1&gt;
 
 &lt;p&gt;貌似一般的线性代数教科书并没有告诉读者行列式的实际意义，只是教会了读者行列式的定义和计算方法。（起码我所阅读的线性代数课本没有提及）&lt;/p&gt;
 
@@ -65,6 +65,26 @@
 &lt;p&gt;&lt;img src=&quot;../images/2015.8/parallelogram.svg&quot; alt=&quot;parallelogram.png&quot;&gt;&lt;/p&gt;
 
 &lt;h2&gt;三阶行列式&lt;/h2&gt;
+
+&lt;p&gt;通过上面的分析，可以知道行列式在几何数学中是有某种意义的，那么三阶行列式又是什么东西呢？&lt;/p&gt;
+
+&lt;p&gt;三阶行列式：&lt;/p&gt;
+
+&lt;p&gt;\( \left| \begin{matrix} x_{0}\ x_{1}\ x_{2}\\ y_{0}\ y_{1}\ y_{2}\\ z_{0}\ z_{1}\ z_{2}\\ \end{matrix} \right| \)&lt;/p&gt;
+
+&lt;p&gt;再变成用向量来表示：&lt;/p&gt;
+
+&lt;p&gt;\( |\ \alpha\ \beta\ \gamma\ | \)&lt;/p&gt;
+
+&lt;p&gt;3个3维向量，想到了什么呢？没错，就是3维空间中的3个向量！&lt;/p&gt;
+
+&lt;p&gt;设 \( \alpha = (1,0,0)^{T} \) \( \beta = (0,1,0)^{T} \) \( \gamma = (0,0,1)^{T} \) ， 即相当于3维正交坐标系的3条轴的单位向量。这样的3个单位向量组成的行列式，值等于1。&lt;/p&gt;
+
+&lt;p&gt;另外，巧合的是，这3个单位向量组成的正方体，体积也为1。实际上，3阶行列式确实等价于平行六面体的体积。&lt;/p&gt;
+
+&lt;p&gt;证明过程（暂无）。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.8/parallelepiped.svg&quot; alt=&quot;parallelogram.png&quot;&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 29 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-2/</link>
