@@ -87,7 +87,7 @@
 
 <p>设A：</p>
 
-<p>\[ A =  \left[ \begin{matrix} 9\ 6\ 0\\ 6\ 5\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] \]</p>
+<p>\[ A =  \left[ \begin{matrix} 9&amp;6&amp;0\\ 6&amp;5&amp;4\\ 3&amp;4&amp;10\\ \end{matrix} \right] \]</p>
 
 <p>要把A分解成LU，第一步是先用高斯消元法，把A变成阶梯型矩阵U：</p>
 
@@ -95,28 +95,49 @@
 <li>\( R2 -= R1 * a_{10}/a_{00} = R1 * 6/9 \)</li>
 </ul>
 
-<p>\[ A_{0} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] = E_{0}A =  \left[ \begin{matrix} 1\ 0\ 0\\ -6/9\ 1\ 0\\ 0\ 0\ 1\\ \end{matrix} \right]
- \left[ \begin{matrix} 9\ 6\ 0\\ 6\ 5\ 4\\ 3\ 4\ 10\\ \end{matrix} \right] \]</p>
+<p>\[ A_{0} =  \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 3&amp;4&amp;10\\ \end{matrix} \right] = E_{0}A =  \left[ \begin{matrix} 1&amp;0&amp;0\\ -6/9&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9&amp;6&amp;0\\ 6&amp;5&amp;4\\ 3&amp;4&amp;10\\ \end{matrix} \right] \]</p>
 
 <ul>
 <li>\( R3 -= R1 * a_{20}/a_{00} = R1 * 3/9 \)</li>
 </ul>
 
-<p>\[ A_{1} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 2\ 10\\ \end{matrix} \right] = E_{1}A_{0} =  \left[ \begin{matrix} 1\ 0\ 0\\ 0\ 1\ 0\\ -3/9\ 0\ 1\\ \end{matrix} \right]
- \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 3\ 4\ 10\\ \end{matrix} \right]  \]</p>
+<p>\[ A_{1} =  \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 0&amp;2&amp;10\\ \end{matrix} \right] = E_{1}A_{0} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ -3/9&amp;0&amp;1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 3&amp;4&amp;10\\ \end{matrix} \right]  \]</p>
 
 <ul>
 <li>\( R3 -= R2 * a_{21}/a_{11} = R1 * 2/1 \)</li>
 </ul>
 
-<p>\[ U = A_{2} =  \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 0\ 2\\ \end{matrix} \right] = E_{2}A_{1} =  \left[ \begin{matrix} 1\ 0\ 0\\ 0\ 1\ 0\\ 0\ -2/1\ 1\\ \end{matrix} \right]
- \left[ \begin{matrix} 9\ 6\ 0\\ 0\ 1\ 4\\ 0\ 2\ 10\\ \end{matrix} \right]  \]</p>
+<p>\[ U = A_{2} =  \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 0&amp;0&amp;2\\ \end{matrix} \right] = E_{2}A_{1} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;-2/1&amp;1\\ \end{matrix} \right]
+ \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 0&amp;2&amp;10\\ \end{matrix} \right]  \]</p>
 
 <ul>
 <li><p>因此得：\( U = E_{2}A_{1} = E_{2}E_{1}A_{0} = E_{2}E_{1}E_{0}A \)</p></li>
 <li><p>再调换下，得到：\( A = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1}U \)</p></li>
 <li><p>所以， \( L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} \)</p></li>
 </ul>
+
+<p>要得到最终的L，需要算3个\(E_{x}\)矩阵的逆矩阵，看似麻烦，其实很简单，因为\(E_{x}\)有这样的性质：</p>
+
+<p>\[  \left[ \begin{matrix} 1&amp;0&amp;0\\ a&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;0&amp;0\\ -a&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
+
+<p>\[  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ a&amp;0&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ -a&amp;0&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
+
+<p>\[  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;a&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;-a&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
+
+<p>所以：</p>
+
+<p>\[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 3/9&amp;0&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;2/1&amp;1\\ \end{matrix} \right] \]</p>
+
+<p>只要搞定右边的3矩阵乘法运算，就能得到L。而又因为：</p>
+
+<p>\[  \left[ \begin{matrix} 1&amp;0&amp;0\\ a_{1}&amp;1&amp;0\\ b_{1}&amp;c_{1}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;0&amp;0\\ a_{2}&amp;1&amp;0\\ b_{2}&amp;c_{2}&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;0&amp;0\\ a_{1}+a_{2}&amp;1&amp;0\\ b_{1}+a_{2}c_{2}+b_{2}&amp;c_{1}+c_{2}&amp;1\\ \end{matrix} \right]
+\]</p>
+
+<p>所以，L的结果可以迅速得到：</p>
+
+<p>\[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \]</p>
 
 <h2>PLU的P</h2>
 
@@ -128,11 +149,11 @@
 
 <p>比如：</p>
 
-<p>\[ P =  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]\ \  A =  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right] \]</p>
+<p>\[ P =  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right]\ \  A =  \left[ \begin{matrix} 3&amp;4&amp;0\\ 1&amp;2&amp;9\\ 0&amp;5&amp;6\\ \end{matrix} \right] \]</p>
 
-<p>\[ PA =  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right] =  \left[ \begin{matrix} 1\ 2\ 9\\ 0\ 5\ 6\\ 3\ 4\ 0\\ \end{matrix} \right] \]</p>
+<p>\[ PA =  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right]  \left[ \begin{matrix} 3&amp;4&amp;0\\ 1&amp;2&amp;9\\ 0&amp;5&amp;6\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;2&amp;9\\ 0&amp;5&amp;6\\ 3&amp;4&amp;0\\ \end{matrix} \right] \]</p>
 
-<p>\[ AP =  \left[ \begin{matrix} 3\ 4\ 0\\ 1\ 2\ 9\\ 0\ 5\ 6\\ \end{matrix} \right]  \left[ \begin{matrix} 0\ 1\ 0\\ 0\ 0\ 1\\ 1\ 0\ 0\\ \end{matrix} \right]  =  \left[ \begin{matrix} 0\ 3\ 4\\ 9\ 1\ 2\\ 6\ 0\ 5\\ \end{matrix} \right] \]</p>
+<p>\[ AP =  \left[ \begin{matrix} 3&amp;4&amp;0\\ 1&amp;2&amp;9\\ 0&amp;5&amp;6\\ \end{matrix} \right]  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right]  =  \left[ \begin{matrix} 0&amp;3&amp;4\\ 9&amp;1&amp;2\\ 6&amp;0&amp;5\\ \end{matrix} \right] \]</p>
 
 <p>从这个例子就可以看出，P左乘A时，改变了A的行的顺序；P右乘A时，改变了A的列的顺序。</p>
 
