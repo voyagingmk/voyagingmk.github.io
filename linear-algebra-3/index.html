@@ -75,6 +75,10 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 
 \[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \]
 
+于是，A的LU分解完成了：
+
+\[ A = LU =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 0&amp;0&amp;2\\ \end{matrix} \right]  \]
+
 PLU的P
 
 这里的P，指的是Permutation Matrix，置换矩阵。
@@ -95,7 +99,60 @@ PLU的P
 
 https://www.youtube.com/watch?v=wTlAUfv_O4s
 
-已经有人证明了，任何方阵都存在它的PLU分解:http://arxiv.org/pdf/math/0506382v1.pdf。
+PA = LU？
+
+为什么要先对A做P置换后，再做LU分解？这是因为不这样做的话，LU会不稳定(stability)。
+
+举个例子：
+
+\[ A =  \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 0&amp;1-10^{20}\\ \end{matrix} \right] = L_{0}U_{0} \]
+
+直接分解后得到的L、U矩阵，出现了大数，程序员读者们肯定会意识到:&quot;大数！这不是要越界的节奏吗！&quot;。所以这是不能接受的。
+
+而神奇的是，对A做一些P置换后，再来LU分解，是可以变稳定的：
+
+\[ PA =  \left[ \begin{matrix} 0&amp;1\\ 1&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;1\\ 10^{-20}&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{-20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;1\\ 0&amp;1-10^{-20}\\ \end{matrix} \right] = L_{1}U_{1} \]
+
+L、U中没有出现大数，于是认为这样的分解是稳定的。
+
+PA的P，需要对P做一些检测后才可以得到，策略就是：沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(E_{i}\)。最后按顺序算\(E_{i}\)的乘积就得到了P。
+
+A的行列式
+
+在&lt;复习向&gt;线性代数之矩阵与行列式(1)中，已经提到了一条行列式公式：
+
+\[ det(AB) = det(A)det(B) \]
+
+而，\( PA = LU \)又可以变成 \( A = P^{-1}LU \)，所以：
+
+\[ det(A) = det(P^{-1}LU) = det(P^{-1})det(L)det(U) \]
+
+可以进一步将这个式子简化：
+
+
+L、U矩阵分别是下三角矩阵和上三角矩阵，它们的行列式等于对角线上元素的乘积
+L矩阵上的元素都为1
+
+
+于是有：
+
+\[ det(A) = det(P^{-1})u_{11}u_{22}\cdots u_{nn} \]
+
+因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P_T) = det(P) \)，所以问题变成了求det(P)。
+
+P怎么求？首先，P相当于多个\(E_i\)矩阵的乘积，而又有\( det(E_i)=-1 \)  (行列式的基本性质：交换行列式的两行，行列式变号），所以有：
+
+\[ P = E_t\cdots E_2E_1 \implies \det(P) = \prod^t_{i=1}\det(E_i)=(-1)^t \]
+
+于是：
+
+\[ det(A) = det(P^{-1}LU) = det(P)u_{11}u_{22}\cdots u_{nn} = (-1)^{t}u_{11}u_{22}\cdots u_{nn} \]
+
+总结
+
+矩阵的分解(factorization)有很多种，PA=LU只是其中一种，但此类分解法都离不开高斯消元这把大杀器。理解好高斯消元是关键。
+
+P.S. 已经有人证明了，任何方阵都存在它的PLU分解:http://arxiv.org/pdf/math/0506382v1.pdf。
 " />
     <meta property="og:description" content="行列式的求解
 
@@ -163,6 +220,10 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 
 \[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \]
 
+于是，A的LU分解完成了：
+
+\[ A = LU =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 0&amp;0&amp;2\\ \end{matrix} \right]  \]
+
 PLU的P
 
 这里的P，指的是Permutation Matrix，置换矩阵。
@@ -183,7 +244,60 @@ PLU的P
 
 https://www.youtube.com/watch?v=wTlAUfv_O4s
 
-已经有人证明了，任何方阵都存在它的PLU分解:http://arxiv.org/pdf/math/0506382v1.pdf。
+PA = LU？
+
+为什么要先对A做P置换后，再做LU分解？这是因为不这样做的话，LU会不稳定(stability)。
+
+举个例子：
+
+\[ A =  \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 0&amp;1-10^{20}\\ \end{matrix} \right] = L_{0}U_{0} \]
+
+直接分解后得到的L、U矩阵，出现了大数，程序员读者们肯定会意识到:&quot;大数！这不是要越界的节奏吗！&quot;。所以这是不能接受的。
+
+而神奇的是，对A做一些P置换后，再来LU分解，是可以变稳定的：
+
+\[ PA =  \left[ \begin{matrix} 0&amp;1\\ 1&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;1\\ 10^{-20}&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{-20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;1\\ 0&amp;1-10^{-20}\\ \end{matrix} \right] = L_{1}U_{1} \]
+
+L、U中没有出现大数，于是认为这样的分解是稳定的。
+
+PA的P，需要对P做一些检测后才可以得到，策略就是：沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(E_{i}\)。最后按顺序算\(E_{i}\)的乘积就得到了P。
+
+A的行列式
+
+在&lt;复习向&gt;线性代数之矩阵与行列式(1)中，已经提到了一条行列式公式：
+
+\[ det(AB) = det(A)det(B) \]
+
+而，\( PA = LU \)又可以变成 \( A = P^{-1}LU \)，所以：
+
+\[ det(A) = det(P^{-1}LU) = det(P^{-1})det(L)det(U) \]
+
+可以进一步将这个式子简化：
+
+
+L、U矩阵分别是下三角矩阵和上三角矩阵，它们的行列式等于对角线上元素的乘积
+L矩阵上的元素都为1
+
+
+于是有：
+
+\[ det(A) = det(P^{-1})u_{11}u_{22}\cdots u_{nn} \]
+
+因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P_T) = det(P) \)，所以问题变成了求det(P)。
+
+P怎么求？首先，P相当于多个\(E_i\)矩阵的乘积，而又有\( det(E_i)=-1 \)  (行列式的基本性质：交换行列式的两行，行列式变号），所以有：
+
+\[ P = E_t\cdots E_2E_1 \implies \det(P) = \prod^t_{i=1}\det(E_i)=(-1)^t \]
+
+于是：
+
+\[ det(A) = det(P^{-1}LU) = det(P)u_{11}u_{22}\cdots u_{nn} = (-1)^{t}u_{11}u_{22}\cdots u_{nn} \]
+
+总结
+
+矩阵的分解(factorization)有很多种，PA=LU只是其中一种，但此类分解法都离不开高斯消元这把大杀器。理解好高斯消元是关键。
+
+P.S. 已经有人证明了，任何方阵都存在它的PLU分解:http://arxiv.org/pdf/math/0506382v1.pdf。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -252,7 +366,7 @@ https://www.youtube.com/watch?v=wTlAUfv_O4s
 
 <h2>PLU的LU</h2>
 
-<p>要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：<a href="">https://www.youtube.com/watch?v=UlWcofkUDDU</a> 能翻墙的同学就直接看吧。)</p>
+<p>要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：<a href="https://www.youtube.com/watch?v=UlWcofkUDDU">https://www.youtube.com/watch?v=UlWcofkUDDU</a> 能翻墙的同学就直接看吧。)</p>
 
 <p>LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。</p>
 
@@ -312,6 +426,10 @@ https://www.youtube.com/watch?v=wTlAUfv_O4s
 
 <p>\[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \]</p>
 
+<p>于是，A的LU分解完成了：</p>
+
+<p>\[ A = LU =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 6/9&amp;1&amp;0\\ 3/9&amp;2/1&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 9&amp;6&amp;0\\ 0&amp;1&amp;4\\ 0&amp;0&amp;2\\ \end{matrix} \right]  \]</p>
+
 <h2>PLU的P</h2>
 
 <p>这里的P，指的是Permutation Matrix，置换矩阵。</p>
@@ -332,7 +450,60 @@ https://www.youtube.com/watch?v=wTlAUfv_O4s
 
 <p>https://www.youtube.com/watch?v=wTlAUfv_O4s</p>
 
-<p>已经有人证明了，任何方阵都存在它的PLU分解:<a href="">http://arxiv.org/pdf/math/0506382v1.pdf</a>。</p>
+<h2>PA = LU？</h2>
+
+<p>为什么要先对A做P置换后，再做LU分解？这是因为不这样做的话，LU会不稳定(stability)。</p>
+
+<p>举个例子：</p>
+
+<p>\[ A =  \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 0&amp;1-10^{20}\\ \end{matrix} \right] = L_{0}U_{0} \]</p>
+
+<p>直接分解后得到的L、U矩阵，出现了<strong>大数</strong>，程序员读者们肯定会意识到:&quot;大数！这不是要越界的节奏吗！&quot;。所以这是不能接受的。</p>
+
+<p>而神奇的是，对A做一些P置换后，再来LU分解，是可以变稳定的：</p>
+
+<p>\[ PA =  \left[ \begin{matrix} 0&amp;1\\ 1&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;1\\ 10^{-20}&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{-20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;1\\ 0&amp;1-10^{-20}\\ \end{matrix} \right] = L_{1}U_{1} \]</p>
+
+<p>L、U中没有出现大数，于是认为这样的分解是稳定的。</p>
+
+<p>PA的P，需要对P做一些检测后才可以得到，策略就是：沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(E_{i}\)。最后按顺序算\(E_{i}\)的乘积就得到了P。</p>
+
+<h2>A的行列式</h2>
+
+<p>在<a href="http://yiqizhumeng.com:4000/linear-algebra/">&lt;复习向&gt;线性代数之矩阵与行列式(1)</a>中，已经提到了一条行列式公式：</p>
+
+<p>\[ det(AB) = det(A)det(B) \]</p>
+
+<p>而，\( PA = LU \)又可以变成 \( A = P^{-1}LU \)，所以：</p>
+
+<p>\[ det(A) = det(P^{-1}LU) = det(P^{-1})det(L)det(U) \]</p>
+
+<p>可以进一步将这个式子简化：</p>
+
+<ul>
+<li>L、U矩阵分别是下三角矩阵和上三角矩阵，它们的行列式等于对角线上元素的乘积</li>
+<li>L矩阵上的元素都为1</li>
+</ul>
+
+<p>于是有：</p>
+
+<p>\[ det(A) = det(P^{-1})u_{11}u_{22}\cdots u_{nn} \]</p>
+
+<p>因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P_T) = det(P) \)，所以问题变成了求det(P)。</p>
+
+<p>P怎么求？首先，P相当于多个\(E_i\)矩阵的乘积，而又有\( det(E_i)=-1 \)  (行列式的基本性质：交换行列式的两行，行列式变号），所以有：</p>
+
+<p>\[ P = E_t\cdots E_2E_1 \implies \det(P) = \prod^t_{i=1}\det(E_i)=(-1)^t \]</p>
+
+<p>于是：</p>
+
+<p>\[ det(A) = det(P^{-1}LU) = det(P)u_{11}u_{22}\cdots u_{nn} = (-1)^{t}u_{11}u_{22}\cdots u_{nn} \]</p>
+
+<h2>总结</h2>
+
+<p>矩阵的分解(factorization)有很多种，PA=LU只是其中一种，但此类分解法都离不开<strong>高斯消元</strong>这把大杀器。理解好高斯消元是关键。</p>
+
+<p>P.S. 已经有人证明了，任何方阵都存在它的PLU分解:<a href="">http://arxiv.org/pdf/math/0506382v1.pdf</a>。</p>
 
   </div>
 

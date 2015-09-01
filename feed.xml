@@ -14,7 +14,7 @@
 
 &lt;h2&gt;PLU的LU&lt;/h2&gt;
 
-&lt;p&gt;要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：&lt;a href=&quot;&quot;&gt;https://www.youtube.com/watch?v=UlWcofkUDDU&lt;/a&gt; 能翻墙的同学就直接看吧。)&lt;/p&gt;
+&lt;p&gt;要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：&lt;a href=&quot;https://www.youtube.com/watch?v=UlWcofkUDDU&quot;&gt;https://www.youtube.com/watch?v=UlWcofkUDDU&lt;/a&gt; 能翻墙的同学就直接看吧。)&lt;/p&gt;
 
 &lt;p&gt;LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。&lt;/p&gt;
 
@@ -74,6 +74,10 @@
 
 &lt;p&gt;\[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 6/9&amp;amp;1&amp;amp;0\\ 3/9&amp;amp;2/1&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
 
+&lt;p&gt;于是，A的LU分解完成了：&lt;/p&gt;
+
+&lt;p&gt;\[ A = LU =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 6/9&amp;amp;1&amp;amp;0\\ 3/9&amp;amp;2/1&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 0&amp;amp;0&amp;amp;2\\ \end{matrix} \right]  \]&lt;/p&gt;
+
 &lt;h2&gt;PLU的P&lt;/h2&gt;
 
 &lt;p&gt;这里的P，指的是Permutation Matrix，置换矩阵。&lt;/p&gt;
@@ -94,7 +98,60 @@
 
 &lt;p&gt;https://www.youtube.com/watch?v=wTlAUfv_O4s&lt;/p&gt;
 
-&lt;p&gt;已经有人证明了，任何方阵都存在它的PLU分解:&lt;a href=&quot;&quot;&gt;http://arxiv.org/pdf/math/0506382v1.pdf&lt;/a&gt;。&lt;/p&gt;
+&lt;h2&gt;PA = LU？&lt;/h2&gt;
+
+&lt;p&gt;为什么要先对A做P置换后，再做LU分解？这是因为不这样做的话，LU会不稳定(stability)。&lt;/p&gt;
+
+&lt;p&gt;举个例子：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 10^{-20}&amp;amp;1\\ 1&amp;amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;amp;0\\ 10^{20}&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;amp;1\\ 0&amp;amp;1-10^{20}\\ \end{matrix} \right] = L_{0}U_{0} \]&lt;/p&gt;
+
+&lt;p&gt;直接分解后得到的L、U矩阵，出现了&lt;strong&gt;大数&lt;/strong&gt;，程序员读者们肯定会意识到:&amp;quot;大数！这不是要越界的节奏吗！&amp;quot;。所以这是不能接受的。&lt;/p&gt;
+
+&lt;p&gt;而神奇的是，对A做一些P置换后，再来LU分解，是可以变稳定的：&lt;/p&gt;
+
+&lt;p&gt;\[ PA =  \left[ \begin{matrix} 0&amp;amp;1\\ 1&amp;amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;amp;1\\ 1&amp;amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;1\\ 10^{-20}&amp;amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;amp;0\\ 10^{-20}&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;amp;1\\ 0&amp;amp;1-10^{-20}\\ \end{matrix} \right] = L_{1}U_{1} \]&lt;/p&gt;
+
+&lt;p&gt;L、U中没有出现大数，于是认为这样的分解是稳定的。&lt;/p&gt;
+
+&lt;p&gt;PA的P，需要对P做一些检测后才可以得到，策略就是：沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(E_{i}\)。最后按顺序算\(E_{i}\)的乘积就得到了P。&lt;/p&gt;
+
+&lt;h2&gt;A的行列式&lt;/h2&gt;
+
+&lt;p&gt;在&lt;a href=&quot;http://yiqizhumeng.com:4000/linear-algebra/&quot;&gt;&amp;lt;复习向&amp;gt;线性代数之矩阵与行列式(1)&lt;/a&gt;中，已经提到了一条行列式公式：&lt;/p&gt;
+
+&lt;p&gt;\[ det(AB) = det(A)det(B) \]&lt;/p&gt;
+
+&lt;p&gt;而，\( PA = LU \)又可以变成 \( A = P^{-1}LU \)，所以：&lt;/p&gt;
+
+&lt;p&gt;\[ det(A) = det(P^{-1}LU) = det(P^{-1})det(L)det(U) \]&lt;/p&gt;
+
+&lt;p&gt;可以进一步将这个式子简化：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;L、U矩阵分别是下三角矩阵和上三角矩阵，它们的行列式等于对角线上元素的乘积&lt;/li&gt;
+&lt;li&gt;L矩阵上的元素都为1&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;于是有：&lt;/p&gt;
+
+&lt;p&gt;\[ det(A) = det(P^{-1})u_{11}u_{22}\cdots u_{nn} \]&lt;/p&gt;
+
+&lt;p&gt;因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P_T) = det(P) \)，所以问题变成了求det(P)。&lt;/p&gt;
+
+&lt;p&gt;P怎么求？首先，P相当于多个\(E_i\)矩阵的乘积，而又有\( det(E_i)=-1 \)  (行列式的基本性质：交换行列式的两行，行列式变号），所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ P = E_t\cdots E_2E_1 \implies \det(P) = \prod^t_{i=1}\det(E_i)=(-1)^t \]&lt;/p&gt;
+
+&lt;p&gt;于是：&lt;/p&gt;
+
+&lt;p&gt;\[ det(A) = det(P^{-1}LU) = det(P)u_{11}u_{22}\cdots u_{nn} = (-1)^{t}u_{11}u_{22}\cdots u_{nn} \]&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;矩阵的分解(factorization)有很多种，PA=LU只是其中一种，但此类分解法都离不开&lt;strong&gt;高斯消元&lt;/strong&gt;这把大杀器。理解好高斯消元是关键。&lt;/p&gt;
+
+&lt;p&gt;P.S. 已经有人证明了，任何方阵都存在它的PLU分解:&lt;a href=&quot;&quot;&gt;http://arxiv.org/pdf/math/0506382v1.pdf&lt;/a&gt;。&lt;/p&gt;
 </description>
         <pubDate>Mon, 31 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-3/</link>
