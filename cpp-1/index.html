@@ -9,9 +9,9 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="条款1：仔细区别pointers和references
+    <meta name="description" content="基础议题(basics)
 " />
-    <meta property="og:description" content="条款1：仔细区别pointers和references
+    <meta property="og:description" content="基础议题(basics)
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -82,7 +82,9 @@
   <h1>More Effective C++ 笔记</h1>
   <h3>Tags: <a href="/tag/c%2B%2B.html" rel="tag">c++</a></h3>
   <div class="entry">
-    <h3>条款1：仔细区别pointers和references</h3>
+    <h2>基础议题(basics)</h2>
+
+<h3>条款1：仔细区别pointers和references</h3>
 
 <ul>
 <li>使用引用，可以不做null判断</li>
@@ -129,6 +131,94 @@
 <ul>
 <li>有default constructor时，可以避免3个问题，一是类数组的初始化不支持带参数的构造函数，二是一些c++模板库，要求被实例化的目标类型必须要有default constructor，三是类的虚继承体系中，如果基类没有default constructor，那么每一层的子类都必须了解基类的构造函数。</li>
 <li>反过来看，使用default constructor时，可能会增加了类的复杂度，因为不能保证每个字段都有意义（default constructor导致赋予字段一个缺省值，这个缺省值可能是多余的）。并且，使用这些字段的调用者，都需要做一个“测试”，测试字段是否真的被初始化了。</li>
+</ul>
+
+<h2>操作符(operators)</h2>
+
+<h3>条款5：对定制的“类型转换函数”保持警觉</h3>
+
+<ul>
+<li><p>用一个普通函数来替代类型转换操作符。因为这种操作符重载是&quot;隐式(implicit)&quot;的：
+<code>c
+class Rational{
+public:
+operator double() const; //not good
+double asDouble() const; //good
+}
+</code></p></li>
+<li><p>单自变量构造函数，前面要加一个explicit声明。</p></li>
+<li><p>用proxy classes 技术时，可以使用隐式类型转换，因为不能连续执行多个类型转换行为（详情见条款30）。</p></li>
+</ul>
+
+<h3>条款6：区别 increment/decrement操作符的前置和后置形式</h3>
+
+<ul>
+<li>后置式应以其前置式为基础（即后置式的函数体的累加实现，是调用了前置式）。</li>
+<li>后置式的返回类型必须加const，从而禁止obj++++这种写法。</li>
+<li>后置式的函数声明的参数要带一个毫无意义的int，只是用来和前置式做区分。</li>
+<li>虽然禁止obj+++++，但是++++obj是允许的。</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">UPInt</span><span class="p">{</span>
+    <span class="kt">int</span> <span class="n">m_num</span><span class="p">;</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">UPInt</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">)</span><span class="o">:</span><span class="n">m_num</span><span class="p">(</span><span class="n">num</span><span class="p">){};</span>
+    <span class="n">UPInt</span><span class="o">&amp;</span> <span class="n">operator</span><span class="o">++</span><span class="p">(){</span>
+        <span class="n">m_num</span><span class="o">++</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="n">this</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">const</span> <span class="n">UPInt</span> <span class="n">operator</span><span class="o">++</span><span class="p">(</span><span class="kt">int</span><span class="p">){</span>
+        <span class="n">UPInt</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="o">*</span><span class="n">this</span><span class="p">;</span>
+        <span class="o">++</span><span class="p">(</span><span class="o">*</span><span class="n">this</span><span class="p">);</span> 
+        <span class="k">return</span> <span class="n">oldValue</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="kt">int</span> <span class="nf">get</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="n">m_num</span><span class="p">;</span>
+    <span class="p">}</span>   
+<span class="p">};</span>
+</code></pre></div>
+<h3>条款7：千万不要重载&amp;&amp;、||和, 操作符</h3>
+
+<p>直接贴上我写的一个代码片段：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;string&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="n">class</span> <span class="n">Boolean</span><span class="p">{</span>
+    <span class="n">string</span> <span class="n">m_name</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">m_bool</span><span class="p">;</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">Boolean</span><span class="p">(</span><span class="n">string</span> <span class="n">name</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">b</span><span class="p">)</span><span class="o">:</span><span class="n">m_name</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">m_bool</span><span class="p">(</span><span class="n">b</span><span class="p">){};</span>
+    <span class="kt">bool</span> <span class="n">operator</span> <span class="o">&amp;&amp;</span><span class="p">(</span><span class="kt">bool</span> <span class="n">b</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">((</span><span class="kt">bool</span><span class="p">)(</span><span class="o">*</span><span class="n">this</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="p">){</span>
+            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="n">operator</span> <span class="nf">bool</span><span class="p">(){</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;get:&quot;</span><span class="o">&lt;&lt;</span><span class="n">m_name</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">m_bool</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Boolean</span> <span class="n">a</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+    <span class="n">Boolean</span> <span class="n">b</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;a &amp;&amp; b = &quot;</span><span class="o">&lt;&lt;</span><span class="n">result</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>运行结果为:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="nl">get</span><span class="p">:</span><span class="n">b</span>
+<span class="nl">get</span><span class="p">:</span><span class="n">a</span>
+<span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+<p>a &amp;&amp; b这个表达式，b先求值了，这不反人类么。</p>
+
+<p>所以：</p>
+
+<ul>
+<li>&amp;&amp; || , 被重载后，“函数调用语义” 会取代 “骡死式语义”。前者的求值顺序是未定义的（C++规范里没有定义），后者必然是从左至右。</li>
 </ul>
 
   </div>
