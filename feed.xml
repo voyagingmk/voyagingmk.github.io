@@ -7,6 +7,62 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>More Effective C++ 笔记</title>
+        <description>&lt;h3&gt;条款1：仔细区别pointers和references&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用引用，可以不做null判断&lt;/li&gt;
+&lt;li&gt;当需要考虑“不指向任何对象”的可能性时，或是考虑“在不同时间指向不同对象”的能力时，你就应该采用pointer，前一种情况可以将pointer设为null，后一种情况可以改变pointer所指对象。&lt;/li&gt;
+&lt;li&gt;当确定“总是会代表某个对象”，而且“一旦代表了该对象就不能够再改变”，那么应该选用reference。&lt;/li&gt;
+&lt;li&gt;总是令operator[]返回一个reference。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;条款2：最好使用C++转型操作符&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;需要使用类型转换时，先考虑能不能用static_cast&lt;/li&gt;
+&lt;li&gt;不能用static_cast的情况有：
+
+&lt;ul&gt;
+&lt;li&gt;移除表达式的常量性(constness)或变易性(volatileness) [用const_cast]&lt;/li&gt;
+&lt;li&gt;继承体系的转型 [用dynamic_cast]&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;const_cast无法进行继承体系的向下转型(cast down)&lt;/li&gt;
+&lt;li&gt;dynamic_cast无法用在缺乏虚函数的类型身上，也不能改变常量性&lt;/li&gt;
+&lt;li&gt;reinterpret_cast不具移植性，是平台相关的&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;条款3：绝对不要以多态(polymorphically)方式处理数组&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;printBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ostream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BST&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numElements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numElements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;BST&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;BalanceBST&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;printBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//OK&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;printBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//Not OK&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;array[i]其实是一个“指针算术表达式”的简写；它代表的其实是* (array+i)。array所指内存和array+i所指内存的距离是i&lt;em&gt;sizeof(数组中的单个元素)。而因为printBSTArray中，声明了array的元素的类型为BST，所以距离是i&lt;/em&gt;sizeof(BST)。但当传入的是BalanceBST的数组时，就会出错了。&lt;/p&gt;
+
+&lt;p&gt;在删除数组时，也有这个问题，C++语言规范中说，通过base class指针删除一个由derived classes objects构成的数组，其结果未定义。&lt;/p&gt;
+
+&lt;p&gt;总的一句话：多态和指针算术不能混用，数组对象几乎总是会涉及指针的算法运算，所以数组和多态不要混用。&lt;/p&gt;
+
+&lt;h3&gt;条款4：非必要不提供 default constructor&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;有default constructor时，可以避免3个问题，一是类数组的初始化不支持带参数的构造函数，二是一些c++模板库，要求被实例化的目标类型必须要有default constructor，三是类的虚继承体系中，如果基类没有default constructor，那么每一层的子类都必须了解基类的构造函数。&lt;/li&gt;
+&lt;li&gt;反过来看，使用default constructor时，可能会增加了类的复杂度，因为不能保证每个字段都有意义（default constructor导致赋予字段一个缺省值，这个缺省值可能是多余的）。并且，使用这些字段的调用者，都需要做一个“测试”，测试字段是否真的被初始化了。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/cpp-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/cpp-1/</guid>
+      </item>
+    
+      <item>
         <title>&lt;复习向&gt;线性代数之矩阵与行列式(3)</title>
         <description>&lt;h1&gt;行列式的求解&lt;/h1&gt;
 
@@ -732,94 +788,6 @@ Given array A = [2,3,1,1,4]&lt;/p&gt;
         <pubDate>Sat, 18 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/jekyll-1/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/jekyll-1/</guid>
-      </item>
-    
-      <item>
-        <title>leetcode题解 problem 134 Gas Station</title>
-        <description>&lt;blockquote&gt;
-&lt;p&gt;There are N gas stations along a circular route, where the amount of gas at station i is gas[i].&lt;/p&gt;
-
-&lt;p&gt;You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.&lt;/p&gt;
-
-&lt;p&gt;Return the starting gas station&amp;#39;s index if you can travel around the circuit once, otherwise return -1.&lt;/p&gt;
-
-&lt;p&gt;Note:
-The solution is guaranteed to be unique.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3&gt;题意：&lt;/h3&gt;
-
-&lt;p&gt;有N个加油站，连成环形，每个加油站有gas[i]的油，从第i个加油站到第i+1个加油站需要消耗cost[i]的油。现在有一辆车，它有无限大的油箱，但是是空的。求问这辆车应该从哪个加油站出发，才可以跑一遍所有的加油站，返回该加油站的序号，如果不存在这样的起点，返回-1。&lt;/p&gt;
-
-&lt;h3&gt;题解：&lt;/h3&gt;
-
-&lt;p&gt;设sum-gas是所有加油站的油的总和，sum-cost是汽车走一圈消耗的油的总和，容易知道，当sum-gas&amp;lt;sum-cost时，汽车是不可能遍历所有加油站的，因为油不够。&lt;/p&gt;
-
-&lt;p&gt;反过来说，当sum-gas&amp;gt;=sum-cost时，是不是一定有一个起点，可以让汽车顺序跑一圈加油站呢？&lt;/p&gt;
-
-&lt;p&gt;证明：
-1）当N=1，g1 &amp;gt;= c1，那么预言正确；&lt;/p&gt;
-
-&lt;p&gt;2）当N=2，g1 + g2 &amp;gt;= c1 + c2，若g1 &amp;gt; c1且g2 &amp;gt; c2，则怎么走都可以，所以只要考虑 (g1 &amp;lt; c1 &amp;amp;&amp;amp; g2 &amp;gt; c2) 或者 (g1 &amp;gt; c1 &amp;amp;&amp;amp; g2 &amp;lt; c2) 的情况（实际上2个情况是等同的，只要证明其一即可）。设g1 &amp;lt; c1，因为g1 + g2 &amp;gt; c1 + c2，所以g2 &amp;gt; c2。那么只要从g &amp;gt; c的点出发，必然可以到另一个点。&lt;/p&gt;
-
-&lt;p&gt;3）当N=3，g1 + g2 + g3 &amp;gt;= c1 + c2 + c3，若g1 &amp;gt; c1且g2 &amp;gt; c2且g3 &amp;gt; c3，则怎么走都可以。所以只需要考虑g1 &amp;lt; c1 &amp;amp;&amp;amp; g2 + g3 &amp;gt; c2 + c3 的情况（g1可以换成g2或g3，因为是加油站是环形的)。设g1 &amp;lt; c1，那么不能以1作为起点，分情况考虑：a)当g2 &amp;gt; c2，那么可以从2出发，而因为g2 + g3 &amp;gt; c2 + c3,所以2-&amp;gt;3-&amp;gt;1成立；b)当g2 &amp;lt; c2时，g3 &amp;gt; c3，又可得g3 + g1 &amp;gt; c3 + c1，所以3-&amp;gt;1-&amp;gt;2成立。 所以3个加油站也必然存在一个可走的路径。&lt;/p&gt;
-
-&lt;p&gt;4）当N=4时，g1 + g2 + g3 + g4 &amp;gt;= c1 + c2 + c3 + c4，因为在3)中已经证明3个加油站必然存在一条路径，那么对于4个加油站，可以设 g1 + g2 + g3 &amp;gt;= c1 + c2 + c3（也可以是234、341、412)，那么对于这3个加油站，肯定是有一条路的，那么久可以把这3个加油站合并，变成 g0 &amp;gt;= c0 且 g0 + g4 &amp;gt;= c0 +c4，问题就转化为2)的情况，而2）已经证明是有解的，所以综上可得，N=4也必然有解。&lt;/p&gt;
-
-&lt;p&gt;5) 当N&amp;gt;4时，通过上面的合并法，归纳得证。&lt;/p&gt;
-
-&lt;p&gt;所以，&lt;strong&gt;当sum-gas&amp;gt;=sum-cost时，一定有一个起点，可以让汽车顺序跑一圈加油站。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;知道起点必然存在后，再利用上面的合并法，可以设起点为i，g(left)是从1到i-1所有加油站的油的总和，c(left)是从1到i-1所有加油站的开销的总和，同理g(right)是i+1到n所有加油站的油的总和，c(right)是从1+1到n所有加油站的开销的总和。那么问题就降级为3个加油站left、i、right的路径问题。因为i是起点，路径必然是i-&amp;gt;right-&amp;gt;left，i就可以合并到right区域里，那么路径进一步简化，变成right-&amp;gt;left。即我们需要的i的值，同时也是right区间的起始点位置。&lt;/p&gt;
-
-&lt;p&gt;right和left的关系为：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;g(right) &amp;gt;= c(right)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;g(left) + g(right) &amp;gt;= c(left) + c(right)&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;区间left = [1, i - 1]&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;区间right = [i, n]&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;具体代码实现是，从1和n向中间扫，计算left和right的gas和cost，当2个指针相遇，且满足上面的关系式，则高位指针的位置就是我们的起点。&lt;/p&gt;
-
-&lt;p&gt;这里可以做一个优化，因为&lt;strong&gt;g(left) + g(right) &amp;gt;= c(left) + c(right)&lt;/strong&gt;，可得&lt;strong&gt;sum = g(left) + g(right) - ( c(left) + c(right) ) &amp;gt;= 0&lt;/strong&gt;那么即是说，在扫的过程中，可以把left和right视作一个合并中加油站集群，只要保证sum&amp;gt;=0成立，left和right就可以不断向中间逼近，直到相遇。&lt;/p&gt;
-
-&lt;p&gt;&amp;quot;伪&amp;quot;代码如下：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;设start = n, end = 1，sum = gas(start-&amp;gt;end) - cost(start-&amp;gt;end)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;初始sum = gas(start) - cost(start)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;while(start &amp;gt; end):&lt;/p&gt;
-
-&lt;p&gt;sum &amp;gt;= 0:
-    当sum &amp;gt;= 0时，因为start的gas比cost大，必然可以走到end，所以可以把把gas(end)-cost(end)加到sum里，sum += gas(end)-cost(end)（也就是把start-&amp;gt;end的所有加油站合并，变成一个start），合并后end加1；&lt;/p&gt;
-
-&lt;p&gt;sum &amp;lt; 0:
-    当sum &amp;lt; 0时，说明start的gas已经少到不能走到end了，但又因为start必然是路径的起点，于是start还可以尝试往左挪，start减一，并执行 sum += gas(start) - cost(start)。（也就是把start的左边的加油站合并到start）&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;canCompleteCircuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cost&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cost&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cost&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-                &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cost&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-        <pubDate>Wed, 15 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/leetcode-problem-134/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-134/</guid>
       </item>
     
   </channel>
