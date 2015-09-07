@@ -221,6 +221,74 @@ double asDouble() const; //good
 <li>&amp;&amp; || , 被重载后，“函数调用语义” 会取代 “骡死式语义”。前者的求值顺序是未定义的（C++规范里没有定义），后者必然是从左至右。</li>
 </ul>
 
+<h3>条款8：了解各种不同意义的new和delete</h3>
+
+<h4>关于new</h4>
+
+<ul>
+<li>new operator是指：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">string</span> <span class="o">*</span> <span class="n">ps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">string</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p>这样子的代码里的new。这个操作符是由语言内建的，就像sizeof一样，不能被改变意义，总是做相同的事情。它的动作分为2个方面，第一，它分配足够的内存，用来放置某类型的对象；第二，它调用一个constructor，为刚才分配的内存中的那个对象设定初值。new operator总是做这两件事，你无法改变其行为。</p>
+
+<ul>
+<li>operator new的一般用法，用来分配且仅分配内存（不调用构造函数）：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="n">class</span> <span class="n">Widget</span><span class="p">{</span>
+    <span class="kt">char</span> <span class="n">member</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">Widget</span><span class="p">(){};</span>
+    <span class="kt">void</span> <span class="nf">print</span><span class="p">(){</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;member=&quot;</span><span class="o">&lt;&lt;</span><span class="n">member</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span> <span class="n">rawMemory</span> <span class="o">=</span> <span class="n">operator</span> <span class="n">new</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Widget</span><span class="p">));</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="k">sizeof</span><span class="p">(</span><span class="n">rawMemory</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="s">&quot;,&quot;</span><span class="o">&lt;&lt;</span><span class="n">rawMemory</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">Widget</span> <span class="o">*</span> <span class="n">widget</span> <span class="o">=</span> <span class="p">(</span><span class="n">Widget</span><span class="o">*</span><span class="p">)</span> <span class="n">rawMemory</span><span class="p">;</span>
+    <span class="n">widget</span><span class="o">-&gt;</span><span class="n">print</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>输出：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mi">8</span><span class="p">,</span><span class="mh">0x306850</span>
+<span class="n">member</span><span class="o">=</span><span class="n">Pm0</span>
+</code></pre></div>
+<ul>
+<li>placement new 用法：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="n">class</span> <span class="n">Widget</span><span class="p">{</span>
+    <span class="kt">char</span> <span class="n">member</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">Widget</span><span class="p">(){};</span>
+<span class="p">};</span>
+
+<span class="n">Widget</span><span class="o">*</span> <span class="nf">constructWidgetInBuf</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">buffer</span><span class="p">){</span>
+    <span class="k">return</span> <span class="n">new</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span> <span class="n">Widget</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Widget</span><span class="p">)];</span>
+    <span class="n">Widget</span> <span class="o">*</span> <span class="n">w</span> <span class="o">=</span> <span class="n">constructWidgetInBuf</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="s">&quot;,&quot;</span><span class="o">&lt;&lt;</span><span class="n">buf</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>输出：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mi">2</span><span class="p">,</span><span class="n">a</span>
+</code></pre></div>
+<ul>
+<li>使用策略：如果你希望将对象产生于heap内存，请使用new operator。它不但分配内存而且为该对象调用一个constructor。如果你只是打算分配内存，请调用operator new，那就没有任何constructor会被调用。如果你打算在heap objects产生时自己决定内存分配方式，请写一个自己的operator new（重载），并使用new operator，它将会自动调用你所写的operator new。如果你打算在已分配的内存中构造对象，请使用placement new。</li>
+</ul>
+
+<h4>关于delete</h4>
+
   </div>
 
   <div class="date">
