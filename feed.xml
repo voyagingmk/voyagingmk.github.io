@@ -273,6 +273,18 @@ double asDouble() const; //good
 &lt;h3&gt;条款12：了解“抛出一个异常”与“传递一个参数”或“调用一个虚函数”之间的差异&lt;/h3&gt;
 
 &lt;p&gt;事实：一个对象被抛出作为异常时，总是会发生复制。（即使声明为static；即使是by reference方式）&lt;/p&gt;
+
+&lt;h3&gt;条款13：以by reference方式捕捉异常&lt;/h3&gt;
+
+&lt;h3&gt;条款14：明智运用exception specifications&lt;/h3&gt;
+
+&lt;h3&gt;条款15：了解异常处理的成本&lt;/h3&gt;
+
+&lt;p&gt;为了能够在运行时期处理异常，程序需要做大量记录工作：在每一个执行点，必须能够确认“如果发生异常，哪些对象需要析构”，他们必须在每一个try语句块的进入点和离开点做记号，针对每个try语句块必须记录对应的catch子句及能偶处理的异常类型。&lt;/p&gt;
+
+&lt;p&gt;运行时期的比对工作（以确保符合exception specifications)不是免费的；异常被抛出时销毁适当对象并找出正确的catch子句也不是免费的。&lt;/p&gt;
+
+&lt;p&gt;第二个成本是，try语句块。代码会膨胀，效率也会下降。（这还是没有异常出现时就有这个开销了）&lt;/p&gt;
 </description>
         <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-1/</link>
