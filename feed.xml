@@ -285,6 +285,56 @@ double asDouble() const; //good
 &lt;p&gt;运行时期的比对工作（以确保符合exception specifications)不是免费的；异常被抛出时销毁适当对象并找出正确的catch子句也不是免费的。&lt;/p&gt;
 
 &lt;p&gt;第二个成本是，try语句块。代码会膨胀，效率也会下降。（这还是没有异常出现时就有这个开销了）&lt;/p&gt;
+
+&lt;h2&gt;效率&lt;/h2&gt;
+
+&lt;h3&gt;条款16：谨记80-20法则&lt;/h3&gt;
+
+&lt;p&gt;2个点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;理性地优化代码来提升程序性能。有的代码优化了，并不一定能带来质的性能提升；要找到性能瓶颈之处才行。&lt;/li&gt;
+&lt;li&gt;利用profiler工具来找到性能瓶颈。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;条款17：考虑使用lazy evaluation（缓式评估）&lt;/h3&gt;
+
+&lt;p&gt;其实就是“能拖就拖”，减少不必要的计算。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;引用计数 &amp;amp;&amp;amp; 区分读和写&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;考虑这样的代码：&lt;/p&gt;
+
+&lt;p&gt;string s1 =&amp;quot;hello&amp;quot;; string s2 = s1;&lt;/p&gt;
+
+&lt;p&gt;执行s2=s1时，执行了一次复制构造函数。这个调用是否昂贵？这个调用是否可以避免？事实上，要具体情况具体考虑。如果s2只是被“读”，而不会被“修改”，那么s2只需要存一个指向s1的引用即可，不应该创建一个副本。&lt;strong&gt;在你真正需要之前，不必着急为某物做一个副本。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Lazy Fetching（缓式取出）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;简单地说，就是读取数据库数据时，能少拿一点就少拿一点，能不拿就不拿。&lt;/p&gt;
+
+&lt;p&gt;比如我自己在使用redis（KV数据库），就可以把一个class实例（有多个成员变量），用hash表来存。使用这个实例时（读or写），不直接hgetall或hsetall（全部读写），而是用hget或hset（单个读写）。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Lazy Expression Evaluation（表达式换评估）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Lazy Evaluation的反义词是Eager Evaluation（急式评估）。
+贴书中的例子：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;m3是m1和m2的合，这是一个百万级的加法操作。如果m3的值实际上是不会被程序用到，那么这个计算就应该被忽略。&lt;/p&gt;
+
+&lt;p&gt;一般来说，定义了m3，应该下文就会用到m3。那么m3的计算就在所难免了，但如果是这样的情况：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;at&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;显然，按照这一个条款的指示，应该使得，m3.at(2,2)执行时，只计算(2,2)处的值，而不计算其他的值。&lt;/p&gt;
 </description>
         <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-1/</link>

@@ -360,6 +360,56 @@ double asDouble() const; //good
 
 <p>第二个成本是，try语句块。代码会膨胀，效率也会下降。（这还是没有异常出现时就有这个开销了）</p>
 
+<h2>效率</h2>
+
+<h3>条款16：谨记80-20法则</h3>
+
+<p>2个点：</p>
+
+<ul>
+<li>理性地优化代码来提升程序性能。有的代码优化了，并不一定能带来质的性能提升；要找到性能瓶颈之处才行。</li>
+<li>利用profiler工具来找到性能瓶颈。</li>
+</ul>
+
+<h3>条款17：考虑使用lazy evaluation（缓式评估）</h3>
+
+<p>其实就是“能拖就拖”，减少不必要的计算。</p>
+
+<ul>
+<li>引用计数 &amp;&amp; 区分读和写</li>
+</ul>
+
+<p>考虑这样的代码：</p>
+
+<p>string s1 =&quot;hello&quot;; string s2 = s1;</p>
+
+<p>执行s2=s1时，执行了一次复制构造函数。这个调用是否昂贵？这个调用是否可以避免？事实上，要具体情况具体考虑。如果s2只是被“读”，而不会被“修改”，那么s2只需要存一个指向s1的引用即可，不应该创建一个副本。<strong>在你真正需要之前，不必着急为某物做一个副本。</strong></p>
+
+<ul>
+<li>Lazy Fetching（缓式取出）</li>
+</ul>
+
+<p>简单地说，就是读取数据库数据时，能少拿一点就少拿一点，能不拿就不拿。</p>
+
+<p>比如我自己在使用redis（KV数据库），就可以把一个class实例（有多个成员变量），用hash表来存。使用这个实例时（读or写），不直接hgetall或hsetall（全部读写），而是用hget或hset（单个读写）。</p>
+
+<ul>
+<li>Lazy Expression Evaluation（表达式换评估）</li>
+</ul>
+
+<p>Lazy Evaluation的反义词是Eager Evaluation（急式评估）。
+贴书中的例子：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">Matrix</span> <span class="nf">m1</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">Matrix</span> <span class="nf">m2</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">Matrix</span> <span class="n">m3</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m2</span><span class="p">;</span>
+</code></pre></div>
+<p>m3是m1和m2的合，这是一个百万级的加法操作。如果m3的值实际上是不会被程序用到，那么这个计算就应该被忽略。</p>
+
+<p>一般来说，定义了m3，应该下文就会用到m3。那么m3的计算就在所难免了，但如果是这样的情况：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">m3</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+<p>显然，按照这一个条款的指示，应该使得，m3.at(2,2)执行时，只计算(2,2)处的值，而不计算其他的值。</p>
+
   </div>
 
   <div class="date">
