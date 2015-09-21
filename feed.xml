@@ -393,6 +393,10 @@ double asDouble() const; //good
 &lt;p&gt;后者要比前者效率要高，因为没有复制对象。&lt;/p&gt;
 
 &lt;h3&gt;条款23：考虑使用其他程序库&lt;/h3&gt;
+
+&lt;p&gt;以iosteam和stdio这2个官方库来说明，不同的库有不同的性能。选择一个适合的库，也是提升性能的好方法。&lt;/p&gt;
+
+&lt;h3&gt;条款24：了解virtual functions、multiple inheritance、virtual base classes、runtime type identification的成本&lt;/h3&gt;
 </description>
         <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-1/</link>
