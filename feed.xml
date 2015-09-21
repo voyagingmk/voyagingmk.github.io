@@ -341,6 +341,58 @@ double asDouble() const; //good
 &lt;p&gt;如果预期到某个操作必然要执行，就可以考虑把这个计算提前，甚至计算结果可以被复用。（caching法）&lt;/p&gt;
 
 &lt;p&gt;另一种做法是Prefetching（预先取出）。具体就是说，做一个计算时，可以一次过做多一些（batch）。比如磁盘的块读取，或者动态数组的内存动态扩张。&lt;/p&gt;
+
+&lt;h3&gt;条款19：了解临时对象的来源&lt;/h3&gt;
+
+&lt;p&gt;当程序产生一个non-heap object而没有为它命名，便诞生了一个临时对象。（匿名对象）&lt;/p&gt;
+
+&lt;p&gt;一般有2种情况产生临时对象：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;隐式类型转换。比如传参时参数有可能被自动转换。&lt;/li&gt;
+&lt;li&gt;函数返回对象。返回的变量的类型和函数的返回类型不同时发生。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;第一种类型，只当对象以by value的方式传递，或当对象被传递给一个reference-to-const参数时，才会发生。如果对象被传递给一个reference-to-non-const参数，并不会发生此类转换。&lt;/p&gt;
+
+&lt;p&gt;第二种情况，感觉这本书的分析过时了，c++11的右值引用，应该是解决这个情况的最有力武器。&lt;/p&gt;
+
+&lt;h3&gt;条款20：协助完成“返回值优化”&lt;/h3&gt;
+
+&lt;p&gt;撇开c++11，对于返回by value的函数，最佳的return写法是，return后面紧跟一个类构造函数。&lt;/p&gt;
+
+&lt;p&gt;这样做可能可以让编译器优化掉这个构造函数产生的临时对象。
+（这一招叫做return value optimization）。&lt;/p&gt;
+
+&lt;h3&gt;条款21：利用重载技术（overload）避免隐式类型转换（implicit type conversions）&lt;/h3&gt;
+
+&lt;p&gt;很显然，就是通过增加定制的重载函数（函数参数类型和实际的参数类型一致），避免不必要的类型转换开销。&lt;/p&gt;
+
+&lt;h3&gt;条款22：考虑以操作符复合形式（op=）取代其独身形式（op）&lt;/h3&gt;
+
+&lt;p&gt;大部分程序员都希望，如果他们能够这样写：&lt;/p&gt;
+
+&lt;p&gt;x = x + y&lt;/p&gt;
+
+&lt;p&gt;他们也能够写成这样：&lt;/p&gt;
+
+&lt;p&gt;x += y&lt;/p&gt;
+
+&lt;p&gt;一般而言，复合操作符比其对应的独身版本效率高，因为独身版本通常返回一个新对象，而我们必须因此负担一个临时对象的构造和析构成本。&lt;/p&gt;
+
+&lt;p&gt;另外，如果同时提供某个操作符的复合形式和独身形式，便允许你的客户在效率与便利性之间做取舍。（虽然这个选择不易）&lt;/p&gt;
+
+&lt;p&gt;比如：&lt;/p&gt;
+
+&lt;p&gt;d = a + b + c;&lt;/p&gt;
+
+&lt;p&gt;和：&lt;/p&gt;
+
+&lt;p&gt;d = 0; d += a; d += b; d += c;&lt;/p&gt;
+
+&lt;p&gt;后者要比前者效率要高，因为没有复制对象。&lt;/p&gt;
+
+&lt;h3&gt;条款23：考虑使用其他程序库&lt;/h3&gt;
 </description>
         <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-1/</link>
