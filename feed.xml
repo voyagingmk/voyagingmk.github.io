@@ -7,6 +7,119 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>&lt;复习向&gt;线性代数之投影矩阵</title>
+        <description>&lt;h2&gt;投影矩阵是what？&lt;/h2&gt;
+
+&lt;p&gt;先给出结论：投影矩阵P（projection），可以把一个向量b，投影到一个“空间”上，投影点称为p，从p到b的向量称为e，e = b - p，e的含义是误差向量（error）。&lt;/p&gt;
+
+&lt;p&gt;再举例子帮助读者理解：&lt;/p&gt;
+
+&lt;h2&gt;上述的“空间”为一维时&lt;/h2&gt;
+
+&lt;p&gt;一个向量b，投影到一个一维的空间，显然，这个空间是一条直线，设直线为单位向量a，那么这个投影其实就是找到这个直线上离b最近的点p，误差向量e就是b到p的距离。因为p在a上，所以有：&lt;/p&gt;
+
+&lt;p&gt;p = ax（p和a都是向量，x是一个值）【式子1】&lt;/p&gt;
+
+&lt;p&gt;然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：&lt;/p&gt;
+
+&lt;p&gt;\[ a^{T}e = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ a^{T}(b-xa) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;再变换一下，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ xa^{T}a = a^{T}b  \]&lt;/p&gt;
+
+&lt;p&gt;\[ x = \dfrac { a^{T}b }{ a^{T}a } \]&lt;/p&gt;
+
+&lt;p&gt;根据【式子1】，最后得到：&lt;/p&gt;
+
+&lt;p&gt;\[ p = a\dfrac { a^{T}b }{ a^{T}a } 【式子2】 \] &lt;/p&gt;
+
+&lt;p&gt;看，式子左边的p是投影向量，右边有b和a，b是原向量，a是空间向量。所以这个式子隐含了一个变换关系：从b通过某种变换能够得到p。所谓的投影矩阵P（注意，是大写），就在这个式子里面了。&lt;/p&gt;
+
+&lt;p&gt;投影矩阵P应该有这样的效果：&lt;/p&gt;
+
+&lt;p&gt;\[ p = Pb  \]&lt;/p&gt;
+
+&lt;p&gt;P作用于任意一个向量b，能够得到b在某个空间的投影点p。&lt;/p&gt;
+
+&lt;p&gt;注意: &lt;strong&gt;P是一个矩阵，不是一个数！&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;【式子2】应该要变换成什么样子，才能变出一个矩阵呢？答案如下：&lt;/p&gt;
+
+&lt;p&gt;\[ p = \dfrac { aa^{T} }{ a^{T}a }b \] &lt;/p&gt;
+
+&lt;p&gt;投影矩阵P：&lt;/p&gt;
+
+&lt;p&gt;\[ P = \dfrac { aa^{T} }{ a^{T}a } \] &lt;/p&gt;
+
+&lt;p&gt;式子右边是一个矩阵，这是因为分子是\(aa^{T}\)，这不是一个数，而是一个矩阵（分母才是一个数）。（顺序很重要！）&lt;/p&gt;
+
+&lt;p&gt;投影矩阵P的性质：&lt;/p&gt;
+
+&lt;p&gt;\[ P = P^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[ P^{n} = P, n为正整数 \]&lt;/p&gt;
+
+&lt;p&gt;第二条性质说明，投影点p再次经过同一个投影变换，依然还是p。&lt;/p&gt;
+
+&lt;h2&gt;投影的实际意义?&lt;/h2&gt;
+
+&lt;p&gt;为什么要找投影点，这是因为，当我们要计算线性方程组 \( Ax=b \)的解时，它可能是无解的。怎么办呢？既然没有正解，就找最优解！最优解就是找一个和b最近的p，并求解\( A\hat{x}=p \)。&lt;/p&gt;
+
+&lt;h2&gt;上述的“空间”为二维时&lt;/h2&gt;
+
+&lt;p&gt;一个向量b，投影到一个二维的空间，显然，这个空间是一个平面。一个平面，可以由2个线性无关（independant)的向量\(a_{1}\)和\(a_{2}\)确定。a1和a2是这个平面的一组基（basis）。&lt;/p&gt;
+
+&lt;p&gt;一组基可以写成矩阵的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ A = [ \ a_{1}\ \ a_{2} ] \ \] 【式子3】&lt;/p&gt;
+
+&lt;p&gt;和一维情况做一个对比：&lt;/p&gt;
+
+&lt;p&gt;投影点p，在一维时 p = ax。那么，在二维平面上呢？显然，p可以由这个平面的基得到：\( p = \hat{x_{1}}a_{1}+x_{2}a_{2} \)。&lt;/p&gt;
+
+&lt;p&gt;根据【式子3】可以得到：&lt;/p&gt;
+
+&lt;p&gt;\[ p = A\hat{x} \]&lt;/p&gt;
+
+&lt;p&gt;\[ e = b - p = b - A\hat{x} \]&lt;/p&gt;
+
+&lt;p&gt;上述一维的情况时的那个e，在二维时也是一样的，e会垂直于这个空间，也就是e和这个平面是垂直的。&lt;/p&gt;
+
+&lt;p&gt;因为e和平面垂直，平面的基是\(a_{1}\)和\(a_{2}\)，即a与\(a_{1}\)和\(a_{2}\)垂直，所以：&lt;/p&gt;
+
+&lt;p&gt;\[ a_{1}^{T}(b - A\hat{x}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ a_{2}^{T}(b - A\hat{x}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} a_{1}^{T}\\ a_{2}^{T}\\ \end{matrix} \right] (b - A\hat{x}) =  \left[ \begin{matrix} 0\\ 0\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ A^{T}(b - A\hat{x}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A^{T}A\hat{x} = A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;这和一维情况的其中一个式子很像，对吧。 但\(A^{T}A\)是一个高维的东西，它不是一个数，而是一个矩阵。&lt;/p&gt;
+
+&lt;p&gt;再变换一下，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat{x} = (A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;所以投影点p和b的变换公式就是：&lt;/p&gt;
+
+&lt;p&gt;\[ p = A\hat{x} = A(A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;抽出投影矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ P =  A(A^{T}A)^{-1}A^{T} \]&lt;/p&gt;
+</description>
+        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-4/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-4/</guid>
+      </item>
+    
+      <item>
         <title>More Effective C++ 笔记</title>
         <description>&lt;h2&gt;基础议题(basics)&lt;/h2&gt;
 
@@ -1110,25 +1223,6 @@ Given array A = [2,3,1,1,4]&lt;/p&gt;
         <pubDate>Mon, 20 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/leetcode-problem-45/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-45/</guid>
-      </item>
-    
-      <item>
-        <title>我是这样用jekyll搭建个人博客的</title>
-        <description>&lt;p&gt;好几年前就尝试用github pages服务来搭建github博客，当时也已经用了jekyll，不过由于那时候主要是在windows下工作学习（学图形学），手头也只有一台电脑，在win环境弄jekyll实在是不方便，要装ruby啊gem啊，都感觉没有linux环境顺手，最后还是转去了csdn博客。不过csdn博客在我毕业后也是荒废了。&lt;/p&gt;
-
-&lt;p&gt;现在我的解决方案是，用我购买的阿里云vps（在阿里云叫ecs），并把我的博客git整个放到Dropbox，并在vps上面搭建了jekyll服务器，就搞定了测试用的博客服务器了。&lt;/p&gt;
-
-&lt;p&gt;写博客的流程就简单了，在win或mac下都可以写，md文件一保存，就会被dropbox同步到云端，然后vps的dropbox文件夹也会即时被更新，而jekyll serve是会自动检测文件状态的，一旦被修改就会重新generate静态网站。那么我就可以直接本地开个浏览器，进入 http://vps地址:jekyll服务器端口/，去预览了。&lt;/p&gt;
-
-&lt;p&gt;还有就是，在win和mac下有个叫sourcetree的git客户端，十分好用，完全不用打git指令，点几下按钮就可以把代码push到github，也就进一步简化了写博客的步骤。&lt;/p&gt;
-
-&lt;p&gt;另外，我发现jekyll-now是符合github pages规范的jekyll程序，但是功能太不完整了，连文章分类tag功能都没。于是我只能回归普通jekyll的模式，开2个git仓库，一个用来放jekyll代码，一个用来放jekyll生成的网站静态代码（也就是本博客的代码）。要更新博客，只需要提交博客的git即可，jekyll的git倒是随意，反正有dropbox在同步，不怕丢失。&lt;/p&gt;
-
-&lt;p&gt;最后的最后，吐槽下坚果云。坚果云的linux版只支持桌面版，没有terminal的版本，导致我在vps上无法用坚果云。Dropbox虽然被墙了，但是Dropbox支持linux terminal，而且安装超级简单，按照官方说明，一下子就搞定了。&lt;/p&gt;
-</description>
-        <pubDate>Sat, 18 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/jekyll-1/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/jekyll-1/</guid>
       </item>
     
   </channel>
