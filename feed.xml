@@ -52,6 +52,34 @@
 &lt;li&gt;如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵&lt;/li&gt;
 &lt;li&gt;如果A、B都是正交矩阵，那么AB也是正交矩阵&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h2&gt;正交矩阵怎么用？&lt;/h2&gt;
+
+&lt;p&gt;在上一篇文章中，讲到了投影矩阵的各种公式，其中有一条是：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{T}A\hat{x} = A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;这个戴着帽子的x是未知量，要求它的值，就需要再变换下：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat{x} = (A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;那么问题来了：右边的式子有点复杂，又要算矩阵乘法又要算逆矩阵，是不是可以简化呢？&lt;/p&gt;
+
+&lt;p&gt;答案是可以，且要用到正交矩阵。因为A是由一组线性无关的列向量组成，当把这组向量转换为标准正交向量组时，就得到了标准正交矩阵Q。拿Q代入上面的式子，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ Q^{T}Q\hat{x} = Q^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;再根据上述的Q的公式，干掉左边的2个Q，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat{x} = Q^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;瞬间豁然开朗。&lt;/p&gt;
+
+&lt;p&gt;但是还有一个问题，怎么从A得到Q呢？&lt;/p&gt;
+
+&lt;h3&gt;矩阵的正交化算法&lt;/h3&gt;
+
+&lt;p&gt;因为从A可以得到Q，所以必然某个矩阵R，使得 A = QR 成立。&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-5/</link>
