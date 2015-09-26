@@ -7,6 +7,58 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>&lt;复习向&gt;线性代数之正交矩阵</title>
+        <description>&lt;h2&gt;基础知识&lt;/h2&gt;
+
+&lt;p&gt;标准正交向量组（Orthonormal vectors）的点积(内积)性质：&lt;/p&gt;
+
+&lt;p&gt;\( q_{i}^{T}q_{j} = 0 \) &lt;strong&gt;if&lt;/strong&gt; \( i\neq j \)&lt;/p&gt;
+
+&lt;p&gt;\( q_{i}^{T}q_{j} = 1 \) &lt;strong&gt;if&lt;/strong&gt; \( i = j \)&lt;/p&gt;
+
+&lt;p&gt;其中每个正交向量的长度\(||q_{i}||=1\)。&lt;/p&gt;
+
+&lt;p&gt;标准正交向量组成的矩阵是：&lt;/p&gt;
+
+&lt;p&gt;\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] \)&lt;/p&gt;
+
+&lt;p&gt;注意，列向量的分量数量未知，Q所以不一定是方阵。&lt;/p&gt;
+
+&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] = I \)&lt;/p&gt;
+
+&lt;p&gt;当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。&lt;/p&gt;
+
+&lt;p&gt;比如当Q为3阶单位矩阵I的置换矩阵时：&lt;/p&gt;
+
+&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ \end{matrix} \right] = I \)&lt;/p&gt;
+
+&lt;p&gt;或者三角函数作为元素的二阶Q：&lt;/p&gt;
+
+&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;amp;-sin\theta\\ sin\theta&amp;amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;amp;sin\theta\\ -sin\theta&amp;amp;cos\theta\\ \end{matrix} \right] = I \)&lt;/p&gt;
+
+&lt;h2&gt;定义&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;当A的列向量的长度都为1时，称A为标准正交矩阵Q。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;定理&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;当\(A^{-1} = A^{T}\)成立时A是正交矩阵&lt;/li&gt;
+&lt;li&gt;A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵&lt;/li&gt;
+&lt;li&gt;正交矩阵A的行列式为1或-1&lt;/li&gt;
+&lt;li&gt;如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵&lt;/li&gt;
+&lt;li&gt;如果A、B都是正交矩阵，那么AB也是正交矩阵&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-5/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-5/</guid>
+      </item>
+    
+      <item>
         <title>&lt;复习向&gt;线性代数之投影矩阵</title>
         <description>&lt;h2&gt;投影矩阵是what？&lt;/h2&gt;
 
@@ -1178,66 +1230,6 @@ double asDouble() const; //good
         <pubDate>Fri, 24 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/beauty-of-math/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/beauty-of-math/</guid>
-      </item>
-    
-      <item>
-        <title>leetcode题解 problem 45 Jump Game II</title>
-        <description>&lt;blockquote&gt;
-&lt;p&gt;Given an array of non-negative integers, you are initially positioned at the first index of the array.&lt;/p&gt;
-
-&lt;p&gt;Each element in the array represents your maximum jump length at that position.&lt;/p&gt;
-
-&lt;p&gt;Your goal is to reach the last index in the minimum number of jumps.&lt;/p&gt;
-
-&lt;p&gt;For example:
-Given array A = [2,3,1,1,4]&lt;/p&gt;
-
-&lt;p&gt;The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.)&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3&gt;题意：&lt;/h3&gt;
-
-&lt;p&gt;Jump Game I 的升级版，问到达最后一个位置时，至少要跳跃多少步。&lt;/p&gt;
-
-&lt;h3&gt;题解：&lt;/h3&gt;
-
-&lt;p&gt;贪心算法：&lt;/p&gt;
-
-&lt;p&gt;因为要求的是到达最后一个位置的最小步数，那么先假设最终的跳跃路径S存在，可以知道这个路径必然是从0位置开始跳（设起点为S1=0），S2必然是在A[0]能到达的范围内。S2的取值范围是[S1 + 1, S1 + A[S1]]。&lt;/p&gt;
-
-&lt;p&gt;若S2不能直接到达last，则S3存在，且S3的取值范围是[S2 + 1, S2 + A[S2]]。 &lt;/p&gt;
-
-&lt;p&gt;观察S2和S3的式子可以发现，这个问题是可以用贪心法或者DP处理的。因为每一个阶段的最优解只和上一个阶段有关。&lt;/p&gt;
-
-&lt;p&gt;那么对于S(i)，究竟是选D = [S(i - 1) + 1, S(i - 1) + A[S(i - 1)]]这个区间的哪个值呢？ 可以让S(i)逐个取D范围的值， 并计算出 y = MAX( S(i) + A[S(i)] )，那么使得y最大的S(i)，就是局部最优解了。&lt;/p&gt;
-
-&lt;p&gt;按照这个思路我实现了下面的代码(runtime 16ms)：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;jump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxStep&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxStep&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxStep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//在maxStep一样大的情况下，选择最靠右的&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;maxStep&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-        <pubDate>Mon, 20 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/leetcode-problem-45/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-45/</guid>
       </item>
     
   </channel>

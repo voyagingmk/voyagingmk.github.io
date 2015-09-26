@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><复习向>线性代数之正交矩阵 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="基础知识
+
+标准正交向量组（Orthonormal vectors）的点积(内积)性质：
+
+\( q_{i}^{T}q_{j} = 0 \) if \( i\neq j \)
+
+\( q_{i}^{T}q_{j} = 1 \) if \( i = j \)
+
+其中每个正交向量的长度\(||q_{i}||=1\)。
+
+标准正交向量组成的矩阵是：
+
+\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] \)
+
+注意，列向量的分量数量未知，Q所以不一定是方阵。
+
+\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] = I \)
+
+当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。
+
+比如当Q为3阶单位矩阵I的置换矩阵时：
+
+\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ \end{matrix} \right] = I \)
+
+或者三角函数作为元素的二阶Q：
+
+\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;-sin\theta\\ sin\theta&amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;sin\theta\\ -sin\theta&amp;cos\theta\\ \end{matrix} \right] = I \)
+
+定义
+
+
+如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵
+当A的列向量的长度都为1时，称A为标准正交矩阵Q。
+
+
+定理
+
+
+当\(A^{-1} = A^{T}\)成立时A是正交矩阵
+A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵
+正交矩阵A的行列式为1或-1
+如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵
+如果A、B都是正交矩阵，那么AB也是正交矩阵
+
+" />
+    <meta property="og:description" content="基础知识
+
+标准正交向量组（Orthonormal vectors）的点积(内积)性质：
+
+\( q_{i}^{T}q_{j} = 0 \) if \( i\neq j \)
+
+\( q_{i}^{T}q_{j} = 1 \) if \( i = j \)
+
+其中每个正交向量的长度\(||q_{i}||=1\)。
+
+标准正交向量组成的矩阵是：
+
+\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] \)
+
+注意，列向量的分量数量未知，Q所以不一定是方阵。
+
+\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] = I \)
+
+当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。
+
+比如当Q为3阶单位矩阵I的置换矩阵时：
+
+\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ \end{matrix} \right] = I \)
+
+或者三角函数作为元素的二阶Q：
+
+\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;-sin\theta\\ sin\theta&amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;sin\theta\\ -sin\theta&amp;cos\theta\\ \end{matrix} \right] = I \)
+
+定义
+
+
+如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵
+当A的列向量的长度都为1时，称A为标准正交矩阵Q。
+
+
+定理
+
+
+当\(A^{-1} = A^{T}\)成立时A是正交矩阵
+A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵
+正交矩阵A的行列式为1或-1
+如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵
+如果A、B都是正交矩阵，那么AB也是正交矩阵
+
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="<复习向>线性代数之正交矩阵" />
+    <meta property="twitter:title" content="<复习向>线性代数之正交矩阵" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/linear-algebra-5/',
+		  'title': '<复习向>线性代数之正交矩阵'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1><复习向>线性代数之正交矩阵</h1>
+  <h3>Tags: <a href="/tag/matrix.html" rel="tag">matrix</a>, <a href="/tag/linear-algebra.html" rel="tag">linear algebra</a></h3>
+  <div class="entry">
+    <h2>基础知识</h2>
+
+<p>标准正交向量组（Orthonormal vectors）的点积(内积)性质：</p>
+
+<p>\( q_{i}^{T}q_{j} = 0 \) <strong>if</strong> \( i\neq j \)</p>
+
+<p>\( q_{i}^{T}q_{j} = 1 \) <strong>if</strong> \( i = j \)</p>
+
+<p>其中每个正交向量的长度\(||q_{i}||=1\)。</p>
+
+<p>标准正交向量组成的矩阵是：</p>
+
+<p>\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] \)</p>
+
+<p>注意，列向量的分量数量未知，Q所以不一定是方阵。</p>
+
+<p>\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] = I \)</p>
+
+<p>当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。</p>
+
+<p>比如当Q为3阶单位矩阵I的置换矩阵时：</p>
+
+<p>\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ \end{matrix} \right] = I \)</p>
+
+<p>或者三角函数作为元素的二阶Q：</p>
+
+<p>\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;-sin\theta\\ sin\theta&amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;sin\theta\\ -sin\theta&amp;cos\theta\\ \end{matrix} \right] = I \)</p>
+
+<h2>定义</h2>
+
+<ul>
+<li><p>如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵</p></li>
+<li><p>当A的列向量的长度都为1时，称A为标准正交矩阵Q。</p></li>
+</ul>
+
+<h2>定理</h2>
+
+<ul>
+<li>当\(A^{-1} = A^{T}\)成立时A是正交矩阵</li>
+<li>A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵</li>
+<li>正交矩阵A的行列式为1或-1</li>
+<li>如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵</li>
+<li>如果A、B都是正交矩阵，那么AB也是正交矩阵</li>
+</ul>
+
+  </div>
+
+  <div class="date">
+    Written on September 26, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

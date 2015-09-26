@@ -81,6 +81,61 @@
   
     <article class="post">
 
+      <h1><a href="/linear-algebra-5/"><复习向>线性代数之正交矩阵</a></h1>
+
+      <div class="entry">
+        <h2>基础知识</h2>
+
+<p>标准正交向量组（Orthonormal vectors）的点积(内积)性质：</p>
+
+<p>\( q_{i}^{T}q_{j} = 0 \) <strong>if</strong> \( i\neq j \)</p>
+
+<p>\( q_{i}^{T}q_{j} = 1 \) <strong>if</strong> \( i = j \)</p>
+
+<p>其中每个正交向量的长度\(||q_{i}||=1\)。</p>
+
+<p>标准正交向量组成的矩阵是：</p>
+
+<p>\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] \)</p>
+
+<p>注意，列向量的分量数量未知，Q所以不一定是方阵。</p>
+
+<p>\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;\cdots&amp;q_{n}\\ \end{matrix} \right] = I \)</p>
+
+<p>当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。</p>
+
+<p>比如当Q为3阶单位矩阵I的置换矩阵时：</p>
+
+<p>\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;0&amp;1\\ 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ \end{matrix} \right] = I \)</p>
+
+<p>或者三角函数作为元素的二阶Q：</p>
+
+<p>\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;-sin\theta\\ sin\theta&amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;sin\theta\\ -sin\theta&amp;cos\theta\\ \end{matrix} \right] = I \)</p>
+
+<h2>定义</h2>
+
+<ul>
+<li><p>如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵</p></li>
+<li><p>当A的列向量的长度都为1时，称A为标准正交矩阵Q。</p></li>
+</ul>
+
+<h2>定理</h2>
+
+<ul>
+<li>当\(A^{-1} = A^{T}\)成立时A是正交矩阵</li>
+<li>A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵</li>
+<li>正交矩阵A的行列式为1或-1</li>
+<li>如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵</li>
+<li>如果A、B都是正交矩阵，那么AB也是正交矩阵</li>
+</ul>
+
+      </div>
+
+      <a href="/linear-algebra-5/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
       <h1><a href="/linear-algebra-4/"><复习向>线性代数之投影矩阵</a></h1>
 
       <div class="entry">
