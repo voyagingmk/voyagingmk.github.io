@@ -73,9 +73,30 @@ A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值
 
 但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。
 
-当A为旋转矩阵时
+当A为旋转矩阵Q时
 
 因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。
+
+\[ Q =  \left[ \begin{matrix} cos(90)&amp;-sin(90)\\ sin(90)&amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;-1\\ 1&amp;0\\ \end{matrix} \right] \]
+
+\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
+\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]
+
+显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。
+
+A的对角化，特征值的一种解法
+
+设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：
+
+\[ AS = A \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;\lambda _{2}x_{2}&amp;\cdots &amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
+\[    =  \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;0&amp;\cdots &amp;0\\ 0&amp;\lambda _{2}&amp;\cdots &amp;0\\ \vdots &amp;\vdots&amp; \cdots &amp;\vdots\\ 0&amp;0&amp;\cdots &amp;\lambda _{n}\\ \end{matrix} \right] \]
+\[ = S\Lambda \]
+
+所以有：
+
+\[ A = S\Lambda S^{-1} \]
+
+这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。
 " />
     <meta property="og:description" content="定义
 
@@ -141,9 +162,30 @@ A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值
 
 但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。
 
-当A为旋转矩阵时
+当A为旋转矩阵Q时
 
 因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。
+
+\[ Q =  \left[ \begin{matrix} cos(90)&amp;-sin(90)\\ sin(90)&amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;-1\\ 1&amp;0\\ \end{matrix} \right] \]
+
+\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
+\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]
+
+显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。
+
+A的对角化，特征值的一种解法
+
+设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：
+
+\[ AS = A \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;\lambda _{2}x_{2}&amp;\cdots &amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
+\[    =  \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;0&amp;\cdots &amp;0\\ 0&amp;\lambda _{2}&amp;\cdots &amp;0\\ \vdots &amp;\vdots&amp; \cdots &amp;\vdots\\ 0&amp;0&amp;\cdots &amp;\lambda _{n}\\ \end{matrix} \right] \]
+\[ = S\Lambda \]
+
+所以有：
+
+\[ A = S\Lambda S^{-1} \]
+
+这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -281,9 +323,30 @@ A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值
 
 <p>但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。</p>
 
-<h2>当A为旋转矩阵时</h2>
+<h2>当A为旋转矩阵Q时</h2>
 
 <p>因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。</p>
+
+<p>\[ Q =  \left[ \begin{matrix} cos(90)&amp;-sin(90)\\ sin(90)&amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;-1\\ 1&amp;0\\ \end{matrix} \right] \]</p>
+
+<p>\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
+\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]</p>
+
+<p>显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。</p>
+
+<h2>A的对角化，特征值的一种解法</h2>
+
+<p>设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：</p>
+
+<p>\[ AS = A \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;\lambda _{2}x_{2}&amp;\cdots &amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
+\[    =  \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;0&amp;\cdots &amp;0\\ 0&amp;\lambda _{2}&amp;\cdots &amp;0\\ \vdots &amp;\vdots&amp; \cdots &amp;\vdots\\ 0&amp;0&amp;\cdots &amp;\lambda _{n}\\ \end{matrix} \right] \]
+\[ = S\Lambda \]</p>
+
+<p>所以有：</p>
+
+<p>\[ A = S\Lambda S^{-1} \]</p>
+
+<p>这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。</p>
 
   </div>
 

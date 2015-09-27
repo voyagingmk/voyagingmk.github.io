@@ -72,9 +72,30 @@
 
 &lt;p&gt;但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。&lt;/p&gt;
 
-&lt;h2&gt;当A为旋转矩阵时&lt;/h2&gt;
+&lt;h2&gt;当A为旋转矩阵Q时&lt;/h2&gt;
 
 &lt;p&gt;因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。&lt;/p&gt;
+
+&lt;p&gt;\[ Q =  \left[ \begin{matrix} cos(90)&amp;amp;-sin(90)\\ sin(90)&amp;amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;amp;-1\\ 1&amp;amp;0\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
+\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]&lt;/p&gt;
+
+&lt;p&gt;显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。&lt;/p&gt;
+
+&lt;h2&gt;A的对角化，特征值的一种解法&lt;/h2&gt;
+
+&lt;p&gt;设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：&lt;/p&gt;
+
+&lt;p&gt;\[ AS = A \left[ \begin{matrix} x_{1}&amp;amp;x_{2}&amp;amp;\cdots &amp;amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;amp;\lambda _{2}x_{2}&amp;amp;\cdots &amp;amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
+\[    =  \left[ \begin{matrix} x_{1}&amp;amp;x_{2}&amp;amp;\cdots &amp;amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;amp;0&amp;amp;\cdots &amp;amp;0\\ 0&amp;amp;\lambda _{2}&amp;amp;\cdots &amp;amp;0\\ \vdots &amp;amp;\vdots&amp;amp; \cdots &amp;amp;\vdots\\ 0&amp;amp;0&amp;amp;\cdots &amp;amp;\lambda _{n}\\ \end{matrix} \right] \]
+\[ = S\Lambda \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ A = S\Lambda S^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-6/</link>
