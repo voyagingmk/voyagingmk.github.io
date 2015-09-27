@@ -18,13 +18,17 @@
 
 &lt;p&gt;\(\lambda E - A\)为A的&lt;strong&gt;特征矩阵&lt;/strong&gt;，行列式\(f(\lambda ) = |\lambda E - A|\)为A的&lt;strong&gt;特征多项式&lt;/strong&gt;，\(|\lambda E - A| = 0\)为A的&lt;strong&gt;特征方程&lt;/strong&gt;,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;p&gt;A的主对角线上元素之和称为A的&lt;strong&gt;迹&lt;/strong&gt;，记为tr(A)，即&lt;/p&gt;
+&lt;p&gt;A的主对角线上元素之和称为A的&lt;strong&gt;迹&lt;/strong&gt;(trace)，记为tr(A)，即&lt;/p&gt;
 
 &lt;p&gt;\[ tr(A) = a_{11} + a_{11} + \cdots + a_{nn} \]&lt;/p&gt;
 
 &lt;p&gt;迹和特征值有很重要的联系：&lt;/p&gt;
 
 &lt;p&gt;\[ tr(A) = \lambda _{1} + \lambda _{2} + \cdots + \lambda _{n} \]&lt;/p&gt;
+
+&lt;p&gt;迹还和A的行列式有关系：&lt;/p&gt;
+
+&lt;p&gt;\[ |A| = \lambda _{1}\lambda _{2}\cdots \lambda _{n} \]&lt;/p&gt;
 
 &lt;h2&gt;A的全部特征值和特征向量的求法&lt;/h2&gt;
 
@@ -67,6 +71,10 @@
 &lt;p&gt;又因为\(Px = x = 1\cdot x\)，所以P的一个特征值是1。&lt;/p&gt;
 
 &lt;p&gt;但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。&lt;/p&gt;
+
+&lt;h2&gt;当A为旋转矩阵时&lt;/h2&gt;
+
+&lt;p&gt;因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-6/</link>
