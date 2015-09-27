@@ -83,7 +83,7 @@
 
 &lt;p&gt;显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。&lt;/p&gt;
 
-&lt;h2&gt;A的对角化，特征值的一种解法&lt;/h2&gt;
+&lt;h2&gt;A的对角化(diagonalize)&lt;/h2&gt;
 
 &lt;p&gt;设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：&lt;/p&gt;
 
@@ -96,6 +96,25 @@
 &lt;p&gt;\[ A = S\Lambda S^{-1} \]&lt;/p&gt;
 
 &lt;p&gt;这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。&lt;/p&gt;
+
+&lt;p&gt;可以对角化的前提是A有n个线性无关的特征向量。A有n个线性无关的特征向量的前提是，所有的\(\lambda \)都不重复（没有重根）。&lt;/p&gt;
+
+&lt;p&gt;BTW，对于A的幂，有一个性质：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;如果有 \( Ax = \lambda x \)，则有\( A^{2}x = AAx = \lambda Ax = \lambda \lambda x = \lambda ^{2}x\) &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( A^{2} = S\Lambda S^{-1}S\Lambda S^{-1} = S\Lambda ^{2}S^{-1} \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个性质说明，A的n次幂的特征值等于\(\lambda ^{n}\)，且无论n等于多少(当前n得是正整数），特征向量不变。&lt;/p&gt;
+
+&lt;p&gt;这也是求矩阵的n次幂的快速解法。&lt;/p&gt;
+
+&lt;p&gt;特征分解还有一个用法是，求A的逆矩阵:&lt;/p&gt;
+
+&lt;p&gt;\[ A^{-1} = (S\Lambda S^{-1})^{-1} =S^{-1}\Lambda ^{-1}S \]&lt;/p&gt;
+
+&lt;p&gt;\(\Lambda\)的逆矩阵是非常容易求的，因为它是一个对角矩阵，所以把对角线上的\(\lambda \)都变成\(1/\lambda \)即可。&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-6/</link>
