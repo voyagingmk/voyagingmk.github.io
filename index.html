@@ -90,8 +90,15 @@
 
 <p>设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
 \[ A\alpha = \lambda \alpha \]
-则称\(\lambda \)为A的一个<strong>特征值(根)</strong>，称\(\alpha \)为A的属于特征值\(\lambda \)的<strong>特征向量</strong>，
-\(\lambda E - A\)为A的<strong>特征矩阵</strong>，行列式\(f(\lambda ) = |\lambda E - A|\)为A的<strong>特征多项式</strong>，\(|\lambda E - A| = 0\)为A的<strong>特征方程</strong>,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的<strong>齐次线性方程组</strong>。</p>
+则称\(\lambda \)为A的一个<strong>特征值(根)</strong>(eigenvalue)，称\(\alpha \)为A的属于特征值\(\lambda \)的<strong>特征向量</strong>(eigenvector)。</p>
+
+<p>\( A\alpha \)和\(\alpha \)平行（即在同一个直线上。</p>
+
+<p>\(\lambda E - A\)为A的<strong>特征矩阵</strong>，行列式\(f(\lambda ) = |\lambda E - A|\)为A的<strong>特征多项式</strong>，\(|\lambda E - A| = 0\)为A的<strong>特征方程</strong>,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的<strong>齐次线性方程组</strong>。</p>
+
+<p>A的主对角线上元素之和称为A的<strong>迹</strong>，记为tr(A)，即</p>
+
+<p>\[ tr(A) = a_{11} + a_{11} + \cdots + a_{nn} \]</p>
 
 <h2>A的全部特征值和特征向量的求法</h2>
 
@@ -103,7 +110,7 @@
 其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。</li>
 </ol>
 
-<h2>性质</h2>
+<h2>特征值的性质</h2>
 
 <ol>
 <li>\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）</li>
@@ -111,6 +118,27 @@
 <li>矩阵A与其转置矩阵\(A^{T}\)有相同的特征值</li>
 <li>\(k\lambda \)是矩阵kA的特征值(k是任意常数)。</li>
 </ol>
+
+<h2>迹的性质</h2>
+
+<ol>
+<li>\( tr(A + B) = tr(A) + tr(B) \)</li>
+<li>\( tr(kA) = k\cdot tr(A) \)</li>
+<li>\( tr(A^{T}) = tr(A) \)</li>
+<li>\( tr(AB) = tr(BA) \)</li>
+<li>\( tr(ABC) = tr(BCA) = tr(CAB) \)</li>
+<li>设A、B为n阶方阵，P为n阶可逆矩阵，且\(P^{-1}AP = B \)，则有\(tr(A) = tr(B)\)</li>
+</ol>
+
+<h2>当A为投影矩阵P时</h2>
+
+<p>因为投影矩阵P可以把一个向量b投影到一个空间的某一个向量，也就是\(Pb = p\)，这个式子和\( A\alpha = \lambda \alpha \)有一致的地方。</p>
+
+<p>那么P的特征向量是什么呢？前面已经说到，\( A\alpha \)和\( \alpha \)是平行关系，那么就是说，如果b在P的列空间之外，b就不是P的特征向量，当b在P的列空间内时，b是P的特征向量。</p>
+
+<p>比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px=x\)，P作用于x后还是得到x)</p>
+
+<p>又因为\(Px=x=1\cdot x\)，所以P的特征值是1。</p>
 
       </div>
 

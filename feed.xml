@@ -12,8 +12,15 @@
 
 &lt;p&gt;设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
 \[ A\alpha = \lambda \alpha \]
-则称\(\lambda \)为A的一个&lt;strong&gt;特征值(根)&lt;/strong&gt;，称\(\alpha \)为A的属于特征值\(\lambda \)的&lt;strong&gt;特征向量&lt;/strong&gt;，
-\(\lambda E - A\)为A的&lt;strong&gt;特征矩阵&lt;/strong&gt;，行列式\(f(\lambda ) = |\lambda E - A|\)为A的&lt;strong&gt;特征多项式&lt;/strong&gt;，\(|\lambda E - A| = 0\)为A的&lt;strong&gt;特征方程&lt;/strong&gt;,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。&lt;/p&gt;
+则称\(\lambda \)为A的一个&lt;strong&gt;特征值(根)&lt;/strong&gt;(eigenvalue)，称\(\alpha \)为A的属于特征值\(\lambda \)的&lt;strong&gt;特征向量&lt;/strong&gt;(eigenvector)。&lt;/p&gt;
+
+&lt;p&gt;\( A\alpha \)和\(\alpha \)平行（即在同一个直线上。&lt;/p&gt;
+
+&lt;p&gt;\(\lambda E - A\)为A的&lt;strong&gt;特征矩阵&lt;/strong&gt;，行列式\(f(\lambda ) = |\lambda E - A|\)为A的&lt;strong&gt;特征多项式&lt;/strong&gt;，\(|\lambda E - A| = 0\)为A的&lt;strong&gt;特征方程&lt;/strong&gt;,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;A的主对角线上元素之和称为A的&lt;strong&gt;迹&lt;/strong&gt;，记为tr(A)，即&lt;/p&gt;
+
+&lt;p&gt;\[ tr(A) = a_{11} + a_{11} + \cdots + a_{nn} \]&lt;/p&gt;
 
 &lt;h2&gt;A的全部特征值和特征向量的求法&lt;/h2&gt;
 
@@ -25,7 +32,7 @@
 其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2&gt;性质&lt;/h2&gt;
+&lt;h2&gt;特征值的性质&lt;/h2&gt;
 
 &lt;ol&gt;
 &lt;li&gt;\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）&lt;/li&gt;
@@ -33,6 +40,27 @@
 &lt;li&gt;矩阵A与其转置矩阵\(A^{T}\)有相同的特征值&lt;/li&gt;
 &lt;li&gt;\(k\lambda \)是矩阵kA的特征值(k是任意常数)。&lt;/li&gt;
 &lt;/ol&gt;
+
+&lt;h2&gt;迹的性质&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;\( tr(A + B) = tr(A) + tr(B) \)&lt;/li&gt;
+&lt;li&gt;\( tr(kA) = k\cdot tr(A) \)&lt;/li&gt;
+&lt;li&gt;\( tr(A^{T}) = tr(A) \)&lt;/li&gt;
+&lt;li&gt;\( tr(AB) = tr(BA) \)&lt;/li&gt;
+&lt;li&gt;\( tr(ABC) = tr(BCA) = tr(CAB) \)&lt;/li&gt;
+&lt;li&gt;设A、B为n阶方阵，P为n阶可逆矩阵，且\(P^{-1}AP = B \)，则有\(tr(A) = tr(B)\)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;当A为投影矩阵P时&lt;/h2&gt;
+
+&lt;p&gt;因为投影矩阵P可以把一个向量b投影到一个空间的某一个向量，也就是\(Pb = p\)，这个式子和\( A\alpha = \lambda \alpha \)有一致的地方。&lt;/p&gt;
+
+&lt;p&gt;那么P的特征向量是什么呢？前面已经说到，\( A\alpha \)和\( \alpha \)是平行关系，那么就是说，如果b在P的列空间之外，b就不是P的特征向量，当b在P的列空间内时，b是P的特征向量。&lt;/p&gt;
+
+&lt;p&gt;比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px=x\)，P作用于x后还是得到x)&lt;/p&gt;
+
+&lt;p&gt;又因为\(Px=x=1\cdot x\)，所以P的特征值是1。&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-6/</link>
