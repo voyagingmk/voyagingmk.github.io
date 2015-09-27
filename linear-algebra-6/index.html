@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><复习向>线性代数之矩阵的特征值、特征向量、特征矩阵、迹 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="定义
+
+设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
+\[ A\alpha = \lambda \alpha \]
+则称\(\lambda \)为A的一个特征值(根)，称\(\alpha \)为A的属于特征值\(\lambda \)的特征向量，
+\(\lambda E - A\)为A的特征矩阵，行列式\(f(\lambda ) = |\lambda E - A|\)为A的特征多项式，\(|\lambda E - A| = 0\)为A的特征方程,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的齐次线性方程组。
+
+A的全部特征值和特征向量的求法
+
+
+计算A的特征多项式
+求特征方程的全部根，即矩阵A的全部特征值
+对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
+\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
+其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。
+
+
+性质
+
+
+\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）
+A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值
+矩阵A与其转置矩阵\(A^{T}\)有相同的特征值
+\(k\lambda \)是矩阵kA的特征值(k是任意常数)。
+
+" />
+    <meta property="og:description" content="定义
+
+设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
+\[ A\alpha = \lambda \alpha \]
+则称\(\lambda \)为A的一个特征值(根)，称\(\alpha \)为A的属于特征值\(\lambda \)的特征向量，
+\(\lambda E - A\)为A的特征矩阵，行列式\(f(\lambda ) = |\lambda E - A|\)为A的特征多项式，\(|\lambda E - A| = 0\)为A的特征方程,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的齐次线性方程组。
+
+A的全部特征值和特征向量的求法
+
+
+计算A的特征多项式
+求特征方程的全部根，即矩阵A的全部特征值
+对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
+\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
+其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。
+
+
+性质
+
+
+\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）
+A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值
+矩阵A与其转置矩阵\(A^{T}\)有相同的特征值
+\(k\lambda \)是矩阵kA的特征值(k是任意常数)。
+
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="<复习向>线性代数之矩阵的特征值、特征向量、特征矩阵、迹" />
+    <meta property="twitter:title" content="<复习向>线性代数之矩阵的特征值、特征向量、特征矩阵、迹" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/linear-algebra-6/',
+		  'title': '<复习向>线性代数之矩阵的特征值、特征向量、特征矩阵、迹'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1><复习向>线性代数之矩阵的特征值、特征向量、特征矩阵、迹</h1>
+  <h3>Tags: <a href="/tag/matrix.html" rel="tag">matrix</a>, <a href="/tag/linear-algebra.html" rel="tag">linear algebra</a></h3>
+  <div class="entry">
+    <h2>定义</h2>
+
+<p>设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
+\[ A\alpha = \lambda \alpha \]
+则称\(\lambda \)为A的一个<strong>特征值(根)</strong>，称\(\alpha \)为A的属于特征值\(\lambda \)的<strong>特征向量</strong>，
+\(\lambda E - A\)为A的<strong>特征矩阵</strong>，行列式\(f(\lambda ) = |\lambda E - A|\)为A的<strong>特征多项式</strong>，\(|\lambda E - A| = 0\)为A的<strong>特征方程</strong>,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的<strong>齐次线性方程组</strong>。</p>
+
+<h2>A的全部特征值和特征向量的求法</h2>
+
+<ol>
+<li>计算A的特征多项式</li>
+<li>求特征方程的全部根，即矩阵A的全部特征值</li>
+<li>对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
+\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
+其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。</li>
+</ol>
+
+<h2>性质</h2>
+
+<ol>
+<li>\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）</li>
+<li>A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值</li>
+<li>矩阵A与其转置矩阵\(A^{T}\)有相同的特征值</li>
+<li>\(k\lambda \)是矩阵kA的特征值(k是任意常数)。</li>
+</ol>
+
+  </div>
+
+  <div class="date">
+    Written on September 26, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

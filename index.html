@@ -74,10 +74,48 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/c%2B%2B.html" class="set-1">c++</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-2">linear algebra</a> <a href="/tag/math.html" class="set-1">math</a> <a href="/tag/matrix.html" class="set-2">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
+  <a href="/tag/c%2B%2B.html" class="set-1">c++</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-3">linear algebra</a> <a href="/tag/math.html" class="set-1">math</a> <a href="/tag/matrix.html" class="set-3">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/linear-algebra-6/"><复习向>线性代数之矩阵的特征值、特征向量、特征矩阵、迹</a></h1>
+      <div class="date">
+        Written on September 26, 2015
+      </div>
+      <div class="entry">
+        <h2>定义</h2>
+
+<p>设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
+\[ A\alpha = \lambda \alpha \]
+则称\(\lambda \)为A的一个<strong>特征值(根)</strong>，称\(\alpha \)为A的属于特征值\(\lambda \)的<strong>特征向量</strong>，
+\(\lambda E - A\)为A的<strong>特征矩阵</strong>，行列式\(f(\lambda ) = |\lambda E - A|\)为A的<strong>特征多项式</strong>，\(|\lambda E - A| = 0\)为A的<strong>特征方程</strong>,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的<strong>齐次线性方程组</strong>。</p>
+
+<h2>A的全部特征值和特征向量的求法</h2>
+
+<ol>
+<li>计算A的特征多项式</li>
+<li>求特征方程的全部根，即矩阵A的全部特征值</li>
+<li>对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
+\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
+其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。</li>
+</ol>
+
+<h2>性质</h2>
+
+<ol>
+<li>\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）</li>
+<li>A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值</li>
+<li>矩阵A与其转置矩阵\(A^{T}\)有相同的特征值</li>
+<li>\(k\lambda \)是矩阵kA的特征值(k是任意常数)。</li>
+</ol>
+
+      </div>
+
+      <a href="/linear-algebra-6/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 
@@ -354,7 +392,7 @@
 <li><p>\( P^{n} = P \) , n为正整数</p></li>
 </ul>
 
-<p>第二条性质说明，投影点p再次经过同一个投影变换，依然还是p。</p>
+<p>第二条性质说明，投影点p再次经过同一个投影变换，依然还是p。这样的矩阵称为幂等矩阵。</p>
 
 <h2>投影的实际意义?</h2>
 
