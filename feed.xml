@@ -22,6 +22,10 @@
 
 &lt;p&gt;\[ tr(A) = a_{11} + a_{11} + \cdots + a_{nn} \]&lt;/p&gt;
 
+&lt;p&gt;迹和特征值有很重要的联系：&lt;/p&gt;
+
+&lt;p&gt;\[ tr(A) = \lambda _{1} + \lambda _{2} + \cdots + \lambda _{n} \]&lt;/p&gt;
+
 &lt;h2&gt;A的全部特征值和特征向量的求法&lt;/h2&gt;
 
 &lt;ol&gt;
@@ -58,9 +62,11 @@
 
 &lt;p&gt;那么P的特征向量是什么呢？前面已经说到，\( A\alpha \)和\( \alpha \)是平行关系，那么就是说，如果b在P的列空间之外，b就不是P的特征向量，当b在P的列空间内时，b是P的特征向量。&lt;/p&gt;
 
-&lt;p&gt;比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px=x\)，P作用于x后还是得到x)&lt;/p&gt;
+&lt;p&gt;比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px = x\)，P作用于x后还是得到x)&lt;/p&gt;
 
-&lt;p&gt;又因为\(Px=x=1\cdot x\)，所以P的特征值是1。&lt;/p&gt;
+&lt;p&gt;又因为\(Px = x = 1\cdot x\)，所以P的一个特征值是1。&lt;/p&gt;
+
+&lt;p&gt;但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-6/</link>
