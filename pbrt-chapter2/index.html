@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PBRT《章2》阅读笔记 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。
+" />
+    <meta property="og:description" content="最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="PBRT《章2》阅读笔记" />
+    <meta property="twitter:title" content="PBRT《章2》阅读笔记" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/pbrt-chapter2/',
+		  'title': 'PBRT《章2》阅读笔记'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>PBRT《章2》阅读笔记</h1>
+  <h3>Tags: <a href="/tag/c%2B%2B.html" rel="tag">c++</a>, <a href="/tag/pbrt.html" rel="tag">pbrt</a></h3>
+  <div class="entry">
+    <p>最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。</p>
+
+<p>本文的cpp代码均来自<a href="https://github.com/mmp/pbrt-v2">https://github.com/mmp/pbrt-v2</a>，木有修改。只为方便读者阅读。</p>
+
+<h2>正文</h2>
+
+<p>一个基本的渲染器，需要实现2点：输入场景数据、输出渲染图像。</p>
+
+<p>输入场景数据这一步，就需要对3D世界各种东西进行抽象、并设计各种数据结构，比如比较fundamental的：3D空间向量、3D坐标系系统、光线，或者visible的：各种2D/3D几何体、纹理系统等。大概就是，这个渲染器要渲染的东西，程序上都会有一些对应的代码。渲染器不可能对未知的东西进行渲染。比如毛发、布这种高端的东西，一个基本的渲染器是无法渲染的，除非你写了一些代码来完成这个事情。</p>
+
+<p>《PBRT》第二章就讲了这些基础的东西。</p>
+
+<p>在前面的线代的文章中，提到了矩阵的基(basis)的概念。矩阵的基是一组线性无关的列向量，这个矩阵的列空间的任意一点，可以通过对矩阵的基的线性组合得到。</p>
+
+<p>那么n维的情况下，定义一个向量的公式是：</p>
+
+<p>\[ v = s_{1}v_{1} + \cdots + s_{n}v_{n} \]</p>
+
+<p>定义一个点的位置的公式是：</p>
+
+<p>\[ p = p_{0} + s_{1}v_{1} + \cdots + s_{n}v_{n} \]</p>
+
+<p>对于渲染器的3维空间，要简化成：</p>
+
+<p>\[ p_{0} = (0,0,0) \]
+\[ basis = (1,0,0) (0,1,0) (0,0,1) \]</p>
+
+<p>这3个标准基向量对应的空间被称为世界空间(world space)。</p>
+
+<h3>向量(vector)、点(point)的区别</h3>
+
+<p>向量和点，区别在于点没有长度的概念，也就是说点是零维的（pbrt的Point和Vector的差异是没有LengthSquared、Length函数)，而向量没有起点的概念，向量只是指明了一个方向并且有长度。</p>
+
+<h3>3维空间下，如何从一个向量出发，构造出一组标准正交基</h3>
+
+<p>注意，这个问题是有重要意义的，因为一组标准正交基相当于一个坐标系。</p>
+
+<ul>
+<li><p>设\( v_{1}=(x_{1},y_{1},z_{1}) \)，并且v1已经单位化</p></li>
+<li><p>随便选择v1的某一个分量，并将它变成0，再交换剩余的2个分量的位置，并对其中一个分量取反，就能得到和v1正交的v2。这是因为这样构造出来的v2，必然使得\(  v_{1}\cdot v_{2}=0 \)。比如当\( v_{2}=(-z_{1},0,x_{1}) \)时，有\( v_{1}\cdot v_{2}=(x_{1},y_{1},z_{1})\cdot (-z_{1},0,x_{1}) = 0\)</p></li>
+<li><p>上面的v2还有不足，因它不是单位化的。单位化的v2应该是\[v_{2}=\dfrac { (-z_{1},0,x_{1}) }{ \sqrt {z_{1}^{1}+x_{1}^{1}}} \]</p></li>
+<li><p>有了v1、v2后，v3就等于v1和v2的叉积(cross product): \( v_{3} =v_{1} \times v_{2} \)</p></li>
+</ul>
+
+  </div>
+
+  <div class="date">
+    Written on September 28, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

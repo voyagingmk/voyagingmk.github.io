@@ -7,6 +7,57 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>PBRT《章2》阅读笔记</title>
+        <description>&lt;p&gt;最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。&lt;/p&gt;
+
+&lt;p&gt;本文的cpp代码均来自&lt;a href=&quot;https://github.com/mmp/pbrt-v2&quot;&gt;https://github.com/mmp/pbrt-v2&lt;/a&gt;，木有修改。只为方便读者阅读。&lt;/p&gt;
+
+&lt;h2&gt;正文&lt;/h2&gt;
+
+&lt;p&gt;一个基本的渲染器，需要实现2点：输入场景数据、输出渲染图像。&lt;/p&gt;
+
+&lt;p&gt;输入场景数据这一步，就需要对3D世界各种东西进行抽象、并设计各种数据结构，比如比较fundamental的：3D空间向量、3D坐标系系统、光线，或者visible的：各种2D/3D几何体、纹理系统等。大概就是，这个渲染器要渲染的东西，程序上都会有一些对应的代码。渲染器不可能对未知的东西进行渲染。比如毛发、布这种高端的东西，一个基本的渲染器是无法渲染的，除非你写了一些代码来完成这个事情。&lt;/p&gt;
+
+&lt;p&gt;《PBRT》第二章就讲了这些基础的东西。&lt;/p&gt;
+
+&lt;p&gt;在前面的线代的文章中，提到了矩阵的基(basis)的概念。矩阵的基是一组线性无关的列向量，这个矩阵的列空间的任意一点，可以通过对矩阵的基的线性组合得到。&lt;/p&gt;
+
+&lt;p&gt;那么n维的情况下，定义一个向量的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ v = s_{1}v_{1} + \cdots + s_{n}v_{n} \]&lt;/p&gt;
+
+&lt;p&gt;定义一个点的位置的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ p = p_{0} + s_{1}v_{1} + \cdots + s_{n}v_{n} \]&lt;/p&gt;
+
+&lt;p&gt;对于渲染器的3维空间，要简化成：&lt;/p&gt;
+
+&lt;p&gt;\[ p_{0} = (0,0,0) \]
+\[ basis = (1,0,0) (0,1,0) (0,0,1) \]&lt;/p&gt;
+
+&lt;p&gt;这3个标准基向量对应的空间被称为世界空间(world space)。&lt;/p&gt;
+
+&lt;h3&gt;向量(vector)、点(point)的区别&lt;/h3&gt;
+
+&lt;p&gt;向量和点，区别在于点没有长度的概念，也就是说点是零维的（pbrt的Point和Vector的差异是没有LengthSquared、Length函数)，而向量没有起点的概念，向量只是指明了一个方向并且有长度。&lt;/p&gt;
+
+&lt;h3&gt;3维空间下，如何从一个向量出发，构造出一组标准正交基&lt;/h3&gt;
+
+&lt;p&gt;注意，这个问题是有重要意义的，因为一组标准正交基相当于一个坐标系。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;设\( v_{1}=(x_{1},y_{1},z_{1}) \)，并且v1已经单位化&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;随便选择v1的某一个分量，并将它变成0，再交换剩余的2个分量的位置，并对其中一个分量取反，就能得到和v1正交的v2。这是因为这样构造出来的v2，必然使得\(  v_{1}\cdot v_{2}=0 \)。比如当\( v_{2}=(-z_{1},0,x_{1}) \)时，有\( v_{1}\cdot v_{2}=(x_{1},y_{1},z_{1})\cdot (-z_{1},0,x_{1}) = 0\)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;上面的v2还有不足，因它不是单位化的。单位化的v2应该是\[v_{2}=\dfrac { (-z_{1},0,x_{1}) }{ \sqrt {z_{1}^{1}+x_{1}^{1}}} \]&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;有了v1、v2后，v3就等于v1和v2的叉积(cross product): \( v_{3} =v_{1} \times v_{2} \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/pbrt-chapter2/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/pbrt-chapter2/</guid>
+      </item>
+    
+      <item>
         <title>&lt;复习向&gt;线性代数之矩阵的特征值、特征向量、特征矩阵、迹</title>
         <description>&lt;h2&gt;定义&lt;/h2&gt;
 
@@ -1419,59 +1470,6 @@ double asDouble() const; //good
         <pubDate>Fri, 24 Jul 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/leetcode-problem-87/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-87/</guid>
-      </item>
-    
-      <item>
-        <title>leetcode题解 problem213 House Robber II</title>
-        <description>&lt;blockquote&gt;
-&lt;p&gt;After robbing those houses on that street, the thief has found himself a new place for his thievery so that he will not get too much attention. This time, all houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, the security system for these houses remain the same as for those in the previous street.&lt;/p&gt;
-
-&lt;p&gt;Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3&gt;题意：&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.qiujiawei.com/leetcode-problem-198/&quot;&gt;&amp;quot;House Robber&amp;quot;&lt;/a&gt;的变种（尼玛又改需求了摔)。改动的地方是，房子分布从一条线变成了一个环，首尾相接了。依然是求最大值。&lt;/p&gt;
-
-&lt;h3&gt;题解：&lt;/h3&gt;
-
-&lt;p&gt;变成环后，其实还是可以用动态规划来解。&lt;/p&gt;
-
-&lt;p&gt;f(n) : 代表窃贼在前n个房子最多能拿到多少钱&lt;/p&gt;
-
-&lt;p&gt;在变成环后，f(n)不能容许同时盗窃第1和第n个房子的情况。那么就分情况解决。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;绝对不偷第1个房子，只在其余房子中偷。也就是排除掉第1个房子，在剩余的第2-&amp;gt;n个房子里偷；&lt;/li&gt;
-&lt;li&gt;绝对不偷第n个房子，那么其实就是求f(n - 1)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;按照这2种情况计算出的f1、f2，求出max(f1，f2)，就是要得到的解。&lt;/p&gt;
-
-&lt;p&gt;代码如下：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;rob&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;cur1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;cur2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cur1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-        <pubDate>Fri, 24 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/leetcode-problem-213/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-213/</guid>
       </item>
     
   </channel>
