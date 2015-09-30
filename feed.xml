@@ -222,6 +222,25 @@ vectors:**&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;\[  \left[ \begin{matrix} xaxis.x&amp;amp;newUp.x&amp;amp;dir.x&amp;amp;pos.x\\ xaxis.y&amp;amp;newUp.y&amp;amp;dir.y&amp;amp;pos.y\\ xaxis.z&amp;amp;newUp.z&amp;amp;dir.z&amp;amp;pos.z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h3&gt;Tranform的应用原理&lt;/h3&gt;
+
+&lt;p&gt;Tranform对Vector和Point的作用过程，上面已经提到了，就是简单的矩阵相乘。&lt;/p&gt;
+
+&lt;p&gt;对Ray和BBox的转换，也不难，就是对Ray的o和d分量分别左乘T、对BBox的8个顶点分别左乘T。&lt;/p&gt;
+
+&lt;p&gt;这里要提一下法向量的Tranform。法向量是不能直接T(n)的，这是错误的。&lt;/p&gt;
+
+&lt;p&gt;直接贴公式：&lt;/p&gt;
+
+&lt;p&gt;\[ n\cdot t = n^{T}t = 0 \]
+\[ (n^{\prime })^{T}t^{\prime }= 0 \]
+\[ (Sn)^{T}Mt = 0 \]
+\[ n^{T}S^{T}Mt = 0 \]
+\[ S^{T}M = I \]
+\[ n^{\prime } = Sn = (M^{-1})^{T}n \]&lt;/p&gt;
+
+&lt;p&gt;M是某种转换，当M对一个面作用时，这个面的法向量要用上面最后那条公式转换。注意到公式里面有一个逆矩阵，所以这就是为什么Transform要存一个逆矩阵。&lt;/p&gt;
 </description>
         <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/pbrt-chapter2/</link>

@@ -300,6 +300,25 @@ vectors:**</p>
 
 <p>\[  \left[ \begin{matrix} xaxis.x&amp;newUp.x&amp;dir.x&amp;pos.x\\ xaxis.y&amp;newUp.y&amp;dir.y&amp;pos.y\\ xaxis.z&amp;newUp.z&amp;dir.z&amp;pos.z\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
 
+<h3>Tranform的应用原理</h3>
+
+<p>Tranform对Vector和Point的作用过程，上面已经提到了，就是简单的矩阵相乘。</p>
+
+<p>对Ray和BBox的转换，也不难，就是对Ray的o和d分量分别左乘T、对BBox的8个顶点分别左乘T。</p>
+
+<p>这里要提一下法向量的Tranform。法向量是不能直接T(n)的，这是错误的。</p>
+
+<p>直接贴公式：</p>
+
+<p>\[ n\cdot t = n^{T}t = 0 \]
+\[ (n^{\prime })^{T}t^{\prime }= 0 \]
+\[ (Sn)^{T}Mt = 0 \]
+\[ n^{T}S^{T}Mt = 0 \]
+\[ S^{T}M = I \]
+\[ n^{\prime } = Sn = (M^{-1})^{T}n \]</p>
+
+<p>M是某种转换，当M对一个面作用时，这个面的法向量要用上面最后那条公式转换。注意到公式里面有一个逆矩阵，所以这就是为什么Transform要存一个逆矩阵。</p>
+
   </div>
 
   <div class="date">
