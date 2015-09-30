@@ -115,6 +115,7 @@ vectors:**&lt;/p&gt;
 &lt;li&gt;Translation，我称之为位置转换&lt;/li&gt;
 &lt;li&gt;Scaling，缩放转换&lt;/li&gt;
 &lt;li&gt;Rotation，旋转转换&lt;/li&gt;
+&lt;li&gt;LookAt，视角转换&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Translation的一般形式：&lt;/p&gt;
@@ -195,6 +196,24 @@ vectors:**&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;\[ R_{(x,y,z)}(\theta ) =  \left[ \begin{matrix} x^{2}+(1-x^{2})c&amp;amp;xy(1-c) -zs&amp;amp;xz(1-c)+ys&amp;amp;0\\ xy(1-c)+zs&amp;amp;y^{2}+(1-y^{2})c&amp;amp;yz(1-c)-xs&amp;amp;0\\ xz(1-c)-ys&amp;amp;yz(1-c)+xs&amp;amp;z^{2}+(1-z^{2})c&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;(好可怕的矩阵=。=，不过这世界上还有个东西叫四元数旋转。有空再写一篇四元数的文章）&lt;/p&gt;
+
+&lt;p&gt;LookAt转换&lt;/p&gt;
+
+&lt;p&gt;LookAt矩阵的第4列是摄像机在世界坐标系的坐标；第3列是单位化的视点朝向向量（摄像机的前方），即视点坐标减去第4列的坐标;第2列是单位化的up向量（摄像机的上方），以世界坐标系表示；第1列是摄像机坐标系的x向量在世界坐标系对应的向量。&lt;/p&gt;
+
+&lt;p&gt;第1列的x向量，是用第2列的up向量和第3列的朝向向量进行叉积得到。&lt;/p&gt;
+
+&lt;p&gt;设：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;pos是摄像机坐标（世界坐标）&lt;/li&gt;
+&lt;li&gt;up是用户提供的摄像机朝上的向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;xaxis = Normalize(Cross(Normalize(up), dir))，是摄像机的x轴单位向量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} 0&amp;amp;0&amp;amp;0&amp;amp;pos.x\\ 0&amp;amp;0&amp;amp;0&amp;amp;pos.y\\ 0&amp;amp;0&amp;amp;0&amp;amp;pos.z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/pbrt-chapter2/</link>

@@ -192,6 +192,7 @@ vectors:**</p>
 <li>Translation，我称之为位置转换</li>
 <li>Scaling，缩放转换</li>
 <li>Rotation，旋转转换</li>
+<li>LookAt，视角转换</li>
 </ul>
 
 <p>Translation的一般形式：</p>
@@ -272,6 +273,24 @@ vectors:**</p>
 </ul>
 
 <p>\[ R_{(x,y,z)}(\theta ) =  \left[ \begin{matrix} x^{2}+(1-x^{2})c&amp;xy(1-c) -zs&amp;xz(1-c)+ys&amp;0\\ xy(1-c)+zs&amp;y^{2}+(1-y^{2})c&amp;yz(1-c)-xs&amp;0\\ xz(1-c)-ys&amp;yz(1-c)+xs&amp;z^{2}+(1-z^{2})c&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
+
+<p>(好可怕的矩阵=。=，不过这世界上还有个东西叫四元数旋转。有空再写一篇四元数的文章）</p>
+
+<p>LookAt转换</p>
+
+<p>LookAt矩阵的第4列是摄像机在世界坐标系的坐标；第3列是单位化的视点朝向向量（摄像机的前方），即视点坐标减去第4列的坐标;第2列是单位化的up向量（摄像机的上方），以世界坐标系表示；第1列是摄像机坐标系的x向量在世界坐标系对应的向量。</p>
+
+<p>第1列的x向量，是用第2列的up向量和第3列的朝向向量进行叉积得到。</p>
+
+<p>设：</p>
+
+<ul>
+<li>pos是摄像机坐标（世界坐标）</li>
+<li>up是用户提供的摄像机朝上的向量（世界坐标）</li>
+<li>xaxis = Normalize(Cross(Normalize(up), dir))，是摄像机的x轴单位向量</li>
+</ul>
+
+<p>\[  \left[ \begin{matrix} 0&amp;0&amp;0&amp;pos.x\\ 0&amp;0&amp;0&amp;pos.y\\ 0&amp;0&amp;0&amp;pos.z\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
 
   </div>
 
