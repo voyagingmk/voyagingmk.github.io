@@ -209,11 +209,19 @@ vectors:**&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;pos是摄像机坐标（世界坐标）&lt;/li&gt;
-&lt;li&gt;up是用户提供的摄像机朝上的向量（世界坐标）&lt;/li&gt;
-&lt;li&gt;xaxis = Normalize(Cross(Normalize(up), dir))，是摄像机的x轴单位向量&lt;/li&gt;
+&lt;li&gt;up是用户提供的摄像机朝向上方的向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;look是用户提供的摄像机视点的向量（世界坐标）&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;\[  \left[ \begin{matrix} 0&amp;amp;0&amp;amp;0&amp;amp;pos.x\\ 0&amp;amp;0&amp;amp;0&amp;amp;pos.y\\ 0&amp;amp;0&amp;amp;0&amp;amp;pos.z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;于是有：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;dir = Normalize(look - pos)，摄像机的朝向向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;xaxis = Normalize(Cross(Normalize(up), dir))，摄像机的x轴单位向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;newUp = Cross(Normalize(dir), xaxis)，新的单位化的up向量（世界坐标）。这里不太明白为什么不直接newUp = Normalize(up)。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} xaxis.x&amp;amp;newUp.x&amp;amp;dir.x&amp;amp;pos.x\\ xaxis.y&amp;amp;newUp.y&amp;amp;dir.y&amp;amp;pos.y\\ xaxis.z&amp;amp;newUp.z&amp;amp;dir.z&amp;amp;pos.z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/pbrt-chapter2/</link>

@@ -286,11 +286,19 @@ vectors:**</p>
 
 <ul>
 <li>pos是摄像机坐标（世界坐标）</li>
-<li>up是用户提供的摄像机朝上的向量（世界坐标）</li>
-<li>xaxis = Normalize(Cross(Normalize(up), dir))，是摄像机的x轴单位向量</li>
+<li>up是用户提供的摄像机朝向上方的向量（世界坐标）</li>
+<li>look是用户提供的摄像机视点的向量（世界坐标）</li>
 </ul>
 
-<p>\[  \left[ \begin{matrix} 0&amp;0&amp;0&amp;pos.x\\ 0&amp;0&amp;0&amp;pos.y\\ 0&amp;0&amp;0&amp;pos.z\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
+<p>于是有：</p>
+
+<ul>
+<li>dir = Normalize(look - pos)，摄像机的朝向向量（世界坐标）</li>
+<li>xaxis = Normalize(Cross(Normalize(up), dir))，摄像机的x轴单位向量（世界坐标）</li>
+<li>newUp = Cross(Normalize(dir), xaxis)，新的单位化的up向量（世界坐标）。这里不太明白为什么不直接newUp = Normalize(up)。</li>
+</ul>
+
+<p>\[  \left[ \begin{matrix} xaxis.x&amp;newUp.x&amp;dir.x&amp;pos.x\\ xaxis.y&amp;newUp.y&amp;dir.y&amp;pos.y\\ xaxis.z&amp;newUp.z&amp;dir.z&amp;pos.z\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
 
   </div>
 
