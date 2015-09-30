@@ -7,6 +7,202 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Understanding Quaternions 中文翻译《理解四元数》</title>
+        <description>&lt;p&gt;原文地址:&lt;a href=&quot;http://www.3dgep.com/understanding-quaternions/&quot;&gt;http://www.3dgep.com/understanding-quaternions/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;正文&lt;/h2&gt;
+
+&lt;p&gt;在这篇文章中我会尝试用简单的方式去解释四元数的概念，即用可视化的方式解释四元数以及几种对四元数的操作。我将把矩阵、欧拉角和四元数放在一起比较，并解释什么时候该用四元数、什么时候该用欧拉角或矩阵。&lt;/p&gt;
+
+&lt;h3&gt;内容结构&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;介绍&lt;/li&gt;
+&lt;li&gt;复数
+
+&lt;ul&gt;
+&lt;li&gt;复数的加减&lt;/li&gt;
+&lt;li&gt;复数的系数缩放&lt;/li&gt;
+&lt;li&gt;复数的积&lt;/li&gt;
+&lt;li&gt;复数的平方&lt;/li&gt;
+&lt;li&gt;共轭复数&lt;/li&gt;
+&lt;li&gt;复数的绝对值&lt;/li&gt;
+&lt;li&gt;两复数的商&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;i的幂&lt;/li&gt;
+&lt;li&gt;复数平面
+
+&lt;ul&gt;
+&lt;li&gt;旋转轴（Rotors)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;四元数
+
+&lt;ul&gt;
+&lt;li&gt;作为有序数的四元数&lt;/li&gt;
+&lt;li&gt;四元数的加减&lt;/li&gt;
+&lt;li&gt;四元数的积&lt;/li&gt;
+&lt;li&gt;一个真·四元数&lt;/li&gt;
+&lt;li&gt;四元数的系数缩放&lt;/li&gt;
+&lt;li&gt;纯四元数&lt;/li&gt;
+&lt;li&gt;四元数的加法形式&lt;/li&gt;
+&lt;li&gt;单位四元数&lt;/li&gt;
+&lt;li&gt;四元数的二进制形式&lt;/li&gt;
+&lt;li&gt;共轭四元数&lt;/li&gt;
+&lt;li&gt;四元数规范&lt;/li&gt;
+&lt;li&gt;四元数规范化&lt;/li&gt;
+&lt;li&gt;四元数的逆&lt;/li&gt;
+&lt;li&gt;四元数的点乘&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;旋转&lt;/li&gt;
+&lt;li&gt;四元数的插值
+
+&lt;ul&gt;
+&lt;li&gt;SLERP
+
+&lt;ul&gt;
+&lt;li&gt;四元数的差&lt;/li&gt;
+&lt;li&gt;四元数求幂运算&lt;/li&gt;
+&lt;li&gt;四元数的分数差&lt;/li&gt;
+&lt;li&gt;考虑？&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;SQUARD&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;结论&lt;/li&gt;
+&lt;li&gt;下载Demo&lt;/li&gt;
+&lt;li&gt;引用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;介绍&lt;/h3&gt;
+
+&lt;p&gt;在计算机图形学中，我们使用转换矩阵来表示空间中的一个位置，以及朝向。一个转换矩阵还可以表示对一个目标的缩放或裁减(?)。  我们可以把转换矩阵想象成一个空间，当你用这个矩阵乘以向量、点（甚至矩阵）， 你就能把向量、点、矩阵转换进这个空间。&lt;/p&gt;
+
+&lt;p&gt;在这篇文章中，我不会讨论这个转换函数的细节。你可以查看我前面的文章，文章中描述了转换矩阵的细节。&lt;/p&gt;
+
+&lt;p&gt;在这篇文章中，我想要讨论一个可替代的方案，即用四元数来描述空间里的物体的朝向。&lt;/p&gt;
+
+&lt;p&gt;四元数的概念是由爱尔兰数学家Sir William Rowan Hamilton发明的（1843年，都柏林）。Hamilton当时正和他的妻子前往爱尔兰皇家研究院，当他从Brougham桥通过皇家运河时，他领悟到了一个激动人心的东西，并立刻把它刻在桥的一个石头上：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
+
+&lt;p&gt;William Rowan Hamilton Plaque on Broome Bridge on the Royal Canal commemorating his discovery of the fundamental formula for quaternion multiplication.&lt;/p&gt;
+
+&lt;h3&gt;复数&lt;/h3&gt;
+
+&lt;p&gt;在我们能够完全理解四元数之前，我们必须先理解四元数是怎么来的。四元数的根源其实是&lt;strong&gt;复数&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;除了知名的数集（自然数、整数、实数、分数）之外，复数系统引入了一个新的数集——虚数。虚数的发明是为了解决一些特定的无解的方程，例如；
+\[ x^{2} + 1 = 0 \]
+要解决这个等式，必须让\(x^{2} = -1 \)，在当然是不行的，因为任意数字的平方都是非负数。&lt;/p&gt;
+
+&lt;p&gt;一般而言，数学家是不能忍受一个等式是无解的，于是一个新的术语被发明了，它就是虚数，一个可以解决上面这个等式的数。&lt;/p&gt;
+
+&lt;p&gt;虚数有这样的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{2} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;不要为这个术语较真，因为逻辑上这个数是不存在的。只要知道i是一个平方等于-1的东西即可。&lt;/p&gt;
+
+&lt;p&gt;虚数的集合可以用\( \mathbb{I} \)来表示。&lt;/p&gt;
+
+&lt;p&gt;复数的集合\( \mathbb{C} \)是一个实数和一个虚数的和，形式如下：&lt;/p&gt;
+
+&lt;p&gt;\[ z = a + bi \ a,b\in R,\ i^{2} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;可以认为所有实数都是b为0的复数、所有虚数都是a=0的复数。&lt;/p&gt;
+
+&lt;h3&gt;复数的加减&lt;/h3&gt;
+
+&lt;p&gt;加法：&lt;/p&gt;
+
+&lt;p&gt;\[ (a_{1} + b_{1}i) + (a_{2} + b_{2}i) = (a_{1} + a_{2}) + (b_{1} + b_{2})i \]&lt;/p&gt;
+
+&lt;p&gt;减法：&lt;/p&gt;
+
+&lt;p&gt;\[ (a_{1} + b_{1}i) - (a_{2} + b_{2}i) = (a_{1} - a_{2}) + (b_{1} - b_{2})i \]&lt;/p&gt;
+
+&lt;h3&gt;复数的系数缩放&lt;/h3&gt;
+
+&lt;p&gt;\[ \lambda (a_{1} + b_{1}i) = \lambda  a_{1} + \lambda b_{1}i \]&lt;/p&gt;
+
+&lt;h3&gt;复数的积&lt;/h3&gt;
+
+&lt;p&gt;\[  z_{1} = (a_{1} + b_{1}i) \]
+\[  z_{2} = (a_{2} + b_{2}i) \]
+\[  z_{1}z_{2} = (a_{1} + b_{1}i)(a_{2} + b_{2}i) = a_{1}a_{2} + a_{1}b_{2}i + b_{1}a_{2}i+b_{1}b_{2}i^{2} \]
+\[ z_{1}z_{2} = (a_{1}a_{2} - b_{1}b_{2}) + (a_{1}b_{2} + b_{1}a_{2})i \]&lt;/p&gt;
+
+&lt;h3&gt;复数的平方&lt;/h3&gt;
+
+&lt;p&gt;\[ z = (a + bi) \]
+\[ z^{2} = (a + bi)(a + bi) \]
+\[ z^{2} = (a^{2} - b^{2}) + 2abi \]&lt;/p&gt;
+
+&lt;h3&gt;共轭复数&lt;/h3&gt;
+
+&lt;p&gt;复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(\z^{*}\)。&lt;/p&gt;
+
+&lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
+
+&lt;p&gt;\[ z^{*} = (a - bi) \]&lt;/p&gt;
+
+&lt;p&gt;复数和它的共轭复数的乘积是：&lt;/p&gt;
+
+&lt;p&gt;\[ zz^{*} = (a + bi)(a - bi) = a^{2}-abi+abi+b^{2} = a^{2}+b^{2} \]&lt;/p&gt;
+
+&lt;h3&gt;复数的绝对值&lt;/h3&gt;
+
+&lt;p&gt;我们使用共轭复数来计算复数的绝对值：&lt;/p&gt;
+
+&lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
+
+&lt;p&gt;\[ |z| = \sqrt {zz^{*}} = \sqrt {(a + bi)(a - bi)} = \sqrt {a^{2} + b^{2} } \]&lt;/p&gt;
+
+&lt;h3&gt;两复数的商&lt;/h3&gt;
+
+&lt;p&gt;\[  z_{1} = (a_{1} + b_{1}i) \]
+\[  z_{2} = (a_{2} + b_{2}i) \]
+\[ \frac {z_{1}}{z_{2}} = \frac {a_{1} + b_{1}i}{a_{2} + b_{2}i} = \frac {(a_{1} + b_{1}i)(a_{2} - b_{2}i)}{(a_{2} + b_{2}i)(a_{2} - b_{2}i)} \]
+\[  = \frac {a_{1}a_{2}-a_{1}b_{2}i+b_{1}a_{2}i-b_{1}b_{2}i^{2} }{a_{2}^{2} + b_{2}^{2}} \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \frac {a_{1}a_{2} + b_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}   + \frac {b_{1}a_{2} - a_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}i \]&lt;/p&gt;
+
+&lt;h2&gt;i的幂&lt;/h2&gt;
+
+&lt;p&gt;如果i的平方等于-1，那么i的n次幂也应该存在：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{0} = 1 \]
+\[ i^{1} = i \]
+\[ i^{2} = -1 \]
+\[ i^{3} = ii^{2} = -i \]
+\[ i^{4} = i^{2}i^{2} = 1 \]
+\[ i^{5} = ii^{4} = i \]
+\[ i^{6} = ii^{5} = i^{2} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;如果按照这个顺序写下去，会出现这样一个模式：
+(1,i,-1,-i,1,...)&lt;/p&gt;
+
+&lt;p&gt;一个类似的模式也出现在递增的负数幂：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{0} = 1 \]
+\[ i^{-1} = -i \]
+\[ i^{-2} = -1 \]
+\[ i^{-3} = i \]
+\[ i^{-4} = 1 \]
+\[ i^{-5} = -i \]
+\[ i^{-6} = -1 \]&lt;/p&gt;
+
+&lt;h2&gt;复数平面&lt;/h2&gt;
+
+&lt;h3&gt;旋转轴（Rotors)&lt;/h3&gt;
+
+&lt;h2&gt;四元数&lt;/h2&gt;
+</description>
+        <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/understanding-quaternions/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/understanding-quaternions/</guid>
+      </item>
+    
+      <item>
         <title>PBRT《章2》阅读笔记</title>
         <description>&lt;p&gt;最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。&lt;/p&gt;
 
@@ -1551,115 +1747,6 @@ double asDouble() const; //good
         <pubDate>Tue, 04 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/raytrace/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/raytrace/</guid>
-      </item>
-    
-      <item>
-        <title>leetcode题解 problem87 Scramble String</title>
-        <description>&lt;h3&gt;题解：&lt;/h3&gt;
-
-&lt;p&gt;设s1，s2是两个长度都为len的字符串（把s1、s2当做字符数组理解）&lt;/p&gt;
-
-&lt;p&gt;设状态量res[n][i][j]，(n &amp;lt; len, i &amp;lt;= n, j &amp;lt;= n), 元素是bool值&lt;/p&gt;
-
-&lt;p&gt;res的含义：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;长度为n，以i位置为起点的子串s1[i, i + n], 以j位置为起点的子串s2[i, i + n], res[n][i][j]标志了这2个子串是不是Scramble&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;那么很显然，res[len-1][0][0]就是我们要的解。&lt;/p&gt;
-
-&lt;p&gt;状态转移方程：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;res[n][i][j] = ( res[k][i][j] &amp;amp;&amp;amp; res[n - k][i + k][j + k] ) || ( res[k][i][j + n - k] &amp;amp;&amp;amp; res[n - k][i + k][j] )&lt;/strong&gt;    ** (1&amp;lt;=k&amp;lt;n) **&lt;/p&gt;
-
-&lt;p&gt;这个式子看起来很吓人。先做个分解：&lt;/p&gt;
-
-&lt;p&gt;设 A = res[k][i][j] &amp;amp;&amp;amp; res[n - k][i + k][j + k] = A1 &amp;amp;&amp;amp; A2&lt;/p&gt;
-
-&lt;p&gt;设 B = res[k][i][j + n - k] &amp;amp;&amp;amp; res[n - k][i + k][j] = B1 &amp;amp;&amp;amp; B2&lt;/p&gt;
-
-&lt;p&gt;设 C = res[n][i][j] = A || B&lt;/p&gt;
-
-&lt;p&gt;也就是说，只要A、B中有一个为T，那么C就为T; 而A、B为T的条件分别是，A1和A2同时为真、B1和B2同时为真。&lt;/p&gt;
-
-&lt;p&gt;A1、A2、B1、B2的含义是什么呢？举例说明一下：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;great&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;rgtae&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;时：&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;           &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|****&lt;/span&gt;                          &lt;span class=&quot;o&quot;&gt;*|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reat&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|****&lt;/span&gt;                          &lt;span class=&quot;o&quot;&gt;*|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gtae&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;A1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;                          &lt;span class=&quot;n&quot;&gt;A2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|****&lt;/span&gt;                          &lt;span class=&quot;o&quot;&gt;*|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reat&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;****|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;                          &lt;span class=&quot;n&quot;&gt;rgta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|*&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;B1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;                          &lt;span class=&quot;n&quot;&gt;B2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;
-
-&lt;span class=&quot;err&quot;&gt;显然&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;F&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;F&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;时：&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;           &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;gr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|***&lt;/span&gt;                          &lt;span class=&quot;o&quot;&gt;**|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eat&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;rg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|***&lt;/span&gt;                          &lt;span class=&quot;o&quot;&gt;**|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tae&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;A1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;                          &lt;span class=&quot;n&quot;&gt;A2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;gr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|***&lt;/span&gt;                          &lt;span class=&quot;o&quot;&gt;**|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eat&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;***|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ae&lt;/span&gt;                          &lt;span class=&quot;n&quot;&gt;rgt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|**&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;B1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;                          &lt;span class=&quot;n&quot;&gt;B2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;
-
-&lt;span class=&quot;err&quot;&gt;显然&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;F&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;当(A1 &amp;amp;&amp;amp; A2) = T时， s1-left和s2-left互为Scramble， s1-right和s2-right互为Scramble；&lt;/strong&gt; &lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;当(B1 &amp;amp;&amp;amp; B2) = T时， s1-left和s2-right互为Scramble， s1-right和s2-left互为Scramble。&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;状态转移方程有了，还差个初始化状态:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;n = 0时，s1、s2退化成s1[i]和s2[j]，那么res[0][i][j] 等于 s1[i] == s2[j]&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;代码如下:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;isScramble&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//tricky&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-                    &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-                        &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; 
-                            &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
-                    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-                    &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP计算导致这么慢的，必须全部状态都算出来才可以返回最终结果。&lt;/p&gt;
-</description>
-        <pubDate>Fri, 24 Jul 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/leetcode-problem-87/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/leetcode-problem-87/</guid>
       </item>
     
   </channel>
