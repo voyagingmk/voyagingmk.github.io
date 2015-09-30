@@ -84,6 +84,8 @@
 
 &lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
 
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/2.jpg&quot; alt=&quot;2.jpg&quot;&gt;&lt;/p&gt;
+
 &lt;p&gt;William Rowan Hamilton Plaque on Broome Bridge on the Royal Canal commemorating his discovery of the fundamental formula for quaternion multiplication.&lt;/p&gt;
 
 &lt;h3&gt;复数&lt;/h3&gt;
@@ -191,7 +193,21 @@
 \[ i^{-5} = -i \]
 \[ i^{-6} = -1 \]&lt;/p&gt;
 
+&lt;p&gt;你可能已经在数学里头见过类似的模式，但是是以（x,y,-x,-y,x,...)的形式，这是在2D笛卡尔平面对一个点逆时针旋转90度时生成的；（x,-y,-x,y,x,...)则是在2D笛卡尔平面对一个点顺时针旋转90度时生成的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
 &lt;h2&gt;复数平面&lt;/h2&gt;
+
+&lt;p&gt;我们也能够把复数映射到一个2D网格平面——复数平面，只需要把实数映射到横轴、虚数映射到纵轴。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;如前面的序列所示，我们可以认为，对一个复数乘以i，这个复数就在复数平面上旋转了90度。&lt;/p&gt;
+
+&lt;p&gt;As shown in the previous sequence, we can say that if we multiply a complex number by i, we can rotate the complex number through the complex plane at 90 degree increments.&lt;/p&gt;
+
+&lt;p&gt;Let’s see if this is true. We’ll take an arbitrary point p in the complex plane:&lt;/p&gt;
 
 &lt;h3&gt;旋转轴（Rotors)&lt;/h3&gt;
 
