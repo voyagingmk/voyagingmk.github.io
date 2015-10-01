@@ -1027,7 +1027,8 @@ vectors:**&lt;/p&gt;
 
 &lt;p&gt;其中每个正交向量的长度\(||q_{i}||=1\)。&lt;/p&gt;
 
-&lt;p&gt;标准正交向量组成的矩阵是：&lt;/p&gt;
+&lt;p&gt;标准正交向量组成的矩阵是：
+&amp;lt;!--more--&amp;gt;&lt;/p&gt;
 
 &lt;p&gt;\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] \)&lt;/p&gt;
 
@@ -1237,9 +1238,9 @@ vectors:**&lt;/p&gt;
 
 &lt;p&gt;p = ax（p和a都是向量，x是一个值）【式子1】&lt;/p&gt;
 
-&lt;p&gt;然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：&lt;/p&gt;
-
-&lt;p&gt;\[ a^{T}e = 0 \]&lt;/p&gt;
+&lt;p&gt;然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：
+&amp;lt;!--more--&amp;gt;
+\[ a^{T}e = 0 \]&lt;/p&gt;
 
 &lt;p&gt;\[ a^{T}(b-xa) = 0 \]&lt;/p&gt;
 
@@ -1361,22 +1362,20 @@ vectors:**&lt;/p&gt;
 &lt;li&gt;使用引用，可以不做null判断&lt;/li&gt;
 &lt;li&gt;当需要考虑“不指向任何对象”的可能性时，或是考虑“在不同时间指向不同对象”的能力时，你就应该采用pointer，前一种情况可以将pointer设为null，后一种情况可以改变pointer所指对象。&lt;/li&gt;
 &lt;li&gt;当确定“总是会代表某个对象”，而且“一旦代表了该对象就不能够再改变”，那么应该选用reference。&lt;/li&gt;
-&lt;li&gt;总是令operator[]返回一个reference。&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;&lt;p&gt;总是令operator[]返回一个reference。
+&amp;lt;!--more--&amp;gt;&lt;/p&gt;
 
-&lt;h3&gt;条款2：最好使用C++转型操作符&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;需要使用类型转换时，先考虑能不能用static_cast&lt;/li&gt;
-&lt;li&gt;不能用static_cast的情况有：
+&lt;h3&gt;条款2：最好使用C++转型操作符&lt;/h3&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;需要使用类型转换时，先考虑能不能用static_cast&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;不能用static_cast的情况有：&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;移除表达式的常量性(constness)或变易性(volatileness) [用const_cast]&lt;/li&gt;
 &lt;li&gt;继承体系的转型 [用dynamic_cast]&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;const_cast无法进行继承体系的向下转型(cast down)&lt;/li&gt;
-&lt;li&gt;dynamic_cast无法用在缺乏虚函数的类型身上，也不能改变常量性&lt;/li&gt;
-&lt;li&gt;reinterpret_cast不具移植性，是平台相关的&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;const_cast无法进行继承体系的向下转型(cast down)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;dynamic_cast无法用在缺乏虚函数的类型身上，也不能改变常量性&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;reinterpret_cast不具移植性，是平台相关的&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3&gt;条款3：绝对不要以多态(polymorphically)方式处理数组&lt;/h3&gt;
@@ -1760,9 +1759,9 @@ double asDouble() const; //good
 
 &lt;p&gt;LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。&lt;/p&gt;
 
-&lt;p&gt;下面手动演示下LU分解过程：&lt;/p&gt;
-
-&lt;p&gt;设A：&lt;/p&gt;
+&lt;p&gt;下面手动演示下LU分解过程：
+&amp;lt;!--more--&amp;gt;
+设A：&lt;/p&gt;
 
 &lt;p&gt;\[ A =  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 6&amp;amp;5&amp;amp;4\\ 3&amp;amp;4&amp;amp;10\\ \end{matrix} \right] \]&lt;/p&gt;
 
@@ -1916,6 +1915,8 @@ double asDouble() const; //good
 
 &lt;p&gt;想一下绝对值的&lt;strong&gt;几何意义&lt;/strong&gt;：指明了一个实数（这里不提虚数）距离数轴原点的大小。&lt;/p&gt;
 
+&lt;!--more--&gt;
+
 &lt;h2&gt;二阶行列式&lt;/h2&gt;
 
 &lt;p&gt;现在看一下二阶行列式：&lt;/p&gt;
@@ -1991,55 +1992,38 @@ double asDouble() const; //good
 
 &lt;p&gt;这个定义是从程序实现角度考虑的。一个矩阵可以用二维数组Array[m][n]来存放，也可以用一维数组Array[m*n]来存放，在不考虑实现语言之前，我更倾向于使用一维数组。&lt;/p&gt;
 
-&lt;p&gt;矩阵的定义虽然不复杂，但是聪明的数学家对矩阵进行了各种研究，导致产生了非常多的概念、术语、定理、推论：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;当m == n时，矩阵可以被称为&lt;strong&gt;n阶矩阵&lt;/strong&gt;，或&lt;strong&gt;n阶方阵&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;矩阵A的m、n和矩阵B的m、n相等时，称A和B为&lt;strong&gt;同阶矩阵&lt;/strong&gt;或&lt;strong&gt;同型矩阵&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;大写字母&lt;strong&gt;O&lt;/strong&gt;代表元素全为0的矩阵&lt;/li&gt;
-&lt;li&gt;矩阵的加法运算满足以下运算律:
-
-&lt;ol&gt;
-&lt;li&gt;交换律 &lt;strong&gt;A + B = B + A&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;结合律 &lt;strong&gt;( A + B ) + C = A + ( B + C )&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;A + O = O + A&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;A + (-A) = (-A) + A = O&lt;/strong&gt;&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;li&gt;矩阵的数乘运算满足以下运算律:
-
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;k ( A + B ) = kA + kB&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;( k + t ) A = kA + tA&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;k ( tA ) = ( kt ) A&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;1 * A = A&lt;/strong&gt;&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;li&gt;矩阵的加法和数乘运算统称为矩阵的&lt;strong&gt;线性运算&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;矩阵之间允许乘法运算：C = AB。但有一个前提：
-左矩阵A的列数必须等于右矩阵B的行数&lt;/li&gt;
-&lt;li&gt;做矩阵相乘运算要注意的一些特性：
-
-&lt;ol&gt;
-&lt;li&gt;AB 有意义时， BA 不一定有意义&lt;/li&gt;
-&lt;li&gt;AB 和 BA 都有意义时，并不意味着 AB = BA（不满足交换律），但存在使得此等式成立的2个矩阵&lt;/li&gt;
-&lt;li&gt;不满足消除率。两个非零矩阵的乘积可能是零矩阵，即 AB = O 成立时，并不能推出 A = O 或 B = O&lt;/li&gt;
-&lt;li&gt;满足结合律：
-
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;( AB ) C = A ( BC )&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;k ( AB ) = ( kA ) B = A ( kB )&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;A ( B + C ) = AB + AC&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;( B + C ) A = BA + CA&lt;/strong&gt;&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;li&gt;矩阵可以做幂运算：
-
-&lt;ol&gt;
-&lt;li&gt;\( \mathbf{ A^{k}A^{t} = A^{k+t} } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ (A^{k})^{t} = A^{kt} } \)&lt;/li&gt;
-&lt;li&gt;若 AB = BA，则 \( \mathbf{ (AB)^{k} = A^{k}B^{k} } \)&lt;/li&gt;
-&lt;li&gt;注意，即使 \( \mathbf{ A^{k} = O } \)，也并不意味着\( \mathbf{  A = O } \)&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;矩阵的定义虽然不复杂，但是聪明的数学家对矩阵进行了各种研究，导致产生了非常多的概念、术语、定理、推论：
+&amp;lt;!--more--&amp;gt;
+1. 当m == n时，矩阵可以被称为&lt;strong&gt;n阶矩阵&lt;/strong&gt;，或&lt;strong&gt;n阶方阵&lt;/strong&gt;
+2. 矩阵A的m、n和矩阵B的m、n相等时，称A和B为&lt;strong&gt;同阶矩阵&lt;/strong&gt;或&lt;strong&gt;同型矩阵&lt;/strong&gt;
+3. 大写字母&lt;strong&gt;O&lt;/strong&gt;代表元素全为0的矩阵
+4. 矩阵的加法运算满足以下运算律:
+    1. 交换律 &lt;strong&gt;A + B = B + A&lt;/strong&gt;
+    2. 结合律 &lt;strong&gt;( A + B ) + C = A + ( B + C )&lt;/strong&gt;
+    3. &lt;strong&gt;A + O = O + A&lt;/strong&gt;
+    4. &lt;strong&gt;A + (-A) = (-A) + A = O&lt;/strong&gt;
+5. 矩阵的数乘运算满足以下运算律:
+    1. &lt;strong&gt;k ( A + B ) = kA + kB&lt;/strong&gt;
+    2. &lt;strong&gt;( k + t ) A = kA + tA&lt;/strong&gt;
+    3. &lt;strong&gt;k ( tA ) = ( kt ) A&lt;/strong&gt;
+    4. &lt;strong&gt;1 * A = A&lt;/strong&gt;
+6. 矩阵的加法和数乘运算统称为矩阵的&lt;strong&gt;线性运算&lt;/strong&gt;
+7. 矩阵之间允许乘法运算：C = AB。但有一个前提：
+    左矩阵A的列数必须等于右矩阵B的行数
+8. 做矩阵相乘运算要注意的一些特性：
+    1. AB 有意义时， BA 不一定有意义
+    2. AB 和 BA 都有意义时，并不意味着 AB = BA（不满足交换律），但存在使得此等式成立的2个矩阵
+    3. 不满足消除率。两个非零矩阵的乘积可能是零矩阵，即 AB = O 成立时，并不能推出 A = O 或 B = O
+    4. 满足结合律：
+        1. &lt;strong&gt;( AB ) C = A ( BC )&lt;/strong&gt;
+        2. &lt;strong&gt;k ( AB ) = ( kA ) B = A ( kB )&lt;/strong&gt;
+        3. &lt;strong&gt;A ( B + C ) = AB + AC&lt;/strong&gt;
+        4. &lt;strong&gt;( B + C ) A = BA + CA&lt;/strong&gt;
+9. 矩阵可以做幂运算：
+    1. \( \mathbf{ A^{k}A^{t} = A^{k+t} } \)
+    2. \( \mathbf{ (A^{k})^{t} = A^{kt} } \)
+    3. 若 AB = BA，则 \( \mathbf{ (AB)^{k} = A^{k}B^{k} } \)
+    4. 注意，即使 \( \mathbf{ A^{k} = O } \)，也并不意味着\( \mathbf{  A = O } \)&lt;/p&gt;
 
 &lt;h2&gt;矩阵的转置&lt;/h2&gt;
 
