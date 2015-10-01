@@ -41,7 +41,7 @@
 &lt;li&gt;作为有序数的四元数&lt;/li&gt;
 &lt;li&gt;四元数的加减&lt;/li&gt;
 &lt;li&gt;四元数的积&lt;/li&gt;
-&lt;li&gt;一个真·四元数&lt;/li&gt;
+&lt;li&gt;实四元数&lt;/li&gt;
 &lt;li&gt;四元数的系数缩放&lt;/li&gt;
 &lt;li&gt;纯四元数&lt;/li&gt;
 &lt;li&gt;四元数的加法形式&lt;/li&gt;
@@ -141,7 +141,7 @@
 
 &lt;h3&gt;共轭复数&lt;/h3&gt;
 
-&lt;p&gt;复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(\z^{*}\)。&lt;/p&gt;
+&lt;p&gt;复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(z^{*}\)。&lt;/p&gt;
 
 &lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
 
@@ -228,6 +228,22 @@
 &lt;p&gt;我们也可以按顺时针方向旋转，只需要把上面的乘数i改成-i。&lt;/p&gt;
 
 &lt;h3&gt;旋转数（Rotors)&lt;/h3&gt;
+
+&lt;p&gt;我们也可以在复数平面上进行任意的旋转，只需要定义下面这个复数：
+\[q = cos\theta +isin\theta \]&lt;/p&gt;
+
+&lt;p&gt;任意的复数乘以q：&lt;/p&gt;
+
+&lt;p&gt;\[ p = a + bi \]
+\[ q = cos\theta + isin\theta \]
+\[ pq = (a + bi)(cos\theta + isin\theta ) \]
+\[ a&amp;#39; + b&amp;#39;i = acos\theta -bsin\theta + (asin\theta +bcos\theta )i \] &lt;/p&gt;
+
+&lt;p&gt;也可以写成矩阵的形式：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} a&amp;#39;&amp;amp;-b&amp;#39;\\ b&amp;#39;&amp;amp;a&amp;#39;\\ \end{matrix} \right] =  \left[ \begin{matrix} cos\theta &amp;amp;-sin\theta \\ sin\theta &amp;amp;cos\theta \\ \end{matrix} \right] \left[ \begin{matrix} a&amp;amp;-b\\ b&amp;amp;a\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;这也是一个在复数平面绕原点逆时针旋转任意点的方法。&lt;/p&gt;
 
 &lt;h2&gt;四元数&lt;/h2&gt;
 </description>
