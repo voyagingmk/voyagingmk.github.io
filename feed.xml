@@ -462,7 +462,24 @@
 &lt;p&gt;\[ |q| = \sqrt {1^{2}+4^{2}+4^{2}+(-4)^{2}} \]
 \[ = \sqrt {49} = 7 \]&lt;/p&gt;
 
+&lt;p&gt;然后，q除以|q|:&lt;/p&gt;
+
+&lt;p&gt;\[ q&amp;#39; = \frac {q}{|q|} \]
+\[ = \frac {(1+4i+4j-4k)}{7} \]
+\[ = \frac {1}{7}+\frac {4}{7}i+\frac {4}{7}j-\frac {4}{7}k \]&lt;/p&gt;
+
 &lt;h3&gt;四元数的逆&lt;/h3&gt;
+
+&lt;p&gt;四元数的逆用\(q^{-1} \)表示。要计算四元数的逆，需要用四元数的共轭四元数去除以四元数的范数的平方：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} = \frac {q^{*}}{|q|^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;为了证明这个式子，我们先根据&lt;strong&gt;逆&lt;/strong&gt;的定义，有：&lt;/p&gt;
+
+&lt;p&gt;\[ qq^{-1} = [1,0] = 1 \]&lt;/p&gt;
+
+&lt;p&gt;两边都左乘共轭四元数\(q^{&lt;em&gt;} \)：
+\[ q^{&lt;/em&gt;}qq^{-1} = q^{*} \]&lt;/p&gt;
 
 &lt;h3&gt;四元数的点乘&lt;/h3&gt;
 </description>
