@@ -506,13 +506,22 @@
 
 &lt;p&gt;\[ q^{-1} = q^{*} \]&lt;/p&gt;
 
-&lt;h3&gt;四元数的点乘&lt;/h3&gt;
+&lt;h3&gt;四元数的点积&lt;/h3&gt;
 
-&lt;p&gt;和向量的点乘相似，我们也可以计算2个四元数的点乘，只需要将各个对应的系数相乘，然后相加:&lt;/p&gt;
+&lt;p&gt;和向量的点积相似，我们也可以计算2个四元数的点积，只需要将各个对应的系数相乘，然后相加:&lt;/p&gt;
 
 &lt;p&gt;\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
 \[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
-\[ q_{1}q_{2} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \] [s_{2},x_{2}i+y_{2}j+z_{2}k] \]&lt;/p&gt;
+\[ q_{1}q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
+
+&lt;p&gt;我们也可以利用四元数点积，来计算四元数之间的角度差：&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]&lt;/p&gt;
+
+&lt;p&gt;对于单位四元数，我们可以简化上面的等式：
+\[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
+
+&lt;h2&gt;旋转&lt;/h2&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
