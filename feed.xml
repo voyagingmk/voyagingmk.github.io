@@ -19,39 +19,54 @@
 &lt;ul&gt;
 &lt;li&gt;介绍&lt;/li&gt;
 &lt;li&gt;复数
-### 复数的加减
-### 复数的系数缩放
-### 复数的积
-### 复数的平方
-### 共轭复数
-### 复数的绝对值
-### 两复数的商&lt;/li&gt;
+
+&lt;ul&gt;
+&lt;li&gt;复数的加减&lt;/li&gt;
+&lt;li&gt;复数的系数缩放&lt;/li&gt;
+&lt;li&gt;复数的积&lt;/li&gt;
+&lt;li&gt;复数的平方&lt;/li&gt;
+&lt;li&gt;共轭复数&lt;/li&gt;
+&lt;li&gt;复数的绝对值&lt;/li&gt;
+&lt;li&gt;两复数的商&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;i的幂&lt;/li&gt;
 &lt;li&gt;复数平面
-### 旋转数（Rotors)&lt;/li&gt;
+
+&lt;ul&gt;
+&lt;li&gt;旋转数（Rotors)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;四元数
-### 作为有序数的四元数
-### 四元数的加减
-### 四元数的积
-### 实四元数
-### 四元数的系数缩放
-### 纯四元数
-### 四元数的加法形式
-### 单位四元数
-### 四元数的二元形式
-### 共轭四元数
-### 四元数范数
-### 四元数规范化
-### 四元数的逆
-### 四元数的点乘&lt;/li&gt;
+
+&lt;ul&gt;
+&lt;li&gt;作为有序数的四元数&lt;/li&gt;
+&lt;li&gt;四元数的加减&lt;/li&gt;
+&lt;li&gt;四元数的积&lt;/li&gt;
+&lt;li&gt;实四元数&lt;/li&gt;
+&lt;li&gt;四元数的系数缩放&lt;/li&gt;
+&lt;li&gt;纯四元数&lt;/li&gt;
+&lt;li&gt;四元数的加法形式&lt;/li&gt;
+&lt;li&gt;单位四元数&lt;/li&gt;
+&lt;li&gt;四元数的二元形式&lt;/li&gt;
+&lt;li&gt;共轭四元数&lt;/li&gt;
+&lt;li&gt;四元数范数&lt;/li&gt;
+&lt;li&gt;四元数规范化&lt;/li&gt;
+&lt;li&gt;四元数的逆&lt;/li&gt;
+&lt;li&gt;四元数的点乘&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;旋转&lt;/li&gt;
 &lt;li&gt;四元数的插值
-### SLERP
-### 四元数的差
-### 四元数求幂运算
-### 四元数的分数差
-### 考虑？
-### SQUARD&lt;/li&gt;
+
+&lt;ul&gt;
+&lt;li&gt;SLERP
+
+&lt;ul&gt;
+&lt;li&gt;四元数的差&lt;/li&gt;
+&lt;li&gt;四元数求幂运算&lt;/li&gt;
+&lt;li&gt;四元数的分数差&lt;/li&gt;
+&lt;li&gt;考虑？&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;SQUARD&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;结论&lt;/li&gt;
 &lt;li&gt;下载Demo&lt;/li&gt;
 &lt;li&gt;引用&lt;/li&gt;
@@ -492,6 +507,12 @@
 &lt;p&gt;\[ q^{-1} = q^{*} \]&lt;/p&gt;
 
 &lt;h3&gt;四元数的点乘&lt;/h3&gt;
+
+&lt;p&gt;和向量的点乘相似，我们也可以计算2个四元数的点乘，只需要将各个对应的系数相乘，然后相加:&lt;/p&gt;
+
+&lt;p&gt;\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
+\[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
+\[ q_{1}q_{2} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \] [s_{2},x_{2}i+y_{2}j+z_{2}k] \]&lt;/p&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
