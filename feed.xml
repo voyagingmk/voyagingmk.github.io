@@ -481,6 +481,16 @@
 &lt;p&gt;两边都左乘共轭四元数\(q^{&lt;em&gt;} \)：
 \[ q^{&lt;/em&gt;}qq^{-1} = q^{*} \]&lt;/p&gt;
 
+&lt;p&gt;将上文中的\( qq^{*} = |q|^{2} \)代入这个式子，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ |q|^{2}q^{-1} = q^{*} \] &lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} = \frac {q^{*}}{|q|^{2}} \] &lt;/p&gt;
+
+&lt;p&gt;对于单位四元数，它的范数是1，所以可以写成：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} = q^{*} \]&lt;/p&gt;
+
 &lt;h3&gt;四元数的点乘&lt;/h3&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
