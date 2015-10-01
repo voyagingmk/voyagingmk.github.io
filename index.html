@@ -150,552 +150,6 @@
 <li>引用</li>
 </ul>
 
-<!--more-->
-
-<h3>介绍</h3>
-
-<p>在计算机图形学中，我们使用转换矩阵来表示空间中的一个位置，以及朝向。一个转换矩阵还可以表示对一个目标的缩放或裁减(?)。  我们可以把转换矩阵想象成一个空间，当你用这个矩阵乘以向量、点（甚至矩阵）， 你就能把向量、点、矩阵转换进这个空间。</p>
-
-<p>在这篇文章中，我不会讨论这个转换函数的细节。你可以查看我前面的文章，文章中描述了转换矩阵的细节。</p>
-
-<p>在这篇文章中，我想要讨论一个可替代的方案，即用四元数来描述空间里的物体的朝向。</p>
-
-<p>四元数的概念是由爱尔兰数学家Sir William Rowan Hamilton发明的（1843年，都柏林）。Hamilton当时正和他的妻子前往爱尔兰皇家研究院，当他从Brougham桥通过皇家运河时，他领悟到了一个激动人心的东西，并立刻把它刻在桥的一个石头上：</p>
-
-<p>\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]</p>
-
-<p><img src="../images/2015.9/2.jpg" alt="2.jpg"></p>
-
-<p>William Rowan Hamilton Plaque on Broome Bridge on the Royal Canal commemorating his discovery of the fundamental formula for quaternion multiplication.</p>
-
-<h3>复数</h3>
-
-<p>在我们能够完全理解四元数之前，我们必须先理解四元数是怎么来的。四元数的根源其实是<strong>复数</strong>。</p>
-
-<p>除了知名的数集（自然数、整数、实数、分数）之外，复数系统引入了一个新的数集——虚数。虚数的发明是为了解决一些特定的无解的方程，例如；
-\[ x^{2} + 1 = 0 \]
-要解决这个等式，必须让\(x^{2} = -1 \)，在当然是不行的，因为任意数字的平方都是非负数。</p>
-
-<p>一般而言，数学家是不能忍受一个等式是无解的，于是一个新的术语被发明了，它就是虚数，一个可以解决上面这个等式的数。</p>
-
-<p>虚数有这样的形式：</p>
-
-<p>\[ i^{2} = -1 \]</p>
-
-<p>不要为这个术语较真，因为逻辑上这个数是不存在的。只要知道i是一个平方等于-1的东西即可。</p>
-
-<p>虚数的集合可以用\( \mathbb{I} \)来表示。</p>
-
-<p>复数的集合\( \mathbb{C} \)是一个实数和一个虚数的和，形式如下：</p>
-
-<p>\[ z = a + bi \ a,b\in R,\ i^{2} = -1 \]</p>
-
-<p>可以认为所有实数都是b为0的复数、所有虚数都是a=0的复数。</p>
-
-<h3>复数的加减</h3>
-
-<p>加法：</p>
-
-<p>\[ (a_{1} + b_{1}i) + (a_{2} + b_{2}i) = (a_{1} + a_{2}) + (b_{1} + b_{2})i \]</p>
-
-<p>减法：</p>
-
-<p>\[ (a_{1} + b_{1}i) - (a_{2} + b_{2}i) = (a_{1} - a_{2}) + (b_{1} - b_{2})i \]</p>
-
-<h3>复数的系数缩放</h3>
-
-<p>\[ \lambda (a_{1} + b_{1}i) = \lambda  a_{1} + \lambda b_{1}i \]</p>
-
-<h3>复数的积</h3>
-
-<p>\[  z_{1} = (a_{1} + b_{1}i) \]
-\[  z_{2} = (a_{2} + b_{2}i) \]
-\[  z_{1}z_{2} = (a_{1} + b_{1}i)(a_{2} + b_{2}i) = a_{1}a_{2} + a_{1}b_{2}i + b_{1}a_{2}i+b_{1}b_{2}i^{2} \]
-\[ z_{1}z_{2} = (a_{1}a_{2} - b_{1}b_{2}) + (a_{1}b_{2} + b_{1}a_{2})i \]</p>
-
-<h3>复数的平方</h3>
-
-<p>\[ z = (a + bi) \]
-\[ z^{2} = (a + bi)(a + bi) \]
-\[ z^{2} = (a^{2} - b^{2}) + 2abi \]</p>
-
-<h3>共轭复数</h3>
-
-<p>复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(z^{*}\)。</p>
-
-<p>\[ z = (a + bi) \]</p>
-
-<p>\[ z^{*} = (a - bi) \]</p>
-
-<p>复数和它的共轭复数的乘积是：</p>
-
-<p>\[ zz^{*} = (a + bi)(a - bi) = a^{2}-abi+abi+b^{2} = a^{2}+b^{2} \]</p>
-
-<h3>复数的绝对值</h3>
-
-<p>我们使用共轭复数来计算复数的绝对值：</p>
-
-<p>\[ z = (a + bi) \]</p>
-
-<p>\[ |z| = \sqrt {zz^{*}} = \sqrt {(a + bi)(a - bi)} = \sqrt {a^{2} + b^{2} } \]</p>
-
-<h3>两复数的商</h3>
-
-<p>\[  z_{1} = (a_{1} + b_{1}i) \]
-\[  z_{2} = (a_{2} + b_{2}i) \]
-\[ \frac {z_{1}}{z_{2}} = \frac {a_{1} + b_{1}i}{a_{2} + b_{2}i} = \frac {(a_{1} + b_{1}i)(a_{2} - b_{2}i)}{(a_{2} + b_{2}i)(a_{2} - b_{2}i)} \]
-\[  = \frac {a_{1}a_{2}-a_{1}b_{2}i+b_{1}a_{2}i-b_{1}b_{2}i^{2} }{a_{2}^{2} + b_{2}^{2}} \]</p>
-
-<p>\[ = \frac {a_{1}a_{2} + b_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}   + \frac {b_{1}a_{2} - a_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}i \]</p>
-
-<h2>i的幂</h2>
-
-<p>如果i的平方等于-1，那么i的n次幂也应该存在：</p>
-
-<p>\[ i^{0} = 1 \]
-\[ i^{1} = i \]
-\[ i^{2} = -1 \]
-\[ i^{3} = ii^{2} = -i \]
-\[ i^{4} = i^{2}i^{2} = 1 \]
-\[ i^{5} = ii^{4} = i \]
-\[ i^{6} = ii^{5} = i^{2} = -1 \]</p>
-
-<p>如果按照这个顺序写下去，会出现这样一个模式：
-(1,i,-1,-i,1,...)</p>
-
-<p>一个类似的模式也出现在递增的负数幂：</p>
-
-<p>\[ i^{0} = 1 \]
-\[ i^{-1} = -i \]
-\[ i^{-2} = -1 \]
-\[ i^{-3} = i \]
-\[ i^{-4} = 1 \]
-\[ i^{-5} = -i \]
-\[ i^{-6} = -1 \]</p>
-
-<p>你可能已经在数学里头见过类似的模式，但是是以（x,y,-x,-y,x,...)的形式，这是在2D笛卡尔平面对一个点逆时针旋转90度时生成的；（x,-y,-x,y,x,...)则是在2D笛卡尔平面对一个点顺时针旋转90度时生成的。</p>
-
-<p><img src="../images/2015.9/3.png" alt="3.png"></p>
-
-<h2>复数平面</h2>
-
-<p>我们也能够把复数映射到一个2D网格平面——复数平面，只需要把实数映射到横轴、虚数映射到纵轴。</p>
-
-<p><img src="../images/2015.9/4.png" alt="4.png"></p>
-
-<p>如前面的序列所示，我们可以认为，对一个复数乘以i，这个复数就在复数平面上旋转了90度。</p>
-
-<p>让我们看看这是不是真的。我们随机地在复数平面上取一个点：</p>
-
-<p>\[ p = 2 + i \]</p>
-
-<p>p乘以i后得到q：
-\[ q = pi = (2+i)i = 2i+i^{2} = -1+2i \]</p>
-
-<p>q乘以i后得到r：
-\[ r = qi = (-1+2i)i = -i+2i^{2} = -2-i \]</p>
-
-<p>r乘以i后得到s：
-\[ s = ri = (-2-i)i = -2i-i^{2} = 1-2i \]</p>
-
-<p>s乘以i后得到t：
-\[ t = si = (1-2i)i = i-2i^{2} = 2+i \]</p>
-
-<p>t刚好是开始的p。如果我们把这些复数放到复数平面上，就得到下面的图：</p>
-
-<p><img src="../images/2015.9/5.png" alt="5.png"></p>
-
-<p>我们也可以按顺时针方向旋转，只需要把上面的乘数i改成-i。</p>
-
-<h3>旋转数（Rotors)</h3>
-
-<p>我们也可以在复数平面上进行任意的旋转，只需要定义下面这个复数：
-\[q = cos\theta +isin\theta \]</p>
-
-<p>任意的复数乘以q：</p>
-
-<p>\[ p = a + bi \]
-\[ q = cos\theta + isin\theta \]
-\[ pq = (a + bi)(cos\theta + isin\theta ) \]
-\[ a&#39; + b&#39;i = acos\theta -bsin\theta + (asin\theta +bcos\theta )i \] </p>
-
-<p>也可以写成矩阵的形式：</p>
-
-<p>\[  \left[ \begin{matrix} a&#39;&amp;-b&#39;\\ b&#39;&amp;a&#39;\\ \end{matrix} \right] =  \left[ \begin{matrix} cos\theta &amp;-sin\theta \\ sin\theta &amp;cos\theta \\ \end{matrix} \right] \left[ \begin{matrix} a&amp;-b\\ b&amp;a\\ \end{matrix} \right] \]</p>
-
-<p>这也是一个在复数平面绕原点逆时针旋转任意点的方法。</p>
-
-<h2>四元数</h2>
-
-<p>了解了复数系统和复数平面后，我们可以额外增加2个虚数到我们的复数系统，从而把这些概念拓展到3维空间。</p>
-
-<p>四元数的一般形式：</p>
-
-<p>\[ q = s + xi + yj + zk s,x,y,z \in \mathbb{R} \]</p>
-
-<p>上面的公式是根据Hamilton的著名的表达式得到的：</p>
-
-<p>\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]</p>
-
-<p>以及：</p>
-
-<p>\[ ij = k jk = i ki = j \]
-\[ ji = -k kj = -i ik = -j \]</p>
-
-<p>你可能已经注意到了，i、j、k之间的关系非常像笛卡尔坐标系下单位向量的叉积规则：</p>
-
-<p>\[ x\times y = z y\times z = x z\times x = y \]
-\[ y\times x = -z z\times y = -x x\times z = -y \]</p>
-
-<p>Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( i^{2} = j^{2} = k^{2} = -1 \)。</p>
-
-<p><img src="../images/2015.9/6.png" alt="6.png">
-（ij, jk, ki这几个性质的可视化）</p>
-
-<p>上图展示了如何用i、j、k作为笛卡尔坐标系的单位向量。</p>
-
-<h3>作为有序数的四元数</h3>
-
-<p>我们可以用有序对的形式，来表示四元数：
-\[s,v] s\in \mathbb{R},v\in \mathbb{R^{3}} \]</p>
-
-<p>其中的v，也可以用它各自独立的3个分量表示：</p>
-
-<p>\[ q = [s,xi + yj + zk], s,x,y,z\in \mathbb{R} \]</p>
-
-<p>使用这种表示法，我们可以更容易地展示四元数和复数之间的相似性。</p>
-
-<h3>四元数的加减</h3>
-
-<p>和复数类似，四元数也可以被加减：</p>
-
-<p>\[ q_{a} = [s_{a},a] \]
-\[ q_{b} = [s_{b},b] \]
-\[ q_{a} + q_{b} = [s_{a} + s_{b},a + b] \]
-\[ q_{a} - q_{b} = [s_{a} - s_{b},a - b] \]</p>
-
-<h3>四元数的积</h3>
-
-<p>我们也可以表示四元数的乘积：</p>
-
-<p>\[ q_{a}q_{b} = [s_{a},a][s_{b},b] \]
-\[ = (s_{a} + x_{a}i + y_{a}j +z_{a}k)(s_{b} + x_{b}i + y_{b}j +z_{b}k) \]
-\[ = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}) \]
-\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i \]
-\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j \]
-\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k \]</p>
-
-<p>四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：</p>
-
-<p>\[ i = [0,i] j = [0,j] k = [0,k] \]</p>
-
-<p>以及还有[1,0] = 1，将它们代入前面的表达式，就得到了：</p>
-
-<p>\[ q_{a}q_{b} = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b})[1,0] \]
-\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})[0,i] \]
-\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})[0,j] \]
-\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})[0,k] \]</p>
-
-<p>再把这个表达式扩展成多个有序对的和：</p>
-
-<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
-\[ + [0,(s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i] \]
-\[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j] \]
-\[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k] \]</p>
-
-<p>如果把上面的式子再乘以单位四元数，并提取公共部分，就可以把等式改写成：</p>
-
-<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
-\[ + [0,s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
-\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]</p>
-
-<p>这个等式是2个有序对的和。第1个有序对是一个<strong>实</strong>四元数，第2个是一个<strong>纯</strong>四元数。这两个四元数也可以合并成一个：</p>
-
-<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}), \]
-\[ s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
-\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]</p>
-
-<p>如果把下面的表达式代入上面的等式：</p>
-
-<p>\[ a = x_{a}i + y_{a}j + z_{a}k\]
-\[ b = x_{b}i + y_{b}j + z_{b}k\]
-\[ a\cdot b = x_{a}x_{b}i^{2}+y_{a}y_{b}j^{2}+z_{a}z_{b}k^{2} \]
-\[ a\times b = (y_{a}z_{b}-y_{b}z_{a})i + (z_{a}x_{b} - z_{b}x_{a})j + (x_{a}y_{b} - x_{b}y_{a})k  \]</p>
-
-<p>我们就得到了：</p>
-
-<p>\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]</p>
-
-<p>这就是四元数乘积的一般式。</p>
-
-<h3>实四元数</h3>
-
-<p>一个实四元数是一个虚部向量为零向量的四元数：</p>
-
-<p>\[ q = [s,0] \]</p>
-
-<p>两个实四元数的乘积是另一个实四元数：</p>
-
-<p>\[ q_{a} = [s_{a},0] \]
-\[ q_{b} = [s_{b},0] \]
-\[ q_{a}q_{b} = [s_{a},0] [s_{b},0] = [s_{a}s_{b},0]  \]</p>
-
-<p>这和2个虚部为0的复数的乘积几乎一样：</p>
-
-<p>\[ z_{1} = a_{1} + 0i \]
-\[ z_{2} = a_{2} + 0i \]
-\[ z_{1}z_{2} = (a_{1} + 0i)(a_{2} + 0i) = a_{1}a_{2} \] </p>
-
-<h3>四元数的系数缩放</h3>
-
-<p>我们也可以用一个系数（实数）去乘四元数：</p>
-
-<p>\[ q = [s,v] \]
-\[ \lambda q = \lambda [s,v] = [\lambda s,\lambda v] \]</p>
-
-<p>我们可以用实四元数与普通四元数的乘积，来确认这个等式是否正确：</p>
-
-<p>\[ q = [s,v] \]
-\[ \lambda = [\lambda ,0] \]
-\[ \lambda q = [\lambda ,0][s,v] = [\lambda s,\lambda v] \]</p>
-
-<h3>纯四元数</h3>
-
-<p>和实四元数相似，Hamilton也定义了纯四元数。纯四元数是s=0的四元数：</p>
-
-<p>\[ q = [0,v] \]</p>
-
-<p>也可以写成下面的形式：</p>
-
-<p>\[ q = xi + yj + zk \]</p>
-
-<p>然后是2个纯四元数的乘积：</p>
-
-<p>\[ q_{a} = [0,a] \]
-\[ q_{b} = [0,b] \]
-\[ q_{a}q_{b} = [0,a] [0,b] = [-a\cdot b, a\times b]  \]</p>
-
-<h3>四元数的加法形式</h3>
-
-<p>我们可以把四元数写成实四元数和纯四元数的和：</p>
-
-<p>\[ q = [s,v] \]
-\[ = [s,0] + [0,v] \]</p>
-
-<h3>单位四元数</h3>
-
-<p>给定任意的向量v，我们可以把这个向量写成一个系数和一个单位方向向量的乘积：</p>
-
-<p>\[ v = \upsilon \hat {v}\ \ v=|v|,|\hat {v}|=1\]</p>
-
-<p>将这个定义和纯四元数的定义结合，就得到了：</p>
-
-<p>\[ q = [0,v] \]
-\[ = [0,\upsilon \hat {v}] \]
-\[ = \upsilon [0,\hat {v}] \]</p>
-
-<p>然后，我们可以定义单位四元数了，它是一个s=0、v为单位向量的四元数：</p>
-
-<p>\[ \hat {q} = [0, \hat {v}] \]</p>
-
-<h3>四元数的二元形式</h3>
-
-<p>我们现在可以把单位四元数的定义和四元数的加法形式结合到一起，就创造了一种新的四元数的表示法，这种表示法和复数的表示法形似：</p>
-
-<p>\[ q = [s,v] \]
-\[ = [s,0] + [0,v] \]
-\[ = [s,0] + \upsilon [0,\hat {v}] \]
-\[ = s + \upsilon \hat {q} \]</p>
-
-<p>这就给了我们一种和复数非常相似的四元数表示法：</p>
-
-<p>\[ z = a + bi \]
-\[ q = s + v\hat {q} \]</p>
-
-<h3>共轭四元数</h3>
-
-<p>共轭四元数的计算，就是将四元数的虚向量取反：</p>
-
-<p>\[  q = [s,v] \]
-\[  q^{*} = [s,-v] \]</p>
-
-<p>四元数和它的共轭四元数的乘积：</p>
-
-<p>\[  qq^{*} = [s,v][s,-v] \]
-\[ = [s^{2} - v\cdot -v,-sv+sv+v\times -v] \]
-\[ = [s^{2} + v\cdot v,0] \]
-\[ = [s^{2} + v^{2},0] \]</p>
-
-<h3>四元数范数</h3>
-
-<p>回忆下复数范数的定义：</p>
-
-<p>\[ |z| = \sqrt {a^{2}+b^{2}} \]
-\[ zz^{*} = |z|^{2} \]</p>
-
-<p>类似的，四元数的范数可以这样定义：</p>
-
-<p>\[ q = [s,v] \]
-\[ |q| = \sqrt {s^{2} + v^{2}} \]</p>
-
-<p>这也让我们可以这样表达四元数范数：</p>
-
-<p>\[ qq^{*} = |q|^{2} \]</p>
-
-<h3>四元数规范化</h3>
-
-<p>利用四元数范数的定义，就可以对四元数进行规范化。要让一个四元数规范化，只需要让这个四元数去除以它的范数：</p>
-
-<p>\[ q&#39; = \frac {q}{\sqrt {s^{2}+v^{2}}} \]</p>
-
-<p>举一个例子，让我们规范化下面这个四元数：</p>
-
-<p>\[ q = [1, 4i + 4j - 4k] \]</p>
-
-<p>第一步，先计算q的范数：</p>
-
-<p>\[ |q| = \sqrt {1^{2}+4^{2}+4^{2}+(-4)^{2}} \]
-\[ = \sqrt {49} = 7 \]</p>
-
-<p>然后，q除以|q|:</p>
-
-<p>\[ q&#39; = \frac {q}{|q|} \]
-\[ = \frac {(1+4i+4j-4k)}{7} \]
-\[ = \frac {1}{7}+\frac {4}{7}i+\frac {4}{7}j-\frac {4}{7}k \]</p>
-
-<h3>四元数的逆</h3>
-
-<p>四元数的逆用\(q^{-1} \)表示。要计算四元数的逆，需要用四元数的共轭四元数去除以四元数的范数的平方：</p>
-
-<p>\[ q^{-1} = \frac {q^{*}}{|q|^{2} } \]</p>
-
-<p>为了证明这个式子，我们先根据<strong>逆</strong>的定义，有：</p>
-
-<p>\[ qq^{-1} = [1,0] = 1 \]</p>
-
-<p>两边都左乘共轭四元数\(q^{<em>} \)：
-\[ q^{</em>}qq^{-1} = q^{*} \]</p>
-
-<p>将上文中的\( qq^{*} = |q|^{2} \)代入这个式子，得到：</p>
-
-<p>\[ |q|^{2}q^{-1} = q^{*} \] </p>
-
-<p>\[ q^{-1} = \frac {q^{*}}{|q|^{2}} \] </p>
-
-<p>对于单位四元数，它的范数是1，所以可以写成：</p>
-
-<p>\[ q^{-1} = q^{*} \]</p>
-
-<h3>四元数的点积</h3>
-
-<p>和向量的点积相似，我们也可以计算2个四元数的点积，只需要将各个对应的系数相乘，然后相加:</p>
-
-<p>\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
-\[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
-\[ q_{1}q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]</p>
-
-<p>我们也可以利用四元数点积，来计算四元数之间的角度差：</p>
-
-<p>\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]</p>
-
-<p>对于单位四元数，我们可以简化上面的等式：
-\[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]</p>
-
-<h2>旋转</h2>
-
-<p>前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
-\[ q = cos\theta + isin\theta \]</p>
-
-<p>根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
-\[ q = [cos\theta, sin\theta v] \]</p>
-
-<p>让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：</p>
-
-<p>\[ p = [0,\textbf {p}] \]</p>
-
-<p>以及单位四元数q：</p>
-
-<p>\[ q = [s,\lambda \hat {v}] \]</p>
-
-<p>从而：</p>
-
-<p>\[ p&#39; = qp = [s,\lambda \hat {v}] [0,\textbf {p}] \]
-\[ =  [-\lambda \hat {v}\cdot \textbf {p}, s\textbf {p} + \lambda \hat {v}\times \textbf {p} ] \]</p>
-
-<p>我们可以看到结果是一个同时有系数、有虚向量的四元数。</p>
-
-<p>让我们先考虑特殊的情形：\( \textbf {p} \)与\( \hat {v} \)正交。这种情况下，点乘部分等于0：\(-\lambda \hat {v}\cdot \textbf {p} = 0\)。所以上面的四元数就变成了纯四元数：</p>
-
-<p>\[ p&#39; =  [0, s\textbf {p} + \lambda \hat {v}\times \textbf {p}] \]</p>
-
-<p>这时候，要使\( \textbf {p} \)绕\( \hat {v} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：</p>
-
-<p>\[ p&#39; =  [0, cos\theta \textbf {p} + sin\theta \hat {v}\times \textbf {p}] \]</p>
-
-<p>现在，让我们找一个例子来测试上面的公式。譬如绕z轴(就是k轴)旋转45度，那么我们的四元数q就变成：</p>
-
-<p>\[ q = [cos\theta ,sin\theta k] \]
-\[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}k] \]</p>
-
-<p>然后，选一个特殊的向量p，并且p要和k轴正交，譬如把在p放到i轴上，也就是：
-\[ p = [0, 2i] \]</p>
-
-<p>好了，现在计算下qp：</p>
-
-<p>\[ p&#39; = qp \]
-\[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}k] [0,2i] \]
-\[ = [0,2\frac {\sqrt {2}}{2}i + 2\frac {\sqrt {2}}{2}k\times i]  \]
-\[  = [0, \sqrt {2}i + \sqrt {2}j] \]</p>
-
-<p>结果是一个绕了k轴转了45度的纯四元数。
-我们可以确认这个四元数的向量部分的长度是：</p>
-
-<p>\[  p&#39; = \sqrt { \sqrt {2}^{2} + \sqrt {2}^{2} }  =  2 \]</p>
-
-<p>这正是我们所期望的！</p>
-
-<p>我们可以用图像展示旋转过程：</p>
-
-<p><img src="../images/2015.9/7.png" alt="7.png"></p>
-
-<p>现在，让我们考虑更一般化的四元数，即和p不正交的四元数。现在让我们把p的向量部分偏移45度：</p>
-
-<p>\[ \hat {v} = \frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k \]</p>
-
-<p>\[ p = 2i \]</p>
-
-<p>\[ q = [cos\theta , sin\theta \hat {v}] \]</p>
-
-<p>\[ p = [0, \textbf {p}] \]</p>
-
-<p>然后算qp：</p>
-
-<p>\[ p&#39; = qp \]
-\[ = [cos\theta ,sin\theta \hat {v}] [0, \mathbf {p} ]  \]
-\[ [-sin\theta \hat {v}\cdot \mathbf {p}, cos\theta \mathbf {p}+sin\theta \hat {v}\times \mathbf {p}] \]</p>
-
-<p>代入我们设定的\(\hat {v}, \mathbf {p}\)，以及\(\theta = 45^{\circ } \)，得到：</p>
-
-<p>\[ p&#39; = [-\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)\cdot (2i), \frac {\sqrt {2}}{2}2i+\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)\times 2i] \]
-\[ = [-1, \sqrt {2}i + j] \]
-注意，算出来的结果已经不是纯四元数了，并且，它并没有旋转45度、范数也不再是2(反而变小了，变成\(\sqrt {3}\))</p>
-
-<p>我们可以用图像展示旋转过程：</p>
-
-<p><img src="../images/2015.9/8.png" alt="8.png"></p>
-
-<blockquote>
-<p>严格来说，这样子在3维空间中表示\(p&#39;\)是不正确的。因为它其实是一个4维的向量！为了简单起见，我只讲这个四元数的向量部分显示出来。</p>
-</blockquote>
-
-<p>然而，还有一线生机。Hamilton发现（但没有正式宣布），如果对qp右乘q的逆，出来的结果是一个纯四元数，并且四元数向量部分的范数可以保持不变。让我们试试应用在我们的例子里。</p>
-
-<p>首先计算:</p>
-
-<p>\[ q =  [cos\theta ,  sin\theta (\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]</p>
-
-<p>\[ q^{-1} =  [cos\theta ,  -sin\theta (\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]</p>
-
       </div>
 
       <a href="/understanding-quaternions/" class="read-more">Read More</a>
@@ -711,238 +165,6 @@
         <p>最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。</p>
 
 <p>本文的cpp代码均来自<a href="https://github.com/mmp/pbrt-v2">https://github.com/mmp/pbrt-v2</a>，木有修改。只为方便读者阅读。</p>
-
-<!--more-->
-
-<h2>正文</h2>
-
-<p>一个基本的渲染器，需要实现2点：输入场景数据、输出渲染图像。</p>
-
-<p>输入场景数据这一步，就需要对3D世界各种东西进行抽象、并设计各种数据结构，比如比较fundamental的：3D空间向量、3D坐标系系统、光线，或者visible的：各种2D/3D几何体、纹理系统等。大概就是，这个渲染器要渲染的东西，程序上都会有一些对应的代码。渲染器不可能对未知的东西进行渲染。比如毛发、布这种高端的东西，一个基本的渲染器是无法渲染的，除非你写了一些代码来完成这个事情。</p>
-
-<p>《PBRT》第二章就讲了这些基础的东西。</p>
-
-<p>在前面的线代的文章中，提到了矩阵的基(basis)的概念。矩阵的基是一组线性无关的列向量，这个矩阵的列空间的任意一点，可以通过对矩阵的基的线性组合得到。</p>
-
-<p>那么n维的情况下，定义一个向量的公式是：</p>
-
-<p>\[ v = s_{1}v_{1} + \cdots + s_{n}v_{n} \]</p>
-
-<p>定义一个点的位置的公式是：</p>
-
-<p>\[ p = p_{0} + s_{1}v_{1} + \cdots + s_{n}v_{n} \]</p>
-
-<p>对于渲染器的3维空间，要简化成：</p>
-
-<p>\[ p_{0} = (0,0,0) \]
-\[ basis = (1,0,0) (0,1,0) (0,0,1) \]</p>
-
-<p>这3个标准基向量对应的空间被称为世界空间(world space)。</p>
-
-<h3>向量(vector)、点(point)的区别</h3>
-
-<p>向量和点，区别在于点没有长度的概念，也就是说点是零维的，点代表空间里的一个<strong>位置</strong>（pbrt的Point和Vector的差异是没有LengthSquared、Length函数)，而向量没有起点的概念，向量只是指明了一个<strong>方向</strong>并且有长度。</p>
-
-<h3>3维空间下，如何从一个向量出发，构造出一组标准正交基</h3>
-
-<p>注意，这个问题是有重要意义的，因为一组标准正交基相当于一个坐标系。</p>
-
-<ul>
-<li><p>设\( v_{1}=(x_{1},y_{1},z_{1}) \)，并且v1已经单位化</p></li>
-<li><p>随便选择v1的某一个分量，并将它变成0，再交换剩余的2个分量的位置，并对其中一个分量取反，就能得到和v1正交的v2。这是因为这样构造出来的v2，必然使得\(  v_{1}\cdot v_{2}=0 \)。比如当\( v_{2}=(-z_{1},0,x_{1}) \)时，有\( v_{1}\cdot v_{2}=(x_{1},y_{1},z_{1})\cdot (-z_{1},0,x_{1}) = 0\)</p></li>
-<li><p>上面的v2还有不足，因它不是单位化的。单位化的v2应该是\[v_{2}=\dfrac { (-z_{1},0,x_{1}) }{ \sqrt {z_{1}^{1}+x_{1}^{1}}} \]</p></li>
-<li><p>有了v1、v2后，v3就等于v1和v2的叉积(cross product): \( v_{3} =v_{1} \times v_{2} \)</p></li>
-</ul>
-
-<h3>法向量Normal</h3>
-
-<p>(突然意识到，pbrt把向量、点、法向量写成3个没有继承关系的类，意义在于，防止程序员乱用并搞砸代码=。=)</p>
-
-<p>** A surface normal is a vector that is perpendicular to a surface at a particular position.It can be defined as the cross product of any two nonparallel vectors
-that are tangent to the surface at a point. **</p>
-
-<p><strong>法向量是与某个平面垂直，并经过平面上某个特殊位置的向量。可以用平面上2个互不平行、与平面正切的向量的叉积来表示。</strong></p>
-
-<p>法向量应该说是一种特殊的向量。pbrt也实现了一个以Vector为参数的Normal构造函数（但有explicit标志），允许通过向量构造出法向量。</p>
-
-<h3>光线Ray</h3>
-
-<p>光线是一条半无限长的线，用一个原点和一个方向向量来表示。</p>
-
-<p>参数形式的光线表示：</p>
-
-<p>\[ r(t) = o + td   \ \ \ 0\leq t\geq \infty \]</p>
-
-<p>光线还有其他成员变量：</p>
-
-<ul>
-<li>mint maxt，用来限定t的范围</li>
-<li>time 用于构建动画，当构建静态场景时不需要</li>
-<li>depth 光线弹射深度。限制光线只能bounce多少次</li>
-</ul>
-
-<h3>微分光线Differential Ray</h3>
-
-<p>先跳过</p>
-
-<h3>包围盒</h3>
-
-<p>包围盒的主要作用，是用来优化程序性能的，更具体的说，就是让复杂场景物件简化成简单的球形、方盒，使得光线快速剔除不相交的对象，计算得更快。</p>
-
-<p>BBox</p>
-
-<p>这玩意神奇的地方，我觉得是它的构造函数。输入是2个Point，就能构造一个盒子，并且也仅仅是花了2个Point来存储。这2个新的Point和输入的Point不同，被称为pMin和pMax:</p>
-
-<p>\[ pMin = (min(p_{1}.x,p_{2}.x), min(p_{1}.y,p_{2}.y), min(p_{1}.z,p_{2}.z)) \]</p>
-
-<p>\[ pMax = (max(p_{1}.x,p_{2}.x), max(p_{1}.y,p_{2}.y), max(p_{1}.z,p_{2}.z)) \]</p>
-
-<p>需要注意的是，根据这个转换公式，要使得pMin和pMax足够定义一个BBox，那么他们必然是BBox的2个对角顶点。且因为BBox平行于x、y、z轴，那么pMin和pMax的任意一个分量都不能相等。（否则，pMin、pMax就只能是BBox的一对邻接顶点）</p>
-
-<p>p1、p2和pMin、pMax是什么关系呢？其实，p1、p2也是这个BBox的某一组对角顶点。计算出来的pMin、pMax也只是这4组对角顶点的特定的一组，只不过pMin必然是BBox8个顶点中最靠近坐标系原点的顶点、pMax必然是最远离坐标系原点的顶点。</p>
-
-<h3>转换Transformation</h3>
-
-<p>** In general, a transformation T is a mapping from points to points and from vectors to
-vectors:**</p>
-
-<p>\[ p^{\prime } = T(p) \]
-\[ v^{\prime } = T(v) \]</p>
-
-<p>回想下线代的知识，就可以知道，这个T必然是一个方阵，阶数等于p(或v)的维数，T对p(或v)的转换，其实只是一次矩阵乘法。</p>
-
-<p>T有很多种，大部分是无特殊转换意义的，但有小部分是有特定意义且能用在图形学里的。譬如：</p>
-
-<ul>
-<li>Translation，我称之为位置转换</li>
-<li>Scaling，缩放转换</li>
-<li>Rotation，旋转转换</li>
-<li>LookAt，视角转换</li>
-</ul>
-
-<p>Translation的一般形式：</p>
-
-<p>\[ T(\vartriangle x,\vartriangle y,\vartriangle z) =  \left[ \begin{matrix} 1&amp;0&amp;0&amp;\vartriangle x\\ 0&amp;1&amp;0&amp;\vartriangle y\\ 0&amp;0&amp;1&amp;\vartriangle z\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<p>Scaling的一般形式：</p>
-
-<p>\[ T(\vartriangle x,\vartriangle y,\vartriangle z) =  \left[ \begin{matrix} x&amp;0&amp;0&amp;0\\ 0&amp;y&amp;0&amp;0\\ 0&amp;0&amp;z&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<p>Rotation的一般形式，比较复杂，先分成3种情况考虑。所谓的旋转，都要有一个轴线，对任意一个3维坐标系来说，有3条轴，所以就有以3条轴为轴线的3个Rotation：</p>
-
-<p>\[ R_{x}(\theta ) =  \left[ \begin{matrix} 1&amp;0&amp;0&amp;0\\ 0&amp;cos\theta &amp;-sin\theta &amp;0\\ 0&amp;sin\theta &amp;cos\theta &amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<p>\[ R_{y}(\theta ) =  \left[ \begin{matrix} cos\theta &amp;0&amp;sin\theta &amp;0\\ 0&amp;1&amp;0&amp;0\\ -sin\theta &amp;0&amp;cos\theta &amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<p>\[ R_{z}(\theta ) =  \left[ \begin{matrix} cos\theta &amp;-sin\theta &amp;0&amp;0\\ sin\theta &amp;cos\theta &amp;0&amp;0\\ 0&amp;0&amp;1&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<p>以x轴的旋转分析一下：</p>
-
-<p>因为：</p>
-
-<p>\[ R_{x}(\theta )[x,y,z,w]^{T} = [x,cos\theta \cdot y - sin\theta \cdot z,sin\theta \cdot y + cos\theta \cdot z, w]^{T} \]</p>
-
-<p>所以有：</p>
-
-<p>\[ R_{x}(\theta )[1,0,0,0]^{T} = [1,0,0,0]^{T} \]</p>
-
-<p>\[ R_{x}(\theta )[0,1,0,0]^{T} = [0,cos\theta ,sin\theta ,0]^{T} \]</p>
-
-<p>\[ R_{x}(\theta )[0,0,1,0]^{T} = [0,-sin\theta ,cos\theta ,0]^{T} \]</p>
-
-<p>可以看出，用Rx旋转x轴,x轴不变,旋转y、z轴，y、z轴会被顺时针旋转\(\theta \)度（左手坐标系时）。</p>
-
-<p>Rotation有一些特性：</p>
-
-<ul>
-<li>\( R_{\alpha }(0) = I \) 这个0是指\(\theta=0\)，不是向量0</li>
-<li>\( R_{\alpha }(\theta _{1})R_{\alpha }(\theta _{2}) = R_{\alpha }(\theta _{1} + \theta _{2}) \)</li>
-<li>\( R_{\alpha }(\theta _{1})R_{\alpha }(\theta _{2}) = R_{\alpha }(\theta _{2})R_{\alpha }(\theta _{1}) \)</li>
-<li>\( R_{\alpha }^{-1}(\theta ) = R_{\alpha }(-\theta ) = R_{\alpha }^{T}(\theta ) \)</li>
-</ul>
-
-<p>回想下正交矩阵的定义：<strong>如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵</strong>，根据上面的第四条性质，R显然也是一个正交矩阵。正交矩阵的好处是，它的逆矩阵很简单，等于它的转置矩阵。</p>
-
-<p>当需要围绕任意一个向量做旋转时，可以这样想：</p>
-
-<ul>
-<li>设轴向量为a，要被旋转的向量为v</li>
-<li>把a向量当做一个x轴（y or z轴也行）；把v到a的error向量（如果不知道什么是error向量，请看我之前的文章）当做y轴</li>
-<li>以x、y轴向量去计算正交的z轴向量（用叉积即可）</li>
-<li>就得到了一个以a向量为x轴的xyz坐标系了</li>
-<li>所以原问题就变成了，绕这个虚拟坐标系的x轴旋转</li>
-</ul>
-
-<p>计算过程：</p>
-
-<ul>
-<li>\( v_{c} = a\parallel v\parallel cos\alpha = a(v\cdot a) \)</li>
-<li>\( v_{1} = v - v_{c} \)</li>
-<li>\( v_{2} = v_{1}\times a \)</li>
-<li>\( v_{1}^{\prime } =  v_{1}cos\theta + v_{2}sin\theta \) </li>
-<li>\( v^{\prime } = v_{c} + v_{1}^{\prime } \) </li>
-</ul>
-
-<p><img src="../images/2015.9/1.png" alt="1.png"></p>
-
-<p>(书里没有标出来\( v_{c} \) ,红色的那段就是)</p>
-
-<p>书里也没有解释上面第三个式子是怎么得到的。我的理解是，因为\( v_{1}^{\prime } \)和\( v_{1} \)等长，所以\( v_{1}^{\prime } \)在\( v_{1} \)上的投影(向量)等于\(v_{1}cos\theta \)，又因为\( v_{1} \)是一个坐标系的轴，所以这个投影就是\( v_{1}^{\prime } \)对应这个轴的分量；同理，\(v_{2}sin\theta \)，是\( v_{1}^{\prime } \)在\( v_{2} \)上的投影。这两个投影向量的和，就是\( v_{1}^{\prime } \)。</p>
-
-<p>不过这个任意轴旋转的矩阵就不那么简单了，先设：</p>
-
-<ul>
-<li>\( c = cos\theta  \)</li>
-<li>\( s = sin\theta  \)</li>
-<li>\( x,y,z = normalize(x,y,z) \)</li>
-</ul>
-
-<p>\[ R_{(x,y,z)}(\theta ) =  \left[ \begin{matrix} x^{2}+(1-x^{2})c&amp;xy(1-c) -zs&amp;xz(1-c)+ys&amp;0\\ xy(1-c)+zs&amp;y^{2}+(1-y^{2})c&amp;yz(1-c)-xs&amp;0\\ xz(1-c)-ys&amp;yz(1-c)+xs&amp;z^{2}+(1-z^{2})c&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<p>(好可怕的矩阵=。=，不过这世界上还有个东西叫四元数旋转。有空再写一篇四元数的文章）</p>
-
-<p>LookAt转换</p>
-
-<p>LookAt矩阵的第4列是摄像机在世界坐标系的坐标；第3列是单位化的视点朝向向量（摄像机的前方），即视点坐标减去第4列的坐标;第2列是单位化的up向量（摄像机的上方），以世界坐标系表示；第1列是摄像机坐标系的x向量在世界坐标系对应的向量。</p>
-
-<p>第1列的x向量，是用第2列的up向量和第3列的朝向向量进行叉积得到。</p>
-
-<p>设：</p>
-
-<ul>
-<li>pos是摄像机坐标（世界坐标）</li>
-<li>up是用户提供的摄像机朝向上方的向量（世界坐标）</li>
-<li>look是用户提供的摄像机视点的向量（世界坐标）</li>
-</ul>
-
-<p>于是有：</p>
-
-<ul>
-<li>dir = Normalize(look - pos)，摄像机的朝向向量（世界坐标）</li>
-<li>xaxis = Normalize(Cross(Normalize(up), dir))，摄像机的x轴单位向量（世界坐标）</li>
-<li>newUp = Cross(Normalize(dir), xaxis)，新的单位化的up向量（世界坐标）。这里不太明白为什么不直接newUp = Normalize(up)。</li>
-</ul>
-
-<p>\[  \left[ \begin{matrix} xaxis.x&amp;newUp.x&amp;dir.x&amp;pos.x\\ xaxis.y&amp;newUp.y&amp;dir.y&amp;pos.y\\ xaxis.z&amp;newUp.z&amp;dir.z&amp;pos.z\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
-
-<h3>Tranform的应用原理</h3>
-
-<p>Tranform对Vector和Point的作用过程，上面已经提到了，就是简单的矩阵相乘。</p>
-
-<p>对Ray和BBox的转换，也不难，就是对Ray的o和d分量分别左乘T、对BBox的8个顶点分别左乘T。</p>
-
-<p>这里要提一下法向量的Tranform。法向量是不能直接T(n)的，这是错误的。</p>
-
-<p>直接贴公式：</p>
-
-<p>\[ n\cdot t = n^{T}t = 0 \]
-\[ (n^{\prime })^{T}t^{\prime }= 0 \]
-\[ (Sn)^{T}Mt = 0 \]
-\[ n^{T}S^{T}Mt = 0 \]
-\[ S^{T}M = I \]
-\[ n^{\prime } = Sn = (M^{-1})^{T}n \]</p>
-
-<p>M是某种转换，当M对一个面作用时，这个面的法向量要用上面最后那条公式转换。注意到公式里面有一个逆矩阵，所以这就是为什么Transform要存一个逆矩阵。</p>
 
       </div>
 
@@ -977,94 +199,6 @@ vectors:**</p>
 <p>迹还和A的行列式有关系：</p>
 
 <p>\[ |A| = \lambda _{1}\lambda _{2}\cdots \lambda _{n} \]</p>
-
-<!--more-->
-
-<h2>A的全部特征值和特征向量的求法</h2>
-
-<ol>
-<li>计算A的特征多项式</li>
-<li>求特征方程的全部根，即矩阵A的全部特征值</li>
-<li>对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
-\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
-其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。</li>
-</ol>
-
-<h2>特征值的性质</h2>
-
-<ol>
-<li>\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）</li>
-<li>A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值</li>
-<li>矩阵A与其转置矩阵\(A^{T}\)有相同的特征值</li>
-<li>\(k\lambda \)是矩阵kA的特征值(k是任意常数)。</li>
-</ol>
-
-<h2>迹的性质</h2>
-
-<ol>
-<li>\( tr(A + B) = tr(A) + tr(B) \)</li>
-<li>\( tr(kA) = k\cdot tr(A) \)</li>
-<li>\( tr(A^{T}) = tr(A) \)</li>
-<li>\( tr(AB) = tr(BA) \)</li>
-<li>\( tr(ABC) = tr(BCA) = tr(CAB) \)</li>
-<li>设A、B为n阶方阵，P为n阶可逆矩阵，且\(P^{-1}AP = B \)，则有\(tr(A) = tr(B)\)</li>
-</ol>
-
-<h2>当A为投影矩阵P时</h2>
-
-<p>因为投影矩阵P可以把一个向量b投影到一个空间的某一个向量，也就是\(Pb = p\)，这个式子和\( A\alpha = \lambda \alpha \)有一致的地方。</p>
-
-<p>那么P的特征向量是什么呢？前面已经说到，\( A\alpha \)和\( \alpha \)是平行关系，那么就是说，如果b在P的列空间之外，b就不是P的特征向量，当b在P的列空间内时，b是P的特征向量。</p>
-
-<p>比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px = x\)，P作用于x后还是得到x)</p>
-
-<p>又因为\(Px = x = 1\cdot x\)，所以P的一个特征值是1。</p>
-
-<p>但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。</p>
-
-<h2>当A为旋转矩阵Q时</h2>
-
-<p>因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。</p>
-
-<p>\[ Q =  \left[ \begin{matrix} cos(90)&amp;-sin(90)\\ sin(90)&amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;-1\\ 1&amp;0\\ \end{matrix} \right] \]</p>
-
-<p>\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
-\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]</p>
-
-<p>显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。</p>
-
-<h2>A的对角化(diagonalize)</h2>
-
-<p>设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：</p>
-
-<p>\[ AS = A \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;\lambda _{2}x_{2}&amp;\cdots &amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
-\[    =  \left[ \begin{matrix} x_{1}&amp;x_{2}&amp;\cdots &amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;0&amp;\cdots &amp;0\\ 0&amp;\lambda _{2}&amp;\cdots &amp;0\\ \vdots &amp;\vdots&amp; \cdots &amp;\vdots\\ 0&amp;0&amp;\cdots &amp;\lambda _{n}\\ \end{matrix} \right] \]
-\[ = S\Lambda \]</p>
-
-<p>所以有：</p>
-
-<p>\[ A = S\Lambda S^{-1} \]</p>
-
-<p>这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。</p>
-
-<p>可以对角化的前提是A有n个线性无关的特征向量。A有n个线性无关的特征向量的前提是，所有的\(\lambda \)都不重复（没有重根）。</p>
-
-<p>BTW，对于A的幂，有一个性质：</p>
-
-<ul>
-<li><p>如果有 \( Ax = \lambda x \)，则有\( A^{2}x = AAx = \lambda Ax = \lambda \lambda x = \lambda ^{2}x\) </p></li>
-<li><p>\( A^{2} = S\Lambda S^{-1}S\Lambda S^{-1} = S\Lambda ^{2}S^{-1} \)</p></li>
-</ul>
-
-<p>这个性质说明，A的n次幂的特征值等于\(\lambda ^{n}\)，且无论n等于多少(当前n得是正整数），特征向量不变。</p>
-
-<p>这也是求矩阵的n次幂的快速解法。</p>
-
-<p>特征分解还有一个用法是，求A的逆矩阵:</p>
-
-<p>\[ A^{-1} = (S\Lambda S^{-1})^{-1} =S\Lambda ^{-1}S^{-1} \]</p>
-
-<p>\(\Lambda\)的逆矩阵是非常容易求的，因为它是一个对角矩阵，所以把对角线上的\(\lambda \)都变成\(1/\lambda \)即可。</p>
 
       </div>
 
@@ -1425,6 +559,394 @@ vectors:**</p>
       </div>
       <div class="entry">
         <h2>基础议题(basics)</h2>
+
+<h3>条款1：仔细区别pointers和references</h3>
+
+<ul>
+<li>使用引用，可以不做null判断</li>
+<li>当需要考虑“不指向任何对象”的可能性时，或是考虑“在不同时间指向不同对象”的能力时，你就应该采用pointer，前一种情况可以将pointer设为null，后一种情况可以改变pointer所指对象。</li>
+<li>当确定“总是会代表某个对象”，而且“一旦代表了该对象就不能够再改变”，那么应该选用reference。</li>
+<li>总是令operator[]返回一个reference。</li>
+</ul>
+
+<h3>条款2：最好使用C++转型操作符</h3>
+
+<ul>
+<li>需要使用类型转换时，先考虑能不能用static_cast</li>
+<li>不能用static_cast的情况有：
+
+<ul>
+<li>移除表达式的常量性(constness)或变易性(volatileness) [用const_cast]</li>
+<li>继承体系的转型 [用dynamic_cast]</li>
+</ul></li>
+<li>const_cast无法进行继承体系的向下转型(cast down)</li>
+<li>dynamic_cast无法用在缺乏虚函数的类型身上，也不能改变常量性</li>
+<li>reinterpret_cast不具移植性，是平台相关的</li>
+</ul>
+
+<h3>条款3：绝对不要以多态(polymorphically)方式处理数组</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">printBSTArray</span><span class="p">(</span><span class="n">ostream</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">BST</span> <span class="n">array</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">numElements</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numElements</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">s</span><span class="o">&lt;&lt;</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">BST</span> <span class="n">BSTArray</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+<span class="n">BalanceBST</span> <span class="n">bBSTArray</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+<span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">BSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//OK</span>
+<span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">bBSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//Not OK</span>
+</code></pre></div>
+<p>array[i]其实是一个“指针算术表达式”的简写；它代表的其实是* (array+i)。array所指内存和array+i所指内存的距离是i<em>sizeof(数组中的单个元素)。而因为printBSTArray中，声明了array的元素的类型为BST，所以距离是i</em>sizeof(BST)。但当传入的是BalanceBST的数组时，就会出错了。</p>
+
+<p>在删除数组时，也有这个问题，C++语言规范中说，通过base class指针删除一个由derived classes objects构成的数组，其结果未定义。</p>
+
+<p>总的一句话：多态和指针算术不能混用，数组对象几乎总是会涉及指针的算法运算，所以数组和多态不要混用。</p>
+
+<h3>条款4：非必要不提供 default constructor</h3>
+
+<ul>
+<li>有default constructor时，可以避免3个问题，一是类数组的初始化不支持带参数的构造函数，二是一些c++模板库，要求被实例化的目标类型必须要有default constructor，三是类的虚继承体系中，如果基类没有default constructor，那么每一层的子类都必须了解基类的构造函数。</li>
+<li>反过来看，使用default constructor时，可能会增加了类的复杂度，因为不能保证每个字段都有意义（default constructor导致赋予字段一个缺省值，这个缺省值可能是多余的）。并且，使用这些字段的调用者，都需要做一个“测试”，测试字段是否真的被初始化了。</li>
+</ul>
+
+<h2>操作符(operators)</h2>
+
+<h3>条款5：对定制的“类型转换函数”保持警觉</h3>
+
+<ul>
+<li><p>用一个普通函数来替代类型转换操作符。因为这种操作符重载是&quot;隐式(implicit)&quot;的：
+<code>c
+class Rational{
+public:
+operator double() const; //not good
+double asDouble() const; //good
+}
+</code></p></li>
+<li><p>单自变量构造函数，前面要加一个explicit声明。</p></li>
+<li><p>用proxy classes 技术时，可以使用隐式类型转换，因为不能连续执行多个类型转换行为（详情见条款30）。</p></li>
+</ul>
+
+<h3>条款6：区别 increment/decrement操作符的前置和后置形式</h3>
+
+<ul>
+<li>后置式应以其前置式为基础（即后置式的函数体的累加实现，是调用了前置式）。</li>
+<li>后置式的返回类型必须加const，从而禁止obj++++这种写法。</li>
+<li>后置式的函数声明的参数要带一个毫无意义的int，只是用来和前置式做区分。</li>
+<li>虽然禁止obj+++++，但是++++obj是允许的。</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">UPInt</span><span class="p">{</span>
+    <span class="kt">int</span> <span class="n">m_num</span><span class="p">;</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">UPInt</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">)</span><span class="o">:</span><span class="n">m_num</span><span class="p">(</span><span class="n">num</span><span class="p">){};</span>
+    <span class="n">UPInt</span><span class="o">&amp;</span> <span class="n">operator</span><span class="o">++</span><span class="p">(){</span>
+        <span class="n">m_num</span><span class="o">++</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="n">this</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">const</span> <span class="n">UPInt</span> <span class="n">operator</span><span class="o">++</span><span class="p">(</span><span class="kt">int</span><span class="p">){</span>
+        <span class="n">UPInt</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="o">*</span><span class="n">this</span><span class="p">;</span>
+        <span class="o">++</span><span class="p">(</span><span class="o">*</span><span class="n">this</span><span class="p">);</span> 
+        <span class="k">return</span> <span class="n">oldValue</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="kt">int</span> <span class="nf">get</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="n">m_num</span><span class="p">;</span>
+    <span class="p">}</span>   
+<span class="p">};</span>
+</code></pre></div>
+<h3>条款7：千万不要重载&amp;&amp;、||和, 操作符</h3>
+
+<p>直接贴上我写的一个代码片段：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;string&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="n">class</span> <span class="n">Boolean</span><span class="p">{</span>
+    <span class="n">string</span> <span class="n">m_name</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">m_bool</span><span class="p">;</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">Boolean</span><span class="p">(</span><span class="n">string</span> <span class="n">name</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">b</span><span class="p">)</span><span class="o">:</span><span class="n">m_name</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">m_bool</span><span class="p">(</span><span class="n">b</span><span class="p">){};</span>
+    <span class="kt">bool</span> <span class="n">operator</span> <span class="o">&amp;&amp;</span><span class="p">(</span><span class="kt">bool</span> <span class="n">b</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">((</span><span class="kt">bool</span><span class="p">)(</span><span class="o">*</span><span class="n">this</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="p">){</span>
+            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="n">operator</span> <span class="nf">bool</span><span class="p">(){</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;get:&quot;</span><span class="o">&lt;&lt;</span><span class="n">m_name</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">m_bool</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Boolean</span> <span class="n">a</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+    <span class="n">Boolean</span> <span class="n">b</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;a &amp;&amp; b = &quot;</span><span class="o">&lt;&lt;</span><span class="n">result</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>运行结果为:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="nl">get</span><span class="p">:</span><span class="n">b</span>
+<span class="nl">get</span><span class="p">:</span><span class="n">a</span>
+<span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+<p>a &amp;&amp; b这个表达式，b先求值了，这不反人类么。</p>
+
+<p>所以：</p>
+
+<ul>
+<li>&amp;&amp; || , 被重载后，“函数调用语义” 会取代 “骡死式语义”。前者的求值顺序是未定义的（C++规范里没有定义），后者必然是从左至右。</li>
+</ul>
+
+<h3>条款8：了解各种不同意义的new和delete</h3>
+
+<h4>关于new</h4>
+
+<ul>
+<li>new operator是指：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">string</span> <span class="o">*</span> <span class="n">ps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">string</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p>这样子的代码里的new。这个操作符是由语言内建的，就像sizeof一样，不能被改变意义，总是做相同的事情。它的动作分为2个方面，第一，它分配足够的内存，用来放置某类型的对象；第二，它调用一个constructor，为刚才分配的内存中的那个对象设定初值。new operator总是做这两件事，你无法改变其行为。</p>
+
+<ul>
+<li>operator new的一般用法，用来分配且仅分配内存（不调用构造函数）：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="n">class</span> <span class="n">Widget</span><span class="p">{</span>
+    <span class="kt">char</span> <span class="n">member</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">Widget</span><span class="p">(){};</span>
+    <span class="kt">void</span> <span class="nf">print</span><span class="p">(){</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;member=&quot;</span><span class="o">&lt;&lt;</span><span class="n">member</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span> <span class="n">rawMemory</span> <span class="o">=</span> <span class="n">operator</span> <span class="n">new</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Widget</span><span class="p">));</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="k">sizeof</span><span class="p">(</span><span class="n">rawMemory</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="s">&quot;,&quot;</span><span class="o">&lt;&lt;</span><span class="n">rawMemory</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">Widget</span> <span class="o">*</span> <span class="n">widget</span> <span class="o">=</span> <span class="p">(</span><span class="n">Widget</span><span class="o">*</span><span class="p">)</span> <span class="n">rawMemory</span><span class="p">;</span>
+    <span class="n">widget</span><span class="o">-&gt;</span><span class="n">print</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>输出：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mi">8</span><span class="p">,</span><span class="mh">0x306850</span>
+<span class="n">member</span><span class="o">=</span><span class="n">Pm0</span>
+</code></pre></div>
+<ul>
+<li>placement new 用法：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="n">class</span> <span class="n">Widget</span><span class="p">{</span>
+    <span class="kt">char</span> <span class="n">member</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="n">Widget</span><span class="p">(){};</span>
+<span class="p">};</span>
+
+<span class="n">Widget</span><span class="o">*</span> <span class="nf">constructWidgetInBuf</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">buffer</span><span class="p">){</span>
+    <span class="k">return</span> <span class="n">new</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span> <span class="n">Widget</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Widget</span><span class="p">)];</span>
+    <span class="n">Widget</span> <span class="o">*</span> <span class="n">w</span> <span class="o">=</span> <span class="n">constructWidgetInBuf</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="s">&quot;,&quot;</span><span class="o">&lt;&lt;</span><span class="n">buf</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>输出：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mi">2</span><span class="p">,</span><span class="n">a</span>
+</code></pre></div>
+<ul>
+<li>使用策略：如果你希望将对象产生于heap内存，请使用new operator。它不但分配内存而且为该对象调用一个constructor。如果你只是打算分配内存，请调用operator new，那就没有任何constructor会被调用。如果你打算在heap objects产生时自己决定内存分配方式，请写一个自己的operator new（重载），并使用new operator，它将会自动调用你所写的operator new。如果你打算在已分配的内存中构造对象，请使用placement new。</li>
+</ul>
+
+<h4>关于delete</h4>
+
+<ul>
+<li>类似new，delete也分为 delete operator 和 operator delete。</li>
+<li>当成对使用operator new、operator delete时，相当于C的malloc和free。</li>
+</ul>
+
+<h4>关于数组</h4>
+
+<ul>
+<li>array new指的是：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">string</span> <span class="o">*</span><span class="n">ps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">string</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+</code></pre></div>
+<p>这样子的代码里的new operator，由于诞生的是数组，所以内存是由一个兄弟函数：operator new[]负责分配。</p>
+
+<ul>
+<li><p>array new 不仅要分配多个对象的内存(operator new[])，且要对每一个对象的内存调用一次default constructor。</p></li>
+<li><p>array delete(即 operator delete[])，类似array new，不过它是先调用每个对象的dtor，再调用 operator delete[]以释放内存。</p></li>
+</ul>
+
+<h2>异常</h2>
+
+<p>大概读了一遍这些条款，最后作者的结论是，能不使用异常就不使用异常，这是因为使用异常会有附加的性能开销。但是具体的影响值不明朗，和具体的编译器有关系。</p>
+
+<h3>条款9：利用destructors避免泄露资源</h3>
+
+<p>问题：C++函数调用过程中，如果出现异常，就会导致这个函数的后续代码不被执行。想一想，如果函数开头new了一个对象，在函数末尾会delete这个对象，而异常出现在中间，那么这个对象就不会被析构，于是内存发生泄露。</p>
+
+<p>解决之道就是，用智能指针来管理堆对象，因为智能指针是局部变量，当异常发生时，局部变量是会正常析构的，而，智能指针所绑定的heap对象，会在智能指针析构时也顺带析构。那么这个问题就算是解决了。（真的吗？）</p>
+
+<p>想一下，如果是在智能指针绑定那个对象（取得资源）过程中发生异常，或者是在资源被析构时发生异常，确定不会出问题吗？</p>
+
+<p>很不幸，确实问题并没有完美解决。</p>
+
+<h3>条款10：在constructors内阻止资源泄露（resource leak）</h3>
+
+<p>首先要知道一个事实：C++不自动清理那些“构造期间抛出异常”的对象。</p>
+
+<p>所以，构造函数的编写要小心，要确保构造过程中抛出异常时，仍能对已初始化的变量进行回收处理，避免泄露。</p>
+
+<p>解决方法：使用trycatch，确保构造函数所有可能被抛出的异常都能够捕获到，在catch里释放资源，并，再把异常往上继续抛出。</p>
+
+<p>这个事情实际上并不简单。比如，如果构造函数使用了初始化列表，而初始化列表代码中使用了new，这个new就没法写trycatch了。如果初始化列表有2个变量A、B，A成功拿到对对象，和B的对象构造失败（bad_alloc），A的堆对象就没机会释放了，就悲剧了。（针对这个情况，可以把new操作封装在某个成员函数里，然后在这个成员函数写trycatch，初始化列表调用这个成员函数即可）。</p>
+
+<p>更明智的做法是，把这种“需要获得对对象的成员变量”，改成使用智能指针。还是那2个A、B，当B出事时，A因为是一个智能指针成员变量，且已经完整构造，A会正常析构，析构的时候会正常地把堆对象也释放。</p>
+
+<h3>条款11：禁止异常流出destructors之外</h3>
+
+<p>析构函数在2种情况下会被调用：一，对象在正常状态下被销毁；二，对象呗异常处理机制销毁。</p>
+
+<p>如果异常流出析构函数，当程序是处在上述第二种情况时，会导致程序被terminate。</p>
+
+<p>解决办法是，在析构函数里写trycatch，捕获一切可能的异常，并把catch留空，即，捕获异常后不做任何事情。</p>
+
+<p>另外一个不让异常流出析构函数的理由是，如果析构过程中，某个敌方抛出异常，并传播到上层，那么这个析构函数的后续代码就没有被执行，这个析构函数就没有完成它负责的任务。</p>
+
+<h3>条款12：了解“抛出一个异常”与“传递一个参数”或“调用一个虚函数”之间的差异</h3>
+
+<p>事实：一个对象被抛出作为异常时，总是会发生复制。（即使声明为static；即使是by reference方式）</p>
+
+<h3>条款13：以by reference方式捕捉异常</h3>
+
+<h3>条款14：明智运用exception specifications</h3>
+
+<h3>条款15：了解异常处理的成本</h3>
+
+<p>为了能够在运行时期处理异常，程序需要做大量记录工作：在每一个执行点，必须能够确认“如果发生异常，哪些对象需要析构”，他们必须在每一个try语句块的进入点和离开点做记号，针对每个try语句块必须记录对应的catch子句及能偶处理的异常类型。</p>
+
+<p>运行时期的比对工作（以确保符合exception specifications)不是免费的；异常被抛出时销毁适当对象并找出正确的catch子句也不是免费的。</p>
+
+<p>第二个成本是，try语句块。代码会膨胀，效率也会下降。（这还是没有异常出现时就有这个开销了）</p>
+
+<h2>效率</h2>
+
+<h3>条款16：谨记80-20法则</h3>
+
+<p>2个点：</p>
+
+<ul>
+<li>理性地优化代码来提升程序性能。有的代码优化了，并不一定能带来质的性能提升；要找到性能瓶颈之处才行。</li>
+<li>利用profiler工具来找到性能瓶颈。</li>
+</ul>
+
+<h3>条款17：考虑使用lazy evaluation（缓式评估）</h3>
+
+<p>其实就是“能拖就拖”，减少不必要的计算。</p>
+
+<ul>
+<li>引用计数 &amp;&amp; 区分读和写</li>
+</ul>
+
+<p>考虑这样的代码：</p>
+
+<p>string s1 =&quot;hello&quot;; string s2 = s1;</p>
+
+<p>执行s2=s1时，执行了一次复制构造函数。这个调用是否昂贵？这个调用是否可以避免？事实上，要具体情况具体考虑。如果s2只是被“读”，而不会被“修改”，那么s2只需要存一个指向s1的引用即可，不应该创建一个副本。<strong>在你真正需要之前，不必着急为某物做一个副本。</strong></p>
+
+<ul>
+<li>Lazy Fetching（缓式取出）</li>
+</ul>
+
+<p>简单地说，就是读取数据库数据时，能少拿一点就少拿一点，能不拿就不拿。</p>
+
+<p>比如我自己在使用redis（KV数据库），就可以把一个class实例（有多个成员变量），用hash表来存。使用这个实例时（读or写），不直接hgetall或hsetall（全部读写），而是用hget或hset（单个读写）。</p>
+
+<ul>
+<li>Lazy Expression Evaluation（表达式换评估）</li>
+</ul>
+
+<p>Lazy Evaluation的反义词是Eager Evaluation（急式评估）。
+贴书中的例子：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">Matrix</span> <span class="nf">m1</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">Matrix</span> <span class="nf">m2</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">Matrix</span> <span class="n">m3</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m2</span><span class="p">;</span>
+</code></pre></div>
+<p>m3是m1和m2的合，这是一个百万级的加法操作。如果m3的值实际上是不会被程序用到，那么这个计算就应该被忽略。</p>
+
+<p>一般来说，定义了m3，应该下文就会用到m3。那么m3的计算就在所难免了，但如果是这样的情况：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">m3</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+<p>显然，按照这一个条款的指示，应该使得，m3.at(2,2)执行时，只计算(2,2)处的值，而不计算其他的值。</p>
+
+<h3>条款18：分期摊还预期的计算成本</h3>
+
+<p>如果预期到某个操作必然要执行，就可以考虑把这个计算提前，甚至计算结果可以被复用。（caching法）</p>
+
+<p>另一种做法是Prefetching（预先取出）。具体就是说，做一个计算时，可以一次过做多一些（batch）。比如磁盘的块读取，或者动态数组的内存动态扩张。</p>
+
+<h3>条款19：了解临时对象的来源</h3>
+
+<p>当程序产生一个non-heap object而没有为它命名，便诞生了一个临时对象。（匿名对象）</p>
+
+<p>一般有2种情况产生临时对象：</p>
+
+<ul>
+<li>隐式类型转换。比如传参时参数有可能被自动转换。</li>
+<li>函数返回对象。返回的变量的类型和函数的返回类型不同时发生。</li>
+</ul>
+
+<p>第一种类型，只当对象以by value的方式传递，或当对象被传递给一个reference-to-const参数时，才会发生。如果对象被传递给一个reference-to-non-const参数，并不会发生此类转换。</p>
+
+<p>第二种情况，感觉这本书的分析过时了，c++11的右值引用，应该是解决这个情况的最有力武器。</p>
+
+<h3>条款20：协助完成“返回值优化”</h3>
+
+<p>撇开c++11，对于返回by value的函数，最佳的return写法是，return后面紧跟一个类构造函数。</p>
+
+<p>这样做可能可以让编译器优化掉这个构造函数产生的临时对象。
+（这一招叫做return value optimization）。</p>
+
+<h3>条款21：利用重载技术（overload）避免隐式类型转换（implicit type conversions）</h3>
+
+<p>很显然，就是通过增加定制的重载函数（函数参数类型和实际的参数类型一致），避免不必要的类型转换开销。</p>
+
+<h3>条款22：考虑以操作符复合形式（op=）取代其独身形式（op）</h3>
+
+<p>大部分程序员都希望，如果他们能够这样写：</p>
+
+<p>x = x + y</p>
+
+<p>他们也能够写成这样：</p>
+
+<p>x += y</p>
+
+<p>一般而言，复合操作符比其对应的独身版本效率高，因为独身版本通常返回一个新对象，而我们必须因此负担一个临时对象的构造和析构成本。</p>
+
+<p>另外，如果同时提供某个操作符的复合形式和独身形式，便允许你的客户在效率与便利性之间做取舍。（虽然这个选择不易）</p>
+
+<p>比如：</p>
+
+<p>d = a + b + c;</p>
+
+<p>和：</p>
+
+<p>d = 0; d += a; d += b; d += c;</p>
+
+<p>后者要比前者效率要高，因为没有复制对象。</p>
+
+<h3>条款23：考虑使用其他程序库</h3>
+
+<p>以iosteam和stdio这2个官方库来说明，不同的库有不同的性能。选择一个适合的库，也是提升性能的好方法。</p>
+
+<h3>条款24：了解virtual functions、multiple inheritance、virtual base classes、runtime type identification的成本</h3>
 
       </div>
 
@@ -1897,6 +1419,13 @@ vectors:**</p>
       <div class="entry">
         <p>本demo是根据Milo的一篇文章实现的：<a href="http://www.cnblogs.com/miloyip/archive/2010/03/29/1698953.html">用JavaScript玩转计算机图形学1，光线追踪入门</a>。</p>
 
+<p>原文是js版本，我用c++实现了一个。
+代码在：https://github.com/voyagingmk/raytrace_demo</p>
+
+<p>渲染效果图：(1000 x 1000)</p>
+
+<p><img src="../images/2015.8/1.png" alt="1.png"></p>
+
       </div>
 
       <a href="/raytrace/" class="read-more">Read More</a>
@@ -1910,6 +1439,106 @@ vectors:**</p>
       </div>
       <div class="entry">
         <h3>题解：</h3>
+
+<p>设s1，s2是两个长度都为len的字符串（把s1、s2当做字符数组理解）</p>
+
+<p>设状态量res[n][i][j]，(n &lt; len, i &lt;= n, j &lt;= n), 元素是bool值</p>
+
+<p>res的含义：</p>
+
+<p><strong>长度为n，以i位置为起点的子串s1[i, i + n], 以j位置为起点的子串s2[i, i + n], res[n][i][j]标志了这2个子串是不是Scramble</strong></p>
+
+<p>那么很显然，res[len-1][0][0]就是我们要的解。</p>
+
+<p>状态转移方程：</p>
+
+<p><strong>res[n][i][j] = ( res[k][i][j] &amp;&amp; res[n - k][i + k][j + k] ) || ( res[k][i][j + n - k] &amp;&amp; res[n - k][i + k][j] )</strong>    ** (1&lt;=k&lt;n) **</p>
+
+<p>这个式子看起来很吓人。先做个分解：</p>
+
+<p>设 A = res[k][i][j] &amp;&amp; res[n - k][i + k][j + k] = A1 &amp;&amp; A2</p>
+
+<p>设 B = res[k][i][j + n - k] &amp;&amp; res[n - k][i + k][j] = B1 &amp;&amp; B2</p>
+
+<p>设 C = res[n][i][j] = A || B</p>
+
+<p>也就是说，只要A、B中有一个为T，那么C就为T; 而A、B为T的条件分别是，A1和A2同时为真、B1和B2同时为真。</p>
+
+<p>A1、A2、B1、B2的含义是什么呢？举例说明一下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">great</span>
+<span class="n">rgtae</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
+<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>           <span class="o">&amp;&amp;</span>     <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
+   <span class="n">g</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">reat</span>
+   <span class="n">r</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">gtae</span>
+   <span class="n">A1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">A2</span> <span class="o">=</span> <span class="n">F</span>
+
+<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span>   <span class="o">&amp;&amp;</span>      <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+   <span class="n">g</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">reat</span>
+   <span class="o">****|</span><span class="n">e</span>                          <span class="n">rgta</span><span class="o">|*</span>
+   <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
+
+<span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">F</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
+<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>           <span class="o">&amp;&amp;</span>     <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
+   <span class="n">gr</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">eat</span>
+   <span class="n">rg</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">tae</span>
+   <span class="n">A1</span> <span class="o">=</span> <span class="n">T</span>                          <span class="n">A2</span> <span class="o">=</span> <span class="n">T</span>
+
+<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span>   <span class="o">&amp;&amp;</span>      <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+   <span class="n">gr</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">eat</span>
+   <span class="o">***|</span><span class="n">ae</span>                          <span class="n">rgt</span><span class="o">|**</span>
+   <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
+
+<span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">&amp;&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">T</span>
+</code></pre></div>
+<ol>
+<li><p><strong>当(A1 &amp;&amp; A2) = T时， s1-left和s2-left互为Scramble， s1-right和s2-right互为Scramble；</strong> </p></li>
+<li><p><strong>当(B1 &amp;&amp; B2) = T时， s1-left和s2-right互为Scramble， s1-right和s2-left互为Scramble。</strong></p></li>
+</ol>
+
+<p>状态转移方程有了，还差个初始化状态:</p>
+
+<p><strong>n = 0时，s1、s2退化成s1[i]和s2[j]，那么res[0][i][j] 等于 s1[i] == s2[j]</strong></p>
+
+<p>代码如下:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">bool</span> <span class="nf">isScramble</span><span class="p">(</span><span class="n">string</span> <span class="n">s1</span><span class="p">,</span> <span class="n">string</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">s1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">!=</span> <span class="n">s2</span><span class="p">.</span><span class="n">length</span><span class="p">()){</span>
+            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;&gt;&gt;</span> <span class="n">result</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+                <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+                <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">s2</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span><span class="c1">//tricky</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">n</span><span class="p">){</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">len</span> <span class="o">-</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">){</span>
+                <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">len</span> <span class="o">-</span> <span class="n">n</span><span class="p">;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">j</span><span class="p">){</span>
+                    <span class="kt">bool</span> <span class="n">r</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">r</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">){</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span> 
+                            <span class="o">||</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+                    <span class="p">}</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP计算导致这么慢的，必须全部状态都算出来才可以返回最终结果。</p>
 
       </div>
 
@@ -1925,8 +1554,50 @@ vectors:**</p>
       <div class="entry">
         <blockquote>
 <p>After robbing those houses on that street, the thief has found himself a new place for his thievery so that he will not get too much attention. This time, all houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, the security system for these houses remain the same as for those in the previous street.</p>
+
+<p>Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p><a href="http://www.qiujiawei.com/leetcode-problem-198/">&quot;House Robber&quot;</a>的变种（尼玛又改需求了摔)。改动的地方是，房子分布从一条线变成了一个环，首尾相接了。依然是求最大值。</p>
+
+<h3>题解：</h3>
+
+<p>变成环后，其实还是可以用动态规划来解。</p>
+
+<p>f(n) : 代表窃贼在前n个房子最多能拿到多少钱</p>
+
+<p>在变成环后，f(n)不能容许同时盗窃第1和第n个房子的情况。那么就分情况解决。</p>
+
+<ol>
+<li>绝对不偷第1个房子，只在其余房子中偷。也就是排除掉第1个房子，在剩余的第2-&gt;n个房子里偷；</li>
+<li>绝对不偷第n个房子，那么其实就是求f(n - 1)</li>
+</ol>
+
+<p>按照这2种情况计算出的f1、f2，求出max(f1，f2)，就是要得到的解。</p>
+
+<p>代码如下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">cur1</span><span class="p">;</span>
+            <span class="n">cur1</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pre</span><span class="p">,</span> <span class="n">cur1</span><span class="p">);</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">cur2</span><span class="p">;</span>
+            <span class="n">cur2</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pre</span><span class="p">,</span> <span class="n">cur2</span><span class="p">);</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">max</span><span class="p">(</span><span class="n">cur1</span><span class="p">,</span> <span class="n">cur2</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-213/" class="read-more">Read More</a>
@@ -1940,6 +1611,26 @@ vectors:**</p>
       </div>
       <div class="entry">
         <p>大学时候读过吴军博士的《浪潮之巅》，从中了解到了IT行业的近代史，形形色色的传奇人物和大事件，非常震撼，读完的同时也对作者的才华感到佩服，不仅是一名一流的计算机科学家，更是一位难得的历史研究者。</p>
+
+<p>最近又拜读了吴博士的《数学之美》。入手前以为是一本和《编程之美》类似的书，无非讲讲算法、数学之类的。但等到开始读的时候才发现，这本书的特别之处，他将IT发展史和数学、算法一起介绍，却一点也不显乱，甚至是让枯燥的数学变得生动，读完的感觉就像读了一本小说。</p>
+
+<p>大概记录下读书笔记吧。</p>
+
+<p>第一个重要点是，自然语言处理。之前完全没了解这方面的技术，一直以为自然语言处理应该也是雷同编程语言的处理，文法分析语义分析什么的。但实际上，这是个大坑。前期研究自然语言处理的科学家，包括各种工程师和语言学家，都花了大量精力地研究怎么用“精确的语言解码器&quot;来让计算机理解自然语言。</p>
+
+<p>这条路是行不通的。一是因为自然语言很难建模，或者说很难建立一个完备的模型，使得任何自然语句计算机都能正确解析和翻译，想想上编译原理课的时候，（一个语法简单的tinyc编译器都折腾死人了）；二是世界上有太多的语言了，不同的语言，语法不一样，无法用同一个数学模型，所有语言都要去分析研究、建模、开发程序，成本太高了。虽然到了21世纪，有人确实用“规则”的方法，实现了翻译精确度50%以上的翻译程序，但这个程度是不够的。特别是遇到强大的对手—基于统计的自然语言处理——的时候。</p>
+
+<p>用了统计语言模型后，语音识别的准确度可以高达90%。这其中仅仅是用到了一些概率论和数论的定理，太神奇了。自然语言处理包括了各种各样小问题，但差不多都是用概率的方法来解决的，包括中文分词等。</p>
+
+<p>第二个重要点是，信息的度量。怎么量化信息？一本《水浒传》有多少信息量？这个问题的答案是，信息熵。<strong>一条信息的信息量与其不确定性有着直接的关系。</strong> 信息量可以用比特数来表示，香农的公式这里就不贴了~</p>
+
+<p>信息的作用呢，就是用来消除不确定性的。比如现在你想追隔壁班的一位女生，你对她一点都不了解，除了知道她长什么样。你不确定你能不能追到这个女生，或者说，你希望提高成功率。于是你需要消除这种不确定性，那就需要去获取关于这个女生的一些信息。</p>
+
+<p>第三个重要点是，搜索和布尔代数。一直对搜索引擎的原理不了解，而吴军这位在google工作过的大牛，解答了我的疑问。原来搜索的核心技术，只是布尔代数。当前还有很多工程问题、优化问题、大数据、分布式问题，也不是开玩笑的。不过总的来说就是，用横向扩张物理服务器的方式来处理大访问量和存放处理大数据，而搜索的核心技术是布尔运算。数学ORZ。</p>
+
+<p>其他的内容，和搜索、反作弊，关联比较多，因为我不是打算做这2个方向的，所以这里也不说太多了。入手这本书的原因是据说这本书讲了一些人工智能的技术。虽然和期待不太一样，不过也是收获颇丰了。</p>
+
+<p>说到人工智能，其实自然语言处理就是现代人工智能技术的一个基础。因为它要解决的是自然语言-&gt;机器，这个输入问题。假设现在我们开发出了一个非常智能的程序，但是它不能直接理解自然语言（输入数据），那它也无法产生我们需要的输出了。以视觉为基础的机器人也是一样，如果不研究计算机视觉技术，那这个机器人就只能是个盲人，即时他大脑再聪明。</p>
 
       </div>
 
@@ -1966,6 +1657,46 @@ Given array A = [2,3,1,1,4]</p>
 <p>The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.)</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p>Jump Game I 的升级版，问到达最后一个位置时，至少要跳跃多少步。</p>
+
+<h3>题解：</h3>
+
+<p>贪心算法：</p>
+
+<p>因为要求的是到达最后一个位置的最小步数，那么先假设最终的跳跃路径S存在，可以知道这个路径必然是从0位置开始跳（设起点为S1=0），S2必然是在A[0]能到达的范围内。S2的取值范围是[S1 + 1, S1 + A[S1]]。</p>
+
+<p>若S2不能直接到达last，则S3存在，且S3的取值范围是[S2 + 1, S2 + A[S2]]。 </p>
+
+<p>观察S2和S3的式子可以发现，这个问题是可以用贪心法或者DP处理的。因为每一个阶段的最优解只和上一个阶段有关。</p>
+
+<p>那么对于S(i)，究竟是选D = [S(i - 1) + 1, S(i - 1) + A[S(i - 1)]]这个区间的哪个值呢？ 可以让S(i)逐个取D范围的值， 并计算出 y = MAX( S(i) + A[S(i)] )，那么使得y最大的S(i)，就是局部最优解了。</p>
+
+<p>按照这个思路我实现了下面的代码(runtime 16ms)：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">jump</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">maxStep</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">){</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">maxStep</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="o">++</span><span class="n">depth</span><span class="p">;</span>
+            <span class="kt">int</span> <span class="n">next</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">maxStep</span><span class="p">){</span><span class="c1">//在maxStep一样大的情况下，选择最靠右的</span>
+                    <span class="n">maxStep</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+                    <span class="n">next</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-45/" class="read-more">Read More</a>
@@ -1979,6 +1710,16 @@ Given array A = [2,3,1,1,4]</p>
       </div>
       <div class="entry">
         <p>好几年前就尝试用github pages服务来搭建github博客，当时也已经用了jekyll，不过由于那时候主要是在windows下工作学习（学图形学），手头也只有一台电脑，在win环境弄jekyll实在是不方便，要装ruby啊gem啊，都感觉没有linux环境顺手，最后还是转去了csdn博客。不过csdn博客在我毕业后也是荒废了。</p>
+
+<p>现在我的解决方案是，用我购买的阿里云vps（在阿里云叫ecs），并把我的博客git整个放到Dropbox，并在vps上面搭建了jekyll服务器，就搞定了测试用的博客服务器了。</p>
+
+<p>写博客的流程就简单了，在win或mac下都可以写，md文件一保存，就会被dropbox同步到云端，然后vps的dropbox文件夹也会即时被更新，而jekyll serve是会自动检测文件状态的，一旦被修改就会重新generate静态网站。那么我就可以直接本地开个浏览器，进入 http://vps地址:jekyll服务器端口/，去预览了。</p>
+
+<p>还有就是，在win和mac下有个叫sourcetree的git客户端，十分好用，完全不用打git指令，点几下按钮就可以把代码push到github，也就进一步简化了写博客的步骤。</p>
+
+<p>另外，我发现jekyll-now是符合github pages规范的jekyll程序，但是功能太不完整了，连文章分类tag功能都没。于是我只能回归普通jekyll的模式，开2个git仓库，一个用来放jekyll代码，一个用来放jekyll生成的网站静态代码（也就是本博客的代码）。要更新博客，只需要提交博客的git即可，jekyll的git倒是随意，反正有dropbox在同步，不怕丢失。</p>
+
+<p>最后的最后，吐槽下坚果云。坚果云的linux版只支持桌面版，没有terminal的版本，导致我在vps上无法用坚果云。Dropbox虽然被墙了，但是Dropbox支持linux terminal，而且安装超级简单，按照官方说明，一下子就搞定了。</p>
 
       </div>
 
@@ -2003,6 +1744,76 @@ Given array A = [2,3,1,1,4]</p>
 The solution is guaranteed to be unique.</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p>有N个加油站，连成环形，每个加油站有gas[i]的油，从第i个加油站到第i+1个加油站需要消耗cost[i]的油。现在有一辆车，它有无限大的油箱，但是是空的。求问这辆车应该从哪个加油站出发，才可以跑一遍所有的加油站，返回该加油站的序号，如果不存在这样的起点，返回-1。</p>
+
+<h3>题解：</h3>
+
+<p>设sum-gas是所有加油站的油的总和，sum-cost是汽车走一圈消耗的油的总和，容易知道，当sum-gas&lt;sum-cost时，汽车是不可能遍历所有加油站的，因为油不够。</p>
+
+<p>反过来说，当sum-gas&gt;=sum-cost时，是不是一定有一个起点，可以让汽车顺序跑一圈加油站呢？</p>
+
+<p>证明：
+1）当N=1，g1 &gt;= c1，那么预言正确；</p>
+
+<p>2）当N=2，g1 + g2 &gt;= c1 + c2，若g1 &gt; c1且g2 &gt; c2，则怎么走都可以，所以只要考虑 (g1 &lt; c1 &amp;&amp; g2 &gt; c2) 或者 (g1 &gt; c1 &amp;&amp; g2 &lt; c2) 的情况（实际上2个情况是等同的，只要证明其一即可）。设g1 &lt; c1，因为g1 + g2 &gt; c1 + c2，所以g2 &gt; c2。那么只要从g &gt; c的点出发，必然可以到另一个点。</p>
+
+<p>3）当N=3，g1 + g2 + g3 &gt;= c1 + c2 + c3，若g1 &gt; c1且g2 &gt; c2且g3 &gt; c3，则怎么走都可以。所以只需要考虑g1 &lt; c1 &amp;&amp; g2 + g3 &gt; c2 + c3 的情况（g1可以换成g2或g3，因为是加油站是环形的)。设g1 &lt; c1，那么不能以1作为起点，分情况考虑：a)当g2 &gt; c2，那么可以从2出发，而因为g2 + g3 &gt; c2 + c3,所以2-&gt;3-&gt;1成立；b)当g2 &lt; c2时，g3 &gt; c3，又可得g3 + g1 &gt; c3 + c1，所以3-&gt;1-&gt;2成立。 所以3个加油站也必然存在一个可走的路径。</p>
+
+<p>4）当N=4时，g1 + g2 + g3 + g4 &gt;= c1 + c2 + c3 + c4，因为在3)中已经证明3个加油站必然存在一条路径，那么对于4个加油站，可以设 g1 + g2 + g3 &gt;= c1 + c2 + c3（也可以是234、341、412)，那么对于这3个加油站，肯定是有一条路的，那么久可以把这3个加油站合并，变成 g0 &gt;= c0 且 g0 + g4 &gt;= c0 +c4，问题就转化为2)的情况，而2）已经证明是有解的，所以综上可得，N=4也必然有解。</p>
+
+<p>5) 当N&gt;4时，通过上面的合并法，归纳得证。</p>
+
+<p>所以，<strong>当sum-gas&gt;=sum-cost时，一定有一个起点，可以让汽车顺序跑一圈加油站。</strong></p>
+
+<p>知道起点必然存在后，再利用上面的合并法，可以设起点为i，g(left)是从1到i-1所有加油站的油的总和，c(left)是从1到i-1所有加油站的开销的总和，同理g(right)是i+1到n所有加油站的油的总和，c(right)是从1+1到n所有加油站的开销的总和。那么问题就降级为3个加油站left、i、right的路径问题。因为i是起点，路径必然是i-&gt;right-&gt;left，i就可以合并到right区域里，那么路径进一步简化，变成right-&gt;left。即我们需要的i的值，同时也是right区间的起始点位置。</p>
+
+<p>right和left的关系为：</p>
+
+<ul>
+<li><p>g(right) &gt;= c(right)</p></li>
+<li><p><strong>g(left) + g(right) &gt;= c(left) + c(right)</strong></p></li>
+<li><p>区间left = [1, i - 1]</p></li>
+<li><p>区间right = [i, n]</p></li>
+</ul>
+
+<p>具体代码实现是，从1和n向中间扫，计算left和right的gas和cost，当2个指针相遇，且满足上面的关系式，则高位指针的位置就是我们的起点。</p>
+
+<p>这里可以做一个优化，因为<strong>g(left) + g(right) &gt;= c(left) + c(right)</strong>，可得<strong>sum = g(left) + g(right) - ( c(left) + c(right) ) &gt;= 0</strong>那么即是说，在扫的过程中，可以把left和right视作一个合并中加油站集群，只要保证sum&gt;=0成立，left和right就可以不断向中间逼近，直到相遇。</p>
+
+<p>&quot;伪&quot;代码如下：</p>
+
+<ol>
+<li><p>设start = n, end = 1，sum = gas(start-&gt;end) - cost(start-&gt;end)</p></li>
+<li><p>初始sum = gas(start) - cost(start)</p></li>
+<li><p>while(start &gt; end):</p>
+
+<p>sum &gt;= 0:
+    当sum &gt;= 0时，因为start的gas比cost大，必然可以走到end，所以可以把把gas(end)-cost(end)加到sum里，sum += gas(end)-cost(end)（也就是把start-&gt;end的所有加油站合并，变成一个start），合并后end加1；</p>
+
+<p>sum &lt; 0:
+    当sum &lt; 0时，说明start的gas已经少到不能走到end了，但又因为start必然是路径的起点，于是start还可以尝试往左挪，start减一，并执行 sum += gas(start) - cost(start)。（也就是把start的左边的加油站合并到start）</p></li>
+</ol>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">canCompleteCircuit</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">gas</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">cost</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="n">gas</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">sum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">end</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">end</span><span class="p">];</span>
+                <span class="o">++</span><span class="n">end</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="o">--</span><span class="n">start</span><span class="p">;</span>
+                <span class="n">sum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">start</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-134/" class="read-more">Read More</a>
@@ -2017,6 +1828,73 @@ The solution is guaranteed to be unique.</p>
       <div class="entry">
         <p>游戏试玩地址：<a href="http://wanga.me/45512" title="http://wanga.me/45512">http://wanga.me/45512</a></p>
 
+<p>技术架构：</p>
+
+<p>平台：web、mobile</p>
+
+<p>引擎：cocos2d</p>
+
+<p>语言：js</p>
+
+<p>使用的插件：chipmunk(物理引擎) underscore(js增强函数库）</p>
+
+<p>技术实现：</p>
+
+<p>这游戏的技术难点是<strong>电网</strong>的实现。</p>
+
+<p>电网的特点：</p>
+
+<ul>
+<li>电流在电网上移动（路径固定，会循环）</li>
+<li>电流可能有多条，电流会转向，可以设置电流的长度、速度</li>
+</ul>
+
+<p>实际上这个游戏的核心创意是我提出的，提出之后，大家一起围绕这个核心玩法开了各种脑洞。可惜因时间关系，只来得及完成这个核心玩法。</p>
+
+<p>技术永远是跟着需求走的。需求确定的情况下，只要选一个成本最低、最简单的实现方案即可。若改了需求，任何程序员都不能保证既有代码实现可以完全不改动。</p>
+
+<p>对于这个电网来说，我主要处理几个难点：</p>
+
+<ul>
+<li>电流和导弹的碰撞的实现</li>
+<li>电流移动问题</li>
+<li>电流转弯问题</li>
+<li>电流动画问题</li>
+<li>电流和发电器整体移动的问题</li>
+</ul>
+
+<p>第一个问题是用物理引擎chipmunk解决的，为什么不是box2d？因为我在公司刚好也在做一款物理类游戏，而chipmunk是能跨android和ios的引擎（box2d暂时不支持ios）。But，引入chipmunk后，又引发新的问题，下面会说到。</p>
+
+<p>第二和第三个问题，电流移动和转弯，都是用cocos的action功能实现的，移动是cc.moveTo，转弯是cc.callFunc（在回调函数里即时计算旋转角），那么一个电流sprite就是不断执行move-&gt;rotate-&gt;move-&gt;rotate即可。</p>
+
+<p>但电流转弯又引发新的问题，因为电流是一个绑定了chipmunk&#39;s body的PhysicSprite，body是一个狭长的长方形，转弯的时候会出现这样子的bug：</p>
+
+<p><img src="../images/2015.7/11.png" alt="11.png">
+<img src="../images/2015.7/12.png" alt="12.png">
+<img src="../images/2015.7/13.png" alt="13.png">
+<img src="../images/2015.7/14.png" alt="14.png"></p>
+
+<p>即电流的body会超出路径限定的范围。于是我做了一个细分的操作，把一条电流切成N截，每一截都是一个PhsicalSprite，那么只要让他们在路径上移动时有前后顺序，就会变成：</p>
+
+<p><img src="../images/2015.7/15.png" alt="15.png"></p>
+
+<p>这里有个实现技巧：要生成N个速度为v的小电流，且他们的总长度为s，可以做一个createCurrent()函数，然后用某种延时机制，在0、 1/N *(s/v)、2/N *(s/v)、···、N/N *(s/v)时刻，各执行一次createCurrent函数，每次执行函数都会在路径起点生成一截小电流。执行N次后，就得到了一条会拐弯的大电流。</p>
+
+<p>第四个问题，电流动画，因为没做过类似的需求，在处理这个问题时总感觉不对，最后出来的效果也不太好。我的做法是，让每截小电流都播放同一个cc.animation帧动画。最后发现效果不是很理想，因为每截小电流太小了，导致动画的细节少了很多。但勉强可以作为demo演示用。</p>
+
+<p>第五个问题，电流和发电器整体移动的问题。按照chipmunk的物理规则，一个PhysicSprite的移动应该是被动的，cp.body移动从而导致PhysicSprite移动。但我是用cc.moveTo来移动的，也就是反过来实现了。不过这个细节也没什么影响。对于这第五个问题，一开始想到的方案是，通过改变所有电流Sprite的父节点的位置，从而整体移动整个电网。</p>
+
+<p>但实际上会出bug：电网是整体偏移了，但是Sprite的body没有偏移，这是因为chipmunk的实现和cocos的node树的实现是完全分开的。所以就还要让body也跟着偏移。</p>
+
+<p>最后我的实现方法是：如果电网会移动，那么久解除PhysicSprite和body的连接，从而可以分别操作sprite和body的位置而又不会互相影响，这样只要2边的位置能对上，就OK了。具体实现这里不提。</p>
+
+<p>其他问题：</p>
+
+<ul>
+<li>电流角度的计算</li>
+<li>关卡配表问题</li>
+</ul>
+
       </div>
 
       <a href="/gamejam-tech/" class="read-more">Read More</a>
@@ -2030,6 +1908,17 @@ The solution is guaranteed to be unique.</p>
       </div>
       <div class="entry">
         <p><img src="../images/2015.7/5.jpg" alt="5.jpg"></p>
+
+<p>比赛介绍：<a href="http://www.indieace.com/article-715-1.html" title="http://www.indieace.com/article-715-1.html">http://www.indieace.com/article-715-1.html</a></p>
+
+<p>本次主题：</p>
+
+<p><img src="../images/2015.7/3.png" alt="3.png"></p>
+
+<p>我们组的作品《虐之太空》：
+<a href="http://wanga.me/45512" title="http://wanga.me/45512">http://wanga.me/45512</a></p>
+
+<p><img src="../images/2015.7/4.jpg" alt="4.jpg"></p>
 
       </div>
 
@@ -2051,6 +1940,61 @@ The solution is guaranteed to be unique.</p>
 <p>Can you solve it without using extra space?</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p>判断一个链表是否有环，有环的话返回环的起始节点，无环的话返回NULL。</p>
+
+<h3>题解：</h3>
+
+<p>Linked List Cycle的升级，不仅要判断有无环，还要求入口。很显然可以在Linked List Cycle的基础上来做。</p>
+
+<p>这里我直接翻译ngcl的<a href="https://leetcode.com/discuss/16567/concise-solution-using-with-detailed-alogrithm-description" title="answer">answer</a>，写得非常好：</p>
+
+<ol>
+<li>用slower和faster方法判断是否有环；</li>
+<li>设链表的头节点是head，环的入口节点是entry，slower和faster2个指针相遇的节点是meeting;</li>
+<li>设L1是head到entry的正向距离，<strong>L2是entry到meeting的正向距离</strong>，C是环的长度，n是faster指针在cycle里遍历的次数(不到一遍算0)；</li>
+</ol>
+
+<p>根据上面的定义，可知：</p>
+
+<ol>
+<li>当slower和faster相遇时，slower已经走了L1 + L2的距离，也即head和meeting的距离;</li>
+<li>当slower和faster相遇时，faster已经走了L1 + L2 + n * C的距离;</li>
+<li>因为slower步进1，而faster步进2，那么当slower和faster第一次相遇时，faster已经走的距离是slower已经走的距离的两倍，即 2* (L1 + L2) = L1 + L2 + n * C =&gt; L1 = (n - 1) * C + (C - L2)</li>
+</ol>
+
+<p><strong>L1 = (n - 1) * C + (C - L2)</strong> 这个等式表明， head和entry的距离(L1)，等于<strong>meeting到entry的正向距离</strong>（链表是有遍历方向的）。</p>
+
+<p>这是因为式子中的 (n - 1) * C相当于走n-1个循环，对一个指向meeting的环内指针来说，走(n - 1) * C等于回到起点，所以式子可以简化成 <strong>L1 = C - L2</strong>。</p>
+
+<p>画成图是这样子：</p>
+
+<p><img src="../images/2015.7/2.png" alt="1.png"></p>
+
+<p>ngcl的代码如下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">ListNode</span> <span class="o">*</span><span class="nf">detectCycle</span><span class="p">(</span><span class="n">ListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">head</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+        <span class="n">ListNode</span> <span class="o">*</span><span class="n">slow</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="n">ListNode</span> <span class="o">*</span><span class="n">fast</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="n">ListNode</span> <span class="o">*</span><span class="n">entry</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">&amp;&amp;</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">slow</span> <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+            <span class="n">fast</span> <span class="o">=</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">slow</span> <span class="o">==</span> <span class="n">fast</span><span class="p">)</span> <span class="p">{</span>                      <span class="c1">// there is a cycle</span>
+                <span class="k">while</span><span class="p">(</span><span class="n">slow</span> <span class="o">!=</span> <span class="n">entry</span><span class="p">)</span> <span class="p">{</span>               <span class="c1">// found the entry location</span>
+                    <span class="n">slow</span>  <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+                    <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">entry</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                                 <span class="c1">// there has no cycle</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-142/" class="read-more">Read More</a>
@@ -2071,6 +2015,47 @@ The solution is guaranteed to be unique.</p>
 <p>the contiguous subarray [2,3] has the largest product = 6.</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p>求数组里最大的连续子序列的乘积。</p>
+
+<h3>题解：</h3>
+
+<p>Maximum Subarray的变形，把求和改成求积了。且有负数。</p>
+
+<p>设DP[i]是以i位置元素为终点的子序列的乘积，那么DP[i]的最大值就是我们要的解。</p>
+
+<p>DP[i] = max( DP[i - 1] * nums[i], nums[i] )</p>
+
+<p>上面的方程是错的，因为没有考虑到负数的情况，比如数组[-10,5,-10]，DP[0] = -10, DP[1] = 5, DP[2] =-10，最大乘积是5。 但实际上最大乘积是 -10 * 5　＊ (-10) = 500。</p>
+
+<p>正确的方程是，记录2个DP数组，一个记乘积最大值，一个记乘积最小值，然后综合2个DP数组的结果，就可以得到真正的最大值。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">DP_max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span> <span class="n">DP_min</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DP_max</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="n">DP_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span> <span class="n">DP_min</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DP_max</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</code></pre></div>
+<p>按这个方程组来做的话，需要O(n)的空间，考虑到题目只要求输出最大值，那么可以优化到O(1)的空间消耗。</p>
+
+<p>原理就是，DP_*[i]只和上一个状态以及当前的值有关，那么只需要保存上一个状态的结果，就足够求最大乘积了。</p>
+
+<p>下面是我的代码：（runtime 8 ms）</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxProduct</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">dp_pre_min</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">dp_pre_max</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">dp_max</span> <span class="o">=</span> <span class="n">dp_pre_max</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">len</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="kt">int</span> <span class="n">dp_cur_max</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dp_pre_max</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">dp_pre_min</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+            <span class="kt">int</span> <span class="n">dp_cur_min</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span> <span class="n">min</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dp_pre_max</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">dp_pre_min</span><span class="o">*</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dp_max</span> <span class="o">&lt;</span> <span class="n">dp_cur_max</span><span class="p">)</span>
+                <span class="n">dp_max</span> <span class="o">=</span> <span class="n">dp_cur_max</span><span class="p">;</span>
+            <span class="n">dp_pre_max</span> <span class="o">=</span> <span class="n">dp_cur_max</span><span class="p">;</span>
+            <span class="n">dp_pre_min</span> <span class="o">=</span> <span class="n">dp_cur_min</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">dp_max</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-152/" class="read-more">Read More</a>
@@ -2085,8 +2070,90 @@ The solution is guaranteed to be unique.</p>
       <div class="entry">
         <blockquote>
 <p>Given a 2D binary matrix filled with 0&#39;s and 1&#39;s, find the largest square containing all 1&#39;s and return its area.</p>
+
+<p>For example, given the following matrix:</p>
+
+<p>1 0 1 0 0</p>
+
+<p>1 0 1 1 1</p>
+
+<p>1 1 1 1 1</p>
+
+<p>1 0 0 1 0</p>
+
+<p>Return 4.</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p>给定一个01矩阵，求矩阵里最大的1字正方形的面积</p>
+
+<h3>题解：</h3>
+
+<p>考虑动态规划来解题。</p>
+
+<p>设DP(i,j)是子矩阵p(0,0)-&gt;p(i,j)里，以p(i,j)为右下顶点的正方形的最大边长(i属于x轴，j属于y轴）。那么DP(i,j)的最大值的平方，就是所要求的解。</p>
+
+<p>以题目的矩阵来说，可以很容易看出DP(i,j)值：</p>
+
+<p>DP(0,0) = <strong>1</strong>  DP(1,0) = <strong>0</strong>  DP(2,0) = <strong>1</strong>  DP(3,0) = <strong>0</strong>  DP(4,0) = <strong>0</strong></p>
+
+<p>DP(0,1) = <strong>1</strong>  DP(1,1) = <strong>0</strong>  DP(2,1) = <strong>1</strong>  DP(3,1) = <strong>1</strong>  DP(4,1) = <strong>1</strong></p>
+
+<p>DP(0,2) = <strong>1</strong>  DP(1,2) = <strong>1</strong>  DP(2,2) = <strong>1</strong>  DP(3,2) = <strong>2</strong>  DP(4,2) = <strong>2</strong></p>
+
+<p>DP(0,3) = <strong>1</strong>  DP(1,3) = <strong>0</strong>  DP(2,3) = <strong>0</strong>  DP(3,3) = <strong>1</strong>  DP(4,3) = <strong>0</strong></p>
+
+<p>DP(i,j)的值很好算，有一些规律存在：（下面是python伪代码）</p>
+
+<p>if j == 0: DP(i,0) = M(i,0)</p>
+
+<p>elif i == 0: DP(0,j) = M(0,j)</p>
+
+<p>elif M(i,j)==0: DP(i,j) = 0</p>
+
+<p>else: DP(i,j) = min( DP(i - 1, j), DP(i, j - 1), DP(i - 1, j - 1)) + 1</p>
+
+<p>前2个if处理了DP(i,j)的边界值问题，后2个if就是DP(i,j)的状态转移方程了。</p>
+
+<p>我的实现代码如下（runtime 12 ms）：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maximalSquare</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;&gt;&amp;</span> <span class="n">matrix</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span><span class="c1">//row col</span>
+        <span class="kt">char</span> <span class="n">result</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">dp</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span><span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+                <span class="k">else</span>
+                <span class="p">{</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-221/" class="read-more">Read More</a>
@@ -2106,6 +2173,38 @@ The solution is guaranteed to be unique.</p>
 In a complete binary tree every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between 1 and 2h nodes inclusive at the last level h.</p>
 </blockquote>
 
+<h3>题意：</h3>
+
+<p>求一颗完全二叉树得节点的数量。</p>
+
+<h3>题解：</h3>
+
+<p>看了这道题的discuss，发现一个挺有意思的解决方案（也可能是最快的方案了），这里分析一下。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">countNodes</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="kt">int</span> <span class="n">hl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hr</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+        <span class="n">TreeNode</span> <span class="o">*</span><span class="n">l</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">root</span><span class="p">;</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span><span class="n">hl</span><span class="o">++</span><span class="p">;</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;}</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span><span class="n">hr</span><span class="o">++</span><span class="p">;</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;}</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">hl</span><span class="o">==</span><span class="n">hr</span><span class="p">)</span> <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">hl</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>函数内第4、5行，2个while循环，获得了root的最左节点和最右节点的深度，然后判断深度是否一样，一样的话，说明root是一棵满二叉树，于是可以用公式直接返回该子树的节点个数。</p>
+
+<p>再利用分而治之的思想，就可以得到总的节点的个数了：</p>
+
+<p>countNodes(root) = 一棵完全二叉树的节点个数 = 1（即根节点） + countNodes(左子树) + countNodes(右子树)</p>
+
+<p>而因为完全二叉树的性质，可以知道root的左子树和右子树中肯定有一棵是满二叉树。所以这个算法是很快的，当countNodes遇到满二叉树时，一次lgn的迭代运算后，即可以返回该树的节点个数。因为只有满二叉树可以让递归中止，所以总的耗时就是计算各个满二叉树的总耗时。</p>
+
       </div>
 
       <a href="/leetcode-problem-222/" class="read-more">Read More</a>
@@ -2123,7 +2222,70 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 <p>Note: You may not slant the container.</p>
 </blockquote>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
 
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
+
+<p>有一排竖直放置的、长短不一的圆柱，圆柱之间间隔都是1，问哪2根圆柱（用ai，aj表示)可以组成一个体积（因为是二维空间，其实就是面积）最大的<strong>水容器</strong>。</p>
+
+<p>注意：容器里面放着其他圆柱也是没影响的（奇葩的容器？），ai和aj不要求相邻；因为是水容器，所以最短边决定了容器的容量。</p>
+
+<h3>题解：</h3>
+
+<p>这道题并不是动态规划题， 原因是动态规划的一个条件——无后效性，无法满足。</p>
+
+<blockquote>
+<p>无后效性是这样一种性质：某阶段的状态一旦确定，则此后过程的演变不再受此前各种状态及决策的影响，简单的说，就是“未来与过去无关”，当前的状态是此前历史的一个完整总结。</p>
+</blockquote>
+
+<p>设S(i)是从第0根柱子到第i根柱子这个范围里，所能得到的最大的面积。换一种说法就是说，S(i)是考虑只有前i根柱子存在的情况下的最优解。所以，S(4)就是我们的解。</p>
+
+<p>考虑动态规划的最优化原理——最优策略的任何一部分子策略也必须是最优的。
+S(i)是符合这个定义的，S(i)代表i阶段时的最优结果。</p>
+
+<p>但S(i)并不满足无后效性规则。考虑下面这个情况：</p>
+
+<p><img src="../images/2015.7/1.png" alt="1.png"></p>
+
+<p>S(3)的值是以[1,3]为边界的面积:(3-1)<em>min(4,2) = 4。按照无后效性定义“未来与过去无关”，S(3)是对0,1,2,3这4根柱子的一个总结，那么S(4)呢？容易看出，S(4)的值是以[1,4]为边界的面积：(4-1)</em>min(4,4) = 12。S(4)的值(未来），不仅与3有关系，还与0、1、2有关系，即过去影响了未来。</p>
+
+<p>这道题的真正解法是很简单的。假设T(i,j)代表我们能从整个区间里找的最大容器面积，T(i,j)=(j-i)*min(a[i],[j]) (i&lt;j)，可以证明，在j的右端肯定没有比j更高的柱子了（只可能小于或等于），不然T(i,j)就不成立。</p>
+
+<p>那么可以反过来思考，我们假设0和n-1号柱子组成的面积是最大的，要使这个结论不成立，除非是在[0,n-1]区间里找到了比a[0]和a[n-1]高的柱子，且新的柱子对的面积比目前的最大值还大。</p>
+
+<p>所以可以从两端向中间迭代，直接看代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">area</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">){</span>
+            <span class="kt">int</span> <span class="n">curArea</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="n">l</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">curArea</span> <span class="o">&gt;</span> <span class="n">area</span><span class="p">)</span>
+                <span class="n">area</span> <span class="o">=</span> <span class="n">curArea</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
+                <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]){</span>
+                    <span class="n">k</span><span class="o">++</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span><span class="p">{</span>
+                <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
+                    <span class="n">k</span><span class="o">--</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">area</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-11/" class="read-more">Read More</a>
@@ -2138,6 +2300,89 @@ In a complete binary tree every level, except possibly the last, is completely f
       <div class="entry">
         <p>A robot is located at the top-left corner of a m x n grid (marked &#39;Start&#39; in the diagram below).</p>
 
+<p>The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked &#39;Finish&#39; in the diagram below).</p>
+
+<p>How many possible unique paths are there?</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">uniquePaths</span><span class="p">(</span><span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
+
+<p>求路径总数，每次只能往右或往下走</p>
+
+<h3>题解：</h3>
+
+<p>入门级别动态规划题目。</p>
+
+<p>列下状态转移方程：</p>
+
+<p>设sum(i，j)是从pos(0,0)到pos(i,j)的路径总数。</p>
+
+<p>可得：</p>
+
+<p><strong>S(i, j) = S(i - 1, j) + S(i, j - 1)</strong></p>
+
+<p>方程的含义是：</p>
+
+<p>每个格子的路径总数 等于 起点到它左边的格子的路径总数 + 起点到它上方的格子的路径总数。</p>
+
+<h3>代码（0ms RunTime)：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">uniquePaths</span><span class="p">(</span><span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">sum</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>对于Unique Paths II，改变点是，有些格子变成了障碍物。其实也很简单，上面的代码稍微改下就好了。</p>
+
+<h3>代码（4ms RunTime)：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">uniquePathsWithObstacles</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">obstacleGrid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">obstacleGrid</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">obstacleGrid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="k">else</span>
+                    <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sum</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-62-63/" class="read-more">Read More</a>
@@ -2152,6 +2397,74 @@ In a complete binary tree every level, except possibly the last, is completely f
       <div class="entry">
         <p>Find the contiguous subarray within an array (containing at least one number) which has the largest sum.</p>
 
+<p>For example, given the array [−2,1,−3,4,−1,2,1,−5,4],
+the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
+
+<p>求子串和最大值</p>
+
+<h3>题解：</h3>
+
+<p>经典动态规划题目。</p>
+
+<p>列下状态转移方程：</p>
+
+<p>设数组为T(i), 设S(i)是数组从0到i位置的子串和的最大值。明确一下，S(i)对应的子串的左右2个索引[start,end]，start的取值范围是[0,i],end必然是i，即[start,end]是数组[0,i]段的一个后缀。</p>
+
+<p>可得：</p>
+
+<p><strong>S(i) = T(i) + ( S(i - 1) &gt; 0 ? S(i - 1) : 0 )</strong></p>
+
+<p>方程的含义是：
+求S(i)时，S(i-1)如果大于0，那么说明i-1存在一个后缀（必然是连续的）使得S(i-1)大于0，此时把T[i]也加进去S(i-1)，当然就是S(i)的最长后缀了。（S(i)可能小于等于0）；</p>
+
+<p>S(i-1)如果小于等于0，说明S(i-1)对增大S(i)没有意义了，也即说明S(i)的最长后缀等于[i,i]，S(i) = T(i)。</p>
+
+<p>空间复杂度O(n)，时间复杂度O(n)。</p>
+
+<h3>代码：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">maxS</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
+                <span class="n">maxS</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>考虑到S(i)数组对于这个题目是多余的，题目只是要求S(i)的max值，那么可以改下代码，把空间复杂度从O(n)降到O(1)。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxS</span><span class="o">=</span><span class="n">INT_MIN</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
+                <span class="n">maxS</span> <span class="o">=</span> <span class="n">sum</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-53/" class="read-more">Read More</a>
@@ -2166,6 +2479,82 @@ In a complete binary tree every level, except possibly the last, is completely f
       <div class="entry">
         <p>Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.</p>
 
+<p>For example, given the following triangle</p>
+
+<ul>
+<li>[</li>
+<li>........[<strong>2</strong>],</li>
+<li>.......[<strong>3</strong>,4],</li>
+<li>.....[6,<strong>5</strong>,7],</li>
+<li>....[4,<strong>1</strong>,8,3]</li>
+<li>]</li>
+</ul>
+
+<p>The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).</p>
+
+<p>Note:</p>
+
+<p>Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">minimumTotal</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">triangle</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
+
+<p>自顶向下寻找一条路径使得路径上每个节点的值的和，是所有路径中最小的。限制条件：每次只能选下一行的邻接节点。</p>
+
+<h3>题解：</h3>
+
+<p>很明显是动态规划方面的题（实际上我就是特地先做动态规划的题=。=）。</p>
+
+<p>列下状态转移方程：</p>
+
+<p>设总共有N层，T=triangle，每个节点的值表示为T(n,i)，从根节点到每个节点的最优路径的值总和为S(n,i)，
+那么可以得到：</p>
+
+<p><strong>S(n,i) = MAX( S(n-1, i-1), S(n-1, i) ) + T(n,i)</strong></p>
+
+<p>初始状态：S(0,0) = T(0,0)</p>
+
+<p>然后自顶向下地迭代一轮，即可求得最下面一层的S(n, i)，遍历这一层，找出S的最小值即可。</p>
+
+<p>空间复杂度O(n)，时间复杂度O(n)</p>
+
+<h3>代码：</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">minimumTotal</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">triangle</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">sum</span><span class="p">(</span><span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+        <span class="kt">int</span> <span class="n">maxLayer</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">maxLayer</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">sum</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">sum</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">leftPathSum</span><span class="p">,</span> <span class="n">righPathSum</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">layer</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">;</span> <span class="n">layer</span> <span class="o">&lt;</span> <span class="n">maxLayer</span><span class="p">;</span> <span class="o">++</span><span class="n">layer</span><span class="p">){</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">layer</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+                <span class="n">leftPathSum</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="p">;</span>
+                <span class="n">righPathSum</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="n">leftPathSum</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">layer</span><span class="p">)</span>
+                    <span class="n">righPathSum</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">[</span><span class="n">layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
+                <span class="n">sum</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">leftPathSum</span><span class="p">,</span> <span class="n">righPathSum</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span><span class="p">[</span><span class="n">maxLayer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">result</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">sum</span><span class="p">[</span><span class="n">maxLayer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-120/" class="read-more">Read More</a>
@@ -2183,7 +2572,85 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 <p>Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.</p>
 </blockquote>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>题意：</h3>
 
+<p>一个坏蛋要去盗窃一排房子，每个房子都藏有一笔钱（函数参数nums记录了每个房子的钱的数量），盗窃的限制条件是，如果某两个相邻的房子同时被盗了，会触发安保系统，也就是说不能连续地盗窃房子。
+求：这个坏蛋最多能盗取多少钱？</p>
+
+<h3>题解：</h3>
+
+<p>看得出题目是要求一个最优解，即安排这个窃贼的行动路线，让他拿到最多的钱。路线有很多种，目标是求最优解，似乎是动态规划题目？那么就试试分析状态转移方程：</p>
+
+<p>f(n) : 代表窃贼在前n个房子最多能拿到多少钱，n==nums.size()时，即是我们要的解</p>
+
+<p>f(0) : 窃贼在前0个房子最多能拿到多少钱（一家都不偷），显然 <strong>f(0) == 0</strong></p>
+
+<p>f(1) : 窃贼在前1个房子最多能拿到多少钱（只偷一家），显然 <strong>f(1) == nums[0]</strong></p>
+
+<p>f(2) : 窃贼在前2个房子最多能拿到多少钱，因为限制条件存在，窃贼只能选偷第1个房子或第2个房子，取决于哪个房子的钱多，那么 <strong>f(2) = max(nums[0], nums[1])</strong></p>
+
+<p>f(3) : 总共有4种路线：[0,2]、[0]、[1]、[2]，而因为nums[i]&gt;=0（钱是非负数），那么可以剔除掉[0]、[2]这2个路线（偷了0后还可以偷2，不会亏，为什么不偷呢？），所以只剩[0,2]、[1]2种，于是 <strong>f(3) = max(nums[1], nums[0] + nums[2])</strong></p>
+
+<p>从而得到方程：</p>
+
+<p>f(n) = max( f(n-1), nums[n-1] + f(n-2) ) </p>
+
+<p>对方程的解释：</p>
+
+<p>偷前n个房子的最优解（即钱的总数），等于：偷前(n-1)个房子的最优解、偷前(n-2)个房子的最优解 + 第n个房子的钱，取这两者中较大的那个。</p>
+
+<p>验证一下该方程是否合理：</p>
+
+<p><strong>f(1)</strong> = nums[0] = max(0，nums[0]) = <strong>max(f(0), nums[0] + f(-1))</strong> =  max(f(0), nums[0] + f(0)) （ 因为n&lt;0时没有意义了，所以f(n&lt;0) = f(0) )</p>
+
+<p><strong>f(2)</strong> = max(nums[0], nums[1]) = <strong>max( f(1), nums[1] + f(0) )</strong></p>
+
+<p>f(3) = max(nums[1], nums[0] + nums[2]) = max( <strong>max(nums[0], nums[1])</strong>, nums[0] + nums[2]) = max( f(2), nums[2] + f(1) )</p>
+
+<p>代码如下(leetcode RunTime 0ms)：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="err">，</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()];</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>又因为，我们只需要求f[n]，并不需要输出整个F数组，那么可以改下代码，降低空间复杂度。</p>
+
+<p>代码如下(leetcode RunTime 0ms)：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">Solution</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">cur</span><span class="p">;</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pre</span><span class="p">,</span> <span class="n">cur</span><span class="p">);</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">cur</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
       </div>
 
       <a href="/leetcode-problem-198/" class="read-more">Read More</a>
@@ -2197,6 +2664,168 @@ In a complete binary tree every level, except possibly the last, is completely f
       </div>
       <div class="entry">
         <h3>编译环境</h3>
+
+<ul>
+<li><p>windows 7 64位</p></li>
+<li><p>VS 2013 Ultimate</p></li>
+<li><p>openssl-1.0.2a</p></li>
+<li><p>nopoll-0.2.8.b184</p></li>
+</ul>
+
+<h3>编译步骤</h3>
+
+<ol>
+<li>nopoll官网提供了二进制安装包，不过不知为什么无法直接用（运行时错误，无法debug)，所以还是得手动编译&lt;</li>
+<li><p>nopoll依赖openssl，所以先编译openssl：</p>
+
+<ul>
+<li>下载<a href="http://www.openssl.org/source/openssl-1.0.2a.tar.gz">http://www.openssl.org/source/openssl-1.0.2a.tar.gz</a></li>
+<li>安装perl <a href="http://downloads.activestate.com/ActivePerl/releases/5.20.1.2000/ActivePerl-5.20.1.2000-MSWin32-x64-298557.msi">http://downloads.activestate.com/ActivePerl/releases/5.20.1.2000/ActivePerl-5.20.1.2000-MSWin32-x64-298557.msi</a></li>
+<li>解压后，阅读INSTALL.W64安装说明
+&gt; We loved with a love that was more than love
+&gt; To build for Win64/x64: 
+&gt; perl Configure VC-WIN64A
+&gt; ms\do_win64a
+&gt; nmake -f ms\ntdll.mak
+&gt; cd out32dll
+&gt; ..\ms\test</li>
+<li><p>第三步的ms\do_win65a和nmake -f ms\ntdll.mak必须要用vs的控制台程序来执行，否则会出错</p>
+
+<p><img src="/images/2015.4/1.png" alt="1.png"></p></li>
+<li><p>编译完成通过后，执行nmake -f ms\ntdll.mak install来生成最终发布文件, 生成位置默认是在usr/local/里，但windows下没有这个目录，所以Perl把ssl生成到当前控制台所在分区的根目录了（如源码在d:/openssl/，则会生成到D:/usr/local/)</p></li>
+</ul></li>
+<li><p>用编译好的openssl库来编译Nopoll</p>
+
+<p>nopoll虽然提供了Makefile.win，但我试了下，发现并不能一键编译，会提示缺少versions.mk和config.mk（这2个文件最后在nopoll的svn仓库里找到），补上这2个文件后再次执行nmake，会提示./prepare-nsh.sh permission denied（win平台执行sh文件？）</p>
+
+<p>按官方的编译方法失败后，只能自行建工程编译了：</p>
+
+<ul>
+<li>新建一个vs工程，取名libnopoll</li>
+<li>添加 nopoll-0.2.8.b184/src目录的源码文件到工程</li>
+<li>这里要改下nopoll_config.h（此文件应该是自动生成的，我们要手动修改一个出来）</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c">  <span class="cm">/*</span>
+<span class="cm">  * Nopoll Library nopoll_config.h</span>
+<span class="cm">  * Platform dependant definitions.</span>
+<span class="cm">  *</span>
+<span class="cm">  * This is a generated file.  Please modify &#39;configure.in&#39;</span>
+<span class="cm">  */</span>
+  <span class="cp">#ifndef __NOPOLL_CONFIG_H__</span>
+  <span class="cp">#define __NOPOLL_CONFIG_H__</span>
+  <span class="cm">/**</span>
+<span class="cm">  * \addtogroup nopoll_decl_module</span>
+<span class="cm">  * @{</span>
+<span class="cm">  */</span>
+  <span class="cm">/**</span>
+<span class="cm">  * @brief Allows to convert integer value (including constant values)</span>
+<span class="cm">  * into a pointer representation.</span>
+<span class="cm">  *</span>
+<span class="cm">  * Use the oposite function to restore the value from a pointer to a</span>
+<span class="cm">  * integer: \ref PTR_TO_INT.</span>
+<span class="cm">  *</span>
+<span class="cm">  * @param integer The integer value to cast to pointer.</span>
+<span class="cm">  *</span>
+<span class="cm">  * @return A \ref noPollPtr reference.</span>
+<span class="cm">  */</span>
+  <span class="cp">#ifndef INT_TO_PTR</span>
+  <span class="cp">#define INT_TO_PTR(integer)   ((noPollPtr) (long) ((int)integer))</span>
+  <span class="cp">#endif</span>
+  <span class="cm">/**</span>
+<span class="cm">  * @brief Allows to convert a pointer reference (\ref noPollPtr),</span>
+<span class="cm">  * which stores an integer that was stored using \ref INT_TO_PTR.</span>
+<span class="cm">  *</span>
+<span class="cm">  * Use the oposite function to restore the pointer value stored in the</span>
+<span class="cm">  * integer value.</span>
+<span class="cm">  *</span>
+<span class="cm">  * @param ptr The pointer to cast to a integer value.</span>
+<span class="cm">  *</span>
+<span class="cm">  * @return A int value.</span>
+<span class="cm">  */</span>
+  <span class="cp">#ifndef PTR_TO_INT</span>
+  <span class="cp">#define PTR_TO_INT(ptr) ((int) (long) (ptr))</span>
+  <span class="cp">#endif</span>
+  <span class="cm">/**</span>
+<span class="cm">  * @brief Allows to get current platform configuration. This is used</span>
+<span class="cm">  * by Nopoll library but could be used by applications built on top of</span>
+<span class="cm">  * Nopoll to change its configuration based on the platform information.</span>
+<span class="cm">  */</span>
+  <span class="c1">//#define NOPOLL_OS_UNIX (1)</span>
+  <span class="cp">#define NOPOLL_OS_WIN32 (1)</span>
+  <span class="cp">#define R_OK 4</span>
+  <span class="cp">#define W_OK 2</span>
+  <span class="cm">/**</span>
+<span class="cm">  * @internal Allows to now if the platform support vasprintf</span>
+<span class="cm">  * function. Do not use this macro as it is supposed to be for</span>
+<span class="cm">  * internal use.</span>
+<span class="cm">  */</span>
+  <span class="c1">//#define NOPOLL_HAVE_VASPRINTF (1)</span>
+  <span class="cm">/**</span>
+<span class="cm">  * @brief Indicates that this platform have support for 64bits.</span>
+<span class="cm">  */</span>
+  <span class="cp">#define NOPOLL_64BIT_PLATFORM (1)</span>
+  <span class="cm">/* @} */</span>
+  <span class="cp">#endif</span>
+</code></pre></div>
+<ul>
+<li><p>配置编译环境</p>
+
+<p><img src="/images/2015.4/2.png" alt="1.png"></p>
+
+<p><img src="/images/2015.4/3.png" alt="1.png"></p>
+
+<ul>
+<li>添加openssl的include、nopoll的src到包含目录</li>
+<li>添加上一步生成的ssl/lib目录 到 库目录</li>
+<li>执行 生成项目，就得到了libnopoll.lib文件</li>
+</ul></li>
+</ul></li>
+<li><p>测试libnopoll.lib是否可用：</p>
+
+<ul>
+<li>新建测试项目，一样是    <img src="/images/2015.4/4.png" alt="1.png"></li>
+<li>添加nopoll官方的example代码，<a href="https://dolphin.aspl.es/svn/publico/nopoll/trunk/test/nopoll-regression-listener.c">https://dolphin.aspl.es/svn/publico/nopoll/trunk/test/nopoll-regression-listener.c</a></li>
+<li><p>复制 /test的pem、crt、key文件到工程目录里:</p>
+
+<p><img src="/images/2015.4/5.png" alt="1.png"></p></li>
+<li><p>然后是附加依赖项：</p>
+
+<p><img src="/images/2015.4/6.png" alt="1.png"></p></li>
+<li><p>之后就可以编译 运行了：</p>
+
+<p><img src="/images/2015.4/7.png" alt="1.png"></p>
+
+<p>看样子是成功了。</p></li>
+<li><p>最后客户端的例子也试着编译下，工程配置和server的一样，咦！！ 编译时出现各种error:</p>
+
+<p><img src="/images/2015.4/8.png" alt="1.png"></p>
+
+<p>照着反馈做即可，在文件头添加一个define </p>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="cp">#define _CRT_SECURE_NO_WARNINGS</span>
+</code></pre></div>
+<p><img src="/images/2015.4/9.png" alt="1.png"></p>
+
+<p>unlink改成_unlink呗；</p>
+
+<p>VERSION可能是要自己定义，也定义一个，之后就顺利编译出来了。</p>
+
+<p>不过运行的时候又出现报错：</p>
+
+<p><img src="/images/2015.4/10.png" alt="1.png"></p>
+
+<p>问题就是windows下没有linux的diff工具，先把相关的几行代码屏蔽掉先把，再次编译运行：</p>
+
+<p><img src="/images/2015.4/11.png" alt="1.png"></p>
+
+<p>Nice，客户端和服务端协同工作了。</p></li>
+</ul></li>
+</ol>
+
+<h3>附</h3>
+
+<ul>
+<li>编译debug版的openssl :  <a href="http://blog.csdn.net/wangxvfeng101/article/details/7261264">http://blog.csdn.net/wangxvfeng101/article/details/7261264</a></li>
+</ul>
 
       </div>
 

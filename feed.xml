@@ -629,14 +629,12 @@
 &lt;p&gt;\[ qp = [-1, \sqrt {2}i + j] \]
 \[ qpq^{-1}  = [-1, \sqrt {2}i + j]\frac {1}{2}[\sqrt {2}, -i-k] \]
 \[ = \frac {1}{2}[-\sqrt {2}-(\sqrt {2}i+j)\cdot (-i-k), i+k+\sqrt {2}(\sqrt {2}i+j)-i+\sqrt {2}j+k] \]
-\[ = \frac {1}{2}[-\sqrt {2}+\sqrt {2},i+k+2i+\sqrt {2}j-i+\sqrt {2}j+k]
+\[ = \frac {1}{2}[-\sqrt {2}+\sqrt {2},i+k+2i+\sqrt {2}j-i+\sqrt {2}j+k] \]
 \[ = [0,i+\sqrt {2}j+k] \]&lt;/p&gt;
 
 &lt;p&gt;这下是纯四元数了，并且它的范数是：&lt;/p&gt;
 
-&lt;p&gt;\[ |qpq^{-1}| = \sqrt {1^{2} + \sqrt {2}^{2} + 1^{2} }\]
-\[ = \sqrt {4} \]
-\[ = 2 \]&lt;/p&gt;
+&lt;p&gt;\[ |qpq^{-1}| = \sqrt {1^{2} + \sqrt {2}^{2} + 1^{2} } = \sqrt {4} = 2 \]&lt;/p&gt;
 
 &lt;p&gt;这和原始的p的范数一致。&lt;/p&gt;
 
@@ -645,6 +643,12 @@
 &lt;p&gt;&lt;img src=&quot;../images/2015.9/9.png&quot; alt=&quot;9.png&quot;&gt;&lt;/p&gt;
 
 &lt;p&gt;所以我们可以看到，这个结果是一个纯四元数，并且原四元数的向量的范数也保持住了。但是还有一个问题：向量被旋转了90度而不是45度。这刚好是我们需要的度数的两倍！为了正确地让一个向量绕某个轴向量旋转某个角度，我们必须以目标角度的一半来计算。因此，我们构造了下面的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [cos\frac {1}{2}\theta ,sin\frac {1}{2}\theta \hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;这就是&lt;strong&gt;旋转四元数&lt;/strong&gt;的一般形式！&lt;/p&gt;
+
+&lt;h2&gt;四元数插值&lt;/h2&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
