@@ -19,54 +19,39 @@
 &lt;ul&gt;
 &lt;li&gt;介绍&lt;/li&gt;
 &lt;li&gt;复数
-
-&lt;ul&gt;
-&lt;li&gt;复数的加减&lt;/li&gt;
-&lt;li&gt;复数的系数缩放&lt;/li&gt;
-&lt;li&gt;复数的积&lt;/li&gt;
-&lt;li&gt;复数的平方&lt;/li&gt;
-&lt;li&gt;共轭复数&lt;/li&gt;
-&lt;li&gt;复数的绝对值&lt;/li&gt;
-&lt;li&gt;两复数的商&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
+### 复数的加减
+### 复数的系数缩放
+### 复数的积
+### 复数的平方
+### 共轭复数
+### 复数的绝对值
+### 两复数的商&lt;/li&gt;
 &lt;li&gt;i的幂&lt;/li&gt;
 &lt;li&gt;复数平面
-
-&lt;ul&gt;
-&lt;li&gt;旋转数（Rotors)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
+### 旋转数（Rotors)&lt;/li&gt;
 &lt;li&gt;四元数
-
-&lt;ul&gt;
-&lt;li&gt;作为有序数的四元数&lt;/li&gt;
-&lt;li&gt;四元数的加减&lt;/li&gt;
-&lt;li&gt;四元数的积&lt;/li&gt;
-&lt;li&gt;实四元数&lt;/li&gt;
-&lt;li&gt;四元数的系数缩放&lt;/li&gt;
-&lt;li&gt;纯四元数&lt;/li&gt;
-&lt;li&gt;四元数的加法形式&lt;/li&gt;
-&lt;li&gt;单位四元数&lt;/li&gt;
-&lt;li&gt;四元数的二进制形式&lt;/li&gt;
-&lt;li&gt;共轭四元数&lt;/li&gt;
-&lt;li&gt;四元数规范&lt;/li&gt;
-&lt;li&gt;四元数规范化&lt;/li&gt;
-&lt;li&gt;四元数的逆&lt;/li&gt;
-&lt;li&gt;四元数的点乘&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
+### 作为有序数的四元数
+### 四元数的加减
+### 四元数的积
+### 实四元数
+### 四元数的系数缩放
+### 纯四元数
+### 四元数的加法形式
+### 单位四元数
+### 四元数的二元形式
+### 共轭四元数
+### 四元数规范
+### 四元数规范化
+### 四元数的逆
+### 四元数的点乘&lt;/li&gt;
 &lt;li&gt;旋转&lt;/li&gt;
 &lt;li&gt;四元数的插值
-
-&lt;ul&gt;
-&lt;li&gt;SLERP
-
-&lt;ul&gt;
-&lt;li&gt;四元数的差&lt;/li&gt;
-&lt;li&gt;四元数求幂运算&lt;/li&gt;
-&lt;li&gt;四元数的分数差&lt;/li&gt;
-&lt;li&gt;考虑？&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;SQUARD&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
+### SLERP
+### 四元数的差
+### 四元数求幂运算
+### 四元数的分数差
+### 考虑？
+### SQUARD&lt;/li&gt;
 &lt;li&gt;结论&lt;/li&gt;
 &lt;li&gt;下载Demo&lt;/li&gt;
 &lt;li&gt;引用&lt;/li&gt;
@@ -246,6 +231,213 @@
 &lt;p&gt;这也是一个在复数平面绕原点逆时针旋转任意点的方法。&lt;/p&gt;
 
 &lt;h2&gt;四元数&lt;/h2&gt;
+
+&lt;p&gt;了解了复数系统和复数平面后，我们可以额外增加2个虚数到我们的复数系统，从而把这些概念拓展到3维空间。&lt;/p&gt;
+
+&lt;p&gt;四元数的一般形式：&lt;/p&gt;
+
+&lt;p&gt;\[ q = s + xi + yj + zk s,x,y,z \in \mathbb{R} \]&lt;/p&gt;
+
+&lt;p&gt;上面的公式是根据Hamilton的著名的表达式得到的：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
+
+&lt;p&gt;以及：&lt;/p&gt;
+
+&lt;p&gt;\[ ij = k jk = i ki = j \]
+\[ ji = -k kj = -i ik = -j \]&lt;/p&gt;
+
+&lt;p&gt;你可能已经注意到了，i、j、k之间的关系非常像笛卡尔坐标系下单位向量的叉积规则：&lt;/p&gt;
+
+&lt;p&gt;\[ x\times y = z y\times z = x z\times x = y \]
+\[ y\times x = -z z\times y = -x x\times z = -y \]&lt;/p&gt;
+
+&lt;p&gt;Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( i^{2} = j^{2} = k^{2} = -1 \)。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/6.png&quot; alt=&quot;6.png&quot;&gt;
+（ij, jk, ki这几个性质的可视化）&lt;/p&gt;
+
+&lt;p&gt;上图展示了如何用i、j、k作为笛卡尔坐标系的单位向量。&lt;/p&gt;
+
+&lt;h3&gt;作为有序数的四元数&lt;/h3&gt;
+
+&lt;p&gt;我们可以用有序对的形式，来表示四元数：
+\[s,v] s\in \mathbb{R},v\in \mathbb{R^{3}} \]&lt;/p&gt;
+
+&lt;p&gt;其中的v，也可以用它各自独立的3个分量表示：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,xi + yj + zk], s,x,y,z\in \mathbb{R} \]&lt;/p&gt;
+
+&lt;p&gt;使用这种表示法，我们可以更容易地展示四元数和复数之间的相似性。&lt;/p&gt;
+
+&lt;h3&gt;四元数的加减&lt;/h3&gt;
+
+&lt;p&gt;和复数类似，四元数也可以被加减：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [s_{a},a] \]
+\[ q_{b} = [s_{b},b] \]
+\[ q_{a} + q_{b} = [s_{a} + s_{b},a + b] \]
+\[ q_{a} - q_{b} = [s_{a} - s_{b},a - b] \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的积&lt;/h3&gt;
+
+&lt;p&gt;我们也可以表示四元数的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [s_{a},a][s_{b},b] \]
+\[ = (s_{a} + x_{a}i + y_{a}j +z_{a}k)(s_{b} + x_{b}i + y_{b}j +z_{b}k) \]
+\[ = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}) \]
+\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i \]
+\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j \]
+\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k \]&lt;/p&gt;
+
+&lt;p&gt;四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：&lt;/p&gt;
+
+&lt;p&gt;\[ i = [0,i] j = [0,j] k = [0,k] \]&lt;/p&gt;
+
+&lt;p&gt;以及还有[1,0] = 1，将它们代入前面的表达式，就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b})[1,0] \]
+\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})[0,i] \]
+\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})[0,j] \]
+\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})[0,k] \]&lt;/p&gt;
+
+&lt;p&gt;再把这个表达式扩展成多个有序对的和：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
+\[ + [0,(s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i] \]
+\[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j] \]
+\[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
+
+&lt;p&gt;如果把上面的式子再乘以单位四元数，并提取公共部分，就可以把等式改写成：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
+\[ + [0,s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
+\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
+
+&lt;p&gt;这个等式是2个有序对的和。第1个有序对是一个&lt;strong&gt;实&lt;/strong&gt;四元数，第2个是一个&lt;strong&gt;纯&lt;/strong&gt;四元数。这两个四元数也可以合并成一个：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}), \]
+\[ s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
+\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
+
+&lt;p&gt;如果把下面的表达式代入上面的等式：&lt;/p&gt;
+
+&lt;p&gt;\[ a = x_{a}i + y_{a}j + z_{a}k\]
+\[ b = x_{b}i + y_{b}j + z_{b}k\]
+\[ a\cdot b = x_{a}x_{b}i^{2}+y_{a}y_{b}j^{2}+z_{a}z_{b}k^{2} \]
+\[ a\times b = (y_{a}z_{b}-y_{b}z_{a})i + (z_{a}x_{b} - z_{b}x_{a})j + (x_{a}y_{b} - x_{b}y_{a})k  \]&lt;/p&gt;
+
+&lt;p&gt;我们就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]&lt;/p&gt;
+
+&lt;p&gt;这就是四元数乘积的一般式。&lt;/p&gt;
+
+&lt;h3&gt;实四元数&lt;/h3&gt;
+
+&lt;p&gt;一个实四元数是一个虚部向量为零向量的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,0] \]&lt;/p&gt;
+
+&lt;p&gt;两个实四元数的乘积是另一个实四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [s_{a},0] \]
+\[ q_{b} = [s_{b},0] \]
+\[ q_{a}q_{b} = [s_{a},0] [s_{b},0] = [s_{a}s_{b},0]  \]&lt;/p&gt;
+
+&lt;p&gt;这和2个虚部为0的复数的乘积几乎一样：&lt;/p&gt;
+
+&lt;p&gt;\[ z_{1} = a_{1} + 0i \]
+\[ z_{2} = a_{2} + 0i \]
+\[ z_{1}z_{2} = (a_{1} + 0i)(a_{2} + 0i) = a_{1}a_{2} \] &lt;/p&gt;
+
+&lt;h3&gt;四元数的系数缩放&lt;/h3&gt;
+
+&lt;p&gt;我们也可以用一个系数（实数）去乘四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ \lambda q = \lambda [s,v] = [\lambda s,\lambda v] \]&lt;/p&gt;
+
+&lt;p&gt;我们可以用实四元数与普通四元数的乘积，来确认这个等式是否正确：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ \lambda = [\lambda ,0] \]
+\[ \lambda q = [\lambda ,0][s,v] = [\lambda s,\lambda v] \]&lt;/p&gt;
+
+&lt;h3&gt;纯四元数&lt;/h3&gt;
+
+&lt;p&gt;和实四元数相似，Hamilton也定义了纯四元数。纯四元数是s=0的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [0,v] \]&lt;/p&gt;
+
+&lt;p&gt;也可以写成下面的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ q = xi + yj + zk \]&lt;/p&gt;
+
+&lt;p&gt;然后是2个纯四元数的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [0,a] \]
+\[ q_{b} = [0,b] \]
+\[ q_{a}q_{b} = [0,a] [0,b] = [-a\cdot b, a\times b]  \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的加法形式&lt;/h3&gt;
+
+&lt;p&gt;我们可以把四元数写成实四元数和纯四元数的和：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ = [s,0] + [0,v] \]&lt;/p&gt;
+
+&lt;h3&gt;单位四元数&lt;/h3&gt;
+
+&lt;p&gt;给定任意的向量v，我们可以把这个向量写成一个系数和一个单位方向向量的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[ v = \upsilon \hat {v}\ \ v=|v|,|\hat {v}|=1\]&lt;/p&gt;
+
+&lt;p&gt;将这个定义和纯四元数的定义结合，就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [0,v] \]
+\[ = [0,\upsilon \hat {v}] \]
+\[ = \upsilon [0,\hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;然后，我们可以定义单位四元数了，它是一个s=0、v为单位向量的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat {q} = [0, \hat {v}] \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的二元形式&lt;/h3&gt;
+
+&lt;p&gt;我们现在可以把单位四元数的定义和四元数的加法形式结合到一起，就创造了一种新的四元数的表示法，这种表示法和复数的表示法形似：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ = [s,0] + [0,v] \]
+\[ = [s,0] + \upsilon [0,\hat {v}] \]
+\[ = s + \upsilon \hat {q} \]&lt;/p&gt;
+
+&lt;p&gt;这就给了我们一种和复数非常相似的四元数表示法：&lt;/p&gt;
+
+&lt;p&gt;\[ z = a + bi \]
+\[ q = s + v\hat {q} \]&lt;/p&gt;
+
+&lt;h3&gt;共轭四元数&lt;/h3&gt;
+
+&lt;p&gt;共轭四元数的计算，就是将四元数的虚向量取反：&lt;/p&gt;
+
+&lt;p&gt;\[  q = [s,v] \]
+\[  q^{*} = [s,-v] \]&lt;/p&gt;
+
+&lt;p&gt;四元数和它的共轭四元数的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[  qq^{*} = [s,v][s,-v] \]
+\[ = [s^{2} - v\cdot -v,-sv+sv+v\times -v] \]
+\[ = [s^{2} + v\cdot v,0] \]
+\[ = [s^{2} + v^{2},0] \]&lt;/p&gt;
+
+&lt;h3&gt;四元数规范&lt;/h3&gt;
+
+&lt;h3&gt;四元数规范化&lt;/h3&gt;
+
+&lt;h3&gt;四元数的逆&lt;/h3&gt;
+
+&lt;h3&gt;四元数的点乘&lt;/h3&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
