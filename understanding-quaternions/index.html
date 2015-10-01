@@ -523,6 +523,37 @@ Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标�
 \[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]
 
 旋转
+
+前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
+\[ q = cos\theta + isin\theta \]
+
+根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
+\[ q = [cos\theta, sin\theta v] \]
+
+让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：
+
+\[ p = [0,\textbf {p}] \]
+
+以及单位四元数q：
+
+\[ q = [s,\lambda \hat {v}] \]
+
+从而：
+
+\[ p&#39; = qp = [s,\lambda \hat {v}] [0,\textbf {p}] \]
+\[ =  [-\lambda \hat {v}\cdot \textbf {p}, s\textbf {p} + \lambda \hat {v}\times \textbf {p}\]
+
+我们可以看到结果是一个同时有系数、有虚向量的四元数。
+
+让我们先考虑特殊的情形：\( \textbf {p} \)与\( \hat {v} \)正交。这种情况下，点乘部分等于0：\(-\lambda \hat {v}\cdot \textbf {p} = 0\)。所以上面的四元数就变成了纯四元数：
+
+\[ p&#39; =  [0, s\textbf {p} + \lambda \hat {v}\times \textbf {p}] \]
+
+这时候，要使\( \textbf {p} \)绕\( \hat {v} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：
+
+\[ p&#39; =  [0, cos\theta \textbf {p} + sin\theta \hat {v}\times \textbf {p}] \]
+
+现在，让我们找一个例子来测试上面的公式。譬如绕z轴旋转45度，那么我们的四元数q就变成：
 " />
     <meta property="og:description" content="原文地址:http://www.3dgep.com/understanding-quaternions/
 
@@ -1038,6 +1069,37 @@ Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标�
 \[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]
 
 旋转
+
+前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
+\[ q = cos\theta + isin\theta \]
+
+根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
+\[ q = [cos\theta, sin\theta v] \]
+
+让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：
+
+\[ p = [0,\textbf {p}] \]
+
+以及单位四元数q：
+
+\[ q = [s,\lambda \hat {v}] \]
+
+从而：
+
+\[ p&#39; = qp = [s,\lambda \hat {v}] [0,\textbf {p}] \]
+\[ =  [-\lambda \hat {v}\cdot \textbf {p}, s\textbf {p} + \lambda \hat {v}\times \textbf {p}\]
+
+我们可以看到结果是一个同时有系数、有虚向量的四元数。
+
+让我们先考虑特殊的情形：\( \textbf {p} \)与\( \hat {v} \)正交。这种情况下，点乘部分等于0：\(-\lambda \hat {v}\cdot \textbf {p} = 0\)。所以上面的四元数就变成了纯四元数：
+
+\[ p&#39; =  [0, s\textbf {p} + \lambda \hat {v}\times \textbf {p}] \]
+
+这时候，要使\( \textbf {p} \)绕\( \hat {v} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：
+
+\[ p&#39; =  [0, cos\theta \textbf {p} + sin\theta \hat {v}\times \textbf {p}] \]
+
+现在，让我们找一个例子来测试上面的公式。譬如绕z轴旋转45度，那么我们的四元数q就变成：
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -1625,6 +1687,37 @@ Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标�
 \[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]</p>
 
 <h2>旋转</h2>
+
+<p>前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
+\[ q = cos\theta + isin\theta \]</p>
+
+<p>根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
+\[ q = [cos\theta, sin\theta v] \]</p>
+
+<p>让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：</p>
+
+<p>\[ p = [0,\textbf {p}] \]</p>
+
+<p>以及单位四元数q：</p>
+
+<p>\[ q = [s,\lambda \hat {v}] \]</p>
+
+<p>从而：</p>
+
+<p>\[ p&#39; = qp = [s,\lambda \hat {v}] [0,\textbf {p}] \]
+\[ =  [-\lambda \hat {v}\cdot \textbf {p}, s\textbf {p} + \lambda \hat {v}\times \textbf {p}\]</p>
+
+<p>我们可以看到结果是一个同时有系数、有虚向量的四元数。</p>
+
+<p>让我们先考虑特殊的情形：\( \textbf {p} \)与\( \hat {v} \)正交。这种情况下，点乘部分等于0：\(-\lambda \hat {v}\cdot \textbf {p} = 0\)。所以上面的四元数就变成了纯四元数：</p>
+
+<p>\[ p&#39; =  [0, s\textbf {p} + \lambda \hat {v}\times \textbf {p}] \]</p>
+
+<p>这时候，要使\( \textbf {p} \)绕\( \hat {v} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：</p>
+
+<p>\[ p&#39; =  [0, cos\theta \textbf {p} + sin\theta \hat {v}\times \textbf {p}] \]</p>
+
+<p>现在，让我们找一个例子来测试上面的公式。譬如绕z轴旋转45度，那么我们的四元数q就变成：</p>
 
   </div>
 
