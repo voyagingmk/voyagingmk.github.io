@@ -231,7 +231,7 @@
 
 &lt;h3&gt;旋转数（Rotors)&lt;/h3&gt;
 
-&lt;p&gt;我们也可以在复数平面上进行任意的旋转，只需要定义下面这个复数：
+&lt;p&gt;我们也可以在复数平面上进行任意角度的旋转，只需要定义下面这个复数：
 \[q = cos\theta +isin\theta \]&lt;/p&gt;
 
 &lt;p&gt;任意的复数乘以q：&lt;/p&gt;
@@ -245,7 +245,7 @@
 
 &lt;p&gt;\[  \left[ \begin{matrix} a&amp;#39;&amp;amp;-b&amp;#39;\\ b&amp;#39;&amp;amp;a&amp;#39;\\ \end{matrix} \right] =  \left[ \begin{matrix} cos\theta &amp;amp;-sin\theta \\ sin\theta &amp;amp;cos\theta \\ \end{matrix} \right] \left[ \begin{matrix} a&amp;amp;-b\\ b&amp;amp;a\\ \end{matrix} \right] \]&lt;/p&gt;
 
-&lt;p&gt;这也是一个在复数平面绕原点逆时针旋转任意点的方法。&lt;/p&gt;
+&lt;p&gt;这也是一个在复数平面绕原点逆时针旋转任意点的方法。（译注：这句话应该是在说旋转矩阵）&lt;/p&gt;
 
 &lt;h2&gt;四元数&lt;/h2&gt;
 
@@ -253,7 +253,7 @@
 
 &lt;p&gt;四元数的一般形式：&lt;/p&gt;
 
-&lt;p&gt;\[ q = s + xi + yj + zk s,x,y,z \in \mathbb{R} \]&lt;/p&gt;
+&lt;p&gt;\[ q = s + xi + yj + zk \ \ \ s,x,y,z \in \mathbb{R} \]&lt;/p&gt;
 
 &lt;p&gt;上面的公式是根据Hamilton的著名的表达式得到的：&lt;/p&gt;
 
@@ -261,13 +261,13 @@
 
 &lt;p&gt;以及：&lt;/p&gt;
 
-&lt;p&gt;\[ ij = k jk = i ki = j \]
-\[ ji = -k kj = -i ik = -j \]&lt;/p&gt;
+&lt;p&gt;\[ ij = k \ \ \ jk = i \ \ \ ki = j \]
+\[ ji = -k \ \ \ kj = -i \ \ \ ik = -j \]&lt;/p&gt;
 
 &lt;p&gt;你可能已经注意到了，i、j、k之间的关系非常像笛卡尔坐标系下单位向量的叉积规则：&lt;/p&gt;
 
-&lt;p&gt;\[ x\times y = z y\times z = x z\times x = y \]
-\[ y\times x = -z z\times y = -x x\times z = -y \]&lt;/p&gt;
+&lt;p&gt;\[ x\times y = z \ \ \ y\times z = x \ \ \ z\times x = y \]
+\[ y\times x = -z \ \ \ z\times y = -x \ \ \ x\times z = -y \]&lt;/p&gt;
 
 &lt;p&gt;Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( i^{2} = j^{2} = k^{2} = -1 \)。&lt;/p&gt;
 
@@ -279,11 +279,11 @@
 &lt;h3&gt;作为有序数的四元数&lt;/h3&gt;
 
 &lt;p&gt;我们可以用有序对的形式，来表示四元数：
-\[s,v] s\in \mathbb{R},v\in \mathbb{R^{3}} \]&lt;/p&gt;
+\[ [s,v] \ \ \ s\in \mathbb{R},v\in \mathbb{R^{3}} \]&lt;/p&gt;
 
 &lt;p&gt;其中的v，也可以用它各自独立的3个分量表示：&lt;/p&gt;
 
-&lt;p&gt;\[ q = [s,xi + yj + zk], s,x,y,z\in \mathbb{R} \]&lt;/p&gt;
+&lt;p&gt;\[ q = [s,xi + yj + zk] \ \ \ s,x,y,z\in \mathbb{R} \]&lt;/p&gt;
 
 &lt;p&gt;使用这种表示法，我们可以更容易地展示四元数和复数之间的相似性。&lt;/p&gt;
 
@@ -307,9 +307,9 @@
 \[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j \]
 \[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k \]&lt;/p&gt;
 
-&lt;p&gt;四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：&lt;/p&gt;
+&lt;p&gt;可以看到，四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：&lt;/p&gt;
 
-&lt;p&gt;\[ i = [0,i] j = [0,j] k = [0,k] \]&lt;/p&gt;
+&lt;p&gt;\[ i = [0,i]\ \ \  j = [0,j]\ \ \  k = [0,k] \]&lt;/p&gt;
 
 &lt;p&gt;以及还有[1,0] = 1，将它们代入前面的表达式，就得到了：&lt;/p&gt;
 
@@ -325,7 +325,7 @@
 \[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j] \]
 \[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
 
-&lt;p&gt;如果把上面的式子再乘以单位四元数，并提取公共部分，就可以把等式改写成：&lt;/p&gt;
+&lt;p&gt;如果把后3个四元数相加，并提取公共部分，就可以把等式改写成：&lt;/p&gt;
 
 &lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
 \[ + [0,s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
