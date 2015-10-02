@@ -750,8 +750,49 @@
 
 &lt;p&gt;第一，如果四元数点积的结果是负值，那么后面的插值就会在4D球面上绕远路，这并不是我们想要的。为了解决这个问题，我们测试点积的结果，当结果是负值时，我们将2个四元数的其中一个取反，取反它的系数和向量部分，并不会改变它代表的朝向。而经过这一步操作，可以保证这个旋转走的是最短路径。&lt;/p&gt;
 
-&lt;p&gt;当\(q_{1}\)和\(q_{2}\)的角度差非常小，小到导致\(sin\theta = 0\)时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(q_{1}\)和\(q_{2}\)的线性插值。
-The other problem arises when the angular difference between  and is very small then  becomes 0. If this happens, then we will get an undefined result when we divide by . In this case, we can fall-back to using linear interpolation between  and .&lt;/p&gt;
+&lt;p&gt;当\(q_{1}\)和\(q_{2}\)的角度差非常小，小到导致\(sin\theta = 0\)时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(q_{1}\)和\(q_{2}\)的线性插值。&lt;/p&gt;
+
+&lt;h2&gt;SQUAD&lt;/h2&gt;
+
+&lt;p&gt;正如一个SLERP可以被用来计算四元数之间的插值，一个SQUAD (&lt;strong&gt;S&lt;/strong&gt;pherical and &lt;strong&gt;Quad&lt;/strong&gt;rangle)可以被用来对旋转路径进行平滑插值。&lt;/p&gt;
+
+&lt;p&gt;如果我们有四元数序列：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{1},q_{2},q_{3},\cdots,q_{n-2},q_{n-1},q_{n}\]&lt;/p&gt;
+
+&lt;p&gt;然后我们再定义一个&amp;quot;辅助&amp;quot;四元数(\(s_{i}\))，它是一个中间控制点：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{i} = exp( - \frac {\log(q_{i+1}q_{i}^{-1})+\log(q_{i-1}q_{i}^{-1})}{4})q_{i} \]&lt;/p&gt;
+
+&lt;p&gt;所以，沿着子曲线的朝向可以定义为：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{i-1},q_{i},q_{i+1},q_{i+2} \]&lt;/p&gt;
+
+&lt;p&gt;在t时刻的朝向就是：&lt;/p&gt;
+
+&lt;p&gt;\[ squad(q_{i},q_{i+1},s_{i},s_{i+1},t ) = slerp(slerp(q_{i},q_{i+1},t),slerp(s_{i},s_{i+1},t),2t(1-t)) \]&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;除了特别难理解之外，相比矩阵或欧拉角，四元数在表示旋转这个事情上，拥有一些明显的优点。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;SLERP和SQUAD，提供了一种使得在朝向之间可以平滑过渡的方法。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;使用四元数来串联&amp;quot;旋转&amp;quot;，要比使用矩阵快得多。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;对于单位四元数，逆向旋转可以通过对向量部分取反来实现。而计算一个矩阵的逆矩阵是被认为比较慢的，如果这个矩阵未被标准正交化的话(标准正交矩阵的逆矩阵是它的转置矩阵)。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;从四元数转换到矩阵，要比从欧拉角转换到矩阵快一点。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;四元数只需要4个数字(如果旋转四元数已经单位化了那么只需要3个，实数部分可以在运行时计算)来表示一个旋转，而矩阵需要至少9个数字。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;尽管使用四元数有这么多优点，还是有缺点存在的。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;因为浮点数的舍入运算错误，四元数可能会变无效。不过，这个错误可以通过重新单位化四元数来避免。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;And probably the most significant deterrent for using quaternions is that they are very hard to understand. I hope that this issue is resolved after reading this article.
+There are several math libraries that implement quaternions and a few of those libraries implement quaternions correctly. In my personal experience, I find GLM (OpenGL Math Library) to be a good math library with a good implementation of quaternions. If you are interested in using quaternions in your own applications, this is the library I would recommend.&lt;/p&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
