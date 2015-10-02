@@ -788,11 +788,16 @@
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;因为浮点数的舍入运算错误，四元数可能会变无效。不过，这个错误可以通过重新单位化四元数来避免。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;使用四元数最具威慑性的地方，还是四元数的理解难度大。我希望这个问题可以通过阅读本文来解决。&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;And probably the most significant deterrent for using quaternions is that they are very hard to understand. I hope that this issue is resolved after reading this article.
-There are several math libraries that implement quaternions and a few of those libraries implement quaternions correctly. In my personal experience, I find GLM (OpenGL Math Library) to be a good math library with a good implementation of quaternions. If you are interested in using quaternions in your own applications, this is the library I would recommend.&lt;/p&gt;
+&lt;p&gt;存在一些已经实现了四元数、并且是正确的的数学程序库。在我的个人经验里，我发现GLM(OpenGL Math Library)是一个优秀的数学库，它的四元数的实现极其不错。如果你对在你的程序中使用四元数感兴趣，那么我会推荐你使用这个数学库。&lt;/p&gt;
+
+&lt;h2&gt;下载Demo&lt;/h2&gt;
+
+&lt;p&gt;我实现了一个小demo来演示一个四元数如何被用来旋转一个3维物体。这个demo是用Unity3.5.2实现的，你可以免费下载它和阅读它的脚本。zip文件也包含了一个Windows版的Unity程序。当然你可以自己构建一个Mac的版本。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.google.com/open?id=0B0ND0J8HHfaXdzM0dmdGUzBLV1U&quot;&gt;Understanding Quaternions.zip&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
