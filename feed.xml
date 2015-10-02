@@ -344,6 +344,8 @@
 \[ a\cdot b = x_{a}x_{b}i^{2}+y_{a}y_{b}j^{2}+z_{a}z_{b}k^{2} \]
 \[ a\times b = (y_{a}z_{b}-y_{b}z_{a})i + (z_{a}x_{b} - z_{b}x_{a})j + (x_{a}y_{b} - x_{b}y_{a})k  \]&lt;/p&gt;
 
+&lt;p&gt;（译注：注意，第三条和第四条并不是四元数的点积和叉积，而是向量的点积和叉积）&lt;/p&gt;
+
 &lt;p&gt;我们就得到了：&lt;/p&gt;
 
 &lt;p&gt;\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]&lt;/p&gt;
