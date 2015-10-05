@@ -7,6 +7,73 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之TRS分解</title>
+        <description>&lt;h3&gt;pbrt的TRS分解&lt;/h3&gt;
+
+&lt;p&gt;设矩阵A，假设A可以分解成T、R、S，则有A=TRS，设A:&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;A_{13}&amp;amp;A_{14}\\ A_{21}&amp;amp;A_{22}&amp;amp;A_{23}&amp;amp;A_{24}\\ A_{31}&amp;amp;A_{32}&amp;amp;A_{33}&amp;amp;A_{34}\\ A_{41}&amp;amp;A_{42}&amp;amp;A_{43}&amp;amp;A_{44}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;再设T、R、S分别为：&lt;/p&gt;
+
+&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;t_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;t_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ R =  \left[ \begin{matrix} r_{11}&amp;amp;r_{12}&amp;amp;r_{13}&amp;amp;0\\ r_{21}&amp;amp;r_{22}&amp;amp;r_{23}&amp;amp;0\\ r_{31}&amp;amp;r_{32}&amp;amp;r_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ S =  \left[ \begin{matrix} s_{x}&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;s_{y}&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;t_{y}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;所以TRS等于：&lt;/p&gt;
+
+&lt;p&gt;\[ A = TRS =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;t_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;t_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} r_{11}&amp;amp;r_{12}&amp;amp;r_{13}&amp;amp;0\\ r_{21}&amp;amp;r_{22}&amp;amp;r_{23}&amp;amp;0\\ r_{31}&amp;amp;r_{32}&amp;amp;r_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} s_{x}&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;s_{y}&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;t_{y}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]\]
+\[ =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;t_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;t_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} r_{11}s_{x}&amp;amp;r_{12}s_{y}&amp;amp;r_{13}s_{z}&amp;amp;0\\ r_{21}s_{x}&amp;amp;r_{22}s_{y}&amp;amp;r_{23}s_{z}&amp;amp;0\\ r_{31}s_{x}&amp;amp;r_{32}s_{y}&amp;amp;r_{33}s_{z}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]\]
+\[  =  \left[ \begin{matrix} r_{11}s_{x}&amp;amp;r_{12}s_{y}&amp;amp;r_{13}s_{z}&amp;amp;t_{x}\\ r_{21}s_{x}&amp;amp;r_{22}s_{y}&amp;amp;r_{23}s_{z}&amp;amp;t_{y}\\ r_{31}s_{x}&amp;amp;r_{32}s_{y}&amp;amp;r_{33}s_{z}&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;从TRS矩阵可以看出：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A矩阵的最后一行为[0,0,0,1]&lt;/li&gt;
+&lt;li&gt;A的最后一列是T的最后一列&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以T是最好求的：&lt;/p&gt;
+
+&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;A_{14}\\ 0&amp;amp;1&amp;amp;0&amp;amp;A_{24}\\ 0&amp;amp;0&amp;amp;1&amp;amp;A_{34}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;同时，我们也可以快速知道RS矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ RS =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;A_{13}&amp;amp;0\\ A_{21}&amp;amp;A_{22}&amp;amp;A_{23}&amp;amp;0\\ A_{31}&amp;amp;A_{32}&amp;amp;A_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;问题就简化成：如果让RS分解成R和S。&lt;/p&gt;
+
+&lt;p&gt;pbrt的解法比较神奇，称为polar decomposition(极分解?)。&lt;/p&gt;
+
+&lt;p&gt;(这算法似乎是用来求矩阵的平方根的，但是为什么可以用在这里，我没搞明白，也没找到证明过程。有知道的朋友麻烦告知一下哈)&lt;/p&gt;
+
+&lt;p&gt;pbrt给了一个公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ M_{i+1} = \frac {1}{2}(M_{i} + (M_{i}^{T})^{-1}) \]&lt;/p&gt;
+
+&lt;p&gt;把M = RS代入这个公式，迭代多次后，M的值会收敛，得到的最终的M就是R。&lt;/p&gt;
+
+&lt;p&gt;然后S就等于\(S = (RS)R^{-1} \)。&lt;/p&gt;
+
+&lt;p&gt;因为S是一个旋转矩阵，意味着S的列空间是3维空间，即S是一个正交矩阵，所以有\(S^{T}=S^{-1}\)。
+代入上面的公式，可以发现:&lt;/p&gt;
+
+&lt;p&gt;\[ S_{i+1} = \frac {1}{2}(S_{i} + (S_{i}^{T})^{-1}) \]
+\[ = \frac {1}{2}(S_{i} + (S_{i}^{-1})^{-1}) \]
+\[ = \frac {1}{2}(S_{i} + (S_{i}) \]
+\[ = \frac {1}{2}2S_{i} \]
+\[ = S_{i} \]&lt;/p&gt;
+
+&lt;p&gt;即是说，对于一个纯粹的旋转矩阵S，将S和S的转置的逆矩阵求平均，依然还是S。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-8/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-8/</guid>
+      </item>
+    
+      <item>
         <title>线性代数之各种各样的矩阵</title>
         <description>&lt;p&gt;矩阵家族成员非常多，本文主要记录了我遇到过的矩阵(前面的文章所提到的矩阵，在这里就不重复列举了)。以后见识了新的矩阵时，会继续扩充本文。&lt;/p&gt;
 
@@ -29,6 +96,8 @@
 &lt;p&gt;\[ A^{\dagger } = A^{*} = A^{H} \]&lt;/p&gt;
 
 &lt;h2&gt;厄米特矩阵 Hermitian matrix&lt;/h2&gt;
+
+&lt;p&gt;厄米特矩阵也称为self-adjoint matrix，中文是：自伴矩阵、自共轭矩阵、自伴随矩阵。&lt;/p&gt;
 
 &lt;p&gt;厄米特矩阵必须满足下面的性质:&lt;/p&gt;
 
@@ -595,7 +664,7 @@
 
 &lt;p&gt;\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
 \[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
-\[ q_{1}q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
+\[ q_{1}\cdot q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
 
 &lt;p&gt;我们也可以利用四元数点积，来计算四元数之间的角度差：&lt;/p&gt;
 
@@ -1123,6 +1192,30 @@ vectors:**&lt;/p&gt;
 \[ n^{\prime } = Sn = (M^{-1})^{T}n \]&lt;/p&gt;
 
 &lt;p&gt;M是某种转换，当M对一个面作用时，这个面的法向量要用上面最后那条公式转换。注意到公式里面有一个逆矩阵，所以这就是为什么Transform要存一个逆矩阵。&lt;/p&gt;
+
+&lt;h3&gt;旋转四元数-&amp;gt;旋转矩阵&lt;/h3&gt;
+
+&lt;p&gt;虽然可以用四元数来实现旋转变换，但是如果能变回矩阵的形式，也是有用的。实际上却是办得到。&lt;/p&gt;
+
+&lt;p&gt;设四元数的旋转轴为:
+\[ q = [cos\frac {\theta }{2}, sin\frac {\theta }{2}\hat {v}] = [q_{w}, q_{x}i + q_{y}j + q_{z}k] = (q_{x}, q_{y}, q_{z}, q_{w}) \]&lt;/p&gt;
+
+&lt;p&gt;被旋转的点的原坐标为p，旋转后的坐标为\(p&amp;#39;\)：&lt;/p&gt;
+
+&lt;p&gt;\[ p = [w, xi + yj + zk] = (x,y,z,0)  \]&lt;/p&gt;
+
+&lt;p&gt;四元数表示的旋转公式：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; = qpq^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;而矩阵表示的旋转公式是：
+\[ p&amp;#39; = Mp \]&lt;/p&gt;
+
+&lt;p&gt;M是未知的，目标就是算出M。把上面的p和q代入四元数旋转公式，就能得到一个新的四元数\(p&amp;#39;\),这个\(p&amp;#39;\)会有i、j、k分量，只要把i、j、k3个分量再按3个未知数x、y、z去分开，就得到一个9x9的矩阵，也就是M了。&lt;/p&gt;
+
+&lt;p&gt;我在纸上写了下推导公式，非常繁琐，不好弄成latex。直接贴上最终的公式吧：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/pbrt-chapter2/</link>
@@ -2213,196 +2306,6 @@ double asDouble() const; //good
         <pubDate>Sat, 29 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-2/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-2/</guid>
-      </item>
-    
-      <item>
-        <title>&lt;复习向&gt;线性代数之矩阵与行列式(1)</title>
-        <description>&lt;h2&gt;矩阵的基本性质&lt;/h2&gt;
-
-&lt;p&gt;我对矩阵的定义：一个含有x个元素的数组(x&amp;gt;=1)，以n个数为一段，将把这个数组按顺序分成m段，并按顺序排成m行，就构成了一个矩阵。&lt;strong&gt;数组&lt;/strong&gt;和&lt;strong&gt;分段&lt;/strong&gt;是构成一个矩阵的充分必要条件。&lt;/p&gt;
-
-&lt;p&gt;这个定义是从程序实现角度考虑的。一个矩阵可以用二维数组Array[m][n]来存放，也可以用一维数组Array[m*n]来存放，在不考虑实现语言之前，我更倾向于使用一维数组。&lt;/p&gt;
-
-&lt;p&gt;矩阵的定义虽然不复杂，但是聪明的数学家对矩阵进行了各种研究，导致产生了非常多的概念、术语、定理、推论：
-&amp;lt;!--more--&amp;gt;
-1. 当m == n时，矩阵可以被称为&lt;strong&gt;n阶矩阵&lt;/strong&gt;，或&lt;strong&gt;n阶方阵&lt;/strong&gt;
-2. 矩阵A的m、n和矩阵B的m、n相等时，称A和B为&lt;strong&gt;同阶矩阵&lt;/strong&gt;或&lt;strong&gt;同型矩阵&lt;/strong&gt;
-3. 大写字母&lt;strong&gt;O&lt;/strong&gt;代表元素全为0的矩阵
-4. 矩阵的加法运算满足以下运算律:
-    1. 交换律 &lt;strong&gt;A + B = B + A&lt;/strong&gt;
-    2. 结合律 &lt;strong&gt;( A + B ) + C = A + ( B + C )&lt;/strong&gt;
-    3. &lt;strong&gt;A + O = O + A&lt;/strong&gt;
-    4. &lt;strong&gt;A + (-A) = (-A) + A = O&lt;/strong&gt;
-5. 矩阵的数乘运算满足以下运算律:
-    1. &lt;strong&gt;k ( A + B ) = kA + kB&lt;/strong&gt;
-    2. &lt;strong&gt;( k + t ) A = kA + tA&lt;/strong&gt;
-    3. &lt;strong&gt;k ( tA ) = ( kt ) A&lt;/strong&gt;
-    4. &lt;strong&gt;1 * A = A&lt;/strong&gt;
-6. 矩阵的加法和数乘运算统称为矩阵的&lt;strong&gt;线性运算&lt;/strong&gt;
-7. 矩阵之间允许乘法运算：C = AB。但有一个前提：
-    左矩阵A的列数必须等于右矩阵B的行数
-8. 做矩阵相乘运算要注意的一些特性：
-    1. AB 有意义时， BA 不一定有意义
-    2. AB 和 BA 都有意义时，并不意味着 AB = BA（不满足交换律），但存在使得此等式成立的2个矩阵
-    3. 不满足消除率。两个非零矩阵的乘积可能是零矩阵，即 AB = O 成立时，并不能推出 A = O 或 B = O
-    4. 满足结合律：
-        1. &lt;strong&gt;( AB ) C = A ( BC )&lt;/strong&gt;
-        2. &lt;strong&gt;k ( AB ) = ( kA ) B = A ( kB )&lt;/strong&gt;
-        3. &lt;strong&gt;A ( B + C ) = AB + AC&lt;/strong&gt;
-        4. &lt;strong&gt;( B + C ) A = BA + CA&lt;/strong&gt;
-9. 矩阵可以做幂运算：
-    1. \( \mathbf{ A^{k}A^{t} = A^{k+t} } \)
-    2. \( \mathbf{ (A^{k})^{t} = A^{kt} } \)
-    3. 若 AB = BA，则 \( \mathbf{ (AB)^{k} = A^{k}B^{k} } \)
-    4. 注意，即使 \( \mathbf{ A^{k} = O } \)，也并不意味着\( \mathbf{  A = O } \)&lt;/p&gt;
-
-&lt;h2&gt;矩阵的转置&lt;/h2&gt;
-
-&lt;p&gt;将\( m\times n \)矩阵 A = \( a_{ij} \)的行和列互换，得到的\( n\times m \)矩阵，称为矩阵A的转置矩阵，简称A的转置，记为\( A^{T} \)。&lt;/p&gt;
-
-&lt;p&gt;矩阵的转置有以下性质：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;\( \mathbf{ (A^{T})^{T} = A }  \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ (A+B)^{T}=A^{T}+B^{T} } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ (kA)^{T}=kA^{T} } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ (AB)^{T}=B^{T}A^{T} } \)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;方阵的行列式&lt;/h2&gt;
-
-&lt;p&gt;定义行列式之前，先定义2个概念：排列和逆序数&lt;/p&gt;
-
-&lt;h3&gt;排列&lt;/h3&gt;
-
-&lt;p&gt;由n个不同的数\(1,2,\cdots,n\)组成的一个有序数组\( i_{1}i_{2}\cdots i_{n} \)称为一个n级排列,简称为排列&lt;/p&gt;
-
-&lt;p&gt;由数\(1,2,\cdots,n\)构成的不同的n级排列共有\( n! \)个。&lt;/p&gt;
-
-&lt;p&gt;例:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1234、3421是4级排列&lt;/li&gt;
-&lt;li&gt;25314是5级排列&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;逆序数&lt;/h3&gt;
-
-&lt;p&gt;在一个n级排列\( i_{1}i_{2}\cdots i_{n} \)中，若数\( i_{t}&amp;gt;i_{s} \)，则称数\( i_{t} \) 与 \( i_{s} \)构成一个逆序，一个n级排序中逆数的总数称为该排列的逆序数，记为
-\( \gamma (i_{1}i_{2}\cdots i_{n}) \)&lt;/p&gt;
-
-&lt;p&gt;例:&lt;/p&gt;
-
-&lt;p&gt;5级排列25314的逆序数:&lt;/p&gt;
-
-&lt;p&gt;\( \gamma (25314) \) = 0 + 0 + 1 + 3 + 1 = 5&lt;/p&gt;
-
-&lt;p&gt;逆序数为奇数的排列称为&lt;strong&gt;奇排列&lt;/strong&gt;，逆序数为偶数的排列称为&lt;strong&gt;偶排列&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;相关定理：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;n个不同的数\(1,2,\cdots,n\)的n！个n级排列中，奇偶排列各占一半&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;交换一个排列中某2个不同的元素，称为一次&lt;strong&gt;对换&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;例：&lt;/p&gt;
-
-&lt;p&gt;\( 31542\overset{(5,2)}{\longrightarrow}31245 \)&lt;/p&gt;
-
-&lt;p&gt;相关定理：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;任意一个排列经过一次对换后，奇偶性改变&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;行列式&lt;/h3&gt;
-
-&lt;p&gt;定义：由 \( n^{2} \)个元素\( a_{ij} \) 排成n行n列组成的式子：&lt;/p&gt;
-
-&lt;p&gt;\( \left| \begin{matrix} a_{11}\ a_{12}\ \ldots\ a_{1n}\\ a_{21}\ a_{22}\ \ldots\ a_{2n}\\ \vdots\ \ \ \ \ \vdots\ \ \ \ \ \vdots\ \ \ \ \ \vdots\ \ \ \ \\ a_{n1}\ a_{n2}\ \ldots\ a_{nn}\\ \end{matrix} \right| \)
-\( = \sum _{ j_{1}j_{2}\ldots j_{n} }(-1)^{\gamma (j_{1}j_{2}\ldots j_{n} ) }a_{1 j_{1}}a_{2 j_{2} }\ldots a_{n j_{n} } \)&lt;/p&gt;
-
-&lt;p&gt;它的计算结果被称为行列式(Determinant)。&lt;/p&gt;
-
-&lt;p&gt;注意，行列式是一个数，而不是一个矩阵。
-这个式子也被称为行列式的展开式。&lt;/p&gt;
-
-&lt;p&gt;行列式的性质：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;\( D^{T} = D \)&lt;/li&gt;
-&lt;li&gt;交换行列式的两行(列)，行列式变号&lt;/li&gt;
-&lt;li&gt;用数k乘行列式的某一行(列)，等于用数k乘此行列式&lt;/li&gt;
-&lt;li&gt;若行列式有一行(列)的元素全为零，则行列式等于零&lt;/li&gt;
-&lt;li&gt;若行列式有两行(列)的对应元素成比例，则行列式等于零&lt;/li&gt;
-&lt;li&gt;若行列式的某一行(列)各元素都是两数之和，即 \( a_{ij} = b_{ij} + c_{ij} \)，则 \( D_{a} = D_{b} + D_{c} \)&lt;/li&gt;
-&lt;li&gt;将行列式某一行(列)所有元素都乘以数k后加到另一行(列)对应位置的元素上，行列式的值不变&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;行列式按某一行(列)展开:&lt;/p&gt;
-
-&lt;p&gt;代数余子式的定义:&lt;/p&gt;
-
-&lt;p&gt;在n阶行列式 D = det( \( a_{ij} \) )中，划去元素\( a_{ij} \)所在的第i行和第j列后，余下的元素按原来的相对位置构成的n-1阶行列式，称为D中元素\( a_{ij} \)的余子式，记为\( M_{ij} \)。&lt;/p&gt;
-
-&lt;p&gt;再记\( A_{ij} =(-1)^{i+j}M_{ij} \)，称\( A_{ij} \)为元素\( a_{ij} \)的代数余子式。&lt;/p&gt;
-
-&lt;p&gt;引理:&lt;/p&gt;
-
-&lt;p&gt;若n阶行列式 D = det( \( a_{ij} \) )中，第i行除\( a_{ij} \)外的其他元素都为零，则该行列式等于\( a_{ij} \)与它的代数余子式的乘积，即：&lt;/p&gt;
-
-&lt;p&gt;\[ D = det( a_{ij} ) = a_{ij}A_{ij} \] &lt;/p&gt;
-
-&lt;p&gt;行列式的展开:&lt;/p&gt;
-
-&lt;p&gt;n阶行列式 D = det( \( a_{ij} \) )等于它的任意一行(列)的各元素与其对应的代数余子式乘积之和，即&lt;/p&gt;
-
-&lt;p&gt;\[ D = a_{i1}A_{i1} + a_{i2}A_{i2} + \cdots + a_{in}A_{in} \] &lt;/p&gt;
-
-&lt;p&gt;\[ D = a_{1j}A_{1j} + a_{2j}A_{2j} + \cdots + a_{nj}A_{nj} \]&lt;/p&gt;
-
-&lt;h2&gt;行列式与转置矩阵之间的一些公式：&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;\( \mathbf{ |A^{T}| = |A| } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ |kA| = k^{n}|A| } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ |AB| = |A||B| } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ |AB| = |BA| } \)&lt;/li&gt;
-&lt;li&gt;\( \mathbf{ |A^{n}| = |A|^{n} } \)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;线性方程组与行列式&lt;/h2&gt;
-
-&lt;p&gt;含有n个未知量、n个方程的线性方程组&lt;/p&gt;
-
-&lt;p&gt;\[ a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n} = b_{1} \]
-\[ a_{21}x_{1} + a_{22}x_{2} + \cdots + a_{2n}x_{n} = b_{2} \]
-\[ \cdots\cdots \]
-\[ a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n} = b_{n} \]&lt;/p&gt;
-
-&lt;p&gt;系数\( a_{ij} \)构成的行列式称为该方程组的系数行列式D&lt;/p&gt;
-
-&lt;p&gt;克拉默(Cramer)法则：若系数行列式 \( D\neq 0 \)，则方程组有唯一解，其解为：
-\[ x_{i} = \dfrac {D_{j}} {D} \]&lt;/p&gt;
-
-&lt;p&gt;\( D_{j} \)是将系数行列式D中第j列的元素\( a_{1j},a_{2j},\cdots a_{nj} \)对应地换成方程组右端的常数项\( b_{1j},b_{2j},\cdots b_{nj} \)，而其余各列保持不变得到的行列式。&lt;/p&gt;
-
-&lt;p&gt;当\( b_{i} \)=0时，上面的线性方程组为：&lt;/p&gt;
-
-&lt;p&gt;\[ a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n} = 0 \]
-\[ a_{21}x_{1} + a_{22}x_{2} + \cdots + a_{2n}x_{n} = 0 \]
-\[ \cdots\cdots \]
-\[ a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n} = 0 \]&lt;/p&gt;
-
-&lt;p&gt;称为&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。齐次线性方程组必然有零解( \( x_{i} = 0 \) ）。&lt;/p&gt;
-
-&lt;p&gt;定理：若齐次线性方程组的系数行列式 \( D\neq 0 \)，则只有零解； 若有非零解，则\( D = 0 \)。&lt;/p&gt;
-</description>
-        <pubDate>Tue, 25 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra/</guid>
       </item>
     
   </channel>
