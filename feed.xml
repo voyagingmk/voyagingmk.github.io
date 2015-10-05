@@ -7,6 +7,85 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之各种各样的矩阵</title>
+        <description>&lt;p&gt;矩阵家族成员非常多，本文主要记录了我遇到过的矩阵(前面的文章所提到的矩阵，在这里就不重复列举了)。以后见识了新的矩阵时，会继续扩充本文。&lt;/p&gt;
+
+&lt;p&gt;(以下知识均查阅了wikipedia。单词的中文翻译查的是有道词典。)&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;共轭(转置)矩阵 Conjugate Transpose Matrix&lt;/h2&gt;
+
+&lt;p&gt;公式上的定义：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{*} = (\overline {A})^{T} \]&lt;/p&gt;
+
+&lt;p&gt;A上面的横线表示对矩阵中的元素的复数部分取反(类似复数的上横线)。&lt;/p&gt;
+
+&lt;p&gt;回想下共轭复数的定义，可以发现，矩阵的共轭，还需要再转置一下，很很大的一个不同点。&lt;/p&gt;
+
+&lt;p&gt;共轭矩阵还有其他表达形式：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{\dagger } = A^{*} = A^{H} \]&lt;/p&gt;
+
+&lt;h2&gt;厄米特矩阵 Hermitian matrix&lt;/h2&gt;
+
+&lt;p&gt;厄米特矩阵必须满足下面的性质:&lt;/p&gt;
+
+&lt;p&gt;\[ A = A^{*} \]&lt;/p&gt;
+
+&lt;p&gt;即，A等于A的共轭矩阵时，A是一个厄米特矩阵。&lt;/p&gt;
+
+&lt;h2&gt;单式矩阵 Unitary matrix&lt;/h2&gt;
+
+&lt;p&gt;看名字有点像单位矩阵(Unit matrix)，但是公式上的定义是这样子的：&lt;/p&gt;
+
+&lt;p&gt;\[ U^{*}U = I \]&lt;/p&gt;
+
+&lt;p&gt;即：如果矩阵的共轭乘以矩阵自身等于单位矩阵，那么它是一个单式矩阵。&lt;/p&gt;
+
+&lt;h2&gt;正定矩阵 Positive Definite Matrix&lt;/h2&gt;
+
+&lt;p&gt;定义比较复杂，我翻译下wikipedia的定义吧：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;一个对称的n阶实数矩阵M，设元素不全为0的列向量为z，当所有这样的z满足\( z^{T}Mz &amp;gt; 0\)时，M是正定矩阵。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;根据定义，可以知道单位矩阵I是正定的；&lt;/p&gt;
+
+&lt;p&gt;贴上wiki的例子来帮助理解：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;设M的z为(a,b,c)，则有：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;这个式子的结果显然是非负的，且当a=b=c=0时，这个式子才等于0，所以满足正定矩阵的条件。&lt;/p&gt;
+
+&lt;h2&gt;半正定矩阵 Positive Semi-Definite&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，半正定矩阵的定义公式是:\( z^{T}Mz &amp;gt;= 0\)。&lt;/p&gt;
+
+&lt;h2&gt;负定矩阵 Negative Definite Matrix&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，负定矩阵的定义公式是:\( z^{T}Mz &amp;lt; 0\)。&lt;/p&gt;
+
+&lt;h2&gt;半负定矩阵 Negative Semi-Definite Matrix&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，负定矩阵的定义公式是:\( z^{T}Mz &amp;lt;= 0\)。&lt;/p&gt;
+
+&lt;h2&gt;厄米特矩阵的正定矩阵&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，厄米特矩阵的正定矩阵的定义公式是:\( z^{*}Mz &amp;gt; 0\)，注意，算出来的值必须是实数，不能是复数。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-7/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-7/</guid>
+      </item>
+    
+      <item>
         <title>Understanding Quaternions 中文翻译《理解四元数》</title>
         <description>&lt;p&gt;原文地址:&lt;a href=&quot;http://www.3dgep.com/understanding-quaternions/&quot;&gt;http://www.3dgep.com/understanding-quaternions/&lt;/a&gt;&lt;/p&gt;
 
@@ -2324,22 +2403,6 @@ double asDouble() const; //good
         <pubDate>Tue, 25 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra/</guid>
-      </item>
-    
-      <item>
-        <title>实现了一个C++11 Based的光线追踪渲染器demo</title>
-        <description>&lt;p&gt;本demo是根据Milo的一篇文章实现的：&lt;a href=&quot;http://www.cnblogs.com/miloyip/archive/2010/03/29/1698953.html&quot;&gt;用JavaScript玩转计算机图形学1，光线追踪入门&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;原文是js版本，我用c++实现了一个。
-代码在：https://github.com/voyagingmk/raytrace_demo&lt;/p&gt;
-
-&lt;p&gt;渲染效果图：(1000 x 1000)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.8/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-</description>
-        <pubDate>Tue, 04 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/raytrace/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/raytrace/</guid>
       </item>
     
   </channel>
