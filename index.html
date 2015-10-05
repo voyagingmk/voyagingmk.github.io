@@ -74,10 +74,23 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/c%2B%2B.html" class="set-1">c++</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-3">linear algebra</a> <a href="/tag/math.html" class="set-1">math</a> <a href="/tag/maths.html" class="set-1">maths</a> <a href="/tag/matrix.html" class="set-3">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
+  <a href="/tag/c%2B%2B.html" class="set-2">c++</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-3">linear algebra</a> <a href="/tag/math.html" class="set-1">math</a> <a href="/tag/maths.html" class="set-1">maths</a> <a href="/tag/matrix.html" class="set-3">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/pbrt-chapter3/">PBRT《章3》阅读笔记</a></h1>
+      <div class="date">
+        Written on October  5, 2015
+      </div>
+      <div class="entry">
+        
+      </div>
+
+      <a href="/pbrt-chapter3/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 
@@ -135,16 +148,15 @@
 
 <p>然后S就等于\(S = (RS)R^{-1} \)。</p>
 
-<p>因为S是一个旋转矩阵，意味着S的列空间是3维空间，即S是一个正交矩阵，所以有\(S^{T}=S^{-1}\)。
-代入上面的公式，可以发现:</p>
+<p>因为R是一个转换矩阵，意味着经过S转换后的点，还是处于原来的空间，只是坐标变换了。那么R必然是一个正交矩阵(列向量之间线性无关)，所以有\(R^{T}=R^{-1}\)。
+将这个式子代入上面的公式，可以发现:</p>
 
-<p>\[ S_{i+1} = \frac {1}{2}(S_{i} + (S_{i}^{T})^{-1}) \]
-\[ = \frac {1}{2}(S_{i} + (S_{i}^{-1})^{-1}) \]
-\[ = \frac {1}{2}(S_{i} + (S_{i}) \]
-\[ = \frac {1}{2}2S_{i} \]
-\[ = S_{i} \]</p>
+<p>\[ R_{i+1} = \frac {1}{2}(R_{i} + (R_{i}^{T})^{-1}) \]
+\[ = \frac {1}{2}(R_{i} + (R_{i}^{-1})^{-1}) \]
+\[ = \frac {1}{2}(R_{i} + R_{i}) \]
+\[ = \frac {1}{2}2R_{i}  = R_{i} \]</p>
 
-<p>即是说，对于一个纯粹的旋转矩阵S，将S和S的转置的逆矩阵求平均，依然还是S。</p>
+<p>即是说，对于一个纯粹的旋转矩阵R，将R和R的转置的逆矩阵求平均，依然还是R。</p>
 
       </div>
 
