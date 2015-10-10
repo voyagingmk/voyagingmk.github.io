@@ -7,8 +7,33 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>复数和三角函数</title>
+        <description>&lt;h2&gt;欧拉公式&lt;/h2&gt;
+
+&lt;p&gt;复数和三角函数有密切的联系，因为大神欧拉发现了这样的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(图片来自
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Euler%27s_formula&quot;&gt;wikipedia-Euler-formula&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;!&amp;lt;--more--&amp;gt;&lt;/p&gt;
+
+&lt;h2&gt;怎么推导出欧拉公式?&lt;/h2&gt;
+</description>
+        <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/complex-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/complex-1/</guid>
+      </item>
+    
+      <item>
         <title>PBRT《章3》阅读笔记</title>
-        <description></description>
+        <description>&lt;p&gt;第三章介绍各种特殊几何体。&lt;/p&gt;
+
+&lt;h3&gt;Ray与Sphere的相交判断&lt;/h3&gt;
+</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/pbrt-chapter3/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/pbrt-chapter3/</guid>
@@ -2076,156 +2101,6 @@ double asDouble() const; //good
         <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-1/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/cpp-1/</guid>
-      </item>
-    
-      <item>
-        <title>&lt;复习向&gt;线性代数之矩阵与行列式(3)</title>
-        <description>&lt;h1&gt;行列式的求解&lt;/h1&gt;
-
-&lt;p&gt;从行列式的定义出发去求行列式，是一个简单但低效的方法。而实际上，解决数学问题的途径往往有多种。这里，我将介绍其中一种比较常见的快速解法：&lt;strong&gt;PLU分解&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h2&gt;PLU的LU&lt;/h2&gt;
-
-&lt;p&gt;要理解PLU，得先搞懂LU分解。（这里分享一个外教的讲解视频，简单好理解：&lt;a href=&quot;https://www.youtube.com/watch?v=UlWcofkUDDU&quot;&gt;https://www.youtube.com/watch?v=UlWcofkUDDU&lt;/a&gt; 能翻墙的同学就直接看吧。)&lt;/p&gt;
-
-&lt;p&gt;LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。&lt;/p&gt;
-
-&lt;p&gt;下面手动演示下LU分解过程：
-&amp;lt;!--more--&amp;gt;
-设A：&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 6&amp;amp;5&amp;amp;4\\ 3&amp;amp;4&amp;amp;10\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;要把A分解成LU，第一步是先用高斯消元法，把A变成阶梯型矩阵U：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( R2 -= R1 * a_{10}/a_{00} = R1 * 6/9 \)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ A_{0} =  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 3&amp;amp;4&amp;amp;10\\ \end{matrix} \right] = E_{0}A =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ -6/9&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]
- \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 6&amp;amp;5&amp;amp;4\\ 3&amp;amp;4&amp;amp;10\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( R3 -= R1 * a_{20}/a_{00} = R1 * 3/9 \)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ A_{1} =  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 0&amp;amp;2&amp;amp;10\\ \end{matrix} \right] = E_{1}A_{0} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ -3/9&amp;amp;0&amp;amp;1\\ \end{matrix} \right]
- \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 3&amp;amp;4&amp;amp;10\\ \end{matrix} \right]  \]&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( R3 -= R2 * a_{21}/a_{11} = R1 * 2/1 \)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ U = A_{2} =  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 0&amp;amp;0&amp;amp;2\\ \end{matrix} \right] = E_{2}A_{1} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;-2/1&amp;amp;1\\ \end{matrix} \right]
- \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 0&amp;amp;2&amp;amp;10\\ \end{matrix} \right]  \]&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;因此得：\( U = E_{2}A_{1} = E_{2}E_{1}A_{0} = E_{2}E_{1}E_{0}A \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;再调换下，得到：\( A = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1}U \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;所以， \( L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} \)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;要得到最终的L，需要算3个\(E_{x}\)矩阵的逆矩阵，看似麻烦，其实很简单，因为\(E_{x}\)有这样的性质：&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ a&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ -a&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ a&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ -a&amp;amp;0&amp;amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;a&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;-a&amp;amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;所以：&lt;/p&gt;
-
-&lt;p&gt;\[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 6/9&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 3/9&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;2/1&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;只要搞定右边的3矩阵乘法运算，就能得到L。而又因为：&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ a_{1}&amp;amp;1&amp;amp;0\\ b_{1}&amp;amp;c_{1}&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ a_{2}&amp;amp;1&amp;amp;0\\ b_{2}&amp;amp;c_{2}&amp;amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ a_{1}+a_{2}&amp;amp;1&amp;amp;0\\ b_{1}+a_{2}c_{2}+b_{2}&amp;amp;c_{1}+c_{2}&amp;amp;1\\ \end{matrix} \right]
-\]&lt;/p&gt;
-
-&lt;p&gt;所以，L的结果可以迅速得到：&lt;/p&gt;
-
-&lt;p&gt;\[ L = E_{0}^{-1}E_{1}^{-1}E_{2}^{-1} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 6/9&amp;amp;1&amp;amp;0\\ 3/9&amp;amp;2/1&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
-
-&lt;p&gt;于是，A的LU分解完成了：&lt;/p&gt;
-
-&lt;p&gt;\[ A = LU =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ 6/9&amp;amp;1&amp;amp;0\\ 3/9&amp;amp;2/1&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} 9&amp;amp;6&amp;amp;0\\ 0&amp;amp;1&amp;amp;4\\ 0&amp;amp;0&amp;amp;2\\ \end{matrix} \right]  \]&lt;/p&gt;
-
-&lt;h2&gt;PLU的P&lt;/h2&gt;
-
-&lt;p&gt;这里的P，指的是Permutation Matrix，置换矩阵。&lt;/p&gt;
-
-&lt;p&gt;何谓置换矩阵？其实就是经过一系列初等变换的单位矩阵，且元素\( a_{ij} = 0 or 1 \)。&lt;/p&gt;
-
-&lt;p&gt;置换矩阵的作用，是用来交换某个矩阵的行（列）顺序。&lt;/p&gt;
-
-&lt;p&gt;比如：&lt;/p&gt;
-
-&lt;p&gt;\[ P =  \left[ \begin{matrix} 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ \end{matrix} \right]\ \  A =  \left[ \begin{matrix} 3&amp;amp;4&amp;amp;0\\ 1&amp;amp;2&amp;amp;9\\ 0&amp;amp;5&amp;amp;6\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ PA =  \left[ \begin{matrix} 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ \end{matrix} \right]  \left[ \begin{matrix} 3&amp;amp;4&amp;amp;0\\ 1&amp;amp;2&amp;amp;9\\ 0&amp;amp;5&amp;amp;6\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;9\\ 0&amp;amp;5&amp;amp;6\\ 3&amp;amp;4&amp;amp;0\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ AP =  \left[ \begin{matrix} 3&amp;amp;4&amp;amp;0\\ 1&amp;amp;2&amp;amp;9\\ 0&amp;amp;5&amp;amp;6\\ \end{matrix} \right]  \left[ \begin{matrix} 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ \end{matrix} \right]  =  \left[ \begin{matrix} 0&amp;amp;3&amp;amp;4\\ 9&amp;amp;1&amp;amp;2\\ 6&amp;amp;0&amp;amp;5\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;从这个例子就可以看出，P左乘A时，改变了A的行的顺序；P右乘A时，改变了A的列的顺序。&lt;/p&gt;
-
-&lt;h2&gt;PA = LU？&lt;/h2&gt;
-
-&lt;p&gt;为什么要先对A做P置换后，再做LU分解？这是因为不这样做的话，LU会不稳定(stability)。&lt;/p&gt;
-
-&lt;p&gt;举个例子：&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} 10^{-20}&amp;amp;1\\ 1&amp;amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;amp;0\\ 10^{20}&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;amp;1\\ 0&amp;amp;1-10^{20}\\ \end{matrix} \right] = L_{0}U_{0} \]&lt;/p&gt;
-
-&lt;p&gt;直接分解后得到的L、U矩阵，出现了&lt;strong&gt;大数&lt;/strong&gt;，程序员读者们肯定会意识到:&amp;quot;大数！这不是要越界的节奏吗！&amp;quot;。所以这是不能接受的。&lt;/p&gt;
-
-&lt;p&gt;而神奇的是，对A做一些P置换后，再来LU分解，是可以变稳定的：&lt;/p&gt;
-
-&lt;p&gt;\[ PA =  \left[ \begin{matrix} 0&amp;amp;1\\ 1&amp;amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;amp;1\\ 1&amp;amp;1\\ \end{matrix} \right] =  \left[ \begin{matrix} 1&amp;amp;1\\ 10^{-20}&amp;amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;amp;0\\ 10^{-20}&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;amp;1\\ 0&amp;amp;1-10^{-20}\\ \end{matrix} \right] = L_{1}U_{1} \]&lt;/p&gt;
-
-&lt;p&gt;L、U中没有出现大数，于是认为这样的分解是稳定的。&lt;/p&gt;
-
-&lt;p&gt;PA的P，需要对P做一些检测后才可以得到，策略就是：沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(E_{i}\)。最后按顺序算\(E_{i}\)的乘积就得到了P。&lt;/p&gt;
-
-&lt;h2&gt;A的行列式&lt;/h2&gt;
-
-&lt;p&gt;在&lt;a href=&quot;http://yiqizhumeng.com:4000/linear-algebra/&quot;&gt;&amp;lt;复习向&amp;gt;线性代数之矩阵与行列式(1)&lt;/a&gt;中，已经提到了一条行列式公式：&lt;/p&gt;
-
-&lt;p&gt;\[ det(AB) = det(A)det(B) \]&lt;/p&gt;
-
-&lt;p&gt;而，\( PA = LU \)又可以变成 \( A = P^{-1}LU \)，所以：&lt;/p&gt;
-
-&lt;p&gt;\[ det(A) = det(P^{-1}LU) = det(P^{-1})det(L)det(U) \]&lt;/p&gt;
-
-&lt;p&gt;可以进一步将这个式子简化：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;L、U矩阵分别是下三角矩阵和上三角矩阵，它们的行列式等于对角线上元素的乘积&lt;/li&gt;
-&lt;li&gt;L矩阵上的元素都为1&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;于是有：&lt;/p&gt;
-
-&lt;p&gt;\[ det(A) = det(P^{-1})u_{11}u_{22}\cdots u_{nn} \]&lt;/p&gt;
-
-&lt;p&gt;因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P_T) = det(P) \)，所以问题变成了求det(P)。&lt;/p&gt;
-
-&lt;p&gt;P怎么求？首先，P相当于多个\(E_i\)矩阵的乘积，而又有\( det(E_i)=-1 \)  (行列式的基本性质：交换行列式的两行，行列式变号），所以有：&lt;/p&gt;
-
-&lt;p&gt;\[ P = E_t\cdots E_2E_1 \implies \det(P) = \prod^t_{i=1}\det(E_i)=(-1)^t \]&lt;/p&gt;
-
-&lt;p&gt;于是：&lt;/p&gt;
-
-&lt;p&gt;\[ det(A) = det(P^{-1}LU) = det(P)u_{11}u_{22}\cdots u_{nn} = (-1)^{t}u_{11}u_{22}\cdots u_{nn} \]&lt;/p&gt;
-
-&lt;h2&gt;总结&lt;/h2&gt;
-
-&lt;p&gt;矩阵的分解(factorization)有很多种，PA=LU只是其中一种，但此类分解法都离不开&lt;strong&gt;高斯消元&lt;/strong&gt;这把大杀器。理解好高斯消元是关键。&lt;/p&gt;
-
-&lt;p&gt;P.S. 已经有人证明了，任何方阵都存在它的PLU分解:&lt;a href=&quot;&quot;&gt;http://arxiv.org/pdf/math/0506382v1.pdf&lt;/a&gt;。&lt;/p&gt;
-</description>
-        <pubDate>Mon, 31 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-3/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-3/</guid>
       </item>
     
   </channel>
