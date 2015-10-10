@@ -7,6 +7,14 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>傅里叶变换详解</title>
+        <description></description>
+        <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/fourier-equation/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/fourier-equation/</guid>
+      </item>
+    
+      <item>
         <title>复数和三角函数</title>
         <description>&lt;h2&gt;欧拉公式&lt;/h2&gt;
 
@@ -19,9 +27,75 @@
 &lt;p&gt;(图片来自
 &lt;a href=&quot;https://en.wikipedia.org/wiki/Euler%27s_formula&quot;&gt;wikipedia-Euler-formula&lt;/a&gt;)&lt;/p&gt;
 
-&lt;p&gt;!&amp;lt;--more--&amp;gt;&lt;/p&gt;
+&lt;!--more--&gt;
 
 &lt;h2&gt;怎么推导出欧拉公式?&lt;/h2&gt;
+
+&lt;p&gt;设z是复数平面的一个复数，且用三角函数来表示它的实数和虚数：&lt;/p&gt;
+
+&lt;p&gt;\[ z = \cos \theta + i\sin \theta \]&lt;/p&gt;
+
+&lt;p&gt;两边算微分:&lt;/p&gt;
+
+&lt;p&gt;\[ dz = (-\sin \theta + i\cos \theta)d\theta \]&lt;/p&gt;
+
+&lt;p&gt;提取i:&lt;/p&gt;
+
+&lt;p&gt;\[ dz = i( \cos \theta + i\sin \theta )d\theta \]&lt;/p&gt;
+
+&lt;p&gt;注意看，括号内的东西，不就是z嘛，所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ dz = izd\theta \]&lt;/p&gt;
+
+&lt;p&gt;换个写法:&lt;/p&gt;
+
+&lt;p&gt;\[ \frac {1}{z}dz = id\theta \]&lt;/p&gt;
+
+&lt;p&gt;两边求积分:&lt;/p&gt;
+
+&lt;p&gt;\[ \int_{}^{} \frac {1}{z}dz = \int_{}^{} id\theta \]&lt;/p&gt;
+
+&lt;p&gt;\[ \ln z = i\theta \]&lt;/p&gt;
+
+&lt;p&gt;注意，右边的积分，是把i当做常数看待的，所以i直接被提取出来。&lt;/p&gt;
+
+&lt;p&gt;再写出这个式子的指数形式:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{\ln z} = e^{i\theta } \]&lt;/p&gt;
+
+&lt;p&gt;\[ z = e^{i\theta } = \cos \theta + i\sin \theta \]&lt;/p&gt;
+
+&lt;p&gt;推导完毕。&lt;/p&gt;
+
+&lt;h2&gt;欧拉公式的延伸特性&lt;/h2&gt;
+
+&lt;p&gt;由:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
+
+&lt;p&gt;得到:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{-ix} = \cos (-x) + i\sin (-x) = \cos x - i\sin x \]&lt;/p&gt;
+
+&lt;p&gt;上面两个等式相加:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} + e^{-ix} = (\cos x + i\sin x) + (\cos x - i\sin x) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 2\cos x \]&lt;/p&gt;
+
+&lt;p&gt;所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;同样的，把上面2个等式相减:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} - e^{-ix} = (\cos x + i\sin x) - (\cos x - i\sin x) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 2i\sin x \]&lt;/p&gt;
+
+&lt;p&gt;所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]&lt;/p&gt;
 </description>
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/complex-1/</link>
@@ -54,6 +128,8 @@
 &lt;p&gt;\[ R =  \left[ \begin{matrix} r_{11}&amp;amp;r_{12}&amp;amp;r_{13}&amp;amp;0\\ r_{21}&amp;amp;r_{22}&amp;amp;r_{23}&amp;amp;0\\ r_{31}&amp;amp;r_{32}&amp;amp;r_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
 
 &lt;p&gt;\[ S =  \left[ \begin{matrix} s_{x}&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;s_{y}&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;t_{y}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;!--more--&gt;
 
 &lt;p&gt;所以TRS等于：&lt;/p&gt;
 
@@ -1706,401 +1782,6 @@ vectors:**&lt;/p&gt;
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-4/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-4/</guid>
-      </item>
-    
-      <item>
-        <title>More Effective C++ 笔记</title>
-        <description>&lt;h2&gt;基础议题(basics)&lt;/h2&gt;
-
-&lt;h3&gt;条款1：仔细区别pointers和references&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;使用引用，可以不做null判断&lt;/li&gt;
-&lt;li&gt;当需要考虑“不指向任何对象”的可能性时，或是考虑“在不同时间指向不同对象”的能力时，你就应该采用pointer，前一种情况可以将pointer设为null，后一种情况可以改变pointer所指对象。&lt;/li&gt;
-&lt;li&gt;当确定“总是会代表某个对象”，而且“一旦代表了该对象就不能够再改变”，那么应该选用reference。&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;总是令operator[]返回一个reference。
-&amp;lt;!--more--&amp;gt;&lt;/p&gt;
-
-&lt;h3&gt;条款2：最好使用C++转型操作符&lt;/h3&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;需要使用类型转换时，先考虑能不能用static_cast&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;不能用static_cast的情况有：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;移除表达式的常量性(constness)或变易性(volatileness) [用const_cast]&lt;/li&gt;
-&lt;li&gt;继承体系的转型 [用dynamic_cast]&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;const_cast无法进行继承体系的向下转型(cast down)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;dynamic_cast无法用在缺乏虚函数的类型身上，也不能改变常量性&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;reinterpret_cast不具移植性，是平台相关的&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;条款3：绝对不要以多态(polymorphically)方式处理数组&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;printBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ostream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BST&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numElements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numElements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;BST&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;BalanceBST&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;printBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//OK&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;printBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bBSTArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//Not OK&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;array[i]其实是一个“指针算术表达式”的简写；它代表的其实是* (array+i)。array所指内存和array+i所指内存的距离是i&lt;em&gt;sizeof(数组中的单个元素)。而因为printBSTArray中，声明了array的元素的类型为BST，所以距离是i&lt;/em&gt;sizeof(BST)。但当传入的是BalanceBST的数组时，就会出错了。&lt;/p&gt;
-
-&lt;p&gt;在删除数组时，也有这个问题，C++语言规范中说，通过base class指针删除一个由derived classes objects构成的数组，其结果未定义。&lt;/p&gt;
-
-&lt;p&gt;总的一句话：多态和指针算术不能混用，数组对象几乎总是会涉及指针的算法运算，所以数组和多态不要混用。&lt;/p&gt;
-
-&lt;h3&gt;条款4：非必要不提供 default constructor&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;有default constructor时，可以避免3个问题，一是类数组的初始化不支持带参数的构造函数，二是一些c++模板库，要求被实例化的目标类型必须要有default constructor，三是类的虚继承体系中，如果基类没有default constructor，那么每一层的子类都必须了解基类的构造函数。&lt;/li&gt;
-&lt;li&gt;反过来看，使用default constructor时，可能会增加了类的复杂度，因为不能保证每个字段都有意义（default constructor导致赋予字段一个缺省值，这个缺省值可能是多余的）。并且，使用这些字段的调用者，都需要做一个“测试”，测试字段是否真的被初始化了。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;操作符(operators)&lt;/h2&gt;
-
-&lt;h3&gt;条款5：对定制的“类型转换函数”保持警觉&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;用一个普通函数来替代类型转换操作符。因为这种操作符重载是&amp;quot;隐式(implicit)&amp;quot;的：
-&lt;code&gt;c
-class Rational{
-public:
-operator double() const; //not good
-double asDouble() const; //good
-}
-&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;单自变量构造函数，前面要加一个explicit声明。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;用proxy classes 技术时，可以使用隐式类型转换，因为不能连续执行多个类型转换行为（详情见条款30）。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;条款6：区别 increment/decrement操作符的前置和后置形式&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;后置式应以其前置式为基础（即后置式的函数体的累加实现，是调用了前置式）。&lt;/li&gt;
-&lt;li&gt;后置式的返回类型必须加const，从而禁止obj++++这种写法。&lt;/li&gt;
-&lt;li&gt;后置式的函数声明的参数要带一个毫无意义的int，只是用来和前置式做区分。&lt;/li&gt;
-&lt;li&gt;虽然禁止obj+++++，但是++++obj是允许的。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UPInt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;UPInt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){};&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;UPInt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_num&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UPInt&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;UPInt&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oldValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oldValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;   
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;条款7：千万不要重载&amp;amp;&amp;amp;、||和, 操作符&lt;/h3&gt;
-
-&lt;p&gt;直接贴上我写的一个代码片段：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;string&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Boolean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Boolean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){};&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;get:&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;a&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;b&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;a &amp;amp;&amp;amp; b = &amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;运行结果为:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;nl&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
-&lt;span class=&quot;nl&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;a &amp;amp;&amp;amp; b这个表达式，b先求值了，这不反人类么。&lt;/p&gt;
-
-&lt;p&gt;所以：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&amp;amp;&amp;amp; || , 被重载后，“函数调用语义” 会取代 “骡死式语义”。前者的求值顺序是未定义的（C++规范里没有定义），后者必然是从左至右。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;条款8：了解各种不同意义的new和delete&lt;/h3&gt;
-
-&lt;h4&gt;关于new&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;new operator是指：&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ps&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Hello&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;这样子的代码里的new。这个操作符是由语言内建的，就像sizeof一样，不能被改变意义，总是做相同的事情。它的动作分为2个方面，第一，它分配足够的内存，用来放置某类型的对象；第二，它调用一个constructor，为刚才分配的内存中的那个对象设定初值。new operator总是做这两件事，你无法改变其行为。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;operator new的一般用法，用来分配且仅分配内存（不调用构造函数）：&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;member&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;\0&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){};&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;member=&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;member&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rawMemory&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rawMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;,&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rawMemory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;widget&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rawMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;widget&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;输出：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x306850&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;member&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Pm0&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;ul&gt;
-&lt;li&gt;placement new 用法：&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;member&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;\0&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;constructWidgetInBuf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)];&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Widget&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;constructWidgetInBuf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;,&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;输出：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;ul&gt;
-&lt;li&gt;使用策略：如果你希望将对象产生于heap内存，请使用new operator。它不但分配内存而且为该对象调用一个constructor。如果你只是打算分配内存，请调用operator new，那就没有任何constructor会被调用。如果你打算在heap objects产生时自己决定内存分配方式，请写一个自己的operator new（重载），并使用new operator，它将会自动调用你所写的operator new。如果你打算在已分配的内存中构造对象，请使用placement new。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;关于delete&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;类似new，delete也分为 delete operator 和 operator delete。&lt;/li&gt;
-&lt;li&gt;当成对使用operator new、operator delete时，相当于C的malloc和free。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;关于数组&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;array new指的是：&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ps&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;这样子的代码里的new operator，由于诞生的是数组，所以内存是由一个兄弟函数：operator new[]负责分配。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;array new 不仅要分配多个对象的内存(operator new[])，且要对每一个对象的内存调用一次default constructor。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;array delete(即 operator delete[])，类似array new，不过它是先调用每个对象的dtor，再调用 operator delete[]以释放内存。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;异常&lt;/h2&gt;
-
-&lt;p&gt;大概读了一遍这些条款，最后作者的结论是，能不使用异常就不使用异常，这是因为使用异常会有附加的性能开销。但是具体的影响值不明朗，和具体的编译器有关系。&lt;/p&gt;
-
-&lt;h3&gt;条款9：利用destructors避免泄露资源&lt;/h3&gt;
-
-&lt;p&gt;问题：C++函数调用过程中，如果出现异常，就会导致这个函数的后续代码不被执行。想一想，如果函数开头new了一个对象，在函数末尾会delete这个对象，而异常出现在中间，那么这个对象就不会被析构，于是内存发生泄露。&lt;/p&gt;
-
-&lt;p&gt;解决之道就是，用智能指针来管理堆对象，因为智能指针是局部变量，当异常发生时，局部变量是会正常析构的，而，智能指针所绑定的heap对象，会在智能指针析构时也顺带析构。那么这个问题就算是解决了。（真的吗？）&lt;/p&gt;
-
-&lt;p&gt;想一下，如果是在智能指针绑定那个对象（取得资源）过程中发生异常，或者是在资源被析构时发生异常，确定不会出问题吗？&lt;/p&gt;
-
-&lt;p&gt;很不幸，确实问题并没有完美解决。&lt;/p&gt;
-
-&lt;h3&gt;条款10：在constructors内阻止资源泄露（resource leak）&lt;/h3&gt;
-
-&lt;p&gt;首先要知道一个事实：C++不自动清理那些“构造期间抛出异常”的对象。&lt;/p&gt;
-
-&lt;p&gt;所以，构造函数的编写要小心，要确保构造过程中抛出异常时，仍能对已初始化的变量进行回收处理，避免泄露。&lt;/p&gt;
-
-&lt;p&gt;解决方法：使用trycatch，确保构造函数所有可能被抛出的异常都能够捕获到，在catch里释放资源，并，再把异常往上继续抛出。&lt;/p&gt;
-
-&lt;p&gt;这个事情实际上并不简单。比如，如果构造函数使用了初始化列表，而初始化列表代码中使用了new，这个new就没法写trycatch了。如果初始化列表有2个变量A、B，A成功拿到对对象，和B的对象构造失败（bad_alloc），A的堆对象就没机会释放了，就悲剧了。（针对这个情况，可以把new操作封装在某个成员函数里，然后在这个成员函数写trycatch，初始化列表调用这个成员函数即可）。&lt;/p&gt;
-
-&lt;p&gt;更明智的做法是，把这种“需要获得对对象的成员变量”，改成使用智能指针。还是那2个A、B，当B出事时，A因为是一个智能指针成员变量，且已经完整构造，A会正常析构，析构的时候会正常地把堆对象也释放。&lt;/p&gt;
-
-&lt;h3&gt;条款11：禁止异常流出destructors之外&lt;/h3&gt;
-
-&lt;p&gt;析构函数在2种情况下会被调用：一，对象在正常状态下被销毁；二，对象呗异常处理机制销毁。&lt;/p&gt;
-
-&lt;p&gt;如果异常流出析构函数，当程序是处在上述第二种情况时，会导致程序被terminate。&lt;/p&gt;
-
-&lt;p&gt;解决办法是，在析构函数里写trycatch，捕获一切可能的异常，并把catch留空，即，捕获异常后不做任何事情。&lt;/p&gt;
-
-&lt;p&gt;另外一个不让异常流出析构函数的理由是，如果析构过程中，某个敌方抛出异常，并传播到上层，那么这个析构函数的后续代码就没有被执行，这个析构函数就没有完成它负责的任务。&lt;/p&gt;
-
-&lt;h3&gt;条款12：了解“抛出一个异常”与“传递一个参数”或“调用一个虚函数”之间的差异&lt;/h3&gt;
-
-&lt;p&gt;事实：一个对象被抛出作为异常时，总是会发生复制。（即使声明为static；即使是by reference方式）&lt;/p&gt;
-
-&lt;h3&gt;条款13：以by reference方式捕捉异常&lt;/h3&gt;
-
-&lt;h3&gt;条款14：明智运用exception specifications&lt;/h3&gt;
-
-&lt;h3&gt;条款15：了解异常处理的成本&lt;/h3&gt;
-
-&lt;p&gt;为了能够在运行时期处理异常，程序需要做大量记录工作：在每一个执行点，必须能够确认“如果发生异常，哪些对象需要析构”，他们必须在每一个try语句块的进入点和离开点做记号，针对每个try语句块必须记录对应的catch子句及能偶处理的异常类型。&lt;/p&gt;
-
-&lt;p&gt;运行时期的比对工作（以确保符合exception specifications)不是免费的；异常被抛出时销毁适当对象并找出正确的catch子句也不是免费的。&lt;/p&gt;
-
-&lt;p&gt;第二个成本是，try语句块。代码会膨胀，效率也会下降。（这还是没有异常出现时就有这个开销了）&lt;/p&gt;
-
-&lt;h2&gt;效率&lt;/h2&gt;
-
-&lt;h3&gt;条款16：谨记80-20法则&lt;/h3&gt;
-
-&lt;p&gt;2个点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;理性地优化代码来提升程序性能。有的代码优化了，并不一定能带来质的性能提升；要找到性能瓶颈之处才行。&lt;/li&gt;
-&lt;li&gt;利用profiler工具来找到性能瓶颈。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;条款17：考虑使用lazy evaluation（缓式评估）&lt;/h3&gt;
-
-&lt;p&gt;其实就是“能拖就拖”，减少不必要的计算。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;引用计数 &amp;amp;&amp;amp; 区分读和写&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;考虑这样的代码：&lt;/p&gt;
-
-&lt;p&gt;string s1 =&amp;quot;hello&amp;quot;; string s2 = s1;&lt;/p&gt;
-
-&lt;p&gt;执行s2=s1时，执行了一次复制构造函数。这个调用是否昂贵？这个调用是否可以避免？事实上，要具体情况具体考虑。如果s2只是被“读”，而不会被“修改”，那么s2只需要存一个指向s1的引用即可，不应该创建一个副本。&lt;strong&gt;在你真正需要之前，不必着急为某物做一个副本。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Lazy Fetching（缓式取出）&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;简单地说，就是读取数据库数据时，能少拿一点就少拿一点，能不拿就不拿。&lt;/p&gt;
-
-&lt;p&gt;比如我自己在使用redis（KV数据库），就可以把一个class实例（有多个成员变量），用hash表来存。使用这个实例时（读or写），不直接hgetall或hsetall（全部读写），而是用hget或hset（单个读写）。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Lazy Expression Evaluation（表达式换评估）&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Lazy Evaluation的反义词是Eager Evaluation（急式评估）。
-贴书中的例子：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;m3是m1和m2的合，这是一个百万级的加法操作。如果m3的值实际上是不会被程序用到，那么这个计算就应该被忽略。&lt;/p&gt;
-
-&lt;p&gt;一般来说，定义了m3，应该下文就会用到m3。那么m3的计算就在所难免了，但如果是这样的情况：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;at&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;显然，按照这一个条款的指示，应该使得，m3.at(2,2)执行时，只计算(2,2)处的值，而不计算其他的值。&lt;/p&gt;
-
-&lt;h3&gt;条款18：分期摊还预期的计算成本&lt;/h3&gt;
-
-&lt;p&gt;如果预期到某个操作必然要执行，就可以考虑把这个计算提前，甚至计算结果可以被复用。（caching法）&lt;/p&gt;
-
-&lt;p&gt;另一种做法是Prefetching（预先取出）。具体就是说，做一个计算时，可以一次过做多一些（batch）。比如磁盘的块读取，或者动态数组的内存动态扩张。&lt;/p&gt;
-
-&lt;h3&gt;条款19：了解临时对象的来源&lt;/h3&gt;
-
-&lt;p&gt;当程序产生一个non-heap object而没有为它命名，便诞生了一个临时对象。（匿名对象）&lt;/p&gt;
-
-&lt;p&gt;一般有2种情况产生临时对象：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;隐式类型转换。比如传参时参数有可能被自动转换。&lt;/li&gt;
-&lt;li&gt;函数返回对象。返回的变量的类型和函数的返回类型不同时发生。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;第一种类型，只当对象以by value的方式传递，或当对象被传递给一个reference-to-const参数时，才会发生。如果对象被传递给一个reference-to-non-const参数，并不会发生此类转换。&lt;/p&gt;
-
-&lt;p&gt;第二种情况，感觉这本书的分析过时了，c++11的右值引用，应该是解决这个情况的最有力武器。&lt;/p&gt;
-
-&lt;h3&gt;条款20：协助完成“返回值优化”&lt;/h3&gt;
-
-&lt;p&gt;撇开c++11，对于返回by value的函数，最佳的return写法是，return后面紧跟一个类构造函数。&lt;/p&gt;
-
-&lt;p&gt;这样做可能可以让编译器优化掉这个构造函数产生的临时对象。
-（这一招叫做return value optimization）。&lt;/p&gt;
-
-&lt;h3&gt;条款21：利用重载技术（overload）避免隐式类型转换（implicit type conversions）&lt;/h3&gt;
-
-&lt;p&gt;很显然，就是通过增加定制的重载函数（函数参数类型和实际的参数类型一致），避免不必要的类型转换开销。&lt;/p&gt;
-
-&lt;h3&gt;条款22：考虑以操作符复合形式（op=）取代其独身形式（op）&lt;/h3&gt;
-
-&lt;p&gt;大部分程序员都希望，如果他们能够这样写：&lt;/p&gt;
-
-&lt;p&gt;x = x + y&lt;/p&gt;
-
-&lt;p&gt;他们也能够写成这样：&lt;/p&gt;
-
-&lt;p&gt;x += y&lt;/p&gt;
-
-&lt;p&gt;一般而言，复合操作符比其对应的独身版本效率高，因为独身版本通常返回一个新对象，而我们必须因此负担一个临时对象的构造和析构成本。&lt;/p&gt;
-
-&lt;p&gt;另外，如果同时提供某个操作符的复合形式和独身形式，便允许你的客户在效率与便利性之间做取舍。（虽然这个选择不易）&lt;/p&gt;
-
-&lt;p&gt;比如：&lt;/p&gt;
-
-&lt;p&gt;d = a + b + c;&lt;/p&gt;
-
-&lt;p&gt;和：&lt;/p&gt;
-
-&lt;p&gt;d = 0; d += a; d += b; d += c;&lt;/p&gt;
-
-&lt;p&gt;后者要比前者效率要高，因为没有复制对象。&lt;/p&gt;
-
-&lt;h3&gt;条款23：考虑使用其他程序库&lt;/h3&gt;
-
-&lt;p&gt;以iosteam和stdio这2个官方库来说明，不同的库有不同的性能。选择一个适合的库，也是提升性能的好方法。&lt;/p&gt;
-
-&lt;h3&gt;条款24：了解virtual functions、multiple inheritance、virtual base classes、runtime type identification的成本&lt;/h3&gt;
-</description>
-        <pubDate>Sun, 06 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/cpp-1/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/cpp-1/</guid>
       </item>
     
   </channel>

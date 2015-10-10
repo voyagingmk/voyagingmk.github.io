@@ -19,10 +19,6 @@
 
 (图片来自
 wikipedia-Euler-formula)
-
-!&lt;--more--&gt;
-
-怎么推导出欧拉公式?
 " />
     <meta property="og:description" content="欧拉公式
 
@@ -34,10 +30,6 @@ wikipedia-Euler-formula)
 
 (图片来自
 wikipedia-Euler-formula)
-
-!&lt;--more--&gt;
-
-怎么推导出欧拉公式?
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -109,7 +101,7 @@ wikipedia-Euler-formula)
 </script>
 <article class="post">
   <h1>复数和三角函数</h1>
-  <h3>Tags: <a href="/tag/complex.html" rel="tag">complex</a></h3>
+  <h3>Tags: <a href="/tag/complex.html" rel="tag">complex</a>, <a href="/tag/math.html" rel="tag">math</a></h3>
   <div class="entry">
     <h2>欧拉公式</h2>
 
@@ -122,9 +114,75 @@ wikipedia-Euler-formula)
 <p>(图片来自
 <a href="https://en.wikipedia.org/wiki/Euler%27s_formula">wikipedia-Euler-formula</a>)</p>
 
-<p>!&lt;--more--&gt;</p>
+<!--more-->
 
 <h2>怎么推导出欧拉公式?</h2>
+
+<p>设z是复数平面的一个复数，且用三角函数来表示它的实数和虚数：</p>
+
+<p>\[ z = \cos \theta + i\sin \theta \]</p>
+
+<p>两边算微分:</p>
+
+<p>\[ dz = (-\sin \theta + i\cos \theta)d\theta \]</p>
+
+<p>提取i:</p>
+
+<p>\[ dz = i( \cos \theta + i\sin \theta )d\theta \]</p>
+
+<p>注意看，括号内的东西，不就是z嘛，所以有:</p>
+
+<p>\[ dz = izd\theta \]</p>
+
+<p>换个写法:</p>
+
+<p>\[ \frac {1}{z}dz = id\theta \]</p>
+
+<p>两边求积分:</p>
+
+<p>\[ \int_{}^{} \frac {1}{z}dz = \int_{}^{} id\theta \]</p>
+
+<p>\[ \ln z = i\theta \]</p>
+
+<p>注意，右边的积分，是把i当做常数看待的，所以i直接被提取出来。</p>
+
+<p>再写出这个式子的指数形式:</p>
+
+<p>\[ e^{\ln z} = e^{i\theta } \]</p>
+
+<p>\[ z = e^{i\theta } = \cos \theta + i\sin \theta \]</p>
+
+<p>推导完毕。</p>
+
+<h2>欧拉公式的延伸特性</h2>
+
+<p>由:</p>
+
+<p>\[ e^{ix} = \cos x + i\sin x\]</p>
+
+<p>得到:</p>
+
+<p>\[ e^{-ix} = \cos (-x) + i\sin (-x) = \cos x - i\sin x \]</p>
+
+<p>上面两个等式相加:</p>
+
+<p>\[ e^{ix} + e^{-ix} = (\cos x + i\sin x) + (\cos x - i\sin x) \]</p>
+
+<p>\[ = 2\cos x \]</p>
+
+<p>所以有:</p>
+
+<p>\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]</p>
+
+<p>同样的，把上面2个等式相减:</p>
+
+<p>\[ e^{ix} - e^{-ix} = (\cos x + i\sin x) - (\cos x - i\sin x) \]</p>
+
+<p>\[ = 2i\sin x \]</p>
+
+<p>所以有:</p>
+
+<p>\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]</p>
 
   </div>
 
