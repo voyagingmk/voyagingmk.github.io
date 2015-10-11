@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>傅里叶变换详解 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+    <title>学习傅里叶变换 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -9,14 +9,32 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="" />
-    <meta property="og:description" content="" />
+    <meta name="description" content="本文主要写的是公式层面的推导，关于傅里叶变换的应用，请到知乎搜索&#39;傅里叶&#39;，能找到很多不错的文章。
+
+本文主要参考了斯坦福大学Brad Osgood的公开课:
+
+http://open.163.com/special/opencourse/fouriertransforms.html
+
+youtube的比较高清:
+
+https://www.youtube.com/watch?v=gZNm7L96pfY
+" />
+    <meta property="og:description" content="本文主要写的是公式层面的推导，关于傅里叶变换的应用，请到知乎搜索&#39;傅里叶&#39;，能找到很多不错的文章。
+
+本文主要参考了斯坦福大学Brad Osgood的公开课:
+
+http://open.163.com/special/opencourse/fouriertransforms.html
+
+youtube的比较高清:
+
+https://www.youtube.com/watch?v=gZNm7L96pfY
+" />
     
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="傅里叶变换详解" />
-    <meta property="twitter:title" content="傅里叶变换详解" />
+    <meta property="og:title" content="学习傅里叶变换" />
+    <meta property="twitter:title" content="学习傅里叶变换" />
     
 
     <!--[if lt IE 9]>
@@ -37,7 +55,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/fourier-equation/',
-		  'title': '傅里叶变换详解'
+		  'title': '学习傅里叶变换'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -80,10 +98,228 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1>傅里叶变换详解</h1>
+  <h1>学习傅里叶变换</h1>
   <h3>Tags: <a href="/tag/fourier.html" rel="tag">fourier</a>, <a href="/tag/math.html" rel="tag">math</a></h3>
   <div class="entry">
-    
+    <p>本文主要写的是公式层面的推导，关于傅里叶变换的应用，请到知乎搜索&#39;傅里叶&#39;，能找到很多不错的文章。</p>
+
+<p>本文主要参考了斯坦福大学Brad Osgood的公开课:</p>
+
+<p><a href="http://open.163.com/special/opencourse/fouriertransforms.html">http://open.163.com/special/opencourse/fouriertransforms.html</a></p>
+
+<p>youtube的比较高清:</p>
+
+<p><a href="https://www.youtube.com/watch?v=gZNm7L96pfY">https://www.youtube.com/watch?v=gZNm7L96pfY</a></p>
+
+<!--more-->
+
+<h2>傅里叶级数</h2>
+
+<p>翻译一下wiki的fourier series：</p>
+
+<blockquote>
+<p>在数学中，傅里叶级数是一个<strong>可以把(有波形的)函数表示成多个简单的sin函数的叠加</strong>的方法。更形式地说，傅里叶级数能够把任意周期函数(信号)分解成<strong>有限(或无限)个简单的震荡函数的叠加</strong>，这些震荡函数可以是正弦函数、余弦函数或复指数。</p>
+</blockquote>
+
+<p>傅里叶级数的公式定义（不要问为什么长这样，这只是一个定义，不是推出来的公式)：</p>
+
+<p>\[ S = \sum_{k=1}^{N}A_{k}\sin (2\pi kt+\phi _{k}) \]</p>
+
+<p>(如果不清楚什么是级数，请戳 <a href="https://en.wikipedia.org/wiki/Series_(mathematics)">https://en.wikipedia.org/wiki/Series_(mathematics)</a></p>
+
+<p>使用三角函数的一道公式:</p>
+
+<p>\[ \sin (\alpha + \beta ) = \sin \alpha \cos \beta + \cos \alpha \sin \beta \]</p>
+
+<p>代入到傅里叶级数，得：</p>
+
+<p>\[ \sin (2\pi kt + \phi _{k}) =\sin 2\pi kt \cos \phi _{k} + \cos 2\pi kt \sin \phi _{k} \]</p>
+
+<p>\[ S = \sum_{k=1}^{N}A_{k}\sin 2\pi kt \cos \phi _{k} + \sum_{k=1}^{N}A_{k}\cos 2\pi kt \sin \phi _{k} \]</p>
+
+<p>再设:</p>
+
+<p>\[ a_{k} = A_{k}\cos \phi _{k} \]</p>
+
+<p>\[ b_{k} = A_{k}\sin \phi _{k} \]</p>
+
+<p>则上面的傅里叶级数被简化成:</p>
+
+<p>\[ S = \sum_{k=1}^{N}a_{k}\sin 2\pi kt + \sum_{k=1}^{N}b_{k}\cos 2\pi kt \]
+\[  S(x) = \sum_{k=1}^{N}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]</p>
+
+<p>这是傅里叶级数的常用形式1。</p>
+
+<p>常用形式2是这样的：</p>
+
+<p>\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{N}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]</p>
+
+<p>前面多出来的那个东西，不复杂，先不管它。</p>
+
+<p>常用形式3，是最重要的：用复指数来表示傅里叶级数。怎么实现？其实就是用了<strong>欧拉公式</strong>：</p>
+
+<p>\[ e^{ix} = \cos x + i\sin x\]</p>
+
+<p>（关于欧拉公式的推导，可以看我的另一篇文章:<a href="http://www.qiujiawei.com/complex-1">复数和三角函数</a> )</p>
+
+<p>把 \( x = 2\pi kt \)代入到欧拉公式，得到:</p>
+
+<p>\[   e^{i2\pi kt} = \cos 2\pi kt + i\sin 2\pi kt\]</p>
+
+<p>再搬出另外两条欧拉公式的推论:</p>
+
+<p>\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]</p>
+
+<p>\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]</p>
+
+<p>也把 \( x = 2\pi kt \)代入，得到:</p>
+
+<p>\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]</p>
+
+<p>\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]</p>
+
+<p>这时候，教授突然说，傅里叶级数可以写成:</p>
+
+<p>\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]</p>
+
+<p>一头雾水了，这究竟是怎么得到的呢。请耐心看下文。</p>
+
+<h3>复指数形式的傅里叶级数的\(c_{k}\)的性质</h3>
+
+<p>对于傅里叶级数f(t)，假设它是一个&quot;实信号(real signal)&quot;（一般来说，傅里叶变换处理的目标都是实信号)，
+那么就有等式:</p>
+
+<p>\[ f(t) = \overline {f(t)} \]</p>
+
+<p>即是说，f(t)没有虚部。而又因为：</p>
+
+<p>\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]</p>
+
+<p>\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \overline {\sum_{k=-n}^{n}c_{k}e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}\overline {e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}e^{-2\pi ikt} \]</p>
+
+<p>然后，要注意一个事实是：这个级数是从-n到n的累加，根据加法交换律，这个级数也可以变成从n到-n的累加，也即:</p>
+
+<p>\[ \sum_{k=-n}^{n} = \sum_{k=n}^{-n}  \]</p>
+
+<p>于是，把傅里叶级数的k变成-k，就有:</p>
+
+<p>\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \sum_{-k=-n}^{n}c_{-k}e^{-2\pi ikt} = \sum_{k=n}^{-n}c_{-k}e^{-2\pi ikt} = \sum_{k=-n}^{n}c_{-k}e^{-2\pi ikt} \]</p>
+
+<p>再对比上面的推导，就会发现：</p>
+
+<p>\[ c_{-k} = \overline {c_{k}} \]</p>
+
+<p>先记住这个性质，然后继续往下看。</p>
+
+<p>设有复数z，它必然会满足一个性质：</p>
+
+<p>\[ z + \overline {z} = 2Re\{ z \} \]</p>
+
+<p>Re{···}代表取出花括号的复数表达式的实部。</p>
+
+<p>对于傅里叶级数，也可以把它当成一个复数，再利用刚刚推导出来的\(c_{-k} = \overline {c_{k}} \)，就有：</p>
+
+<p>\[ c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} = c_{k}e^{2\pi ikt} + c_{-k}e^{-2\pi ikt}\]
+\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}}e^{\overline {2\pi ikt}} \]
+\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}e^{2\pi ikt}} \]
+\[ = 2Re\{ c_{k}e^{2\pi ikt} \} \]</p>
+
+<p>这个结果表明，\(c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} \)是一个实数。把这个结论代入到傅里叶级数，就可以得到：</p>
+
+<p>\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]
+\[ = \sum_{k=0}^{n}2Re\{ c_{k}e^{2\pi ikt} \} \]
+\[ = 2Re\{ \sum_{k=0}^{n}c_{k}e^{2\pi ikt} \} \]</p>
+
+<p>注意，这个式子是把0和-0都算进去的。如果不允许signed zero，就要对k=0的情况特殊处理。</p>
+
+<h3>求解\(c_{k}\)的积分形式</h3>
+
+<p>回到前面的那个傅里叶级数f(t)：</p>
+
+<p>\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]</p>
+
+<p>其实是这样子搞出来的：
+先假设傅里叶的<strong>常用形式2</strong>可以变换成这个等式，然后求\(c_{k}\)，求得出来的话，式子不就成立了嘛。</p>
+
+<p>为了搞定这个事情，要使用新的招数：积分。</p>
+
+<p>( 在教授的notes(<a href="https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf">https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf</a>]的第10-12页第1.5小节Lost at c，清楚地推导了一遍\(c_{k}\)。 )</p>
+
+<p>这里我按自己对原文的理解，翻译下。</p>
+
+<p><img src="../images/2015.10/5.png" alt="5.png"></p>
+
+<p>上面这个式子是说，我们随便取了一个k，并对傅里叶级数等式两边乘以\( e^{-2\pi ikt } \)，又因为:</p>
+
+<p>\[ e^{-2\pi ikt }c_{k}e^{2\pi ikt } =c_{k}e^{-2\pi ikt + 2\pi ikt } = c_{k}e^{0} = c_{k} \]</p>
+
+<p>所以可以把\(c_{k}\)移到等式左边，左边的那个东东移到右边，就得到了一个\(c_{k}\)的表达式:</p>
+
+<p><img src="../images/2015.10/6.png" alt="6.png"></p>
+
+<p>然后再放大招：对等式两边同时积分，范围是0到1（f(t)的t的周期为1）。</p>
+
+<p>积分的时候，会发现有这么个神奇的结果:</p>
+
+<p><img src="../images/2015.10/7.png" alt="7.png"></p>
+
+<p>也就是红圈里的那个东东的积分结果是0：</p>
+
+<p><img src="../images/2015.10/8.jpg" alt="8.jpg"></p>
+
+<p>于是，积分等式就只剩下：</p>
+
+<p>\[ \int _{0}^{1}c_{k}dt = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]</p>
+
+<p>\[ (1-0)c_{k} = c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]</p>
+
+<p>这就是\(c_{k}\)的积分形式。</p>
+
+<p>做一个总结：</p>
+
+<p>如果对于一个已知的周期为1的周期函数f(t)，它可以写成这样的形式：</p>
+
+<p>\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]</p>
+
+<p>那么其中的\(c_{k}\)必然满足：</p>
+
+<p>\[ c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]</p>
+
+<h3>求解\(c_{k}\)的非积分形式</h3>
+
+<p>再换个思路，由这3个公式:</p>
+
+<p>\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{N}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]</p>
+
+<p>\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]</p>
+
+<p>\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]</p>
+
+<p>得:</p>
+
+<p>\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{N}(a_{k}\frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} + b_{k}\frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2}) \]
+\[  = \frac {A_{0}}{2} + \sum_{k=1}^{N}(\frac {b_{k} - ia_{k}}{2}e^{i2\pi kt} + \frac {b_{k} + ia_{k}}{2}e^{-i2\pi  kt})  \]</p>
+
+<p>设:</p>
+
+<p>\[ c_{0} = \frac {1}{2}A_{0} \]
+\[ c_{k} = \frac {1}{2}(b_{k} - ia_{k}) \]
+\[ c_{-k} = \frac {1}{2}(b_{k} + ia_{k}) \]</p>
+
+<p>（注意，\( c_{-k} = \overline {c_{k}} \)哦，证明前面小节的推导是对的。）</p>
+
+<p>则:</p>
+
+<p>\[ S = c_{0} + \sum_{k=1}^{N}(c_{k}e^{i2\pi kt} + c_{-k}e^{-i2\pi  kt})  \]</p>
+
+<h3>大跃进，终极的傅里叶级数的复指数形式</h3>
+
+<p>终极的傅里叶级数的复指数形式是：</p>
+
+<p>\[ f(t) = C_{0} + \sum_{k=-\infty }^{\infty }C_{k}e^{ikt} \]</p>
+
+<p>\[ C_{k} = \frac {1}{2\pi }\int _{-\pi }^{\pi }f(t)e^{-ikt}dt \]</p>
+
   </div>
 
   <div class="date">

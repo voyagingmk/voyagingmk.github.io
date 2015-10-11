@@ -7,8 +7,226 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>傅里叶变换详解</title>
-        <description></description>
+        <title>学习傅里叶变换</title>
+        <description>&lt;p&gt;本文主要写的是公式层面的推导，关于傅里叶变换的应用，请到知乎搜索&amp;#39;傅里叶&amp;#39;，能找到很多不错的文章。&lt;/p&gt;
+
+&lt;p&gt;本文主要参考了斯坦福大学Brad Osgood的公开课:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://open.163.com/special/opencourse/fouriertransforms.html&quot;&gt;http://open.163.com/special/opencourse/fouriertransforms.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;youtube的比较高清:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=gZNm7L96pfY&quot;&gt;https://www.youtube.com/watch?v=gZNm7L96pfY&lt;/a&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;傅里叶级数&lt;/h2&gt;
+
+&lt;p&gt;翻译一下wiki的fourier series：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;在数学中，傅里叶级数是一个&lt;strong&gt;可以把(有波形的)函数表示成多个简单的sin函数的叠加&lt;/strong&gt;的方法。更形式地说，傅里叶级数能够把任意周期函数(信号)分解成&lt;strong&gt;有限(或无限)个简单的震荡函数的叠加&lt;/strong&gt;，这些震荡函数可以是正弦函数、余弦函数或复指数。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;傅里叶级数的公式定义（不要问为什么长这样，这只是一个定义，不是推出来的公式)：&lt;/p&gt;
+
+&lt;p&gt;\[ S = \sum_{k=1}^{N}A_{k}\sin (2\pi kt+\phi _{k}) \]&lt;/p&gt;
+
+&lt;p&gt;(如果不清楚什么是级数，请戳 &lt;a href=&quot;https://en.wikipedia.org/wiki/Series_(mathematics)&quot;&gt;https://en.wikipedia.org/wiki/Series_(mathematics)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;使用三角函数的一道公式:&lt;/p&gt;
+
+&lt;p&gt;\[ \sin (\alpha + \beta ) = \sin \alpha \cos \beta + \cos \alpha \sin \beta \]&lt;/p&gt;
+
+&lt;p&gt;代入到傅里叶级数，得：&lt;/p&gt;
+
+&lt;p&gt;\[ \sin (2\pi kt + \phi _{k}) =\sin 2\pi kt \cos \phi _{k} + \cos 2\pi kt \sin \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;\[ S = \sum_{k=1}^{N}A_{k}\sin 2\pi kt \cos \phi _{k} + \sum_{k=1}^{N}A_{k}\cos 2\pi kt \sin \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;再设:&lt;/p&gt;
+
+&lt;p&gt;\[ a_{k} = A_{k}\cos \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;\[ b_{k} = A_{k}\sin \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;则上面的傅里叶级数被简化成:&lt;/p&gt;
+
+&lt;p&gt;\[ S = \sum_{k=1}^{N}a_{k}\sin 2\pi kt + \sum_{k=1}^{N}b_{k}\cos 2\pi kt \]
+\[  S(x) = \sum_{k=1}^{N}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
+
+&lt;p&gt;这是傅里叶级数的常用形式1。&lt;/p&gt;
+
+&lt;p&gt;常用形式2是这样的：&lt;/p&gt;
+
+&lt;p&gt;\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{N}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
+
+&lt;p&gt;前面多出来的那个东西，不复杂，先不管它。&lt;/p&gt;
+
+&lt;p&gt;常用形式3，是最重要的：用复指数来表示傅里叶级数。怎么实现？其实就是用了&lt;strong&gt;欧拉公式&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
+
+&lt;p&gt;（关于欧拉公式的推导，可以看我的另一篇文章:&lt;a href=&quot;http://www.qiujiawei.com/complex-1&quot;&gt;复数和三角函数&lt;/a&gt; )&lt;/p&gt;
+
+&lt;p&gt;把 \( x = 2\pi kt \)代入到欧拉公式，得到:&lt;/p&gt;
+
+&lt;p&gt;\[   e^{i2\pi kt} = \cos 2\pi kt + i\sin 2\pi kt\]&lt;/p&gt;
+
+&lt;p&gt;再搬出另外两条欧拉公式的推论:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]&lt;/p&gt;
+
+&lt;p&gt;也把 \( x = 2\pi kt \)代入，得到:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]&lt;/p&gt;
+
+&lt;p&gt;这时候，教授突然说，傅里叶级数可以写成:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;一头雾水了，这究竟是怎么得到的呢。请耐心看下文。&lt;/p&gt;
+
+&lt;h3&gt;复指数形式的傅里叶级数的\(c_{k}\)的性质&lt;/h3&gt;
+
+&lt;p&gt;对于傅里叶级数f(t)，假设它是一个&amp;quot;实信号(real signal)&amp;quot;（一般来说，傅里叶变换处理的目标都是实信号)，
+那么就有等式:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \overline {f(t)} \]&lt;/p&gt;
+
+&lt;p&gt;即是说，f(t)没有虚部。而又因为：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \overline {\sum_{k=-n}^{n}c_{k}e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}\overline {e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}e^{-2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;然后，要注意一个事实是：这个级数是从-n到n的累加，根据加法交换律，这个级数也可以变成从n到-n的累加，也即:&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{k=-n}^{n} = \sum_{k=n}^{-n}  \]&lt;/p&gt;
+
+&lt;p&gt;于是，把傅里叶级数的k变成-k，就有:&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \sum_{-k=-n}^{n}c_{-k}e^{-2\pi ikt} = \sum_{k=n}^{-n}c_{-k}e^{-2\pi ikt} = \sum_{k=-n}^{n}c_{-k}e^{-2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;再对比上面的推导，就会发现：&lt;/p&gt;
+
+&lt;p&gt;\[ c_{-k} = \overline {c_{k}} \]&lt;/p&gt;
+
+&lt;p&gt;先记住这个性质，然后继续往下看。&lt;/p&gt;
+
+&lt;p&gt;设有复数z，它必然会满足一个性质：&lt;/p&gt;
+
+&lt;p&gt;\[ z + \overline {z} = 2Re\{ z \} \]&lt;/p&gt;
+
+&lt;p&gt;Re{···}代表取出花括号的复数表达式的实部。&lt;/p&gt;
+
+&lt;p&gt;对于傅里叶级数，也可以把它当成一个复数，再利用刚刚推导出来的\(c_{-k} = \overline {c_{k}} \)，就有：&lt;/p&gt;
+
+&lt;p&gt;\[ c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} = c_{k}e^{2\pi ikt} + c_{-k}e^{-2\pi ikt}\]
+\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}}e^{\overline {2\pi ikt}} \]
+\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}e^{2\pi ikt}} \]
+\[ = 2Re\{ c_{k}e^{2\pi ikt} \} \]&lt;/p&gt;
+
+&lt;p&gt;这个结果表明，\(c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} \)是一个实数。把这个结论代入到傅里叶级数，就可以得到：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]
+\[ = \sum_{k=0}^{n}2Re\{ c_{k}e^{2\pi ikt} \} \]
+\[ = 2Re\{ \sum_{k=0}^{n}c_{k}e^{2\pi ikt} \} \]&lt;/p&gt;
+
+&lt;p&gt;注意，这个式子是把0和-0都算进去的。如果不允许signed zero，就要对k=0的情况特殊处理。&lt;/p&gt;
+
+&lt;h3&gt;求解\(c_{k}\)的积分形式&lt;/h3&gt;
+
+&lt;p&gt;回到前面的那个傅里叶级数f(t)：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;其实是这样子搞出来的：
+先假设傅里叶的&lt;strong&gt;常用形式2&lt;/strong&gt;可以变换成这个等式，然后求\(c_{k}\)，求得出来的话，式子不就成立了嘛。&lt;/p&gt;
+
+&lt;p&gt;为了搞定这个事情，要使用新的招数：积分。&lt;/p&gt;
+
+&lt;p&gt;( 在教授的notes(&lt;a href=&quot;https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf&quot;&gt;https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf&lt;/a&gt;]的第10-12页第1.5小节Lost at c，清楚地推导了一遍\(c_{k}\)。 )&lt;/p&gt;
+
+&lt;p&gt;这里我按自己对原文的理解，翻译下。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;上面这个式子是说，我们随便取了一个k，并对傅里叶级数等式两边乘以\( e^{-2\pi ikt } \)，又因为:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{-2\pi ikt }c_{k}e^{2\pi ikt } =c_{k}e^{-2\pi ikt + 2\pi ikt } = c_{k}e^{0} = c_{k} \]&lt;/p&gt;
+
+&lt;p&gt;所以可以把\(c_{k}\)移到等式左边，左边的那个东东移到右边，就得到了一个\(c_{k}\)的表达式:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/6.png&quot; alt=&quot;6.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;然后再放大招：对等式两边同时积分，范围是0到1（f(t)的t的周期为1）。&lt;/p&gt;
+
+&lt;p&gt;积分的时候，会发现有这么个神奇的结果:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;也就是红圈里的那个东东的积分结果是0：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/8.jpg&quot; alt=&quot;8.jpg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;于是，积分等式就只剩下：&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{0}^{1}c_{k}dt = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+
+&lt;p&gt;\[ (1-0)c_{k} = c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+
+&lt;p&gt;这就是\(c_{k}\)的积分形式。&lt;/p&gt;
+
+&lt;p&gt;做一个总结：&lt;/p&gt;
+
+&lt;p&gt;如果对于一个已知的周期为1的周期函数f(t)，它可以写成这样的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;那么其中的\(c_{k}\)必然满足：&lt;/p&gt;
+
+&lt;p&gt;\[ c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+
+&lt;h3&gt;求解\(c_{k}\)的非积分形式&lt;/h3&gt;
+
+&lt;p&gt;再换个思路，由这3个公式:&lt;/p&gt;
+
+&lt;p&gt;\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{N}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
+
+&lt;p&gt;\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]&lt;/p&gt;
+
+&lt;p&gt;得:&lt;/p&gt;
+
+&lt;p&gt;\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{N}(a_{k}\frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} + b_{k}\frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2}) \]
+\[  = \frac {A_{0}}{2} + \sum_{k=1}^{N}(\frac {b_{k} - ia_{k}}{2}e^{i2\pi kt} + \frac {b_{k} + ia_{k}}{2}e^{-i2\pi  kt})  \]&lt;/p&gt;
+
+&lt;p&gt;设:&lt;/p&gt;
+
+&lt;p&gt;\[ c_{0} = \frac {1}{2}A_{0} \]
+\[ c_{k} = \frac {1}{2}(b_{k} - ia_{k}) \]
+\[ c_{-k} = \frac {1}{2}(b_{k} + ia_{k}) \]&lt;/p&gt;
+
+&lt;p&gt;（注意，\( c_{-k} = \overline {c_{k}} \)哦，证明前面小节的推导是对的。）&lt;/p&gt;
+
+&lt;p&gt;则:&lt;/p&gt;
+
+&lt;p&gt;\[ S = c_{0} + \sum_{k=1}^{N}(c_{k}e^{i2\pi kt} + c_{-k}e^{-i2\pi  kt})  \]&lt;/p&gt;
+
+&lt;h3&gt;大跃进，终极的傅里叶级数的复指数形式&lt;/h3&gt;
+
+&lt;p&gt;终极的傅里叶级数的复指数形式是：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = C_{0} + \sum_{k=-\infty }^{\infty }C_{k}e^{ikt} \]&lt;/p&gt;
+
+&lt;p&gt;\[ C_{k} = \frac {1}{2\pi }\int _{-\pi }^{\pi }f(t)e^{-ikt}dt \]&lt;/p&gt;
+</description>
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/fourier-equation/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/fourier-equation/</guid>
