@@ -20,7 +20,9 @@
 
 &lt;!--more--&gt;
 
-&lt;h2&gt;傅里叶级数&lt;/h2&gt;
+&lt;h2&gt;傅里叶级数 fourier series&lt;/h2&gt;
+
+&lt;h3&gt;基础&lt;/h3&gt;
 
 &lt;p&gt;翻译一下wiki的fourier series：&lt;/p&gt;
 
@@ -239,11 +241,24 @@
 
 &lt;h3&gt;大跃进，终极的傅里叶级数的复指数形式&lt;/h3&gt;
 
-&lt;p&gt;终极的傅里叶级数的复指数形式是(fourier series exponential form)：&lt;/p&gt;
+&lt;p&gt;终极的傅里叶级数的复指数形式是(fourier series exponential form  )：&lt;/p&gt;
 
-&lt;p&gt;\[ f(t) = c_{0} + \sum_{k=-\infty }^{\infty }c_{k}e^{ik\omega t} \]&lt;/p&gt;
+&lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }c_{k}e^{2\pi ikt} \]&lt;/p&gt;
 
-&lt;p&gt;\[ c_{k} = \frac {T}{1}\int _{-\frac {2}{T} }^{\frac {2}{T} }f(t)e^{-ik\omega t}dt \]&lt;/p&gt;
+&lt;p&gt;前面的傅里叶级数是finite的，这个是infinite的。&lt;/p&gt;
+
+&lt;p&gt;其中的\(c_{k}\)有一个专门的notation：\( \hat {f}(t) \)，代入后得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat {f}(t) = \int _{-\frac {1}{2} }^{\frac {1}{2} }f(t)e^{-2\pi ikt}dt \]&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }\hat {f}(t)e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;h2&gt;傅里叶变换 fourier transform&lt;/h2&gt;
+
+&lt;h3&gt;傅里叶积分定理 fourier integrate&lt;/h3&gt;
+
+&lt;p&gt;若函数f(t)在\(-\infty ,+\infty \)上的任一有限区间内满足Dirichlet条件，并且在\(-\infty ,+\infty \)上绝对可积（即积分\( \int _{-\infty }^{+\infty }|f(t)|dt\)收敛)，则有：
+\[ \frac {1}{2\pi }\int _{-\infty }^{+\infty }\left [ \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt\right ]e^{i\omega t}d\omega =  \begin {cases} f(t), 当t为f(t)的连续点; \\  \frac {f(t+0)+f(t-0)}{2},当t为f(t)的间断点。 \end {cases} \]&lt;/p&gt;
 </description>
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/fourier-equation/</link>
