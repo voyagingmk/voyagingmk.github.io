@@ -259,7 +259,7 @@
 
 &lt;h3&gt;傅里叶积分定理 fourier integrate&lt;/h3&gt;
 
-&lt;p&gt;若函数f(t)在\(-\infty ,+\infty \)上的任一有限区间内满足Dirichlet条件，并且在\(-\infty ,+\infty \)上绝对可积（即积分\( \int _{-\infty }^{+\infty }|f(t)|dt\)收敛)，则有：
+&lt;p&gt;若函数f(t)在\(-\infty ,+\infty \)上的任一有限区间内满足Dirichlet条件，并且在\( (-\infty ,+\infty) \)上绝对可积（即积分\( \int _{-\infty }^{+\infty }|f(t)|dt\)收敛)，则有：
 \[ \frac {1}{2\pi }\int _{-\infty }^{+\infty }\left [ \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt\right ]e^{i\omega t}d\omega =  \begin {cases} f(t), 当t为f(t)的连续点; \\  \frac {f(t+0)+f(t-0)}{2},当t为f(t)的间断点。 \end {cases} \]&lt;/p&gt;
 
 &lt;p&gt;令:&lt;/p&gt;
@@ -304,11 +304,23 @@
 
 &lt;h4&gt;位移性质&lt;/h4&gt;
 
-&lt;p&gt;设\( \mathcal {F}[f(t)] = F(\omega )\)，则:&lt;/p&gt;
+&lt;p&gt;设\( \mathcal {F}[f(t)] = F(\omega )\)，\( f(t) = \mathcal {F}^{-1}[ F(\omega ) ] \)，则:&lt;/p&gt;
 
 &lt;p&gt;\[ \mathcal {F}[f(t\pm t_{0})] = e^{\pm i\omega t_{0}}F(\omega )\]&lt;/p&gt;
 
-&lt;p&gt;其中\( t_{0} \)为常数。&lt;/p&gt;
+&lt;p&gt;\[ \mathcal {F}^{-1}[F(\omega )\mp F_{0}(\omega )] = e^{\pm i\omega _{0}t}f(t) \]&lt;/p&gt;
+
+&lt;p&gt;其中\( t_{0},\omega _{0} \)为常数。&lt;/p&gt;
+
+&lt;h4&gt;微分性质&lt;/h4&gt;
+
+&lt;p&gt;若f(t)在\( (-\infty ,+\infty) \)内连续或只有有限个可去间断点，且：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathcal {F}[f(t)] = F(\omega )\]&lt;/p&gt;
+
+&lt;p&gt;则：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathcal {F}[f&amp;#39;(t)] = i\omega F(\omega )\]&lt;/p&gt;
 </description>
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/fourier-equation/</link>
