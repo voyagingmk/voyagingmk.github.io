@@ -334,7 +334,11 @@
 
 &lt;h4&gt;积分性质&lt;/h4&gt;
 
-&lt;p&gt;设\( g(t) = \int _{-\infty }^{t}f(t)dt\)，若\( \lim _{t\to +\infty }g(t) = 0 \)，则:&lt;/p&gt;
+&lt;p&gt;设\( g(t) = \int _{-\infty }^{t}f(t)dt\)，若：&lt;/p&gt;
+
+&lt;p&gt;\[ \lim _{t\to +\infty }g(t) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;则:&lt;/p&gt;
 
 &lt;p&gt;\[ \mathcal {F}[g(t)]=\frac {1}{i\omega }\mathcal {F}[f(t)] \]&lt;/p&gt;
 

@@ -411,7 +411,7 @@ https://www.youtube.com/watch?v=gZNm7L96pfY
 
 <p>若f(t)在\( (-\infty ,+\infty) \)内连续或只有有限个可去间断点，且：</p>
 
-<p>\[ \lim_{|t|\to +\infty }f(t) = 0 \]</p>
+<p>\[ \lim _{|t|\to +\infty }f(t) = 0 \]</p>
 
 <p>\[ \mathcal {F}[f(t)] = F(\omega )\]</p>
 
@@ -426,6 +426,26 @@ https://www.youtube.com/watch?v=gZNm7L96pfY
 <p>\[ \frac {d}{d\omega }F(\omega ) = -i\mathcal {F}[tf(t)] \]</p>
 
 <h4>积分性质</h4>
+
+<p>设\( g(t) = \int _{-\infty }^{t}f(t)dt\)，若：</p>
+
+<p>\[ \lim _{t\to +\infty }g(t) = 0 \]</p>
+
+<p>则:</p>
+
+<p>\[ \mathcal {F}[g(t)]=\frac {1}{i\omega }\mathcal {F}[f(t)] \]</p>
+
+<h4>对称性质</h4>
+
+<p>若\( F(\omega ) = \mathcal {F}[f(t)] \)，则：</p>
+
+<p>\[ \mathcal {F}[F(t)] = 2\pi f(-\omega ) \]</p>
+
+<h4>相似性质</h4>
+
+<p>设\( F(\omega ) = \mathcal {F}[f(t)] \)，a为非零常数，则：</p>
+
+<p>\[  \mathcal {F}[f(at)] = \frac {1}{|a|}F(\frac {\omega }{a}) \]</p>
 
   </div>
 
