@@ -1,0 +1,2089 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Wyman的技术博客</title>
+    <description>伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</description>
+    <link>http://www.qiujiawei.com</link>
+    <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>学习傅里叶变换</title>
+        <description>&lt;p&gt;本文主要写的是公式层面的推导，关于傅里叶变换的应用，请到知乎搜索&amp;#39;傅里叶&amp;#39;，能找到很多不错的文章。&lt;/p&gt;
+
+&lt;p&gt;本文主要参考了斯坦福大学Brad Osgood的公开课:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://open.163.com/special/opencourse/fouriertransforms.html&quot;&gt;http://open.163.com/special/opencourse/fouriertransforms.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;youtube的比较高清:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=gZNm7L96pfY&quot;&gt;https://www.youtube.com/watch?v=gZNm7L96pfY&lt;/a&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;傅里叶级数 fourier series&lt;/h2&gt;
+
+&lt;h3&gt;基础&lt;/h3&gt;
+
+&lt;p&gt;翻译一下wiki的fourier series：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;在数学中，傅里叶级数是一个&lt;strong&gt;可以把(有波形的)函数表示成多个简单的sin函数的叠加&lt;/strong&gt;的方法。更形式地说，傅里叶级数能够把任意周期函数(信号)分解成&lt;strong&gt;有限(或无限)个简单的震荡函数的叠加&lt;/strong&gt;，这些震荡函数可以是正弦函数、余弦函数或复指数。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;傅里叶级数的公式定义（不要问为什么长这样，这只是一个定义，不是推出来的公式)：&lt;/p&gt;
+
+&lt;p&gt;\[ S = \sum_{k=1}^{n}A_{k}\sin (2\pi kt+\phi _{k}) \]&lt;/p&gt;
+
+&lt;p&gt;(如果不清楚什么是级数，请戳 &lt;a href=&quot;https://en.wikipedia.org/wiki/Series_(mathematics)&quot;&gt;https://en.wikipedia.org/wiki/Series_(mathematics)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;使用三角函数的一道公式:&lt;/p&gt;
+
+&lt;p&gt;\[ \sin (\alpha + \beta ) = \sin \alpha \cos \beta + \cos \alpha \sin \beta \]&lt;/p&gt;
+
+&lt;p&gt;代入到傅里叶级数，得：&lt;/p&gt;
+
+&lt;p&gt;\[ \sin (2\pi kt + \phi _{k}) =\sin 2\pi kt \cos \phi _{k} + \cos 2\pi kt \sin \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;\[ S = \sum_{k=1}^{n}A_{k}\sin 2\pi kt \cos \phi _{k} + \sum_{k=1}^{n}A_{k}\cos 2\pi kt \sin \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;再设:&lt;/p&gt;
+
+&lt;p&gt;\[ a_{k} = A_{k}\cos \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;\[ b_{k} = A_{k}\sin \phi _{k} \]&lt;/p&gt;
+
+&lt;p&gt;则上面的傅里叶级数被简化成:&lt;/p&gt;
+
+&lt;p&gt;\[ S = \sum_{k=1}^{n}a_{k}\sin 2\pi kt + \sum_{k=1}^{n}b_{k}\cos 2\pi kt \]
+\[  S(x) = \sum_{k=1}^{n}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
+
+&lt;p&gt;这是傅里叶级数的常用形式1。&lt;/p&gt;
+
+&lt;p&gt;常用形式2是这样的：&lt;/p&gt;
+
+&lt;p&gt;\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{n}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
+
+&lt;p&gt;前面多出来的那个东西，不复杂，先不管它。&lt;/p&gt;
+
+&lt;p&gt;常用形式3，是最重要的：用复指数来表示傅里叶级数。怎么实现？其实就是用了&lt;strong&gt;欧拉公式&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
+
+&lt;p&gt;（关于欧拉公式的推导，可以看我的另一篇文章:&lt;a href=&quot;http://www.qiujiawei.com/complex-1&quot;&gt;复数和三角函数&lt;/a&gt; )&lt;/p&gt;
+
+&lt;p&gt;把 \( x = 2\pi kt \)代入到欧拉公式，得到:&lt;/p&gt;
+
+&lt;p&gt;\[   e^{i2\pi kt} = \cos 2\pi kt + i\sin 2\pi kt\]&lt;/p&gt;
+
+&lt;p&gt;再搬出另外两条欧拉公式的推论:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]&lt;/p&gt;
+
+&lt;p&gt;也把 \( x = 2\pi kt \)代入，得到:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]&lt;/p&gt;
+
+&lt;p&gt;这时候，教授突然说，傅里叶级数可以写成:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;这个式子确实是常用形式3——复指数表示的傅里叶级数。
+但是，这究竟是怎么得到的呢。&lt;/p&gt;
+
+&lt;p&gt;请耐心看下文。&lt;/p&gt;
+
+&lt;h3&gt;复指数形式的傅里叶级数的\(c_{k}\)的性质&lt;/h3&gt;
+
+&lt;p&gt;对于傅里叶级数f(t)，假设它是一个&amp;quot;实信号(real signal)&amp;quot;（一般来说，傅里叶变换处理的目标都是实信号)，
+那么就有等式:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \overline {f(t)} \]&lt;/p&gt;
+
+&lt;p&gt;即是说，f(t)没有虚部。而又因为：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \overline {\sum_{k=-n}^{n}c_{k}e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}\overline {e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}e^{-2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;然后，要注意一个事实是：这个级数是从-n到n的累加，根据加法交换律，这个级数也可以变成从n到-n的累加，也即:&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{k=-n}^{n} = \sum_{k=n}^{-n}  \]&lt;/p&gt;
+
+&lt;p&gt;于是，把傅里叶级数的k变成-k，就有:&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \sum_{-k=-n}^{n}c_{-k}e^{-2\pi ikt} = \sum_{k=n}^{-n}c_{-k}e^{-2\pi ikt} = \sum_{k=-n}^{n}c_{-k}e^{-2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;再对比上面的推导，就会发现：&lt;/p&gt;
+
+&lt;p&gt;\[ c_{-k} = \overline {c_{k}} \]&lt;/p&gt;
+
+&lt;p&gt;先记住这个性质，然后继续往下看。&lt;/p&gt;
+
+&lt;p&gt;设有复数z，它必然会满足一个性质：&lt;/p&gt;
+
+&lt;p&gt;\[ z + \overline {z} = 2Re\{ z \} \]&lt;/p&gt;
+
+&lt;p&gt;Re{···}代表取出花括号的复数表达式的实部。&lt;/p&gt;
+
+&lt;p&gt;对于傅里叶级数，也可以把它当成一个复数，再利用刚刚推导出来的\(c_{-k} = \overline {c_{k}} \)，就有：&lt;/p&gt;
+
+&lt;p&gt;\[ c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} = c_{k}e^{2\pi ikt} + c_{-k}e^{-2\pi ikt}\]
+\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}}e^{\overline {2\pi ikt}} \]
+\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}e^{2\pi ikt}} \]
+\[ = 2Re\{ c_{k}e^{2\pi ikt} \} \]&lt;/p&gt;
+
+&lt;p&gt;这个结果表明，\(c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} \)是一个实数。把这个结论代入到傅里叶级数，就可以得到：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]
+\[ = \sum_{k=0}^{n}2Re\{ c_{k}e^{2\pi ikt} \} \]
+\[ = 2Re\{ \sum_{k=0}^{n}c_{k}e^{2\pi ikt} \} \]&lt;/p&gt;
+
+&lt;p&gt;注意，这个式子是把0和-0都算进去的。如果不允许signed zero，就要对k=0的情况特殊处理。&lt;/p&gt;
+
+&lt;h3&gt;求解\(c_{k}\)的积分形式&lt;/h3&gt;
+
+&lt;p&gt;回到前面的那个傅里叶级数f(t)：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;其实是这样子搞出来的：
+先假设傅里叶的&lt;strong&gt;常用形式2&lt;/strong&gt;可以变换成这个等式，然后求\(c_{k}\)，求得出来的话，式子不就成立了嘛。&lt;/p&gt;
+
+&lt;p&gt;为了搞定这个事情，要使用新的招数：积分。&lt;/p&gt;
+
+&lt;p&gt;( 在教授的notes(&lt;a href=&quot;https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf&quot;&gt;https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf&lt;/a&gt;]的第10-12页第1.5小节Lost at c，清楚地推导了一遍\(c_{k}\)。 )&lt;/p&gt;
+
+&lt;p&gt;这里我按自己对原文的理解，翻译下。&lt;/p&gt;
+
+&lt;p&gt;我们先随便取了一个k(k在-n到n之间)，然后，对上面的傅里叶级数等式两边同时乘以\( e^{-2\pi ikt } \)：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{-2\pi ikt }f(t) = e^{-2\pi ikt }\sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;把右边的式子展开，得到:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{-2\pi ikt }f(t) = \cdots + e^{-2\pi ikt }c_{k}e^{2\pi ikt} + \cdots \]
+\[ = \cdots + c_{k}e^{-2\pi ikt}e^{2\pi ikt } + \cdots \]
+\[ = \cdots + c_{k}e^{-2\pi ikt + 2\pi ikt } + \cdots \]
+\[ = \cdots + c_{k} + \cdots \]&lt;/p&gt;
+
+&lt;p&gt;这时候，可以把\(c_{k}\)移到等式左边，左边的那个东东移到右边，就得到了一个\(c_{k}\)的表达式:&lt;/p&gt;
+
+&lt;p&gt;\[ c_{k}  = e^{-2\pi ikt }f(t) - \sum_{k&amp;#39;=-n\,k&amp;#39;\neq k}^{n}c_{k&amp;#39;}e^{2\pi ik&amp;#39;t}e^{-2\pi ikt } \]
+\[ e^{-2\pi ikt }f(t) - \sum_{k&amp;#39;=-n\,k&amp;#39;\neq k}^{n}c_{k&amp;#39;}e^{2\pi i(k&amp;#39;-k)t} \]&lt;/p&gt;
+
+&lt;p&gt;然后再放大招：对等式两边同时积分，范围是0到1（f(t)的t的周期为1）。&lt;/p&gt;
+
+&lt;p&gt;积分的时候，会发现有这么个神奇的等式:&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{0}^{1}e^{2\pi i(k&amp;#39;-k)t}dt = \left  [ \frac {2\pi i(k&amp;#39;-k)}{1}e^{2\pi i(k&amp;#39;-k)t}\right ]_{0}^{1} \]
+\[ = \frac {2\pi i(k&amp;#39;-k)}{1}(e^{2\pi i(k&amp;#39;-k)} - e^{0})\]
+\[ = \frac {2\pi i(k&amp;#39;-k)}{1}(1-1) = 0\]&lt;/p&gt;
+
+&lt;p&gt;最后那个1-1=0的前面那个1，其实用上欧拉公式就懂了，&lt;strong&gt;\( 2\pi i(k&amp;#39;-k) \)&lt;/strong&gt;，代表\(\phi =2\pi (k&amp;#39;-k)\) ,又因为k&amp;#39;-k必然是整数，所以\(\phi \)代表了复数平面的坐标(1,0)，所以整个式子就等于1。&lt;/p&gt;
+
+&lt;p&gt;于是，积分等式就只剩下：&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{0}^{1}c_{k}dt = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+
+&lt;p&gt;\[ (1-0)c_{k} = c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+
+&lt;p&gt;这就是\(c_{k}\)的积分形式。&lt;/p&gt;
+
+&lt;p&gt;做一个小结：&lt;/p&gt;
+
+&lt;p&gt;如果对于一个已知的周期为1的周期函数f(t)，它可以写成这样的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;那么其中的\(c_{k}\)必然满足：&lt;/p&gt;
+
+&lt;p&gt;\[ c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+
+&lt;h3&gt;求解\(c_{k}\)的非积分形式&lt;/h3&gt;
+
+&lt;p&gt;回到傅里叶级数的常用形式2:&lt;/p&gt;
+
+&lt;p&gt;\[  f(t) = \frac {A_{0}}{2} + \sum_{k=1}^{n}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
+
+&lt;p&gt;代入下面这2个式子:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]&lt;/p&gt;
+
+&lt;p&gt;得:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \frac {A_{0}}{2} + \sum_{k=1}^{n}(a_{k}\frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} + b_{k}\frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2}) \]
+\[  = \frac {A_{0}}{2} + \sum_{k=1}^{n}(\frac {b_{k} - ia_{k}}{2}e^{i2\pi kt} + \frac {b_{k} + ia_{k}}{2}e^{-i2\pi  kt})  \]&lt;/p&gt;
+
+&lt;p&gt;设:&lt;/p&gt;
+
+&lt;p&gt;\[ c_{0} = \frac {1}{2}A_{0} \]
+\[ c_{k} = \frac {1}{2}(b_{k} - ia_{k}) \]
+\[ c_{-k} = \overline {c_{k}} = \frac {1}{2}(b_{k} + ia_{k}) \]&lt;/p&gt;
+
+&lt;p&gt;（注意，第三个式子是利用了前面的结论 ）&lt;/p&gt;
+
+&lt;p&gt;则:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = c_{0} + \sum_{k=1}^{n}(c_{k}e^{i2\pi kt} + c_{-k}e^{-i2\pi  kt}) \]
+\[ = c_{0} + \sum_{k=1}^{n}c_{k}e^{i2\pi kt} + \sum_{k=1}^{n}c_{-k}e^{-i2\pi  kt} \]
+\[ = c_{0} + \sum_{k=1}^{n}c_{k}e^{i2\pi kt} + \sum_{k=-1}^{-n}c_{k}e^{i2\pi  kt} \]
+\[ = c_{0} +  \sum_{k=-n,k\neq 0}^{n}c_{k}e^{i2\pi kt}   \]&lt;/p&gt;
+
+&lt;p&gt;和那个常用形式3非常接近了，只需要把\(c_{0}\)也合并到级数里即可。但，这需要有一个前提：\( c_{0} = \frac {1}{2}A_{0} \)和k=0时的f(t)的\( c_{0} \)相等，而这是不一定的。&lt;/p&gt;
+
+&lt;p&gt;傅里叶级数是很不错的东西，但是实际应用时，要考虑很多细节，不是随便用就可以的。&lt;/p&gt;
+
+&lt;h3&gt;大跃进，终极的傅里叶级数的复指数形式&lt;/h3&gt;
+
+&lt;p&gt;终极的傅里叶级数的复指数形式是(fourier series exponential form  )：&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }c_{k}e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;p&gt;前面的傅里叶级数是finite的，这个是infinite的。&lt;/p&gt;
+
+&lt;p&gt;其中的\(c_{k}\)有一个专门的notation：\( \hat {f}(t) \)，代入后得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat {f}(t) = \int _{-\frac {1}{2} }^{\frac {1}{2} }f(t)e^{-2\pi ikt}dt \]&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }\hat {f}(t)e^{2\pi ikt} \]&lt;/p&gt;
+
+&lt;h2&gt;傅里叶变换 fourier transform&lt;/h2&gt;
+
+&lt;p&gt;(以下内容摘选自《复变函数与积分变换(华东理工大学出版社)》，有删改)&lt;/p&gt;
+
+&lt;h3&gt;傅里叶积分定理 fourier integrate&lt;/h3&gt;
+
+&lt;p&gt;若函数f(t)在\(-\infty ,+\infty \)上的任一有限区间内满足Dirichlet条件，并且在\(-\infty ,+\infty \)上绝对可积（即积分\( \int _{-\infty }^{+\infty }|f(t)|dt\)收敛)，则有：
+\[ \frac {1}{2\pi }\int _{-\infty }^{+\infty }\left [ \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt\right ]e^{i\omega t}d\omega =  \begin {cases} f(t), 当t为f(t)的连续点; \\  \frac {f(t+0)+f(t-0)}{2},当t为f(t)的间断点。 \end {cases} \]&lt;/p&gt;
+
+&lt;p&gt;令:&lt;/p&gt;
+
+&lt;p&gt;\[ F(\omega ) = \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt \]&lt;/p&gt;
+
+&lt;p&gt;则:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \frac {1}{2\pi }\int _{-\infty }^{+\infty }F(\omega )e^{i\omega t}d\omega \]&lt;/p&gt;
+
+&lt;p&gt;上两式子表明\( F(\omega ) 和 f(t) \)通过指定的积分运算可以相互表示。&lt;/p&gt;
+
+&lt;p&gt;第一个式子称为f(t)的&lt;strong&gt;傅里叶变换&lt;/strong&gt;，记为:&lt;/p&gt;
+
+&lt;p&gt;\[ F(\omega ) = \mathcal {F}[f(t)] \]&lt;/p&gt;
+
+&lt;p&gt;函数为\(F(\omega ) \)称为f(t)的&lt;strong&gt;像函数&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;第二个式子称为\(F(\omega ) \)的&lt;strong&gt;逆傅里叶变换&lt;/strong&gt;，记为:&lt;/p&gt;
+
+&lt;p&gt;\[ f(t) = \mathcal {F}^{-1}[ F(\omega ) ] \]&lt;/p&gt;
+
+&lt;p&gt;函数f(t)称为为\(F(\omega ) \)的&lt;strong&gt;像原函数&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3&gt;傅里叶变换的性质&lt;/h3&gt;
+
+&lt;h4&gt;线性性质&lt;/h4&gt;
+
+&lt;p&gt;设：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( \mathcal {F}[f_{1}(t)] = F_{1}(\omega )\)&lt;/li&gt;
+&lt;li&gt;\( \mathcal {F}[f_{2}(t)] = F_{2}(\omega )\)&lt;/li&gt;
+&lt;li&gt;\( \alpha \beta \)为常数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;则:&lt;/p&gt;
+
+&lt;p&gt;\[ \mathcal {F}[\alpha f_{1}(t) + \beta f_{2}(t)] = \alpha F_{1}(\omega ) + \beta F_{2}(\omega ) \]&lt;/p&gt;
+
+&lt;p&gt;\[ \mathcal {F}^{-1}[\alpha F_{1}(\omega ) + \beta F_{2}(\omega )] = \alpha f_{1}(t) + \beta f_{2}(t) \]&lt;/p&gt;
+
+&lt;h4&gt;位移性质&lt;/h4&gt;
+
+&lt;p&gt;设\( \mathcal {F}[f(t)] = F(\omega )\)，则:&lt;/p&gt;
+
+&lt;p&gt;\[ \mathcal {F}[f(t\pm t_{0})] = e^{\pm i\omega t_{0}}F(\omega )\]&lt;/p&gt;
+
+&lt;p&gt;其中\( t_{0} \)为常数。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/fourier-equation/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/fourier-equation/</guid>
+      </item>
+    
+      <item>
+        <title>复数和三角函数</title>
+        <description>&lt;h2&gt;欧拉公式&lt;/h2&gt;
+
+&lt;p&gt;复数和三角函数有密切的联系，因为大神欧拉发现了这样的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(图片来自
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Euler%27s_formula&quot;&gt;wikipedia-Euler-formula&lt;/a&gt;)&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;怎么推导出欧拉公式?&lt;/h2&gt;
+
+&lt;p&gt;设z是复数平面的一个复数，且用三角函数来表示它的实数和虚数：&lt;/p&gt;
+
+&lt;p&gt;\[ z = \cos \theta + i\sin \theta \]&lt;/p&gt;
+
+&lt;p&gt;两边算微分:&lt;/p&gt;
+
+&lt;p&gt;\[ dz = (-\sin \theta + i\cos \theta)d\theta \]&lt;/p&gt;
+
+&lt;p&gt;提取i:&lt;/p&gt;
+
+&lt;p&gt;\[ dz = i( \cos \theta + i\sin \theta )d\theta \]&lt;/p&gt;
+
+&lt;p&gt;注意看，括号内的东西，不就是z嘛，所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ dz = izd\theta \]&lt;/p&gt;
+
+&lt;p&gt;换个写法:&lt;/p&gt;
+
+&lt;p&gt;\[ \frac {1}{z}dz = id\theta \]&lt;/p&gt;
+
+&lt;p&gt;两边求积分:&lt;/p&gt;
+
+&lt;p&gt;\[ \int_{}^{} \frac {1}{z}dz = \int_{}^{} id\theta \]&lt;/p&gt;
+
+&lt;p&gt;\[ \ln z = i\theta \]&lt;/p&gt;
+
+&lt;p&gt;注意，右边的积分，是把i当做常数看待的，所以i直接被提取出来。&lt;/p&gt;
+
+&lt;p&gt;再写出这个式子的指数形式:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{\ln z} = e^{i\theta } \]&lt;/p&gt;
+
+&lt;p&gt;\[ z = e^{i\theta } = \cos \theta + i\sin \theta \]&lt;/p&gt;
+
+&lt;p&gt;推导完毕。&lt;/p&gt;
+
+&lt;h2&gt;欧拉公式的延伸特性&lt;/h2&gt;
+
+&lt;p&gt;由:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
+
+&lt;p&gt;得到:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{-ix} = \cos (-x) + i\sin (-x) = \cos x - i\sin x \]&lt;/p&gt;
+
+&lt;p&gt;上面两个等式相加:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} + e^{-ix} = (\cos x + i\sin x) + (\cos x - i\sin x) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 2\cos x \]&lt;/p&gt;
+
+&lt;p&gt;所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]&lt;/p&gt;
+
+&lt;p&gt;同样的，把上面2个等式相减:&lt;/p&gt;
+
+&lt;p&gt;\[ e^{ix} - e^{-ix} = (\cos x + i\sin x) - (\cos x - i\sin x) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 2i\sin x \]&lt;/p&gt;
+
+&lt;p&gt;所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]&lt;/p&gt;
+</description>
+        <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/complex-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/complex-1/</guid>
+      </item>
+    
+      <item>
+        <title>PBRT《章3》阅读笔记</title>
+        <description>&lt;p&gt;第三章介绍各种特殊几何体。&lt;/p&gt;
+
+&lt;h3&gt;Ray与Sphere的相交判断&lt;/h3&gt;
+</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/pbrt-chapter3/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/pbrt-chapter3/</guid>
+      </item>
+    
+      <item>
+        <title>线性代数之TRS分解</title>
+        <description>&lt;h3&gt;pbrt的TRS分解&lt;/h3&gt;
+
+&lt;p&gt;设矩阵A，假设A可以分解成T、R、S，则有A=TRS，设A:&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;A_{13}&amp;amp;A_{14}\\ A_{21}&amp;amp;A_{22}&amp;amp;A_{23}&amp;amp;A_{24}\\ A_{31}&amp;amp;A_{32}&amp;amp;A_{33}&amp;amp;A_{34}\\ A_{41}&amp;amp;A_{42}&amp;amp;A_{43}&amp;amp;A_{44}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;再设T、R、S分别为：&lt;/p&gt;
+
+&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;t_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;t_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ R =  \left[ \begin{matrix} r_{11}&amp;amp;r_{12}&amp;amp;r_{13}&amp;amp;0\\ r_{21}&amp;amp;r_{22}&amp;amp;r_{23}&amp;amp;0\\ r_{31}&amp;amp;r_{32}&amp;amp;r_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ S =  \left[ \begin{matrix} s_{x}&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;s_{y}&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;t_{y}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;所以TRS等于：&lt;/p&gt;
+
+&lt;p&gt;\[ A = TRS =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;t_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;t_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} r_{11}&amp;amp;r_{12}&amp;amp;r_{13}&amp;amp;0\\ r_{21}&amp;amp;r_{22}&amp;amp;r_{23}&amp;amp;0\\ r_{31}&amp;amp;r_{32}&amp;amp;r_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} s_{x}&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;s_{y}&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;t_{y}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]\]
+\[ =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;t_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;t_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} r_{11}s_{x}&amp;amp;r_{12}s_{y}&amp;amp;r_{13}s_{z}&amp;amp;0\\ r_{21}s_{x}&amp;amp;r_{22}s_{y}&amp;amp;r_{23}s_{z}&amp;amp;0\\ r_{31}s_{x}&amp;amp;r_{32}s_{y}&amp;amp;r_{33}s_{z}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]\]
+\[  =  \left[ \begin{matrix} r_{11}s_{x}&amp;amp;r_{12}s_{y}&amp;amp;r_{13}s_{z}&amp;amp;t_{x}\\ r_{21}s_{x}&amp;amp;r_{22}s_{y}&amp;amp;r_{23}s_{z}&amp;amp;t_{y}\\ r_{31}s_{x}&amp;amp;r_{32}s_{y}&amp;amp;r_{33}s_{z}&amp;amp;t_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;从TRS矩阵可以看出：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A矩阵的最后一行为[0,0,0,1]&lt;/li&gt;
+&lt;li&gt;A的最后一列是T的最后一列&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以T是最好求的：&lt;/p&gt;
+
+&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;A_{14}\\ 0&amp;amp;1&amp;amp;0&amp;amp;A_{24}\\ 0&amp;amp;0&amp;amp;1&amp;amp;A_{34}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;同时，我们也可以快速知道RS矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ RS =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;A_{13}&amp;amp;0\\ A_{21}&amp;amp;A_{22}&amp;amp;A_{23}&amp;amp;0\\ A_{31}&amp;amp;A_{32}&amp;amp;A_{33}&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;问题就简化成：如果让RS分解成R和S。&lt;/p&gt;
+
+&lt;p&gt;pbrt的解法比较神奇，称为polar decomposition(极分解?)。&lt;/p&gt;
+
+&lt;p&gt;(这算法似乎是用来求矩阵的平方根的，但是为什么可以用在这里，我没搞明白，也没找到证明过程。有知道的朋友麻烦告知一下哈)&lt;/p&gt;
+
+&lt;p&gt;pbrt给了一个公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ M_{i+1} = \frac {1}{2}(M_{i} + (M_{i}^{T})^{-1}) \]&lt;/p&gt;
+
+&lt;p&gt;把M = RS代入这个公式，迭代多次后，M的值会收敛，得到的最终的M就是R。&lt;/p&gt;
+
+&lt;p&gt;然后S就等于\(S = (RS)R^{-1} \)。&lt;/p&gt;
+
+&lt;p&gt;因为R是一个转换矩阵，意味着经过S转换后的点，还是处于原来的空间，只是坐标变换了。那么R必然是一个正交矩阵(列向量之间线性无关)，所以有\(R^{T}=R^{-1}\)。
+将这个式子代入上面的公式，可以发现:&lt;/p&gt;
+
+&lt;p&gt;\[ R_{i+1} = \frac {1}{2}(R_{i} + (R_{i}^{T})^{-1}) \]
+\[ = \frac {1}{2}(R_{i} + (R_{i}^{-1})^{-1}) \]
+\[ = \frac {1}{2}(R_{i} + R_{i}) \]
+\[ = \frac {1}{2}2R_{i}  = R_{i} \]&lt;/p&gt;
+
+&lt;p&gt;即是说，对于一个纯粹的旋转矩阵R，将R和R的转置的逆矩阵求平均，依然还是R。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-8/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-8/</guid>
+      </item>
+    
+      <item>
+        <title>线性代数之各种各样的矩阵</title>
+        <description>&lt;p&gt;矩阵家族成员非常多，本文主要记录了我遇到过的矩阵(前面的文章所提到的矩阵，在这里就不重复列举了)。以后见识了新的矩阵时，会继续扩充本文。&lt;/p&gt;
+
+&lt;p&gt;(以下知识均查阅了wikipedia。单词的中文翻译查的是有道词典。)&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;共轭(转置)矩阵 Conjugate Transpose Matrix&lt;/h2&gt;
+
+&lt;p&gt;公式上的定义：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{*} = (\overline {A})^{T} \]&lt;/p&gt;
+
+&lt;p&gt;A上面的横线表示对矩阵中的元素的复数部分取反(类似复数的上横线)。&lt;/p&gt;
+
+&lt;p&gt;回想下共轭复数的定义，可以发现，矩阵的共轭，还需要再转置一下，很很大的一个不同点。&lt;/p&gt;
+
+&lt;p&gt;共轭矩阵还有其他表达形式：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{\dagger } = A^{*} = A^{H} \]&lt;/p&gt;
+
+&lt;h2&gt;厄米特矩阵 Hermitian matrix&lt;/h2&gt;
+
+&lt;p&gt;厄米特矩阵也称为self-adjoint matrix，中文是：自伴矩阵、自共轭矩阵、自伴随矩阵。&lt;/p&gt;
+
+&lt;p&gt;厄米特矩阵必须满足下面的性质:&lt;/p&gt;
+
+&lt;p&gt;\[ A = A^{*} \]&lt;/p&gt;
+
+&lt;p&gt;即，A等于A的共轭矩阵时，A是一个厄米特矩阵。&lt;/p&gt;
+
+&lt;h2&gt;单式矩阵 Unitary matrix&lt;/h2&gt;
+
+&lt;p&gt;看名字有点像单位矩阵(Unit matrix)，但是公式上的定义是这样子的：&lt;/p&gt;
+
+&lt;p&gt;\[ U^{*}U = I \]&lt;/p&gt;
+
+&lt;p&gt;即：如果矩阵的共轭乘以矩阵自身等于单位矩阵，那么它是一个单式矩阵。&lt;/p&gt;
+
+&lt;h2&gt;正定矩阵 Positive Definite Matrix&lt;/h2&gt;
+
+&lt;p&gt;定义比较复杂，我翻译下wikipedia的定义吧：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;一个对称的n阶实数矩阵M，设元素不全为0的列向量为z，当所有这样的z满足\( z^{T}Mz &amp;gt; 0\)时，M是正定矩阵。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;根据定义，可以知道单位矩阵I是正定的；&lt;/p&gt;
+
+&lt;p&gt;贴上wiki的例子来帮助理解：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;设M的z为(a,b,c)，则有：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;这个式子的结果显然是非负的，且当a=b=c=0时，这个式子才等于0，所以满足正定矩阵的条件。&lt;/p&gt;
+
+&lt;h2&gt;半正定矩阵 Positive Semi-Definite&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，半正定矩阵的定义公式是:\( z^{T}Mz &amp;gt;= 0\)。&lt;/p&gt;
+
+&lt;h2&gt;负定矩阵 Negative Definite Matrix&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，负定矩阵的定义公式是:\( z^{T}Mz &amp;lt; 0\)。&lt;/p&gt;
+
+&lt;h2&gt;半负定矩阵 Negative Semi-Definite Matrix&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，负定矩阵的定义公式是:\( z^{T}Mz &amp;lt;= 0\)。&lt;/p&gt;
+
+&lt;h2&gt;厄米特矩阵的正定矩阵&lt;/h2&gt;
+
+&lt;p&gt;参考正定矩阵，厄米特矩阵的正定矩阵的定义公式是:\( z^{*}Mz &amp;gt; 0\)，注意，算出来的值必须是实数，不能是复数。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-7/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-7/</guid>
+      </item>
+    
+      <item>
+        <title>Understanding Quaternions 中文翻译《理解四元数》</title>
+        <description>&lt;p&gt;原文地址:&lt;a href=&quot;http://www.3dgep.com/understanding-quaternions/&quot;&gt;http://www.3dgep.com/understanding-quaternions/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;正文&lt;/h2&gt;
+
+&lt;p&gt;在这篇文章中我会尝试用简单的方式去解释四元数的概念，即用可视化的方式解释四元数以及几种对四元数的操作。我将把矩阵、欧拉角和四元数放在一起比较，并解释什么时候该用四元数、什么时候该用欧拉角或矩阵。&lt;/p&gt;
+
+&lt;h3&gt;内容结构&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;介绍&lt;/li&gt;
+&lt;li&gt;复数
+
+&lt;ul&gt;
+&lt;li&gt;复数的加减&lt;/li&gt;
+&lt;li&gt;复数的系数缩放&lt;/li&gt;
+&lt;li&gt;复数的积&lt;/li&gt;
+&lt;li&gt;复数的平方&lt;/li&gt;
+&lt;li&gt;共轭复数&lt;/li&gt;
+&lt;li&gt;复数的绝对值&lt;/li&gt;
+&lt;li&gt;两复数的商&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;i的幂&lt;/li&gt;
+&lt;li&gt;复数平面
+
+&lt;ul&gt;
+&lt;li&gt;旋转数（Rotors)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;四元数
+
+&lt;ul&gt;
+&lt;li&gt;作为有序数的四元数&lt;/li&gt;
+&lt;li&gt;四元数的加减&lt;/li&gt;
+&lt;li&gt;四元数的积&lt;/li&gt;
+&lt;li&gt;实四元数&lt;/li&gt;
+&lt;li&gt;四元数的系数缩放&lt;/li&gt;
+&lt;li&gt;纯四元数&lt;/li&gt;
+&lt;li&gt;四元数的加法形式&lt;/li&gt;
+&lt;li&gt;单位四元数&lt;/li&gt;
+&lt;li&gt;四元数的二元形式&lt;/li&gt;
+&lt;li&gt;共轭四元数&lt;/li&gt;
+&lt;li&gt;四元数范数&lt;/li&gt;
+&lt;li&gt;四元数规范化&lt;/li&gt;
+&lt;li&gt;四元数的逆&lt;/li&gt;
+&lt;li&gt;四元数的点乘&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;旋转&lt;/li&gt;
+&lt;li&gt;四元数的插值
+
+&lt;ul&gt;
+&lt;li&gt;SLERP
+
+&lt;ul&gt;
+&lt;li&gt;四元数的差&lt;/li&gt;
+&lt;li&gt;四元数的指数运算&lt;/li&gt;
+&lt;li&gt;2个四元数的分数差&lt;/li&gt;
+&lt;li&gt;注意事项&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;SQUARD&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;结论&lt;/li&gt;
+&lt;li&gt;下载Demo&lt;/li&gt;
+&lt;li&gt;引用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!--more--&gt;
+
+&lt;h3&gt;介绍&lt;/h3&gt;
+
+&lt;p&gt;在计算机图形学中，我们使用转换矩阵来表示空间中的一个位置以及朝向。一个转换矩阵还可以表示对一个目标的缩放(scale)或错切(shear)等。   我们可以把转换矩阵想象成一个空间，当你用这个矩阵乘以向量、点（甚至矩阵）后， 你就把向量、点、矩阵转换进这个空间了。&lt;/p&gt;
+
+&lt;p&gt;在这篇文章中，我不会讨论转换矩阵的细节。你可以查看我前面的文章，文章中描述了转换矩阵的细节。&lt;/p&gt;
+
+&lt;p&gt;在这篇文章中，我想要讨论一个可替代的方案，即用四元数来描述空间里的物体的朝向。&lt;/p&gt;
+
+&lt;p&gt;四元数的概念是由爱尔兰数学家Sir William Rowan Hamilton发明的（1843年，都柏林）。Hamilton当时正和他的妻子前往爱尔兰皇家研究院，当他从Brougham桥通过皇家运河时，他领悟到了一个激动人心的东西，并立刻把它刻在桥的一个石头上：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/2.jpg&quot; alt=&quot;2.jpg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;William Rowan Hamilton Plaque on Broome Bridge on the Royal Canal commemorating his discovery of the fundamental formula for quaternion multiplication.&lt;/p&gt;
+
+&lt;h3&gt;复数&lt;/h3&gt;
+
+&lt;p&gt;在我们能够完全理解四元数之前，我们必须先知道四元数是怎么来的。四元数的根源其实是&lt;strong&gt;复数&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;除了知名的数集（自然数、整数、实数、分数）之外，复数系统引入了一个新的数集——虚数。虚数的发明是为了解决一些特定的无解的方程，例如：
+\[ x^{2} + 1 = 0 \]
+要解决这个等式，必须让\(x^{2} = -1 \)，这当然是不行的，因为任意实数的平方都是非负数。&lt;/p&gt;
+
+&lt;p&gt;一般而言，数学家是不能忍受一个等式是无解的。于是，一个新的术语被发明了，它就是虚数，一个可以解决上面这个等式的数。&lt;/p&gt;
+
+&lt;p&gt;虚数有这样的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{2} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;不要为这个术语较真，因为逻辑上这个数是不存在的。只要知道i是一个平方等于-1的东西即可。&lt;/p&gt;
+
+&lt;p&gt;虚数的集合可以用\( \mathbb{I} \)来表示。&lt;/p&gt;
+
+&lt;p&gt;复数的集合\( \mathbb{C} \)是一个实数和一个虚数的和，形式如下：&lt;/p&gt;
+
+&lt;p&gt;\[ z = a + bi \ a,b\in R,\ i^{2} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;可以认为所有实数都是b=0的复数、所有虚数都是a=0的复数。&lt;/p&gt;
+
+&lt;h3&gt;复数的加减&lt;/h3&gt;
+
+&lt;p&gt;加法：&lt;/p&gt;
+
+&lt;p&gt;\[ (a_{1} + b_{1}i) + (a_{2} + b_{2}i) = (a_{1} + a_{2}) + (b_{1} + b_{2})i \]&lt;/p&gt;
+
+&lt;p&gt;减法：&lt;/p&gt;
+
+&lt;p&gt;\[ (a_{1} + b_{1}i) - (a_{2} + b_{2}i) = (a_{1} - a_{2}) + (b_{1} - b_{2})i \]&lt;/p&gt;
+
+&lt;h3&gt;复数的系数缩放&lt;/h3&gt;
+
+&lt;p&gt;\[ \lambda (a_{1} + b_{1}i) = \lambda  a_{1} + \lambda b_{1}i \]&lt;/p&gt;
+
+&lt;h3&gt;复数的积&lt;/h3&gt;
+
+&lt;p&gt;\[  z_{1} = (a_{1} + b_{1}i) \]
+\[  z_{2} = (a_{2} + b_{2}i) \]
+\[  z_{1}z_{2} = (a_{1} + b_{1}i)(a_{2} + b_{2}i) = a_{1}a_{2} + a_{1}b_{2}i + b_{1}a_{2}i+b_{1}b_{2}i^{2} \]
+\[ z_{1}z_{2} = (a_{1}a_{2} - b_{1}b_{2}) + (a_{1}b_{2} + b_{1}a_{2})i \]&lt;/p&gt;
+
+&lt;h3&gt;复数的平方&lt;/h3&gt;
+
+&lt;p&gt;\[ z = (a + bi) \]
+\[ z^{2} = (a + bi)(a + bi) \]
+\[ z^{2} = (a^{2} - b^{2}) + 2abi \]&lt;/p&gt;
+
+&lt;h3&gt;共轭复数&lt;/h3&gt;
+
+&lt;p&gt;复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(z^{*}\)。&lt;/p&gt;
+
+&lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
+
+&lt;p&gt;\[ z^{*} = (a - bi) \]&lt;/p&gt;
+
+&lt;p&gt;复数和它的共轭复数的乘积是：&lt;/p&gt;
+
+&lt;p&gt;\[ zz^{*} = (a + bi)(a - bi) = a^{2}-abi+abi+b^{2} = a^{2}+b^{2} \]&lt;/p&gt;
+
+&lt;h3&gt;复数的绝对值&lt;/h3&gt;
+
+&lt;p&gt;我们使用共轭复数来计算复数的绝对值：&lt;/p&gt;
+
+&lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
+
+&lt;p&gt;\[ |z| = \sqrt {zz^{*}} = \sqrt {(a + bi)(a - bi)} = \sqrt {a^{2} + b^{2} } \]&lt;/p&gt;
+
+&lt;h3&gt;两复数的商&lt;/h3&gt;
+
+&lt;p&gt;\[  z_{1} = (a_{1} + b_{1}i) \]
+\[  z_{2} = (a_{2} + b_{2}i) \]
+\[ \frac {z_{1}}{z_{2}} = \frac {a_{1} + b_{1}i}{a_{2} + b_{2}i} = \frac {(a_{1} + b_{1}i)(a_{2} - b_{2}i)}{(a_{2} + b_{2}i)(a_{2} - b_{2}i)} \]
+\[  = \frac {a_{1}a_{2}-a_{1}b_{2}i+b_{1}a_{2}i-b_{1}b_{2}i^{2} }{a_{2}^{2} + b_{2}^{2}} \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \frac {a_{1}a_{2} + b_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}   + \frac {b_{1}a_{2} - a_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}i \]&lt;/p&gt;
+
+&lt;h2&gt;i的幂&lt;/h2&gt;
+
+&lt;p&gt;如果i的平方等于-1，那么i的n次幂也应该存在：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{0} = 1 \]
+\[ i^{1} = i \]
+\[ i^{2} = -1 \]
+\[ i^{3} = ii^{2} = -i \]
+\[ i^{4} = i^{2}i^{2} = 1 \]
+\[ i^{5} = ii^{4} = i \]
+\[ i^{6} = ii^{5} = i^{2} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;如果按照这个顺序写下去，会出现这样一个模式：
+(1,i,-1,-i,1,...)&lt;/p&gt;
+
+&lt;p&gt;一个类似的模式也出现在递增的负数幂：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{0} = 1 \]
+\[ i^{-1} = -i \]
+\[ i^{-2} = -1 \]
+\[ i^{-3} = i \]
+\[ i^{-4} = 1 \]
+\[ i^{-5} = -i \]
+\[ i^{-6} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;你可能已经在数学里头见过类似的模式，但是是以（x,y,-x,-y,x,...)的形式，这是在2D笛卡尔平面对一个点逆时针旋转90度时生成的；（x,-y,-x,y,x,...)则是在2D笛卡尔平面对一个点顺时针旋转90度时生成的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
+&lt;h2&gt;复数平面&lt;/h2&gt;
+
+&lt;p&gt;我们也能够把复数映射到一个2D网格平面——复数平面，只需要把实数映射到横轴、虚数映射到纵轴。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;如前面的序列所示，我们可以认为，对一个复数乘以i，这个复数就在复数平面上旋转了90度。&lt;/p&gt;
+
+&lt;p&gt;让我们看看这是不是真的。我们随机地在复数平面上取一个点：&lt;/p&gt;
+
+&lt;p&gt;\[ p = 2 + i \]&lt;/p&gt;
+
+&lt;p&gt;p乘以i后得到q：
+\[ q = pi = (2+i)i = 2i+i^{2} = -1+2i \]&lt;/p&gt;
+
+&lt;p&gt;q乘以i后得到r：
+\[ r = qi = (-1+2i)i = -i+2i^{2} = -2-i \]&lt;/p&gt;
+
+&lt;p&gt;r乘以i后得到s：
+\[ s = ri = (-2-i)i = -2i-i^{2} = 1-2i \]&lt;/p&gt;
+
+&lt;p&gt;s乘以i后得到t：
+\[ t = si = (1-2i)i = i-2i^{2} = 2+i \]&lt;/p&gt;
+
+&lt;p&gt;t刚好是开始的p。如果我们把这些复数放到复数平面上，就得到下面的图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;我们也可以按顺时针方向旋转，只需要把上面的乘数i改成-i。&lt;/p&gt;
+
+&lt;h3&gt;旋转数（Rotors)&lt;/h3&gt;
+
+&lt;p&gt;我们也可以在复数平面上进行任意角度的旋转，只需要定义下面这个复数：
+\[q = cos\theta +isin\theta \]&lt;/p&gt;
+
+&lt;p&gt;任意的复数乘以q：&lt;/p&gt;
+
+&lt;p&gt;\[ p = a + bi \]
+\[ q = cos\theta + isin\theta \]
+\[ pq = (a + bi)(cos\theta + isin\theta ) \]
+\[ a&amp;#39; + b&amp;#39;i = acos\theta -bsin\theta + (asin\theta +bcos\theta )i \] &lt;/p&gt;
+
+&lt;p&gt;也可以写成矩阵的形式：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} a&amp;#39;&amp;amp;-b&amp;#39;\\ b&amp;#39;&amp;amp;a&amp;#39;\\ \end{matrix} \right] =  \left[ \begin{matrix} cos\theta &amp;amp;-sin\theta \\ sin\theta &amp;amp;cos\theta \\ \end{matrix} \right] \left[ \begin{matrix} a&amp;amp;-b\\ b&amp;amp;a\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;这也是一个在复数平面绕原点逆时针旋转任意点的方法。（译注：这句话应该是在说旋转矩阵）&lt;/p&gt;
+
+&lt;h2&gt;四元数&lt;/h2&gt;
+
+&lt;p&gt;了解了复数系统和复数平面后，我们可以额外增加2个虚数到我们的复数系统，从而把这些概念拓展到3维空间。&lt;/p&gt;
+
+&lt;p&gt;四元数的一般形式：&lt;/p&gt;
+
+&lt;p&gt;\[ q = s + xi + yj + zk \ \ \ s,x,y,z \in \mathbb{R} \]&lt;/p&gt;
+
+&lt;p&gt;上面的公式是根据Hamilton的著名的表达式得到的：&lt;/p&gt;
+
+&lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
+
+&lt;p&gt;以及：&lt;/p&gt;
+
+&lt;p&gt;\[ ij = k \ \ \ jk = i \ \ \ ki = j \]
+\[ ji = -k \ \ \ kj = -i \ \ \ ik = -j \]&lt;/p&gt;
+
+&lt;p&gt;你可能已经注意到了，i、j、k之间的关系非常像笛卡尔坐标系下单位向量的叉积规则：&lt;/p&gt;
+
+&lt;p&gt;\[ x\times y = z \ \ \ y\times z = x \ \ \ z\times x = y \]
+\[ y\times x = -z \ \ \ z\times y = -x \ \ \ x\times z = -y \]&lt;/p&gt;
+
+&lt;p&gt;Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( i^{2} = j^{2} = k^{2} = -1 \)。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/6.png&quot; alt=&quot;6.png&quot;&gt;
+（ij, jk, ki这几个性质的可视化）&lt;/p&gt;
+
+&lt;p&gt;上图展示了如何用i、j、k作为笛卡尔坐标系的单位向量。&lt;/p&gt;
+
+&lt;h3&gt;作为有序数的四元数&lt;/h3&gt;
+
+&lt;p&gt;我们可以用有序对的形式，来表示四元数：
+\[ [s,v] \ \ \ s\in \mathbb{R},v\in \mathbb{R^{3}} \]&lt;/p&gt;
+
+&lt;p&gt;其中的v，也可以用它各自独立的3个分量表示：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,xi + yj + zk] \ \ \ s,x,y,z\in \mathbb{R} \]&lt;/p&gt;
+
+&lt;p&gt;使用这种表示法，我们可以更容易地展示四元数和复数之间的相似性。&lt;/p&gt;
+
+&lt;h3&gt;四元数的加减&lt;/h3&gt;
+
+&lt;p&gt;和复数类似，四元数也可以被加减：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [s_{a},a] \]
+\[ q_{b} = [s_{b},b] \]
+\[ q_{a} + q_{b} = [s_{a} + s_{b},a + b] \]
+\[ q_{a} - q_{b} = [s_{a} - s_{b},a - b] \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的积&lt;/h3&gt;
+
+&lt;p&gt;我们也可以表示四元数的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [s_{a},a][s_{b},b] \]
+\[ = (s_{a} + x_{a}i + y_{a}j +z_{a}k)(s_{b} + x_{b}i + y_{b}j +z_{b}k) \]
+\[ = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}) \]
+\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i \]
+\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j \]
+\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k \]&lt;/p&gt;
+
+&lt;p&gt;可以看到，四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：&lt;/p&gt;
+
+&lt;p&gt;\[ i = [0,i]\ \ \  j = [0,j]\ \ \  k = [0,k] \]&lt;/p&gt;
+
+&lt;p&gt;以及还有[1,0] = 1，将它们代入前面的表达式，就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b})[1,0] \]
+\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})[0,i] \]
+\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})[0,j] \]
+\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})[0,k] \]&lt;/p&gt;
+
+&lt;p&gt;再把这个表达式扩展成多个有序对的和：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
+\[ + [0,(s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i] \]
+\[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j] \]
+\[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
+
+&lt;p&gt;如果把后3个四元数相加，并提取公共部分，就可以把等式改写成：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
+\[ + [0,s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
+\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
+
+&lt;p&gt;这个等式是2个有序对的和。第1个有序对是一个&lt;strong&gt;实&lt;/strong&gt;四元数，第2个是一个&lt;strong&gt;纯&lt;/strong&gt;四元数。这两个四元数也可以合并成一个：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}), \]
+\[ s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
+\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
+
+&lt;p&gt;如果把下面的表达式代入上面的等式：&lt;/p&gt;
+
+&lt;p&gt;\[ a = x_{a}i + y_{a}j + z_{a}k\]
+\[ b = x_{b}i + y_{b}j + z_{b}k\]
+\[ a\cdot b = x_{a}x_{b}i^{2}+y_{a}y_{b}j^{2}+z_{a}z_{b}k^{2} \]
+\[ a\times b = (y_{a}z_{b}-y_{b}z_{a})i + (z_{a}x_{b} - z_{b}x_{a})j + (x_{a}y_{b} - x_{b}y_{a})k  \]&lt;/p&gt;
+
+&lt;p&gt;（译注：注意，第三条和第四条并不是四元数的点积和叉积，而是向量的点积和叉积）&lt;/p&gt;
+
+&lt;p&gt;我们就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]&lt;/p&gt;
+
+&lt;p&gt;这就是四元数乘积的一般式。&lt;/p&gt;
+
+&lt;h3&gt;实四元数&lt;/h3&gt;
+
+&lt;p&gt;一个实四元数是一个虚部向量为零向量的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,0] \]&lt;/p&gt;
+
+&lt;p&gt;两个实四元数的乘积是另一个实四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [s_{a},0] \]
+\[ q_{b} = [s_{b},0] \]
+\[ q_{a}q_{b} = [s_{a},0] [s_{b},0] = [s_{a}s_{b},0]  \]&lt;/p&gt;
+
+&lt;p&gt;这和2个虚部为0的复数的乘积几乎一样：&lt;/p&gt;
+
+&lt;p&gt;\[ z_{1} = a_{1} + 0i \]
+\[ z_{2} = a_{2} + 0i \]
+\[ z_{1}z_{2} = (a_{1} + 0i)(a_{2} + 0i) = a_{1}a_{2} \] &lt;/p&gt;
+
+&lt;h3&gt;四元数的系数缩放&lt;/h3&gt;
+
+&lt;p&gt;我们也可以用一个系数（实数）去乘四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ \lambda q = \lambda [s,v] = [\lambda s,\lambda v] \]&lt;/p&gt;
+
+&lt;p&gt;我们可以用实四元数与普通四元数的乘积，来确认这个等式是否正确：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ \lambda = [\lambda ,0] \]
+\[ \lambda q = [\lambda ,0][s,v] = [\lambda s,\lambda v] \]&lt;/p&gt;
+
+&lt;h3&gt;纯四元数&lt;/h3&gt;
+
+&lt;p&gt;和实四元数相似，Hamilton也定义了纯四元数。纯四元数是s=0的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [0,v] \]&lt;/p&gt;
+
+&lt;p&gt;也可以写成下面的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ q = xi + yj + zk \]&lt;/p&gt;
+
+&lt;p&gt;然后是2个纯四元数的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [0,a] \]
+\[ q_{b} = [0,b] \]
+\[ q_{a}q_{b} = [0,a] [0,b] = [-a\cdot b, a\times b]  \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的加法形式&lt;/h3&gt;
+
+&lt;p&gt;我们可以把四元数写成实四元数和纯四元数的和：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ = [s,0] + [0,v] \]&lt;/p&gt;
+
+&lt;h3&gt;单位四元数&lt;/h3&gt;
+
+&lt;p&gt;给定任意的向量v，我们可以把这个向量写成一个系数和一个单位方向向量的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[ v = \mathbf {v}\hat {v}\ \ \mathbf {v}=|v|,|\hat {v}|=1\]&lt;/p&gt;
+
+&lt;p&gt;将这个定义和纯四元数的定义结合，就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [0,v] \]
+\[ = [0,\mathbf {v} \hat {v}] \]
+\[ = \mathbf {v} [0,\hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;然后，我们可以定义单位四元数了，它是一个s=0、v为单位向量的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat {q} = [0, \hat {v}] \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的二元形式&lt;/h3&gt;
+
+&lt;p&gt;我们现在可以把单位四元数的定义和四元数的加法形式结合到一起，就创造了一种新的四元数的表示法，这种表示法和复数的表示法形似：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ = [s,0] + [0,v] \]
+\[ = [s,0] + \mathbf {v} [0,\hat {v}] \]
+\[ = s + \mathbf {v} \hat {q} \]&lt;/p&gt;
+
+&lt;p&gt;这就给了我们一种和复数非常相似的四元数表示法：&lt;/p&gt;
+
+&lt;p&gt;\[ z = a + bi \]
+\[ q = s + \mathbf {v} \hat {q} \]&lt;/p&gt;
+
+&lt;h3&gt;共轭四元数&lt;/h3&gt;
+
+&lt;p&gt;共轭四元数的计算，就是将四元数的虚向量取反：&lt;/p&gt;
+
+&lt;p&gt;\[  q = [s,v] \]
+\[  q^{*} = [s,-v] \]&lt;/p&gt;
+
+&lt;p&gt;四元数和它的共轭四元数的乘积：&lt;/p&gt;
+
+&lt;p&gt;\[  qq^{*} = [s,v][s,-v] \]
+\[ = [s^{2} - v\cdot -v,-sv+sv+v\times -v] \]
+\[ = [s^{2} + v\cdot v,0] \]
+\[ = [s^{2} + v^{2},0] \]&lt;/p&gt;
+
+&lt;h3&gt;四元数范数&lt;/h3&gt;
+
+&lt;p&gt;回忆下复数范数的定义：&lt;/p&gt;
+
+&lt;p&gt;\[ |z| = \sqrt {a^{2}+b^{2}} \]
+\[ zz^{*} = |z|^{2} \]&lt;/p&gt;
+
+&lt;p&gt;类似的，四元数的范数可以这样定义：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,v] \]
+\[ |q| = \sqrt {s^{2} + v^{2}} \]&lt;/p&gt;
+
+&lt;p&gt;这也让我们可以这样表达四元数范数：&lt;/p&gt;
+
+&lt;p&gt;\[ qq^{*} = |q|^{2} \]&lt;/p&gt;
+
+&lt;h3&gt;四元数规范化&lt;/h3&gt;
+
+&lt;p&gt;利用四元数范数的定义，就可以对四元数进行规范化。要让一个四元数规范化，只需要让这个四元数去除以它的范数：&lt;/p&gt;
+
+&lt;p&gt;\[ q&amp;#39; = \frac {q}{\sqrt {s^{2}+v^{2}}} \]&lt;/p&gt;
+
+&lt;p&gt;举一个例子，让我们规范化下面这个四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [1, 4i + 4j - 4k] \]&lt;/p&gt;
+
+&lt;p&gt;第一步，先计算q的范数：&lt;/p&gt;
+
+&lt;p&gt;\[ |q| = \sqrt {1^{2}+4^{2}+4^{2}+(-4)^{2}} \]
+\[ = \sqrt {49} = 7 \]&lt;/p&gt;
+
+&lt;p&gt;然后，q除以|q|:&lt;/p&gt;
+
+&lt;p&gt;\[ q&amp;#39; = \frac {q}{|q|} \]
+\[ = \frac {(1+4i+4j-4k)}{7} \]
+\[ = \frac {1}{7}+\frac {4}{7}i+\frac {4}{7}j-\frac {4}{7}k \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的逆&lt;/h3&gt;
+
+&lt;p&gt;四元数的逆用\(q^{-1} \)表示。要计算四元数的逆，需要用四元数的共轭四元数去除以四元数的范数的平方：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} = \frac {q^{*}}{|q|^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;为了证明这个式子，我们先根据&lt;strong&gt;逆&lt;/strong&gt;的定义，有：&lt;/p&gt;
+
+&lt;p&gt;\[ qq^{-1} = [1,0] = 1 \]&lt;/p&gt;
+
+&lt;p&gt;两边都左乘共轭四元数\(q^{&lt;em&gt;} \)：
+\[ q^{&lt;/em&gt;}qq^{-1} = q^{*} \]&lt;/p&gt;
+
+&lt;p&gt;将上文中的\( qq^{*} = |q|^{2} \)代入这个式子，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ |q|^{2}q^{-1} = q^{*} \] &lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} = \frac {q^{*}}{|q|^{2}} \] &lt;/p&gt;
+
+&lt;p&gt;对于单位四元数，它的范数是1，所以可以写成：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} = q^{*} \]&lt;/p&gt;
+
+&lt;h3&gt;四元数的点积&lt;/h3&gt;
+
+&lt;p&gt;和向量的点积相似，我们也可以计算2个四元数的点积，只需要将各个对应的系数相乘，然后相加:&lt;/p&gt;
+
+&lt;p&gt;\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
+\[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
+\[ q_{1}\cdot q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
+
+&lt;p&gt;我们也可以利用四元数点积，来计算四元数之间的角度差：&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]&lt;/p&gt;
+
+&lt;p&gt;对于单位四元数，我们可以简化上面的等式：
+\[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
+
+&lt;h2&gt;旋转&lt;/h2&gt;
+
+&lt;p&gt;前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
+\[ q = cos\theta + isin\theta \]&lt;/p&gt;
+
+&lt;p&gt;根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
+\[ q = [cos\theta, sin\theta v] \]&lt;/p&gt;
+
+&lt;p&gt;让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ p = [0,\textbf {p}] \]&lt;/p&gt;
+
+&lt;p&gt;以及单位四元数q：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [s,\lambda \hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;从而：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; = qp = [s,\lambda \hat {v}] [0,\textbf {p}] \]
+\[ =  [-\lambda \hat {v}\cdot \textbf {p}, s\textbf {p} + \lambda \hat {v}\times \textbf {p} ] \]&lt;/p&gt;
+
+&lt;p&gt;我们可以看到结果是一个同时有系数、有虚向量的四元数。&lt;/p&gt;
+
+&lt;p&gt;让我们先考虑特殊的情形：\( \textbf {p} \)与\( \hat {v} \)正交。这种情况下，点乘部分等于0：\(-\lambda \hat {v}\cdot \textbf {p} = 0\)。所以上面的四元数就变成了纯四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; =  [0, s\textbf {p} + \lambda \hat {v}\times \textbf {p}] \]&lt;/p&gt;
+
+&lt;p&gt;这时候，要使\( \textbf {p} \)绕\( \hat {v} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; =  [0, cos\theta \textbf {p} + sin\theta \hat {v}\times \textbf {p}] \]&lt;/p&gt;
+
+&lt;p&gt;现在，让我们找一个例子来测试上面的公式。譬如绕z轴(就是k轴)旋转45度，那么我们的四元数q就变成：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [cos\theta ,sin\theta k] \]
+\[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}k] \]&lt;/p&gt;
+
+&lt;p&gt;然后，选一个特殊的p，并且p要和k轴正交，譬如把p放到i轴上，也就是：
+\[ p = [0, 2i] \]&lt;/p&gt;
+
+&lt;p&gt;好了，现在计算下qp：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; = qp \]
+\[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}k] [0,2i] \]
+\[ = [0,2\frac {\sqrt {2}}{2}i + 2\frac {\sqrt {2}}{2}k\times i]  \]
+\[  = [0, \sqrt {2}i + \sqrt {2}j] \]&lt;/p&gt;
+
+&lt;p&gt;结果是一个绕了k轴转了45度的纯四元数。
+我们可以确认这个四元数的向量部分的长度是：&lt;/p&gt;
+
+&lt;p&gt;\[  p&amp;#39; = \sqrt { \sqrt {2}^{2} + \sqrt {2}^{2} }  =  2 \]&lt;/p&gt;
+
+&lt;p&gt;这正是我们所期望的！&lt;/p&gt;
+
+&lt;p&gt;我们可以用图像展示旋转过程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;现在，让我们考虑更一般化的四元数，即和p不正交的四元数。现在让我们把p的向量部分偏移45度：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat {v} = \frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k \]&lt;/p&gt;
+
+&lt;p&gt;\[ \textbf {p} = 2i \]&lt;/p&gt;
+
+&lt;p&gt;\[ q = [cos\theta , sin\theta \hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;\[ p = [0, \textbf {p}] \]&lt;/p&gt;
+
+&lt;p&gt;然后算qp：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; = qp \]
+\[ = [cos\theta ,sin\theta \hat {v}] [0, \mathbf {p} ]  \]
+\[ [-sin\theta \hat {v}\cdot \mathbf {p}, cos\theta \mathbf {p}+sin\theta \hat {v}\times \mathbf {p}] \]&lt;/p&gt;
+
+&lt;p&gt;代入我们设定的\(\hat {v}, \mathbf {p}\)，以及\(\theta = 45^{\circ } \)，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; = [-\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)\cdot (2i), \frac {\sqrt {2}}{2}2i+\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)\times 2i] \]
+\[ = [-1, \sqrt {2}i + j] \]
+注意，算出来的结果已经不是纯四元数了，并且，它并没有旋转45度、范数也不再是2(反而变小了，变成\(\sqrt {3}\))&lt;/p&gt;
+
+&lt;p&gt;我们可以用图像展示旋转过程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;严格来说，这样子在3维空间中表示\(p&amp;#39;\)是不正确的。因为它其实是一个4维的向量！为了简单起见，我只将这个四元数的向量部分显示出来。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;然而，还有一线生机。Hamilton发现（但没有正式宣布），如果对qp右乘q的逆，出来的结果是一个纯四元数，并且四元数向量部分的范数可以保持不变。让我们试试应用在我们的例子里。&lt;/p&gt;
+
+&lt;p&gt;首先计算:&lt;/p&gt;
+
+&lt;p&gt;\[ q =  [cos\theta ,  sin\theta (\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]&lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} =  [cos\theta ,  -sin\theta (\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]&lt;/p&gt;
+
+&lt;p&gt;(译注：这里\(q^{-1}=q^{*}\)是因为q是单位四元数)&lt;/p&gt;
+
+&lt;p&gt;再代入\(\theta = 45^{\circ } \)，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{-1} =  [\frac {\sqrt {2}}{2},  -\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]&lt;/p&gt;
+
+&lt;p&gt;\[ \frac {1}{2}[\sqrt {2}, -i-k] \]&lt;/p&gt;
+
+&lt;p&gt;现在，把前面算出来的qp再次拿出来：&lt;/p&gt;
+
+&lt;p&gt;\[ qp = [-1, \sqrt {2}i + j] \]
+\[ qpq^{-1}  = [-1, \sqrt {2}i + j]\frac {1}{2}[\sqrt {2}, -i-k] \]
+\[ = \frac {1}{2}[-\sqrt {2}-(\sqrt {2}i+j)\cdot (-i-k), i+k+\sqrt {2}(\sqrt {2}i+j)-i+\sqrt {2}j+k] \]
+\[ = \frac {1}{2}[-\sqrt {2}+\sqrt {2},i+k+2i+\sqrt {2}j-i+\sqrt {2}j+k] \]
+\[ = [0,i+\sqrt {2}j+k] \]&lt;/p&gt;
+
+&lt;p&gt;这下是纯四元数了，并且它的范数是：&lt;/p&gt;
+
+&lt;p&gt;\[ |qpq^{-1}| = \sqrt {1^{2} + \sqrt {2}^{2} + 1^{2} } = \sqrt {4} = 2 \]&lt;/p&gt;
+
+&lt;p&gt;这和原始的p的范数一致。&lt;/p&gt;
+
+&lt;p&gt;下面的图像展示了旋转结果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/9.png&quot; alt=&quot;9.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;所以我们可以看到，这个结果是一个纯四元数，并且原四元数的向量的范数也保持住了。但是还有一个问题：向量被旋转了90度而不是45度。这刚好是我们需要的度数的两倍！为了正确地让一个向量绕某个轴向量旋转某个角度，我们必须以目标角度的一半来计算。因此，我们构造了下面的四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q = [cos\frac {1}{2}\theta ,sin\frac {1}{2}\theta \hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;这就是&lt;strong&gt;旋转四元数&lt;/strong&gt;的一般形式！&lt;/p&gt;
+
+&lt;h2&gt;四元数插值&lt;/h2&gt;
+
+&lt;p&gt;在计算机图形学中使用四元数，其中一个重要原因是四元数非常适合用来表示空间中的旋转。四元数解决了其他3维空间旋转算法会遇到的恼人的问题，比如使用欧拉角来表示旋转操作时会遇到的万向节锁问题(&lt;a href=&quot;https://en.wikipedia.org/wiki/Gimbal_lock&quot;&gt;Gimbal lock&lt;/a&gt;)。&lt;/p&gt;
+
+&lt;p&gt;使用四元数，我们可以定义好几种方案来表示3维空间的转动插值。第一种是SLERP，它被用来把一个点(物体)从一个朝向平滑地插值到另一个朝向。第二个是SLERP的扩展版本，被称为SQAD，它被用来处理用一系列朝向定义得到的一条路径的插值。&lt;/p&gt;
+
+&lt;h2&gt;SLERP&lt;/h2&gt;
+
+&lt;p&gt;SLERP代表&lt;strong&gt;S&lt;/strong&gt;pherical &lt;strong&gt;L&lt;/strong&gt;inear Int&lt;strong&gt;erp&lt;/strong&gt;olation。SLERP可以在2个朝向之间平滑地插值。&lt;/p&gt;
+
+&lt;p&gt;第一个朝向设为\( q_{1}\)，第二个朝向设为\( q_{2}\)。被插值前的点设为\( \mathbf {p} \)，插值后的点设为\( \mathbf {p}&amp;#39; \)。而插值参数t，当t=0时会把\(\mathbf {p}\)转到\( q_{1}\)，当t=1时会转到\( q_{2}\)。&lt;/p&gt;
+
+&lt;p&gt;标准的线性插值公式是(译注：这个公式是笛卡尔坐标系下的，不是指四元数)：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf {p}&amp;#39; = \mathbf {p}_{1} + t(\mathbf {p}_{2} - \mathbf {p}_{1} ) \]&lt;/p&gt;
+
+&lt;p&gt;应用这个等式的一般步骤是：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;计算\( \mathbf {p}_{1} 、\mathbf {p}_{2}\)之间的差。&lt;/li&gt;
+&lt;li&gt;根据参数t，计算两个点的差的小数值(因为0&amp;lt;=t&amp;lt;=1)&lt;/li&gt;
+&lt;li&gt;把第二步的值加上原始点的值，算出结果&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我们可以把这个基础公式，套用到2个用四元数表示的朝向的插值上。&lt;/p&gt;
+
+&lt;h3&gt;四元数的差&lt;/h3&gt;
+
+&lt;p&gt;根据上面的公式的第一步，我们必须先计算\( q_{1}、 q_{2}\)的差。对于四元数来说，这等价于计算2个四元数的角度差：&lt;/p&gt;
+
+&lt;p&gt;\[ diff =  q_{1}^{-1}q_{2} \]&lt;/p&gt;
+
+&lt;p&gt;（译注：这个公式用到了上述的四元数点积公式）&lt;/p&gt;
+
+&lt;h3&gt;四元数的指数&lt;/h3&gt;
+
+&lt;p&gt;接下来是计算上面的角度差的分数值，方法是计算四元数的t次幂(就是上面的那个插值参数t)。&lt;/p&gt;
+
+&lt;p&gt;四元数的指数的一般化公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{t} = exp(t \log q) \]&lt;/p&gt;
+
+&lt;p&gt;其中，(纯)四元数的exp函数的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{q} = exp(q) = exp([0,\theta \hat {v}]) \]
+\[ = [cos\theta ,sin\theta \hat {v} ] \]&lt;/p&gt;
+
+&lt;p&gt;(纯)四元数的对数公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ \log q = \log (cos\theta + sin \theta \hat {v}) \]
+\[ = \log (exp(\theta \hat {v} )) \]
+\[ = \theta \hat {v} \]
+\[ = [0, \theta \hat {v}] \]&lt;/p&gt;
+
+&lt;p&gt;(译注：上述的2次公式推导，其实省略了很多证明过程。具体可以参考：&lt;a href=&quot;http://bpeers.com/blog/?itemid=861&quot;&gt;http://bpeers.com/blog/?itemid=861&lt;/a&gt;,&lt;a href=&quot;http://bpeers.com/blog/?itemid=863&quot;&gt;http://bpeers.com/blog/?itemid=863&lt;/a&gt;,&lt;a href=&quot;http://bpeers.com/blog/?itemid=866&quot;&gt;http://bpeers.com/blog/?itemid=866&lt;/a&gt;, &lt;a href=&quot;http://bpeers.com/blog/?itemid=1001&quot;&gt;http://bpeers.com/blog/?itemid=1001&lt;/a&gt; )&lt;/p&gt;
+
+&lt;p&gt;对于t = 0，我们有：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{0} = exp(0\log q) \]
+\[ = exp([cos(0), sin(0)\hat {v}]) \]
+\[ = exp([1,0]) \]
+\[ = [1,0] \]&lt;/p&gt;
+
+&lt;p&gt;而对于t = 1，有：&lt;/p&gt;
+
+&lt;p&gt;\[ q^{1} = exp(1\log q) = q \]&lt;/p&gt;
+
+&lt;h3&gt;2个四元数的分数差&lt;/h3&gt;
+
+&lt;p&gt;对于角旋转的插值计算，我们利用q1和q2的角度分数差来调整原始朝向q1：&lt;/p&gt;
+
+&lt;p&gt;\[ q&amp;#39; = q_{1}(q_{1}^{-1}q_{2})^{t} \]&lt;/p&gt;
+
+&lt;p&gt;这也就是使用四元数的球面线性插值的一般形式。然而，这不是slerp函数的常用形式。&lt;/p&gt;
+
+&lt;p&gt;我们可以应用类似的用于计算向量的球面插值公式，到四元数里。计算向量的球面插值的一般形式定义如下：&lt;/p&gt;
+
+&lt;p&gt;\[ v_{t} = \frac {sin((1-t)\theta )}{sin\theta }v_{1} + \frac {sin(t\theta )}{sin\theta }v_{2} \]&lt;/p&gt;
+
+&lt;p&gt;用图像表示如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;这个公式可以原封不动地应用到四元数：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{t} = \frac {sin((1-t)\theta )}{sin\theta }q_{1} + \frac {sin(t\theta )}{sin\theta }q_{2} \]&lt;/p&gt;
+
+&lt;p&gt;但这个公式需要提供角度\(\theta \)，我们可以计算\(q_{1}\)和\(q_{2}\)的点积从而得出角度\(\theta \)：&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta  = \frac {q_{1}\cdot q_{2}}{ |q_{1}||q_{2}| } \]&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \theta = cos^{-1}(\frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|}) \]&lt;/p&gt;
+
+&lt;h3&gt;注意事项&lt;/h3&gt;
+
+&lt;p&gt;这个方案有2个问题，必须在实现过程中加以考虑。&lt;/p&gt;
+
+&lt;p&gt;第一，如果四元数点积的结果是负值，那么后面的插值就会在4D球面上绕远路，这并不是我们想要的。为了解决这个问题，我们测试点积的结果，当结果是负值时，我们将2个四元数的其中一个取反，取反它的系数和向量部分，并不会改变它代表的朝向。而经过这一步操作，可以保证这个旋转走的是最短路径。&lt;/p&gt;
+
+&lt;p&gt;当\(q_{1}\)和\(q_{2}\)的角度差非常小，小到导致\(sin\theta = 0\)时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(q_{1}\)和\(q_{2}\)的线性插值。&lt;/p&gt;
+
+&lt;h2&gt;SQUAD&lt;/h2&gt;
+
+&lt;p&gt;正如一个SLERP可以被用来计算四元数之间的插值，一个SQUAD (&lt;strong&gt;S&lt;/strong&gt;pherical and &lt;strong&gt;Quad&lt;/strong&gt;rangle)可以被用来对旋转路径进行平滑插值。&lt;/p&gt;
+
+&lt;p&gt;如果我们有四元数序列：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{1},q_{2},q_{3},\cdots,q_{n-2},q_{n-1},q_{n}\]&lt;/p&gt;
+
+&lt;p&gt;然后我们再定义一个&amp;quot;辅助&amp;quot;四元数(\(s_{i}\))，它是一个中间控制点：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{i} = exp( - \frac {\log(q_{i+1}q_{i}^{-1})+\log(q_{i-1}q_{i}^{-1})}{4})q_{i} \]&lt;/p&gt;
+
+&lt;p&gt;所以，沿着子曲线的朝向可以定义为：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{i-1},q_{i},q_{i+1},q_{i+2} \]&lt;/p&gt;
+
+&lt;p&gt;在t时刻的朝向就是：&lt;/p&gt;
+
+&lt;p&gt;\[ squad(q_{i},q_{i+1},s_{i},s_{i+1},t ) = slerp(slerp(q_{i},q_{i+1},t),slerp(s_{i},s_{i+1},t),2t(1-t)) \]&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;除了特别难理解之外，相比矩阵或欧拉角，四元数在表示旋转这个事情上，拥有一些明显的优点。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;SLERP和SQUAD，提供了一种使得在朝向之间可以平滑过渡的方法。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;使用四元数来串联&amp;quot;旋转&amp;quot;，要比使用矩阵快得多。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;对于单位四元数，逆向旋转可以通过对向量部分取反来实现。而计算一个矩阵的逆矩阵是被认为比较慢的，如果这个矩阵未被标准正交化的话(标准正交矩阵的逆矩阵是它的转置矩阵)。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;从四元数转换到矩阵，要比从欧拉角转换到矩阵快一点。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;四元数只需要4个数字(如果旋转四元数已经单位化了那么只需要3个，实数部分可以在运行时计算)来表示一个旋转，而矩阵需要至少9个数字。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;尽管使用四元数有这么多优点，还是有缺点存在的。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;因为浮点数的舍入运算错误，四元数可能会变无效。不过，这个错误可以通过重新单位化四元数来避免。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;使用四元数最具威慑性的地方，还是四元数的理解难度大。我希望这个问题可以通过阅读本文来解决。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;存在一些已经实现了四元数、并且是正确的的数学程序库。在我的个人经验里，我发现GLM(OpenGL Math Library)是一个优秀的数学库，它的四元数的实现极其不错。如果你对在你的程序中使用四元数感兴趣，那么我会推荐你使用这个数学库。&lt;/p&gt;
+
+&lt;h2&gt;下载Demo&lt;/h2&gt;
+
+&lt;p&gt;我实现了一个小demo来演示一个四元数如何被用来旋转一个3维物体。这个demo是用Unity3.5.2实现的，你可以免费下载它和阅读它的脚本。zip文件也包含了一个Windows版的Unity程序。当然你可以自己构建一个Mac的版本。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.google.com/open?id=0B0ND0J8HHfaXdzM0dmdGUzBLV1U&quot;&gt;Understanding Quaternions.zip&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/understanding-quaternions/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/understanding-quaternions/</guid>
+      </item>
+    
+      <item>
+        <title>PBRT《章2》阅读笔记</title>
+        <description>&lt;p&gt;最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。&lt;/p&gt;
+
+&lt;p&gt;本文的cpp代码均来自&lt;a href=&quot;https://github.com/mmp/pbrt-v2&quot;&gt;https://github.com/mmp/pbrt-v2&lt;/a&gt;，木有修改。只为方便读者阅读。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;正文&lt;/h2&gt;
+
+&lt;p&gt;一个基本的渲染器，需要实现2点：输入场景数据、输出渲染图像。&lt;/p&gt;
+
+&lt;p&gt;输入场景数据这一步，就需要对3D世界各种东西进行抽象、并设计各种数据结构，比如比较fundamental的：3D空间向量、3D坐标系系统、光线，或者visible的：各种2D/3D几何体、纹理系统等。大概就是，这个渲染器要渲染的东西，程序上都会有一些对应的代码。渲染器不可能对未知的东西进行渲染。比如毛发、布这种高端的东西，一个基本的渲染器是无法渲染的，除非你写了一些代码来完成这个事情。&lt;/p&gt;
+
+&lt;p&gt;《PBRT》第二章就讲了这些基础的东西。&lt;/p&gt;
+
+&lt;p&gt;在前面的线代的文章中，提到了矩阵的基(basis)的概念。矩阵的基是一组线性无关的列向量，这个矩阵的列空间的任意一点，可以通过对矩阵的基的线性组合得到。&lt;/p&gt;
+
+&lt;p&gt;那么n维的情况下，定义一个向量的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ v = s_{1}v_{1} + \cdots + s_{n}v_{n} \]&lt;/p&gt;
+
+&lt;p&gt;定义一个点的位置的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ p = p_{0} + s_{1}v_{1} + \cdots + s_{n}v_{n} \]&lt;/p&gt;
+
+&lt;p&gt;对于渲染器的3维空间，要简化成：&lt;/p&gt;
+
+&lt;p&gt;\[ p_{0} = (0,0,0) \]
+\[ basis = (1,0,0) (0,1,0) (0,0,1) \]&lt;/p&gt;
+
+&lt;p&gt;这3个标准基向量对应的空间被称为世界空间(world space)。&lt;/p&gt;
+
+&lt;h3&gt;向量(vector)、点(point)的区别&lt;/h3&gt;
+
+&lt;p&gt;向量和点，区别在于点没有长度的概念，也就是说点是零维的，点代表空间里的一个&lt;strong&gt;位置&lt;/strong&gt;（pbrt的Point和Vector的差异是没有LengthSquared、Length函数)，而向量没有起点的概念，向量只是指明了一个&lt;strong&gt;方向&lt;/strong&gt;并且有长度。&lt;/p&gt;
+
+&lt;h3&gt;3维空间下，如何从一个向量出发，构造出一组标准正交基&lt;/h3&gt;
+
+&lt;p&gt;注意，这个问题是有重要意义的，因为一组标准正交基相当于一个坐标系。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;设\( v_{1}=(x_{1},y_{1},z_{1}) \)，并且v1已经单位化&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;随便选择v1的某一个分量，并将它变成0，再交换剩余的2个分量的位置，并对其中一个分量取反，就能得到和v1正交的v2。这是因为这样构造出来的v2，必然使得\(  v_{1}\cdot v_{2}=0 \)。比如当\( v_{2}=(-z_{1},0,x_{1}) \)时，有\( v_{1}\cdot v_{2}=(x_{1},y_{1},z_{1})\cdot (-z_{1},0,x_{1}) = 0\)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;上面的v2还有不足，因它不是单位化的。单位化的v2应该是\[v_{2}=\dfrac { (-z_{1},0,x_{1}) }{ \sqrt {z_{1}^{1}+x_{1}^{1}}} \]&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;有了v1、v2后，v3就等于v1和v2的叉积(cross product): \( v_{3} =v_{1} \times v_{2} \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;法向量Normal&lt;/h3&gt;
+
+&lt;p&gt;(突然意识到，pbrt把向量、点、法向量写成3个没有继承关系的类，意义在于，防止程序员乱用并搞砸代码=。=)&lt;/p&gt;
+
+&lt;p&gt;** A surface normal is a vector that is perpendicular to a surface at a particular position.It can be defined as the cross product of any two nonparallel vectors
+that are tangent to the surface at a point. **&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;法向量是与某个平面垂直，并经过平面上某个特殊位置的向量。可以用平面上2个互不平行、与平面正切的向量的叉积来表示。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;法向量应该说是一种特殊的向量。pbrt也实现了一个以Vector为参数的Normal构造函数（但有explicit标志），允许通过向量构造出法向量。&lt;/p&gt;
+
+&lt;h3&gt;光线Ray&lt;/h3&gt;
+
+&lt;p&gt;光线是一条半无限长的线，用一个原点和一个方向向量来表示。&lt;/p&gt;
+
+&lt;p&gt;参数形式的光线表示：&lt;/p&gt;
+
+&lt;p&gt;\[ r(t) = o + td   \ \ \ 0\leq t\geq \infty \]&lt;/p&gt;
+
+&lt;p&gt;光线还有其他成员变量：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;mint maxt，用来限定t的范围&lt;/li&gt;
+&lt;li&gt;time 用于构建动画，当构建静态场景时不需要&lt;/li&gt;
+&lt;li&gt;depth 光线弹射深度。限制光线只能bounce多少次&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;微分光线Differential Ray&lt;/h3&gt;
+
+&lt;p&gt;先跳过&lt;/p&gt;
+
+&lt;h3&gt;包围盒&lt;/h3&gt;
+
+&lt;p&gt;包围盒的主要作用，是用来优化程序性能的，更具体的说，就是让复杂场景物件简化成简单的球形、方盒，使得光线快速剔除不相交的对象，计算得更快。&lt;/p&gt;
+
+&lt;p&gt;BBox&lt;/p&gt;
+
+&lt;p&gt;这玩意神奇的地方，我觉得是它的构造函数。输入是2个Point，就能构造一个盒子，并且也仅仅是花了2个Point来存储。这2个新的Point和输入的Point不同，被称为pMin和pMax:&lt;/p&gt;
+
+&lt;p&gt;\[ pMin = (min(p_{1}.x,p_{2}.x), min(p_{1}.y,p_{2}.y), min(p_{1}.z,p_{2}.z)) \]&lt;/p&gt;
+
+&lt;p&gt;\[ pMax = (max(p_{1}.x,p_{2}.x), max(p_{1}.y,p_{2}.y), max(p_{1}.z,p_{2}.z)) \]&lt;/p&gt;
+
+&lt;p&gt;需要注意的是，根据这个转换公式，要使得pMin和pMax足够定义一个BBox，那么他们必然是BBox的2个对角顶点。且因为BBox平行于x、y、z轴，那么pMin和pMax的任意一个分量都不能相等。（否则，pMin、pMax就只能是BBox的一对邻接顶点）&lt;/p&gt;
+
+&lt;p&gt;p1、p2和pMin、pMax是什么关系呢？其实，p1、p2也是这个BBox的某一组对角顶点。计算出来的pMin、pMax也只是这4组对角顶点的特定的一组，只不过pMin必然是BBox8个顶点中最靠近坐标系原点的顶点、pMax必然是最远离坐标系原点的顶点。&lt;/p&gt;
+
+&lt;h3&gt;转换Transformation&lt;/h3&gt;
+
+&lt;p&gt;** In general, a transformation T is a mapping from points to points and from vectors to
+vectors:**&lt;/p&gt;
+
+&lt;p&gt;\[ p^{\prime } = T(p) \]
+\[ v^{\prime } = T(v) \]&lt;/p&gt;
+
+&lt;p&gt;回想下线代的知识，就可以知道，这个T必然是一个方阵，阶数等于p(或v)的维数，T对p(或v)的转换，其实只是一次矩阵乘法。&lt;/p&gt;
+
+&lt;p&gt;T有很多种，大部分是无特殊转换意义的，但有小部分是有特定意义且能用在图形学里的。譬如：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Translation，我称之为位置转换&lt;/li&gt;
+&lt;li&gt;Scaling，缩放转换&lt;/li&gt;
+&lt;li&gt;Rotation，旋转转换&lt;/li&gt;
+&lt;li&gt;LookAt，视角转换&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Translation的一般形式：&lt;/p&gt;
+
+&lt;p&gt;\[ T(\vartriangle x,\vartriangle y,\vartriangle z) =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;\vartriangle x\\ 0&amp;amp;1&amp;amp;0&amp;amp;\vartriangle y\\ 0&amp;amp;0&amp;amp;1&amp;amp;\vartriangle z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;Scaling的一般形式：&lt;/p&gt;
+
+&lt;p&gt;\[ T(\vartriangle x,\vartriangle y,\vartriangle z) =  \left[ \begin{matrix} x&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;y&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;z&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;Rotation的一般形式，比较复杂，先分成3种情况考虑。所谓的旋转，都要有一个轴线，对任意一个3维坐标系来说，有3条轴，所以就有以3条轴为轴线的3个Rotation：&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x}(\theta ) =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;cos\theta &amp;amp;-sin\theta &amp;amp;0\\ 0&amp;amp;sin\theta &amp;amp;cos\theta &amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ R_{y}(\theta ) =  \left[ \begin{matrix} cos\theta &amp;amp;0&amp;amp;sin\theta &amp;amp;0\\ 0&amp;amp;1&amp;amp;0&amp;amp;0\\ -sin\theta &amp;amp;0&amp;amp;cos\theta &amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ R_{z}(\theta ) =  \left[ \begin{matrix} cos\theta &amp;amp;-sin\theta &amp;amp;0&amp;amp;0\\ sin\theta &amp;amp;cos\theta &amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;以x轴的旋转分析一下：&lt;/p&gt;
+
+&lt;p&gt;因为：&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x}(\theta )[x,y,z,w]^{T} = [x,cos\theta \cdot y - sin\theta \cdot z,sin\theta \cdot y + cos\theta \cdot z, w]^{T} \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x}(\theta )[1,0,0,0]^{T} = [1,0,0,0]^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x}(\theta )[0,1,0,0]^{T} = [0,cos\theta ,sin\theta ,0]^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x}(\theta )[0,0,1,0]^{T} = [0,-sin\theta ,cos\theta ,0]^{T} \]&lt;/p&gt;
+
+&lt;p&gt;可以看出，用Rx旋转x轴,x轴不变,旋转y、z轴，y、z轴会被顺时针旋转\(\theta \)度（左手坐标系时）。&lt;/p&gt;
+
+&lt;p&gt;Rotation有一些特性：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( R_{\alpha }(0) = I \) 这个0是指\(\theta=0\)，不是向量0&lt;/li&gt;
+&lt;li&gt;\( R_{\alpha }(\theta _{1})R_{\alpha }(\theta _{2}) = R_{\alpha }(\theta _{1} + \theta _{2}) \)&lt;/li&gt;
+&lt;li&gt;\( R_{\alpha }(\theta _{1})R_{\alpha }(\theta _{2}) = R_{\alpha }(\theta _{2})R_{\alpha }(\theta _{1}) \)&lt;/li&gt;
+&lt;li&gt;\( R_{\alpha }^{-1}(\theta ) = R_{\alpha }(-\theta ) = R_{\alpha }^{T}(\theta ) \)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;回想下正交矩阵的定义：&lt;strong&gt;如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵&lt;/strong&gt;，根据上面的第四条性质，R显然也是一个正交矩阵。正交矩阵的好处是，它的逆矩阵很简单，等于它的转置矩阵。&lt;/p&gt;
+
+&lt;p&gt;当需要围绕任意一个向量做旋转时，可以这样想：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;设轴向量为a，要被旋转的向量为v&lt;/li&gt;
+&lt;li&gt;把a向量当做一个x轴（y or z轴也行）；把v到a的error向量（如果不知道什么是error向量，请看我之前的文章）当做y轴&lt;/li&gt;
+&lt;li&gt;以x、y轴向量去计算正交的z轴向量（用叉积即可）&lt;/li&gt;
+&lt;li&gt;就得到了一个以a向量为x轴的xyz坐标系了&lt;/li&gt;
+&lt;li&gt;所以原问题就变成了，绕这个虚拟坐标系的x轴旋转&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;计算过程：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( v_{c} = a\parallel v\parallel cos\alpha = a(v\cdot a) \)&lt;/li&gt;
+&lt;li&gt;\( v_{1} = v - v_{c} \)&lt;/li&gt;
+&lt;li&gt;\( v_{2} = v_{1}\times a \)&lt;/li&gt;
+&lt;li&gt;\( v_{1}^{\prime } =  v_{1}cos\theta + v_{2}sin\theta \) &lt;/li&gt;
+&lt;li&gt;\( v^{\prime } = v_{c} + v_{1}^{\prime } \) &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.9/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(书里没有标出来\( v_{c} \) ,红色的那段就是)&lt;/p&gt;
+
+&lt;p&gt;书里也没有解释上面第三个式子是怎么得到的。我的理解是，因为\( v_{1}^{\prime } \)和\( v_{1} \)等长，所以\( v_{1}^{\prime } \)在\( v_{1} \)上的投影(向量)等于\(v_{1}cos\theta \)，又因为\( v_{1} \)是一个坐标系的轴，所以这个投影就是\( v_{1}^{\prime } \)对应这个轴的分量；同理，\(v_{2}sin\theta \)，是\( v_{1}^{\prime } \)在\( v_{2} \)上的投影。这两个投影向量的和，就是\( v_{1}^{\prime } \)。&lt;/p&gt;
+
+&lt;p&gt;不过这个任意轴旋转的矩阵就不那么简单了，先设：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( c = cos\theta  \)&lt;/li&gt;
+&lt;li&gt;\( s = sin\theta  \)&lt;/li&gt;
+&lt;li&gt;\( x,y,z = normalize(x,y,z) \)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ R_{(x,y,z)}(\theta ) =  \left[ \begin{matrix} x^{2}+(1-x^{2})c&amp;amp;xy(1-c) -zs&amp;amp;xz(1-c)+ys&amp;amp;0\\ xy(1-c)+zs&amp;amp;y^{2}+(1-y^{2})c&amp;amp;yz(1-c)-xs&amp;amp;0\\ xz(1-c)-ys&amp;amp;yz(1-c)+xs&amp;amp;z^{2}+(1-z^{2})c&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;(好可怕的矩阵=。=，不过这世界上还有个东西叫四元数旋转。有空再写一篇四元数的文章）&lt;/p&gt;
+
+&lt;p&gt;LookAt转换&lt;/p&gt;
+
+&lt;p&gt;LookAt矩阵的第4列是摄像机在世界坐标系的坐标；第3列是单位化的视点朝向向量（摄像机的前方），即视点坐标减去第4列的坐标;第2列是单位化的up向量（摄像机的上方），以世界坐标系表示；第1列是摄像机坐标系的x向量在世界坐标系对应的向量。&lt;/p&gt;
+
+&lt;p&gt;第1列的x向量，是用第2列的up向量和第3列的朝向向量进行叉积得到。&lt;/p&gt;
+
+&lt;p&gt;设：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;pos是摄像机坐标（世界坐标）&lt;/li&gt;
+&lt;li&gt;up是用户提供的摄像机朝向上方的向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;look是用户提供的摄像机视点的向量（世界坐标）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;于是有：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;dir = Normalize(look - pos)，摄像机的朝向向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;xaxis = Normalize(Cross(Normalize(up), dir))，摄像机的x轴单位向量（世界坐标）&lt;/li&gt;
+&lt;li&gt;newUp = Cross(Normalize(dir), xaxis)，新的单位化的up向量（世界坐标）。这里不太明白为什么不直接newUp = Normalize(up)。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} xaxis.x&amp;amp;newUp.x&amp;amp;dir.x&amp;amp;pos.x\\ xaxis.y&amp;amp;newUp.y&amp;amp;dir.y&amp;amp;pos.y\\ xaxis.z&amp;amp;newUp.z&amp;amp;dir.z&amp;amp;pos.z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h3&gt;Tranform的应用原理&lt;/h3&gt;
+
+&lt;p&gt;Tranform对Vector和Point的作用过程，上面已经提到了，就是简单的矩阵相乘。&lt;/p&gt;
+
+&lt;p&gt;对Ray和BBox的转换，也不难，就是对Ray的o和d分量分别左乘T、对BBox的8个顶点分别左乘T。&lt;/p&gt;
+
+&lt;p&gt;这里要提一下法向量的Tranform。法向量是不能直接T(n)的，这是错误的。&lt;/p&gt;
+
+&lt;p&gt;直接贴公式：&lt;/p&gt;
+
+&lt;p&gt;\[ n\cdot t = n^{T}t = 0 \]
+\[ (n^{\prime })^{T}t^{\prime }= 0 \]
+\[ (Sn)^{T}Mt = 0 \]
+\[ n^{T}S^{T}Mt = 0 \]
+\[ S^{T}M = I \]
+\[ n^{\prime } = Sn = (M^{-1})^{T}n \]&lt;/p&gt;
+
+&lt;p&gt;M是某种转换，当M对一个面作用时，这个面的法向量要用上面最后那条公式转换。注意到公式里面有一个逆矩阵，所以这就是为什么Transform要存一个逆矩阵。&lt;/p&gt;
+
+&lt;h3&gt;旋转四元数-&amp;gt;旋转矩阵&lt;/h3&gt;
+
+&lt;p&gt;虽然可以用四元数来实现旋转变换，但是如果能变回矩阵的形式，也是有用的。实际上却是办得到。&lt;/p&gt;
+
+&lt;p&gt;设四元数的旋转轴为:
+\[ q = [cos\frac {\theta }{2}, sin\frac {\theta }{2}\hat {v}] = [q_{w}, q_{x}i + q_{y}j + q_{z}k] = (q_{x}, q_{y}, q_{z}, q_{w}) \]&lt;/p&gt;
+
+&lt;p&gt;被旋转的点的原坐标为p，旋转后的坐标为\(p&amp;#39;\)：&lt;/p&gt;
+
+&lt;p&gt;\[ p = [w, xi + yj + zk] = (x,y,z,0)  \]&lt;/p&gt;
+
+&lt;p&gt;四元数表示的旋转公式：&lt;/p&gt;
+
+&lt;p&gt;\[ p&amp;#39; = qpq^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;而矩阵表示的旋转公式是：
+\[ p&amp;#39; = Mp \]&lt;/p&gt;
+
+&lt;p&gt;M是未知的，目标就是算出M。把上面的p和q代入四元数旋转公式，就能得到一个新的四元数\(p&amp;#39;\),这个\(p&amp;#39;\)会有i、j、k分量，只要把i、j、k3个分量再按3个未知数x、y、z去分开，就得到一个9x9的矩阵，也就是M了。&lt;/p&gt;
+
+&lt;p&gt;我在纸上写了下推导公式，非常繁琐，不好弄成latex。直接贴上最终的公式吧：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/pbrt-chapter2/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/pbrt-chapter2/</guid>
+      </item>
+    
+      <item>
+        <title>&lt;复习向&gt;线性代数之矩阵的特征值、特征向量、特征矩阵、迹</title>
+        <description>&lt;h2&gt;定义&lt;/h2&gt;
+
+&lt;p&gt;设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
+\[ A\alpha = \lambda \alpha \]
+则称\(\lambda \)为A的一个&lt;strong&gt;特征值(根)&lt;/strong&gt;(eigenvalue)，称\(\alpha \)为A的属于特征值\(\lambda \)的&lt;strong&gt;特征向量&lt;/strong&gt;(eigenvector)。&lt;/p&gt;
+
+&lt;p&gt;\( A\alpha \)和\(\alpha \)平行（即在同一个直线上。&lt;/p&gt;
+
+&lt;p&gt;\(\lambda E - A\)为A的&lt;strong&gt;特征矩阵&lt;/strong&gt;，行列式\(f(\lambda ) = |\lambda E - A|\)为A的&lt;strong&gt;特征多项式&lt;/strong&gt;，\(|\lambda E - A| = 0\)为A的&lt;strong&gt;特征方程&lt;/strong&gt;,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;A的主对角线上元素之和称为A的&lt;strong&gt;迹&lt;/strong&gt;(trace)，记为tr(A)，即&lt;/p&gt;
+
+&lt;p&gt;\[ tr(A) = a_{11} + a_{11} + \cdots + a_{nn} \]&lt;/p&gt;
+
+&lt;p&gt;迹和特征值有很重要的联系：&lt;/p&gt;
+
+&lt;p&gt;\[ tr(A) = \lambda _{1} + \lambda _{2} + \cdots + \lambda _{n} \]&lt;/p&gt;
+
+&lt;p&gt;迹还和A的行列式有关系：&lt;/p&gt;
+
+&lt;p&gt;\[ |A| = \lambda _{1}\lambda _{2}\cdots \lambda _{n} \]&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;A的全部特征值和特征向量的求法&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;计算A的特征多项式&lt;/li&gt;
+&lt;li&gt;求特征方程的全部根，即矩阵A的全部特征值&lt;/li&gt;
+&lt;li&gt;对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
+\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
+其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;特征值的性质&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）&lt;/li&gt;
+&lt;li&gt;A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值&lt;/li&gt;
+&lt;li&gt;矩阵A与其转置矩阵\(A^{T}\)有相同的特征值&lt;/li&gt;
+&lt;li&gt;\(k\lambda \)是矩阵kA的特征值(k是任意常数)。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;迹的性质&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;\( tr(A + B) = tr(A) + tr(B) \)&lt;/li&gt;
+&lt;li&gt;\( tr(kA) = k\cdot tr(A) \)&lt;/li&gt;
+&lt;li&gt;\( tr(A^{T}) = tr(A) \)&lt;/li&gt;
+&lt;li&gt;\( tr(AB) = tr(BA) \)&lt;/li&gt;
+&lt;li&gt;\( tr(ABC) = tr(BCA) = tr(CAB) \)&lt;/li&gt;
+&lt;li&gt;设A、B为n阶方阵，P为n阶可逆矩阵，且\(P^{-1}AP = B \)，则有\(tr(A) = tr(B)\)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;当A为投影矩阵P时&lt;/h2&gt;
+
+&lt;p&gt;因为投影矩阵P可以把一个向量b投影到一个空间的某一个向量，也就是\(Pb = p\)，这个式子和\( A\alpha = \lambda \alpha \)有一致的地方。&lt;/p&gt;
+
+&lt;p&gt;那么P的特征向量是什么呢？前面已经说到，\( A\alpha \)和\( \alpha \)是平行关系，那么就是说，如果b在P的列空间之外，b就不是P的特征向量，当b在P的列空间内时，b是P的特征向量。&lt;/p&gt;
+
+&lt;p&gt;比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px = x\)，P作用于x后还是得到x)&lt;/p&gt;
+
+&lt;p&gt;又因为\(Px = x = 1\cdot x\)，所以P的一个特征值是1。&lt;/p&gt;
+
+&lt;p&gt;但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。&lt;/p&gt;
+
+&lt;h2&gt;当A为旋转矩阵Q时&lt;/h2&gt;
+
+&lt;p&gt;因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。&lt;/p&gt;
+
+&lt;p&gt;\[ Q =  \left[ \begin{matrix} cos(90)&amp;amp;-sin(90)\\ sin(90)&amp;amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;amp;-1\\ 1&amp;amp;0\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
+\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]&lt;/p&gt;
+
+&lt;p&gt;显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。&lt;/p&gt;
+
+&lt;h2&gt;A的对角化(diagonalize)&lt;/h2&gt;
+
+&lt;p&gt;设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：&lt;/p&gt;
+
+&lt;p&gt;\[ AS = A \left[ \begin{matrix} x_{1}&amp;amp;x_{2}&amp;amp;\cdots &amp;amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;amp;\lambda _{2}x_{2}&amp;amp;\cdots &amp;amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
+\[    =  \left[ \begin{matrix} x_{1}&amp;amp;x_{2}&amp;amp;\cdots &amp;amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;amp;0&amp;amp;\cdots &amp;amp;0\\ 0&amp;amp;\lambda _{2}&amp;amp;\cdots &amp;amp;0\\ \vdots &amp;amp;\vdots&amp;amp; \cdots &amp;amp;\vdots\\ 0&amp;amp;0&amp;amp;\cdots &amp;amp;\lambda _{n}\\ \end{matrix} \right] \]
+\[ = S\Lambda \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ A = S\Lambda S^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。&lt;/p&gt;
+
+&lt;p&gt;可以对角化的前提是A有n个线性无关的特征向量。A有n个线性无关的特征向量的前提是，所有的\(\lambda \)都不重复（没有重根）。&lt;/p&gt;
+
+&lt;p&gt;BTW，对于A的幂，有一个性质：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;如果有 \( Ax = \lambda x \)，则有\( A^{2}x = AAx = \lambda Ax = \lambda \lambda x = \lambda ^{2}x\) &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( A^{2} = S\Lambda S^{-1}S\Lambda S^{-1} = S\Lambda ^{2}S^{-1} \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个性质说明，A的n次幂的特征值等于\(\lambda ^{n}\)，且无论n等于多少(当前n得是正整数），特征向量不变。&lt;/p&gt;
+
+&lt;p&gt;这也是求矩阵的n次幂的快速解法。&lt;/p&gt;
+
+&lt;p&gt;特征分解还有一个用法是，求A的逆矩阵:&lt;/p&gt;
+
+&lt;p&gt;\[ A^{-1} = (S\Lambda S^{-1})^{-1} =S\Lambda ^{-1}S^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;\(\Lambda\)的逆矩阵是非常容易求的，因为它是一个对角矩阵，所以把对角线上的\(\lambda \)都变成\(1/\lambda \)即可。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-6/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-6/</guid>
+      </item>
+    
+      <item>
+        <title>&lt;复习向&gt;线性代数之正交矩阵</title>
+        <description>&lt;h2&gt;基础知识&lt;/h2&gt;
+
+&lt;p&gt;标准正交向量组（Orthonormal vectors）的点积(内积)性质：&lt;/p&gt;
+
+&lt;p&gt;\( q_{i}^{T}q_{j} = 0 \) &lt;strong&gt;if&lt;/strong&gt; \( i\neq j \)&lt;/p&gt;
+
+&lt;p&gt;\( q_{i}^{T}q_{j} = 1 \) &lt;strong&gt;if&lt;/strong&gt; \( i = j \)&lt;/p&gt;
+
+&lt;p&gt;其中每个正交向量的长度\(||q_{i}||=1\)。&lt;/p&gt;
+
+&lt;p&gt;标准正交向量组成的矩阵是：
+&amp;lt;!--more--&amp;gt;&lt;/p&gt;
+
+&lt;p&gt;\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] \)&lt;/p&gt;
+
+&lt;p&gt;注意，列向量的分量数量未知，Q所以不一定是方阵。&lt;/p&gt;
+
+&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] = I \)&lt;/p&gt;
+
+&lt;p&gt;当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。&lt;/p&gt;
+
+&lt;p&gt;比如当Q为3阶单位矩阵I的置换矩阵时：&lt;/p&gt;
+
+&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ \end{matrix} \right] = I \)&lt;/p&gt;
+
+&lt;p&gt;或者三角函数作为元素的二阶Q：&lt;/p&gt;
+
+&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;amp;-sin\theta\\ sin\theta&amp;amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;amp;sin\theta\\ -sin\theta&amp;amp;cos\theta\\ \end{matrix} \right] = I \)&lt;/p&gt;
+
+&lt;h2&gt;定义&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;当A的列向量的长度都为1时，称A为标准正交矩阵Q。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;定理&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;当\(A^{-1} = A^{T}\)成立时A是正交矩阵&lt;/li&gt;
+&lt;li&gt;A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵&lt;/li&gt;
+&lt;li&gt;正交矩阵A的行列式为1或-1&lt;/li&gt;
+&lt;li&gt;如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵&lt;/li&gt;
+&lt;li&gt;如果A、B都是正交矩阵，那么AB也是正交矩阵&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;正交矩阵怎么用？&lt;/h2&gt;
+
+&lt;p&gt;在上一篇文章中，讲到了投影矩阵的各种公式，其中有一条是：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{T}A\hat{x} = A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;这个戴着帽子的x是未知量，要求它的值，就需要再变换下：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat{x} = (A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;那么问题来了：右边的式子有点复杂，又要算矩阵乘法又要算逆矩阵，是不是可以简化呢？&lt;/p&gt;
+
+&lt;p&gt;答案是可以，且要用到正交矩阵。因为A是由一组线性无关的列向量组成，当把这组向量转换为标准正交向量组时，就得到了标准正交矩阵Q。拿Q代入上面的式子，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ Q^{T}Q\hat{x} = Q^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;再根据上述的Q的公式，干掉左边的2个Q，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat{x} = Q^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;瞬间豁然开朗。&lt;/p&gt;
+
+&lt;p&gt;但是还有一个问题，怎么从A得到Q呢？&lt;/p&gt;
+
+&lt;h2&gt;矩阵的正交化算法&lt;/h2&gt;
+
+&lt;p&gt;因为从A可以得到Q，所以必然某个矩阵R，使得 A = QR 成立，这个过程叫做A的QR分解（QR decomposition)。&lt;/p&gt;
+
+&lt;h3&gt;先举一个二维的例子：&lt;/h3&gt;
+
+&lt;p&gt;设 a1 = (3,4)、a2 = (4,3)，显然a1和a2线性无关（不在同一条直线上），且a1和a2的长度都不是1。a1、a2是二维空间的一组基(basis)。&lt;/p&gt;
+
+&lt;p&gt;a1,a2对应的矩阵为：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} a_{1}&amp;amp;a_{2}\\ \end{matrix} \right] =  \left[ \begin{matrix} 3&amp;amp;4\\ 4&amp;amp;3\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;显然，A是一个方阵。接下来就是实现A的QR分解。&lt;/p&gt;
+
+&lt;p&gt;标准正交矩阵，可以分为2个步骤实现：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;正交化(orthogonal)&lt;/li&gt;
+&lt;li&gt;标准化(normalize)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;二维空间下，让2个向量正交化，即等于是要找出2个互相垂直的向量。怎么找最简单呢？因为这样的向量组无限多，于是a1或a2都可以是某组正交向量的其中一个向量。&lt;/p&gt;
+
+&lt;p&gt;那么，我们可以让a1作为一个正交向量，然后再找出一个与a1垂直的向量，就得到一组正交向量了。&lt;/p&gt;
+
+&lt;p&gt;设u1、u2为要求的标准正交向量组，n1、n2代表a1、a2的单位向量，那么可以有：&lt;/p&gt;
+
+&lt;p&gt;\[ u_{1} = n_{1} \]&lt;/p&gt;
+
+&lt;p&gt;u2怎么求？很简单，利用投影矩阵的知识即可完成。因为a2和a1线性无关，那么a2在a1上有且只有一个投影点p2，算出这个投影点p2，就能快速得到a2关于a1的error向量：&lt;/p&gt;
+
+&lt;p&gt;\[ e_{2} = a_{2} - p_{2} \]&lt;/p&gt;
+
+&lt;p&gt;为什么要算e2向量？因为e2向量的一个重要性质是，e2和a1是互相垂直的，换句话说就是，&lt;strong&gt;e2和a1正交!&lt;/strong&gt;。有了e2，将其单位化后，就是u2了。&lt;/p&gt;
+
+&lt;p&gt;求u2的步骤：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;先求n1，即a1的单位向量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ n_{1} = \dfrac { a_{1} }{ ||a_{1}|| } \] &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;求出a2的投影点p2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ p_{2} = n_{1}\dfrac { n_{1}^{T}a_{2} }{  n_{1}^{T} n_{1} } = n_{1}(n_{1}^{T}a_{2}) \] &lt;/p&gt;
+
+&lt;p&gt;那个分母为什么可以去掉呢？这是因为n1是单位向量，\( n_{1}^{T} n_{1} \)是n1的内积，显然这个内积等于1。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;求e2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ e_{2} = a_{2} - p_{2} = a_{2} - n_{1}(n_{1}^{T}a_{2}) \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;单位化e2，得到u2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ u_{2} = \dfrac { e_{2} }{ ||e_{2}|| } \]&lt;/p&gt;
+
+&lt;p&gt;好了，公式出来了，拿上面的例子验证下：&lt;/p&gt;
+
+&lt;p&gt;\[ u_{1} = n_{1} = \dfrac { a_{1} }{ ||a_{1}|| } = (\dfrac {3}{5},\dfrac {4}{5} ) \]&lt;/p&gt;
+
+&lt;p&gt;\[ e_{2} = a_{2} - p_{2} = a_{2} - n_{1}(n_{1}^{T}a_{2}) = (\dfrac {28}{25},\dfrac {-21}{25}) \]&lt;/p&gt;
+
+&lt;p&gt;\[ u_{2} = \dfrac { e_{2} }{ ||e_{2}|| } = (\dfrac {4}{5},\dfrac {-3}{5}) \]&lt;/p&gt;
+
+&lt;p&gt;\[ u_{1} \cdot u_{2} = (\dfrac {3}{5},\dfrac {4}{5}) \cdot (\dfrac {4}{5},\dfrac {-3}{5}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;u1和u2的内积为0，且长度均为1，所以U1和u2是一组标准正交向量。&lt;/p&gt;
+
+&lt;p&gt;\[ Q =  \left[ \begin{matrix} u_{1}&amp;amp;u_{2}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h3&gt;高维时的通用QR解法&lt;/h3&gt;
+
+&lt;p&gt;上面是维度为2时的QR分解过程，接下来谈谈3维以及n维的情况。&lt;/p&gt;
+
+&lt;p&gt;当维度为3时，还是比较好想象的，我们分步构想下QR分解过程：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A矩阵由3个线性无关的向量构成，A的列空间是一个三维空间，即三维空间的任意一个点都可以通过线性组合这3个向量得到&lt;/li&gt;
+&lt;li&gt;设3个向量为a1、a2、a3，先对a1、a2进行正交化运算，过程和上述的一致，除了\(a_{i}\)变成了3个分量。&lt;/li&gt;
+&lt;li&gt;正交化a1、a2，就得到了a1、a2对应的平面空间的一组标准正交基u1、u2&lt;/li&gt;
+&lt;li&gt;于是原问题变成：求解u1、u2、a3的正交化。u1和u2已经是标准正交向量，不用管它们，问题就是求出u3。&lt;/li&gt;
+&lt;li&gt;a3是在u1、u2对应的平面&lt;strong&gt;之外&lt;/strong&gt;的一个点，a3在这个平面上有且只有一个投影点p3，将它求出来&lt;/li&gt;
+&lt;li&gt;再求出\( e_{3} = a_{3} - p_{3} \)就得到了a3的error向量，该向量垂直于u1、u2平面！&lt;/li&gt;
+&lt;li&gt;将e3标准化后，就得到了u3&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;n&amp;gt;3维的情况，可以用归纳法解出。&lt;/p&gt;
+
+&lt;p&gt;高维情况下的QR分解，公式如下：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} a_{1}&amp;amp;a_{2}&amp;amp;\cdots&amp;amp;a_{n}\\ \end{matrix} \right] \]
+\[ A =  \left[ \begin{matrix} u_{1}&amp;amp;u_{2}&amp;amp;\cdots&amp;amp;u_{n}\\ \end{matrix} \right] \left[ \begin{matrix} a_{1}\cdot u_{1}&amp;amp;a_{2}\cdot u_{1}&amp;amp;\cdots &amp;amp;a_{n}\cdot u_{1}\\ 0&amp;amp;a_{2}\cdot u_{2}&amp;amp;\cdots &amp;amp;a_{n}\cdot u_{2}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots\\ 0&amp;amp;0&amp;amp;\cdots &amp;amp;a_{n}\cdot u_{n}\\ \end{matrix} \right] = QR \]&lt;/p&gt;
+
+&lt;p&gt;Q是标准正交矩阵，R是上三角矩阵。&lt;/p&gt;
+
+&lt;p&gt;证明过程略，不过可以简单分析下这公式的正确性。&lt;/p&gt;
+
+&lt;p&gt;Q乘以R的结果是A矩阵，那么可以得到：&lt;/p&gt;
+
+&lt;p&gt;\[ a_{1} = u_{1}(a_{1}\cdot u_{1}) \]&lt;/p&gt;
+
+&lt;p&gt;这个式子，是不是很眼熟，其实就是投影公式：&lt;/p&gt;
+
+&lt;p&gt;\[ p_{1} = a_{1} = u_{1}\dfrac { u_{1}^{T}a_{1} }{  u_{1}^{T} u_{1} } = u_{1}(u_{1}^{T}a_{1}) = u_{1}(a_{1}\cdot u_{1}) \] &lt;/p&gt;
+
+&lt;p&gt;（后面的内积有2种写法，同个意思，不用在意）&lt;/p&gt;
+
+&lt;p&gt;这个式子说明，经过QR分解后，a1的投影点还是a1，且在u1上。（但a1不一定等于u1）&lt;/p&gt;
+
+&lt;p&gt;我把a2也写出来：&lt;/p&gt;
+
+&lt;p&gt;\[ a_{2} = u_{1}(a_{2}\cdot u_{1}) + u_{2}(a_{2}\cdot u_{2}) \]&lt;/p&gt;
+
+&lt;p&gt;类似a1，a2 = a2在u1的投影 + a2在u2的投影。（注意：a2一定不在u上，因为这样a1和a2就线性有关了；a2不一定在u2上）&lt;/p&gt;
+
+&lt;p&gt;然后a3，就不用写了，显然a3 = a3在u1的投影 + a3在u2的投影 + a3在u2的投影。&lt;/p&gt;
+
+&lt;p&gt;\(a_{n}\)以此类推。所以这个公式是OK的。&lt;/p&gt;
+
+&lt;p&gt;总结一下：&lt;/p&gt;
+
+&lt;p&gt;要对A做QR分解，得从A本身出发，算出各个标准正交向量，并且这是一个迭代的过程：从a1算出u1，再通过a2和u1得到u2，接着，\(u_{n}\)都可以通过\(a_{n}\)和前面算出来的\(u_{i}\ \ (i&amp;lt;n)\)得到。&lt;/p&gt;
+
+&lt;p&gt;如果QR分解的目的只是为了得到Q矩阵，那么R矩阵是没什么卵用的，因为R矩阵本身也包含了目标变量n，所以没办法用\(Q=AR^{-1}\)公式求Q矩阵。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-5/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-5/</guid>
+      </item>
+    
+      <item>
+        <title>&lt;复习向&gt;线性代数之投影矩阵</title>
+        <description>&lt;h2&gt;投影矩阵是what？&lt;/h2&gt;
+
+&lt;p&gt;先给出结论：投影矩阵P（projection），可以把一个向量b，投影到一个“空间”上，投影点称为p，从p到b的向量称为e，e = b - p，e的含义是误差向量（error）。&lt;/p&gt;
+
+&lt;p&gt;再举例子帮助读者理解：&lt;/p&gt;
+
+&lt;h2&gt;上述的“空间”为一维时&lt;/h2&gt;
+
+&lt;p&gt;一个向量b，投影到一个一维的空间，显然，这个空间是一条直线，设直线为单位向量a，那么这个投影其实就是找到这个直线上离b最近的点p，误差向量e就是b到p的距离。因为p在a上，所以有：&lt;/p&gt;
+
+&lt;p&gt;p = ax（p和a都是向量，x是一个值）【式子1】&lt;/p&gt;
+
+&lt;p&gt;然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：
+&amp;lt;!--more--&amp;gt;
+\[ a^{T}e = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ a^{T}(b-xa) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;再变换一下，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ xa^{T}a = a^{T}b  \]&lt;/p&gt;
+
+&lt;p&gt;\[ x = \dfrac { a^{T}b }{ a^{T}a } \]&lt;/p&gt;
+
+&lt;p&gt;根据【式子1】，最后得到：&lt;/p&gt;
+
+&lt;p&gt;\[ p = a\dfrac { a^{T}b }{ a^{T}a } 【式子2】 \] &lt;/p&gt;
+
+&lt;p&gt;看，式子左边的p是投影向量，右边有b和a，b是原向量，a是空间向量。所以这个式子隐含了一个变换关系：从b通过某种变换能够得到p。所谓的投影矩阵P（注意，是大写），就在这个式子里面了。&lt;/p&gt;
+
+&lt;p&gt;投影矩阵P应该有这样的效果：&lt;/p&gt;
+
+&lt;p&gt;\[ p = Pb  \]&lt;/p&gt;
+
+&lt;p&gt;P作用于任意一个向量b，能够得到b在某个空间的投影点p。&lt;/p&gt;
+
+&lt;p&gt;注意: &lt;strong&gt;P是一个矩阵，不是一个数！&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;【式子2】应该要变换成什么样子，才能变出一个矩阵呢？答案如下：&lt;/p&gt;
+
+&lt;p&gt;\[ p = \dfrac { aa^{T} }{ a^{T}a }b \] &lt;/p&gt;
+
+&lt;p&gt;投影矩阵P：&lt;/p&gt;
+
+&lt;p&gt;\[ P = \dfrac { aa^{T} }{ a^{T}a } \] &lt;/p&gt;
+
+&lt;p&gt;式子右边是一个矩阵，这是因为分子是\(aa^{T}\)，这不是一个数，而是一个矩阵（分母才是一个数）。（顺序很重要！）&lt;/p&gt;
+
+&lt;p&gt;投影矩阵P的2条重要性质：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;\( P = P^{T} \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( P^{n} = P \) , n为正整数&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;第二条性质说明，投影点p再次经过同一个投影变换，依然还是p。这样的矩阵称为幂等矩阵。&lt;/p&gt;
+
+&lt;h2&gt;投影的实际意义?&lt;/h2&gt;
+
+&lt;p&gt;为什么要找投影点，这是因为，当我们要计算线性方程组 \( Ax=b \)的解时，它可能是无解的。怎么办呢？既然没有正解，就找最优解！最优解就是找一个和b最近的p，并求解\( A\hat{x}=p \)。&lt;/p&gt;
+
+&lt;h2&gt;上述的“空间”为二维时&lt;/h2&gt;
+
+&lt;p&gt;一个向量b，投影到一个二维的空间，显然，这个空间是一个平面。一个平面，可以由2个线性无关（independant)的向量\(a_{1}\)和\(a_{2}\)确定。a1和a2是这个平面的一组基（basis）。&lt;/p&gt;
+
+&lt;p&gt;一组基可以写成矩阵的形式：&lt;/p&gt;
+
+&lt;p&gt;\[ A = [ \ a_{1}\ \ a_{2} ] \ \] 【式子3】&lt;/p&gt;
+
+&lt;p&gt;和一维情况做一个对比：&lt;/p&gt;
+
+&lt;p&gt;投影点p，在一维时 p = ax。那么，在二维平面上呢？显然，p可以由这个平面的基得到：\( p = \hat{x_{1}}a_{1}+x_{2}a_{2} \)。&lt;/p&gt;
+
+&lt;p&gt;根据【式子3】可以得到：&lt;/p&gt;
+
+&lt;p&gt;\[ p = A\hat{x} \]&lt;/p&gt;
+
+&lt;p&gt;\[ e = b - p = b - A\hat{x} \]&lt;/p&gt;
+
+&lt;p&gt;上述一维的情况时的那个e，在二维时也是一样的，e会垂直于这个空间，也就是e和这个平面是垂直的。&lt;/p&gt;
+
+&lt;p&gt;因为e和平面垂直，平面的基是\(a_{1}\)和\(a_{2}\)，即a与\(a_{1}\)和\(a_{2}\)垂直，所以：&lt;/p&gt;
+
+&lt;p&gt;\[ a_{1}^{T}(b - A\hat{x}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ a_{2}^{T}(b - A\hat{x}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} a_{1}^{T}\\ a_{2}^{T}\\ \end{matrix} \right] (b - A\hat{x}) =  \left[ \begin{matrix} 0\\ 0\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ A^{T}(b - A\hat{x}) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A^{T}A\hat{x} = A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;这和一维情况的其中一个式子很像，对吧。 但\(A^{T}A\)是一个高维的东西，它不是一个数，而是一个矩阵。&lt;/p&gt;
+
+&lt;p&gt;再变换一下，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat{x} = (A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;所以投影点p和b的变换公式就是：&lt;/p&gt;
+
+&lt;p&gt;\[ p = A\hat{x} = A(A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
+
+&lt;p&gt;抽出投影矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ P = A(A^{T}A)^{-1}A^{T} 【式子4】\]&lt;/p&gt;
+
+&lt;p&gt;这条式子，中间的括号假如可以去掉的话，就变成了：&lt;/p&gt;
+
+&lt;p&gt;\[ P = A A^{-1} (A^{T})^{-1} A^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[ P = II = I \]&lt;/p&gt;
+
+&lt;p&gt;为什么P变成了单位矩阵I呢？这是因为把\( (A^{T}A)^{-1} \)解开的前提是&lt;strong&gt;A是一个方阵&lt;/strong&gt;。但就现在这个二维平面的例子而言，A由2个基构成（（每个基有3个分量），A并不是方阵，所以是不能解开的。上述的变换是错误的。&lt;/p&gt;
+
+&lt;p&gt;当A是方阵时，意味着有3个基，而又因为基之间线性无关，所以方阵A不可能只是代表一个平面空间，实际上，A代表的是一个三维空间。所以，一个在三维空间的点b，投影到三维空间后，当然还是b。所以A是方阵时，投影矩阵就是单位矩阵I。&lt;/p&gt;
+
+&lt;p&gt;当A不是方阵时，要按照【式子4】去求投影矩阵P。&lt;/p&gt;
+
+&lt;p&gt;另外，在高维情况下，P的那2条性质依然成立。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-4/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-4/</guid>
+      </item>
+    
+  </channel>
+</rss>
