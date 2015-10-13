@@ -113,7 +113,9 @@ https://www.youtube.com/watch?v=gZNm7L96pfY
 
 <!--more-->
 
-<h2>傅里叶级数</h2>
+<h2>傅里叶级数 fourier series</h2>
+
+<h3>基础</h3>
 
 <p>翻译一下wiki的fourier series：</p>
 
@@ -332,11 +334,46 @@ https://www.youtube.com/watch?v=gZNm7L96pfY
 
 <h3>大跃进，终极的傅里叶级数的复指数形式</h3>
 
-<p>终极的傅里叶级数的复指数形式是(fourier series exponential form)：</p>
+<p>终极的傅里叶级数的复指数形式是(fourier series exponential form  )：</p>
 
-<p>\[ f(t) = c_{0} + \sum_{k=-\infty }^{\infty }c_{k}e^{ik\omega t} \]</p>
+<p>\[ f(t) = \sum_{k=-\infty }^{\infty }c_{k}e^{2\pi ikt} \]</p>
 
-<p>\[ c_{k} = \frac {T}{1}\int _{-\frac {2}{T} }^{\frac {2}{T} }f(t)e^{-ik\omega t}dt \]</p>
+<p>前面的傅里叶级数是finite的，这个是infinite的。</p>
+
+<p>其中的\(c_{k}\)有一个专门的notation：\( \hat {f}(t) \)，代入后得到：</p>
+
+<p>\[ \hat {f}(t) = \int _{-\frac {1}{2} }^{\frac {1}{2} }f(t)e^{-2\pi ikt}dt \]</p>
+
+<p>\[ f(t) = \sum_{k=-\infty }^{\infty }\hat {f}(t)e^{2\pi ikt} \]</p>
+
+<h2>傅里叶变换 fourier transform</h2>
+
+<h3>傅里叶积分定理 fourier integrate</h3>
+
+<p>若函数f(t)在\(-\infty ,+\infty \)上的任一有限区间内满足Dirichlet条件，并且在\(-\infty ,+\infty \)上绝对可积（即积分\( \int _{-\infty }^{+\infty }|f(t)|dt\)收敛)，则有：
+\[ \frac {1}{2\pi }\int _{-\infty }^{+\infty }\left [ \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt\right ]e^{i\omega t}d\omega =  \begin {cases} f(t), 当t为f(t)的连续点; \\  \frac {f(t+0)+f(t-0)}{2},当t为f(t)的间断点。 \end {cases} \]</p>
+
+<p>令:</p>
+
+<p>\[ F(\omega ) = \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt \]</p>
+
+<p>则:</p>
+
+<p>\[ f(t) = \frac {1}{2\pi }\int _{-\infty }^{+\infty }F(\omega )e^{i\omega t}d\omega \]</p>
+
+<p>上两式子表明\( F(\omega ) 和 f(t) \)通过指定的积分运算可以相互表示。</p>
+
+<p>第一个式子称为f(t)的傅里叶变换，记为:</p>
+
+<p>\[ F(\omega ) = \mathcal {F}[f(t)] \]</p>
+
+<p>函数为\(F(\omega ) \)称为f(t)的<strong>像函数</strong>。</p>
+
+<p>第二个式子称为\(F(\omega ) \)的逆傅里叶变换，记为:</p>
+
+<p>\[ f(t) = \mathcal {F}^{-1}[ F(\omega ) ] \]</p>
+
+<p>函数f(t)称为为\(F(\omega ) \)的<strong>像原函数</strong>。</p>
 
   </div>
 
