@@ -7,6 +7,75 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>理解卷积 Convolution</title>
+        <description>&lt;h2&gt;数学中的卷积&lt;/h2&gt;
+
+&lt;p&gt;卷积的wiki：&lt;a href=&quot;https://en.wikipedia.org/wiki/Convolution#Derivations&quot;&gt;Convolution&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;卷积和(convolution sum)的公式是:&lt;/p&gt;
+
+&lt;p&gt;\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]&lt;/p&gt;
+
+&lt;p&gt;写成积分形式是:&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;\[ x(t)*h(t) = \int _{-\infty }^{\infty }x(\tau )h(t-\tau )d\tau = \int _{-\infty }^{\infty }x(t-\tau )h(\tau )d\tau \]&lt;/p&gt;
+
+&lt;p&gt;这个东西，很难从公式推导上理解（其实是没在网上找到推导过程，只知道和这个东西有关&lt;a href=&quot;https://en.wikipedia.org/wiki/LTI_system_theory#Overview&quot;&gt;LTI system theory&lt;/a&gt;）。不过我想到一个比较好的理解方式。&lt;/p&gt;
+
+&lt;p&gt;首先介绍下狄拉克δ函数。&lt;/p&gt;
+
+&lt;h3&gt;狄拉克δ函数 dirac delta function&lt;/h3&gt;
+
+&lt;p&gt;狄拉克δ函数的wiki：&lt;a href=&quot;https://en.wikipedia.org/wiki/Dirac_delta_function&quot;&gt;dirac delta function&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;狄拉克δ函数在坐标系上的长相:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/Dirac_function_approximation.gif&quot; alt=&quot;Dirac_function_approximation.gif&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;（图片来自wiki）&lt;/p&gt;
+
+&lt;p&gt;在&lt;strong&gt;信号处理科学&lt;/strong&gt;中狄拉克δ函数被称为单位脉冲信号(unit impulse symbol）。上面这个图也很形象地说明了这一点。&lt;/p&gt;
+
+&lt;p&gt;狄拉克δ函数有这样的性质:&lt;/p&gt;
+
+&lt;p&gt;\[ delta (t) =  \begin {cases} +\infty , t=0 \\  0, t\neq 0 \end {cases} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{-\infty }^{\infty }\delta (t)dt = 1 \]&lt;/p&gt;
+
+&lt;p&gt;狄拉克δ函数在t等于0时值为正无穷，t不等于0时则为0，且在整个定义域的积分等于1。&lt;/p&gt;
+
+&lt;h3&gt;狄拉克δ函数与卷积&lt;/h3&gt;
+
+&lt;p&gt;考虑一个特殊情况：h(t)是狄拉克δ函数。代入卷积公式，有:&lt;/p&gt;
+
+&lt;p&gt;\[ x(t) * h(t) = x(t) * \delta (t) = \int _{-\infty }^{\infty }x(\tau )\delta (t-\tau )d\tau = x(t) \]&lt;/p&gt;
+
+&lt;p&gt;(这里省略了推导过程）&lt;/p&gt;
+
+&lt;p&gt;这个结果说明，x(t)和狄拉克δ函数卷积的结果还是x(t)，为什么会这样呢？&lt;/p&gt;
+
+&lt;p&gt;再看下前面给出的卷积和标准公式：&lt;/p&gt;
+
+&lt;p&gt;\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]&lt;/p&gt;
+
+&lt;p&gt;把其中的\( h(t - \tau ) \)换成\( \delta (t - \tau ) \)，那么里面的\( t - \tau \)，其实就是让那个脉冲信号在横轴上移动(偏移)\( \tau \)距离。根据狄拉克δ函数的定义，可以知道，当\( t = \tau \)时，\( x(\tau )h(t-\tau ) \)才非0，且等于\( x(\tau ) \)。所以卷积和也就等于\( x(\tau ) \)。（这也算是上面的公式的证明吧）&lt;/p&gt;
+
+&lt;p&gt;将这个特殊情况一般化，即不限制h = δ时，就是所谓的卷积公式了。&lt;/p&gt;
+
+&lt;h3&gt;找到的相关资料&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.eecg.toronto.edu/%7Eahouse/mirror/engi7824/course_notes_7824_part6.pdf&quot;&gt;The Convolution Sum for Discrete-Time LTI Systems. Andrew W. H. House&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sun, 18 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/convolution/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/convolution/</guid>
+      </item>
+    
+      <item>
         <title>gcc-4.9.3 编译过程笔记</title>
         <description>&lt;p&gt;官方的编译指南：&lt;a href=&quot;https://gcc.gnu.org/install/&quot;&gt;https://gcc.gnu.org/install/&lt;/a&gt;&lt;/p&gt;
 
@@ -515,6 +584,76 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 &lt;p&gt;设\( F(\omega ) = \mathcal {F}[f(t)] \)，a为非零常数，则：&lt;/p&gt;
 
 &lt;p&gt;\[  \mathcal {F}[f(at)] = \frac {1}{|a|}F(\frac {\omega }{a}) \]&lt;/p&gt;
+
+&lt;h3&gt;离散傅里叶变换 discrete fourier transform&lt;/h3&gt;
+
+&lt;p&gt;wiki:&lt;a href=&quot;https://en.wikibooks.org/wiki/Digital_Signal_Processing/Discrete_Fourier_Transform&quot;&gt;Digital Signal Processing/Discrete Fourier Transform&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;离散傅里叶变换的标准形式如下:&lt;/p&gt;
+
+&lt;p&gt;\[ F[m] =  \sum_{n=0}^{N-1}f[n]e^{-2\pi imn/N}, m = 0,1,\dots ,N-1 \]&lt;/p&gt;
+
+&lt;p&gt;解释一下:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;f(t)是原信号(时域)，\( f(n_{0}) \) 到 \( f(n_{N - 1}) \)是所谓的采样点，也就是说f(t)被离散成了这些点；&lt;/li&gt;
+&lt;li&gt;F(w)是转换后的频域信号，\( F(m_{0}) \) 到 \( F(m_{N - 1} )\)是频域里均匀分布的N个点；&lt;/li&gt;
+&lt;li&gt;那么上面的公式就是指，对于每个m值，都求出这n个采样点f(n)的傅里叶级数，这个级数就是F(m)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;要推导出这个这个公式并不容易，其中还要用到卷积的知识。&lt;/p&gt;
+
+&lt;p&gt;先大概地讲一遍：&lt;/p&gt;
+
+&lt;p&gt;给信号函数f(t)设定一个有限的时间范围L：\( 0\leq t\leq L \)；给f(t)的傅里叶转换F(w)设定一个有限的频率范围2B：\( 0\leq w\leq 2B \)。&lt;/p&gt;
+
+&lt;p&gt;这里为什么是2B呢？这需要先认识一下&lt;strong&gt;采样定理&lt;/strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem#Introduction&quot;&gt;Nyquist–Shannon sampling theorem&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;香农指出，如果一个信号函数f(t)的频率不高于B赫兹，那么用时间间隔\( \frac {1}{2B} \)秒去采样f(t)而得到的f(t&amp;#39;)，相当于f(t)。&lt;/p&gt;
+
+&lt;p&gt;简单来说，如果要完美地采样一个函数f(t)，采样间隔必须小于或等于\( \frac {1}{2B} \)秒（大于或等于2B赫兹），B是这个f(t)的频域的最大赫兹。&lt;/p&gt;
+
+&lt;p&gt;继续推导。&lt;/p&gt;
+
+&lt;p&gt;既然时域的范围是L，完美的采样频率是2B，那么理论上要采样的点共有这么多个：&lt;/p&gt;
+
+&lt;p&gt;\[ N = \frac {L}{1/2B} = 2BL \]&lt;/p&gt;
+
+&lt;p&gt;采样点列表如下：&lt;/p&gt;
+
+&lt;p&gt;\[ t_{0} = 0, t_{1} = \frac {1}{2B}, t_{2} = \frac {2}{2B}, \cdots , t_{N-1} = \frac {N-1}{2B} \]&lt;/p&gt;
+
+&lt;p&gt;所以，f(t)的离散版本就是这个采样点列表\( f(t_{0}), f(t_{1}),\cdots , f(t_{N-1}) \)。&lt;/p&gt;
+
+&lt;p&gt;接下来轮到&lt;strong&gt;卷积&lt;/strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Convolution&quot;&gt;Convolution&lt;/a&gt;登场。&lt;/p&gt;
+
+&lt;p&gt;关于卷积这个东西，请阅读的另一篇文章&lt;a href=&quot;http://www.qiujiawei.com/convolution&quot;&gt;理解卷积Convolution&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3&gt;傅里叶变换的应用&lt;/h3&gt;
+
+&lt;h4&gt;采样和重建 Sampling and Reconstruction&lt;/h4&gt;
+
+&lt;p&gt;采样和重建这两个字花了我不少功夫去理解。其实并不复杂，举一个例子吧。&lt;/p&gt;
+
+&lt;p&gt;假设现在有一个你不太喜欢的信号函数f(t)，可以想象成一个充满毛刺的、扭曲的正弦波形曲线(理论上不必须是波形)。你觉得它太丑了，想给它整容，变成你喜欢的模样。那么，就可以这样子做：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;采样&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在横轴上挑选一些你觉得不错的坐标t，代入f(t)，这样就得到了一个坐标集合\( (t_{i},f(t_{i}))(i=[0,n]) \)。
+这个过程叫做采样，这些坐标对样本，对应的t坐标叫做采样点。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;重建&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;经过采样后，原来的连续的f(t)变成了离散的\( f(t_{i})(i=[0,n]) \)(continuous to descrete)。对于这个\(f(t_{i})\)，我们可以根据这些坐标，重新构建一条新的曲线，也就是说，整出一条新的曲线，使得这条新曲线会通过所有的采样坐标点。这个过程叫做重建。&lt;/p&gt;
+
+&lt;p&gt;重点来了:&lt;strong&gt;采样和重建是通过傅里叶变换完成的&lt;/strong&gt;。这意味着什么？首先要记住，傅里叶变换，可以把时域的函数变成一个等价的频域的函数。我们还是按前面的做法，完成采样工作，但是采样点要尽量多，并且均匀。采样后，用傅里叶变换把\(f(t_{i})\)变成\(F(w_{i})\)，然后就可以&lt;strong&gt;在频域上完成真正的采样&lt;/strong&gt;。
+在频域上采样，往往比在时域上采样要简单得多，比如说，你只对中高频信号感兴趣，那么就可以只采样那些频率高的点。对F(w_{i})采样后，得到F&amp;#39;(w_{i})，再通过&lt;strong&gt;逆傅里叶变换&lt;/strong&gt;，就可以得到一个新的f&amp;#39;(t)。整容完毕。&lt;/p&gt;
+
+&lt;p&gt;哦，还有一个细节要注意，上面用的傅里叶变换应该是&lt;strong&gt;离散傅里叶变换&lt;/strong&gt;。因为我们在时域采样了一些离散的点，并只对这些点做傅里叶变换。&lt;/p&gt;
 </description>
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/fourier-equation/</link>
@@ -1952,215 +2091,6 @@ vectors:**&lt;/p&gt;
         <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-6/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-6/</guid>
-      </item>
-    
-      <item>
-        <title>&lt;复习向&gt;线性代数之正交矩阵</title>
-        <description>&lt;h2&gt;基础知识&lt;/h2&gt;
-
-&lt;p&gt;标准正交向量组（Orthonormal vectors）的点积(内积)性质：&lt;/p&gt;
-
-&lt;p&gt;\( q_{i}^{T}q_{j} = 0 \) &lt;strong&gt;if&lt;/strong&gt; \( i\neq j \)&lt;/p&gt;
-
-&lt;p&gt;\( q_{i}^{T}q_{j} = 1 \) &lt;strong&gt;if&lt;/strong&gt; \( i = j \)&lt;/p&gt;
-
-&lt;p&gt;其中每个正交向量的长度\(||q_{i}||=1\)。&lt;/p&gt;
-
-&lt;p&gt;标准正交向量组成的矩阵是：
-&amp;lt;!--more--&amp;gt;&lt;/p&gt;
-
-&lt;p&gt;\( Q = \) \(  \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] \)&lt;/p&gt;
-
-&lt;p&gt;注意，列向量的分量数量未知，Q所以不一定是方阵。&lt;/p&gt;
-
-&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} q_{1}^{T}\\ \vdots\\ q_{n}^{T}\\ \end{matrix} \right] \left[ \begin{matrix} q_{1}&amp;amp;\cdots&amp;amp;q_{n}\\ \end{matrix} \right] = I \)&lt;/p&gt;
-
-&lt;p&gt;当Q是方阵时，显然Q有逆矩阵，且\( Q^{-1} = Q^{T} \)。&lt;/p&gt;
-
-&lt;p&gt;比如当Q为3阶单位矩阵I的置换矩阵时：&lt;/p&gt;
-
-&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} 0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ \end{matrix} \right] \left[ \begin{matrix} 0&amp;amp;0&amp;amp;1\\ 1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0\\ \end{matrix} \right] = I \)&lt;/p&gt;
-
-&lt;p&gt;或者三角函数作为元素的二阶Q：&lt;/p&gt;
-
-&lt;p&gt;\( Q^{T}Q =  \left[ \begin{matrix} cos\theta&amp;amp;-sin\theta\\ sin\theta&amp;amp;cos\theta\\ \end{matrix} \right]  \left[ \begin{matrix} cos\theta&amp;amp;sin\theta\\ -sin\theta&amp;amp;cos\theta\\ \end{matrix} \right] = I \)&lt;/p&gt;
-
-&lt;h2&gt;定义&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;当A的列向量的长度都为1时，称A为标准正交矩阵Q。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;定理&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;当\(A^{-1} = A^{T}\)成立时A是正交矩阵&lt;/li&gt;
-&lt;li&gt;A的列(或行)向量组是\(R^{n}\)的一组标准正交基时，A是正交矩阵&lt;/li&gt;
-&lt;li&gt;正交矩阵A的行列式为1或-1&lt;/li&gt;
-&lt;li&gt;如果A是正交矩阵，则\(A^{-1},A^{T},A^{*}\)都是正交矩阵&lt;/li&gt;
-&lt;li&gt;如果A、B都是正交矩阵，那么AB也是正交矩阵&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;正交矩阵怎么用？&lt;/h2&gt;
-
-&lt;p&gt;在上一篇文章中，讲到了投影矩阵的各种公式，其中有一条是：&lt;/p&gt;
-
-&lt;p&gt;\[ A^{T}A\hat{x} = A^{T}b \]&lt;/p&gt;
-
-&lt;p&gt;这个戴着帽子的x是未知量，要求它的值，就需要再变换下：&lt;/p&gt;
-
-&lt;p&gt;\[ \hat{x} = (A^{T}A)^{-1}A^{T}b \]&lt;/p&gt;
-
-&lt;p&gt;那么问题来了：右边的式子有点复杂，又要算矩阵乘法又要算逆矩阵，是不是可以简化呢？&lt;/p&gt;
-
-&lt;p&gt;答案是可以，且要用到正交矩阵。因为A是由一组线性无关的列向量组成，当把这组向量转换为标准正交向量组时，就得到了标准正交矩阵Q。拿Q代入上面的式子，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ Q^{T}Q\hat{x} = Q^{T}b \]&lt;/p&gt;
-
-&lt;p&gt;再根据上述的Q的公式，干掉左边的2个Q，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ \hat{x} = Q^{T}b \]&lt;/p&gt;
-
-&lt;p&gt;瞬间豁然开朗。&lt;/p&gt;
-
-&lt;p&gt;但是还有一个问题，怎么从A得到Q呢？&lt;/p&gt;
-
-&lt;h2&gt;矩阵的正交化算法&lt;/h2&gt;
-
-&lt;p&gt;因为从A可以得到Q，所以必然某个矩阵R，使得 A = QR 成立，这个过程叫做A的QR分解（QR decomposition)。&lt;/p&gt;
-
-&lt;h3&gt;先举一个二维的例子：&lt;/h3&gt;
-
-&lt;p&gt;设 a1 = (3,4)、a2 = (4,3)，显然a1和a2线性无关（不在同一条直线上），且a1和a2的长度都不是1。a1、a2是二维空间的一组基(basis)。&lt;/p&gt;
-
-&lt;p&gt;a1,a2对应的矩阵为：&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} a_{1}&amp;amp;a_{2}\\ \end{matrix} \right] =  \left[ \begin{matrix} 3&amp;amp;4\\ 4&amp;amp;3\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;显然，A是一个方阵。接下来就是实现A的QR分解。&lt;/p&gt;
-
-&lt;p&gt;标准正交矩阵，可以分为2个步骤实现：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;正交化(orthogonal)&lt;/li&gt;
-&lt;li&gt;标准化(normalize)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;二维空间下，让2个向量正交化，即等于是要找出2个互相垂直的向量。怎么找最简单呢？因为这样的向量组无限多，于是a1或a2都可以是某组正交向量的其中一个向量。&lt;/p&gt;
-
-&lt;p&gt;那么，我们可以让a1作为一个正交向量，然后再找出一个与a1垂直的向量，就得到一组正交向量了。&lt;/p&gt;
-
-&lt;p&gt;设u1、u2为要求的标准正交向量组，n1、n2代表a1、a2的单位向量，那么可以有：&lt;/p&gt;
-
-&lt;p&gt;\[ u_{1} = n_{1} \]&lt;/p&gt;
-
-&lt;p&gt;u2怎么求？很简单，利用投影矩阵的知识即可完成。因为a2和a1线性无关，那么a2在a1上有且只有一个投影点p2，算出这个投影点p2，就能快速得到a2关于a1的error向量：&lt;/p&gt;
-
-&lt;p&gt;\[ e_{2} = a_{2} - p_{2} \]&lt;/p&gt;
-
-&lt;p&gt;为什么要算e2向量？因为e2向量的一个重要性质是，e2和a1是互相垂直的，换句话说就是，&lt;strong&gt;e2和a1正交!&lt;/strong&gt;。有了e2，将其单位化后，就是u2了。&lt;/p&gt;
-
-&lt;p&gt;求u2的步骤：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;先求n1，即a1的单位向量&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ n_{1} = \dfrac { a_{1} }{ ||a_{1}|| } \] &lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;求出a2的投影点p2&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ p_{2} = n_{1}\dfrac { n_{1}^{T}a_{2} }{  n_{1}^{T} n_{1} } = n_{1}(n_{1}^{T}a_{2}) \] &lt;/p&gt;
-
-&lt;p&gt;那个分母为什么可以去掉呢？这是因为n1是单位向量，\( n_{1}^{T} n_{1} \)是n1的内积，显然这个内积等于1。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;求e2&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ e_{2} = a_{2} - p_{2} = a_{2} - n_{1}(n_{1}^{T}a_{2}) \]&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;单位化e2，得到u2&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ u_{2} = \dfrac { e_{2} }{ ||e_{2}|| } \]&lt;/p&gt;
-
-&lt;p&gt;好了，公式出来了，拿上面的例子验证下：&lt;/p&gt;
-
-&lt;p&gt;\[ u_{1} = n_{1} = \dfrac { a_{1} }{ ||a_{1}|| } = (\dfrac {3}{5},\dfrac {4}{5} ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ e_{2} = a_{2} - p_{2} = a_{2} - n_{1}(n_{1}^{T}a_{2}) = (\dfrac {28}{25},\dfrac {-21}{25}) \]&lt;/p&gt;
-
-&lt;p&gt;\[ u_{2} = \dfrac { e_{2} }{ ||e_{2}|| } = (\dfrac {4}{5},\dfrac {-3}{5}) \]&lt;/p&gt;
-
-&lt;p&gt;\[ u_{1} \cdot u_{2} = (\dfrac {3}{5},\dfrac {4}{5}) \cdot (\dfrac {4}{5},\dfrac {-3}{5}) = 0 \]&lt;/p&gt;
-
-&lt;p&gt;u1和u2的内积为0，且长度均为1，所以U1和u2是一组标准正交向量。&lt;/p&gt;
-
-&lt;p&gt;\[ Q =  \left[ \begin{matrix} u_{1}&amp;amp;u_{2}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h3&gt;高维时的通用QR解法&lt;/h3&gt;
-
-&lt;p&gt;上面是维度为2时的QR分解过程，接下来谈谈3维以及n维的情况。&lt;/p&gt;
-
-&lt;p&gt;当维度为3时，还是比较好想象的，我们分步构想下QR分解过程：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;A矩阵由3个线性无关的向量构成，A的列空间是一个三维空间，即三维空间的任意一个点都可以通过线性组合这3个向量得到&lt;/li&gt;
-&lt;li&gt;设3个向量为a1、a2、a3，先对a1、a2进行正交化运算，过程和上述的一致，除了\(a_{i}\)变成了3个分量。&lt;/li&gt;
-&lt;li&gt;正交化a1、a2，就得到了a1、a2对应的平面空间的一组标准正交基u1、u2&lt;/li&gt;
-&lt;li&gt;于是原问题变成：求解u1、u2、a3的正交化。u1和u2已经是标准正交向量，不用管它们，问题就是求出u3。&lt;/li&gt;
-&lt;li&gt;a3是在u1、u2对应的平面&lt;strong&gt;之外&lt;/strong&gt;的一个点，a3在这个平面上有且只有一个投影点p3，将它求出来&lt;/li&gt;
-&lt;li&gt;再求出\( e_{3} = a_{3} - p_{3} \)就得到了a3的error向量，该向量垂直于u1、u2平面！&lt;/li&gt;
-&lt;li&gt;将e3标准化后，就得到了u3&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;n&amp;gt;3维的情况，可以用归纳法解出。&lt;/p&gt;
-
-&lt;p&gt;高维情况下的QR分解，公式如下：&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} a_{1}&amp;amp;a_{2}&amp;amp;\cdots&amp;amp;a_{n}\\ \end{matrix} \right] \]
-\[ A =  \left[ \begin{matrix} u_{1}&amp;amp;u_{2}&amp;amp;\cdots&amp;amp;u_{n}\\ \end{matrix} \right] \left[ \begin{matrix} a_{1}\cdot u_{1}&amp;amp;a_{2}\cdot u_{1}&amp;amp;\cdots &amp;amp;a_{n}\cdot u_{1}\\ 0&amp;amp;a_{2}\cdot u_{2}&amp;amp;\cdots &amp;amp;a_{n}\cdot u_{2}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots\\ 0&amp;amp;0&amp;amp;\cdots &amp;amp;a_{n}\cdot u_{n}\\ \end{matrix} \right] = QR \]&lt;/p&gt;
-
-&lt;p&gt;Q是标准正交矩阵，R是上三角矩阵。&lt;/p&gt;
-
-&lt;p&gt;证明过程略，不过可以简单分析下这公式的正确性。&lt;/p&gt;
-
-&lt;p&gt;Q乘以R的结果是A矩阵，那么可以得到：&lt;/p&gt;
-
-&lt;p&gt;\[ a_{1} = u_{1}(a_{1}\cdot u_{1}) \]&lt;/p&gt;
-
-&lt;p&gt;这个式子，是不是很眼熟，其实就是投影公式：&lt;/p&gt;
-
-&lt;p&gt;\[ p_{1} = a_{1} = u_{1}\dfrac { u_{1}^{T}a_{1} }{  u_{1}^{T} u_{1} } = u_{1}(u_{1}^{T}a_{1}) = u_{1}(a_{1}\cdot u_{1}) \] &lt;/p&gt;
-
-&lt;p&gt;（后面的内积有2种写法，同个意思，不用在意）&lt;/p&gt;
-
-&lt;p&gt;这个式子说明，经过QR分解后，a1的投影点还是a1，且在u1上。（但a1不一定等于u1）&lt;/p&gt;
-
-&lt;p&gt;我把a2也写出来：&lt;/p&gt;
-
-&lt;p&gt;\[ a_{2} = u_{1}(a_{2}\cdot u_{1}) + u_{2}(a_{2}\cdot u_{2}) \]&lt;/p&gt;
-
-&lt;p&gt;类似a1，a2 = a2在u1的投影 + a2在u2的投影。（注意：a2一定不在u上，因为这样a1和a2就线性有关了；a2不一定在u2上）&lt;/p&gt;
-
-&lt;p&gt;然后a3，就不用写了，显然a3 = a3在u1的投影 + a3在u2的投影 + a3在u2的投影。&lt;/p&gt;
-
-&lt;p&gt;\(a_{n}\)以此类推。所以这个公式是OK的。&lt;/p&gt;
-
-&lt;p&gt;总结一下：&lt;/p&gt;
-
-&lt;p&gt;要对A做QR分解，得从A本身出发，算出各个标准正交向量，并且这是一个迭代的过程：从a1算出u1，再通过a2和u1得到u2，接着，\(u_{n}\)都可以通过\(a_{n}\)和前面算出来的\(u_{i}\ \ (i&amp;lt;n)\)得到。&lt;/p&gt;
-
-&lt;p&gt;如果QR分解的目的只是为了得到Q矩阵，那么R矩阵是没什么卵用的，因为R矩阵本身也包含了目标变量n，所以没办法用\(Q=AR^{-1}\)公式求Q矩阵。&lt;/p&gt;
-</description>
-        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-5/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-5/</guid>
       </item>
     
   </channel>

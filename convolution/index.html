@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>理解卷积 Convolution – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="数学中的卷积
+
+卷积的wiki：Convolution。
+
+卷积和(convolution sum)的公式是:
+
+\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]
+
+写成积分形式是:
+" />
+    <meta property="og:description" content="数学中的卷积
+
+卷积的wiki：Convolution。
+
+卷积和(convolution sum)的公式是:
+
+\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]
+
+写成积分形式是:
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="理解卷积 Convolution" />
+    <meta property="twitter:title" content="理解卷积 Convolution" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/convolution/',
+		  'title': '理解卷积 Convolution'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>理解卷积 Convolution</h1>
+  <h3>Tags: <a href="/tag/math.html" rel="tag">math</a></h3>
+  <div class="entry">
+    <h2>数学中的卷积</h2>
+
+<p>卷积的wiki：<a href="https://en.wikipedia.org/wiki/Convolution#Derivations">Convolution</a>。</p>
+
+<p>卷积和(convolution sum)的公式是:</p>
+
+<p>\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]</p>
+
+<p>写成积分形式是:</p>
+
+<!--more-->
+
+<p>\[ x(t)*h(t) = \int _{-\infty }^{\infty }x(\tau )h(t-\tau )d\tau = \int _{-\infty }^{\infty }x(t-\tau )h(\tau )d\tau \]</p>
+
+<p>这个东西，很难从公式推导上理解（其实是没在网上找到推导过程，只知道和这个东西有关<a href="https://en.wikipedia.org/wiki/LTI_system_theory#Overview">LTI system theory</a>）。不过我想到一个比较好的理解方式。</p>
+
+<p>首先介绍下狄拉克δ函数。</p>
+
+<h3>狄拉克δ函数 dirac delta function</h3>
+
+<p>狄拉克δ函数的wiki：<a href="https://en.wikipedia.org/wiki/Dirac_delta_function">dirac delta function</a>。</p>
+
+<p>狄拉克δ函数在坐标系上的长相:</p>
+
+<p><img src="../images/2015.10/8.png" alt="8.png"></p>
+
+<p><img src="../images/2015.10/Dirac_function_approximation.gif" alt="Dirac_function_approximation.gif"></p>
+
+<p>（图片来自wiki）</p>
+
+<p>在<strong>信号处理科学</strong>中狄拉克δ函数被称为单位脉冲信号(unit impulse symbol）。上面这个图也很形象地说明了这一点。</p>
+
+<p>狄拉克δ函数有这样的性质:</p>
+
+<p>\[ delta (t) =  \begin {cases} +\infty , t=0 \\  0, t\neq 0 \end {cases} \]</p>
+
+<p>\[ \int _{-\infty }^{\infty }\delta (t)dt = 1 \]</p>
+
+<p>狄拉克δ函数在t等于0时值为正无穷，t不等于0时则为0，且在整个定义域的积分等于1。</p>
+
+<h3>狄拉克δ函数与卷积</h3>
+
+<p>考虑一个特殊情况：h(t)是狄拉克δ函数。代入卷积公式，有:</p>
+
+<p>\[ x(t) * h(t) = x(t) * \delta (t) = \int _{-\infty }^{\infty }x(\tau )\delta (t-\tau )d\tau = x(t) \]</p>
+
+<p>(这里省略了推导过程）</p>
+
+<p>这个结果说明，x(t)和狄拉克δ函数卷积的结果还是x(t)，为什么会这样呢？</p>
+
+<p>再看下前面给出的卷积和标准公式：</p>
+
+<p>\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]</p>
+
+<p>把其中的\( h(t - \tau ) \)换成\( \delta (t - \tau ) \)，那么里面的\( t - \tau \)，其实就是让那个脉冲信号在横轴上移动(偏移)\( \tau \)距离。根据狄拉克δ函数的定义，可以知道，当\( t = \tau \)时，\( x(\tau )h(t-\tau ) \)才非0，且等于\( x(\tau ) \)。所以卷积和也就等于\( x(\tau ) \)。（这也算是上面的公式的证明吧）</p>
+
+<p>将这个特殊情况一般化，即不限制h = δ时，就是所谓的卷积公式了。</p>
+
+<h3>找到的相关资料</h3>
+
+<p><a href="http://www.eecg.toronto.edu/%7Eahouse/mirror/engi7824/course_notes_7824_part6.pdf">The Convolution Sum for Discrete-Time LTI Systems. Andrew W. H. House</a></p>
+
+  </div>
+
+  <div class="date">
+    Written on October 18, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
