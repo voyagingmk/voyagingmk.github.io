@@ -485,11 +485,15 @@ https://www.youtube.com/watch?v=gZNm7L96pfY
 
 <p>\[ t_{0} = 0, t_{1} = \frac {1}{2B}, t_{2} = \frac {2}{2B}, \cdots , t_{N-1} = \frac {N-1}{2B} \]</p>
 
-<p>所以，f(t)的离散版本就是这个采样点列表\( f(t_{0}), f(t_{1}),\cdots , f(t_{N-1}) \)。</p>
+<p>所以，f(t)的离散版本\( f_{discrete}(t) \)就是这个采样点列表\( f(t_{0}), f(t_{1}),\cdots , f(t_{N-1}) \)。</p>
 
 <p>接下来轮到<strong>卷积</strong><a href="https://en.wikipedia.org/wiki/Convolution">Convolution</a>登场。</p>
 
-<p>关于卷积这个东西，请阅读的另一篇文章<a href="http://www.qiujiawei.com/convolution">理解卷积Convolution</a>。</p>
+<p>关于卷积这个东西，请阅读我的另一篇文章<a href="http://www.qiujiawei.com/convolution">理解卷积Convolution</a>。</p>
+
+<p>因为上面得到的\( f_{discrete}(t) \)是不连续的，所以不能直接用傅里叶变换把它转换用到频域（标准傅里叶变换是处理连续函数的）。</p>
+
+<p>这时候怎么办呢？试试用卷积公式吧：</p>
 
 <h3>傅里叶变换的应用</h3>
 
