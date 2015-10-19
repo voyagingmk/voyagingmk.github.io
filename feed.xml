@@ -660,9 +660,11 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;wiki:&lt;a href=&quot;https://en.wikibooks.org/wiki/Digital_Signal_Processing/Discrete_Fourier_Transform&quot;&gt;Digital Signal Processing/Discrete Fourier Transform&lt;/a&gt;。&lt;/p&gt;
 
-&lt;p&gt;设在时域上有离散的采样点\( f = (f[0],f[1],\cdots ,f[N-1]) \)，对f做离散傅里叶变换(DFT)，可以得到频域上的一系列离散点\( F = (F[0],F[1],\cdots ,F[N-1]) \)，且：&lt;/p&gt;
+&lt;p&gt;设在时域上有离散的采样点\( f = (f[0],f[1],\cdots ,f[N-1]) \)，对f做离散傅里叶变换(DFT)，可以得到频域上的离散点\( F = (F[0],F[1],\cdots ,F[N-1]) \)，且：&lt;/p&gt;
 
 &lt;p&gt;\[ F[m] =  \sum_{n=0}^{N-1}f[n]e^{-2\pi imn/N}, m = 0,1,\dots ,N-1 \]&lt;/p&gt;
+
+&lt;p&gt;这个就是DFT的标准公式。&lt;/p&gt;
 
 &lt;p&gt;解释一下:&lt;/p&gt;
 
