@@ -81,6 +81,38 @@
 &lt;p&gt;\[ III_{T}(t) = \sum _{k=-\infty }^{\infty }\delta (t - kT)\]&lt;/p&gt;
 
 &lt;p&gt;这个公式和图片完全对应。&lt;/p&gt;
+
+&lt;p&gt;下面介绍它的一些性质:&lt;/p&gt;
+
+&lt;h4&gt;缩放性质&lt;/h4&gt;
+
+&lt;p&gt;当T = 1（单位周期）时：&lt;/p&gt;
+
+&lt;p&gt;\[ III(t) = \sum _{k=-\infty }^{\infty }\delta (t - k)\]&lt;/p&gt;
+
+&lt;p&gt;这时再对t缩放a倍:&lt;/p&gt;
+
+&lt;p&gt;\[ III(at) = \sum _{k=-\infty }^{\infty }\delta (at - k)\]&lt;/p&gt;
+
+&lt;p&gt;现在搬出δ函数的对称性质公式:&lt;/p&gt;
+
+&lt;p&gt;\[ \delta (at) = \frac {1}{a}\delta (t) \]&lt;/p&gt;
+
+&lt;p&gt;\[ III(at) = \sum _{k=-\infty }^{\infty }\delta (at - k) \]
+\[ = \sum _{k=-\infty }^{\infty }\delta (a(t - \frac {k}{a})) \]
+\[ = \sum _{k=-\infty }^{\infty }\frac {1}{a}\delta (t - \frac {k}{a}) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \frac {1}{a}III_{\frac {1}{a}}(t)\]&lt;/p&gt;
+
+&lt;p&gt;也就是:&lt;/p&gt;
+
+&lt;p&gt;\[  III(at)  = \frac {1}{a}III_{\frac {1}{a}}(t) \]&lt;/p&gt;
+
+&lt;p&gt;\[  III_{a}(t)  = \frac {1}{a}III_{}(\frac {t}{a}) \]&lt;/p&gt;
+
+&lt;h4&gt;傅里叶变换&lt;/h4&gt;
+
+&lt;p&gt;\[  III_{a}(t) = \frac {1}{T}\sum _{k=-\infty }^{\infty }e^{2\pi is\frac {t}{T}} \]&lt;/p&gt;
 </description>
         <pubDate>Sun, 18 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/shah-function/</link>

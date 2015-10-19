@@ -275,6 +275,38 @@
 
 <p>这个公式和图片完全对应。</p>
 
+<p>下面介绍它的一些性质:</p>
+
+<h4>缩放性质</h4>
+
+<p>当T = 1（单位周期）时：</p>
+
+<p>\[ III(t) = \sum _{k=-\infty }^{\infty }\delta (t - k)\]</p>
+
+<p>这时再对t缩放a倍:</p>
+
+<p>\[ III(at) = \sum _{k=-\infty }^{\infty }\delta (at - k)\]</p>
+
+<p>现在搬出δ函数的对称性质公式:</p>
+
+<p>\[ \delta (at) = \frac {1}{a}\delta (t) \]</p>
+
+<p>\[ III(at) = \sum _{k=-\infty }^{\infty }\delta (at - k) \]
+\[ = \sum _{k=-\infty }^{\infty }\delta (a(t - \frac {k}{a})) \]
+\[ = \sum _{k=-\infty }^{\infty }\frac {1}{a}\delta (t - \frac {k}{a}) \]</p>
+
+<p>\[ = \frac {1}{a}III_{\frac {1}{a}}(t)\]</p>
+
+<p>也就是:</p>
+
+<p>\[  III(at)  = \frac {1}{a}III_{\frac {1}{a}}(t) \]</p>
+
+<p>\[  III_{a}(t)  = \frac {1}{a}III_{}(\frac {t}{a}) \]</p>
+
+<h4>傅里叶变换</h4>
+
+<p>\[  III_{a}(t) = \frac {1}{T}\sum _{k=-\infty }^{\infty }e^{2\pi is\frac {t}{T}} \]</p>
+
   </div>
 
   <div class="date">
