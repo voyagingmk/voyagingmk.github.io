@@ -20,11 +20,11 @@
 
 &lt;p&gt;下面介绍它的一些性质:&lt;/p&gt;
 
-&lt;h3&gt;对称性质&lt;/h3&gt;
+&lt;h4&gt;对称性质&lt;/h4&gt;
 
 &lt;p&gt;从δ函数的波形图(或者定义)可以简单看出，δ函数是偶函数，即:&lt;/p&gt;
 
-&lt;p&gt;\[ delta (t) = delta (-t) \]&lt;/p&gt;
+&lt;p&gt;\[ \delta (t) = \delta (-t) \]&lt;/p&gt;
 
 &lt;h4&gt;缩放性质&lt;/h4&gt;
 
