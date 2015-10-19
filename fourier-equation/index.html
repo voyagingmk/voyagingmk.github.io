@@ -481,19 +481,75 @@ https://www.youtube.com/watch?v=gZNm7L96pfY
 
 <p>\[ N = \frac {L}{1/2B} = 2BL \]</p>
 
-<p>采样点列表如下：</p>
+<p>时域的采样点横坐标列表如下：</p>
 
 <p>\[ t_{0} = 0, t_{1} = \frac {1}{2B}, t_{2} = \frac {2}{2B}, \cdots , t_{N-1} = \frac {N-1}{2B} \]</p>
 
 <p>所以，f(t)的离散版本\( f_{discrete}(t) \)就是这个采样点列表\( f(t_{0}), f(t_{1}),\cdots , f(t_{N-1}) \)。</p>
 
-<p>接下来轮到<strong>卷积</strong><a href="https://en.wikipedia.org/wiki/Convolution">Convolution</a>登场。</p>
+<p>接下来轮到<strong>卷积</strong><a href="https://en.wikipedia.org/wiki/Convolution">Convolution</a>和<strong>狄拉克梳状函数</strong><a href="https://en.wikipedia.org/wiki/Dirac_comb">Dirac comb</a>登场。</p>
 
-<p>关于卷积这个东西，请阅读我的另一篇文章<a href="http://www.qiujiawei.com/convolution">理解卷积Convolution</a>。</p>
+<p>(关于卷积和狄拉克梳状函数，请阅读我的其他文章<a href="http://www.qiujiawei.com/convolution">理解卷积</a>，<a href="http://www.qiujiawei.com/shah-function">狄拉克梳状函数</a> )。</p>
 
-<p>因为上面得到的\( f_{discrete}(t) \)是不连续的，所以不能直接用傅里叶变换把它转换用到频域（标准傅里叶变换是处理连续函数的）。</p>
+<p>继续讨论。因为上面得到的\( f_{discrete}(t) \)是不连续的，所以不能直接用傅里叶变换把它转换用到频域（标准傅里叶变换是处理连续函数的）。要把不连续信号转成连续信号，就是用卷积，即把离散信号和连续信号‘合并’。</p>
 
-<p>这时候怎么办呢？试试用卷积公式吧：</p>
+<p>狄拉克梳状函数：</p>
+
+<p>\[ III_{T}(t) = \sum _{k=-\infty }^{\infty }\delta (t - kT)\]</p>
+
+<p>代入我们的离散横坐标\( (t_{0}, t_{1}, \cdots , t_{N-1} \)，则有：</p>
+
+<p>\[ III_{T=\frac {1}{2B}}(t) = \sum _{n=0 }^{N-1 }\delta (t - t_{n})\]</p>
+
+<p>定义一个\( f_{discrete}(t) \)，代表f(t)离散化后和shah函数合并:</p>
+
+<p>\[ f_{discrete}(t)  = \sum _{n=0 }^{N-1 }f(t_{n})\delta (t - t_{n}) \]</p>
+
+<p>这个式子是连续的(因为t的取值是连续的)。这个式子也叫做<strong>f(t)的采样形式</strong>(the sampled form of f(t))。它的傅里叶变换是:</p>
+
+<p>\[ \mathcal {F}[f_{discrete}(s)] =  \sum _{n=0 }^{N-1 }f(t_{n})\mathcal {F}[\delta (t - t_{n})] = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi ist_{n} } \]</p>
+
+<p>注意，这个傅里叶变换也是连续的。</p>
+
+<p>上面是时域到频域的讨论，接下来换个角度：想一下如何在频域中对连续的频域信号做采样，并转换到时域。也即<strong>离散的逆傅里叶变换</strong>。</p>
+
+<p>在频域中做采样，那么就是做离散化，<strong>频率间隔</strong>应该是多少(赫兹)？因为\( 0\leq t\leq L \)，所以采样频率是\( \frac {1}{L} \)（这里还没搞懂）。所以在频域中采样就是，从频率=0(赫兹)开始，间隔=1/L(赫兹)，到频率=2B(赫兹)结束，对F(s)进行采样。</p>
+
+<p>总共的频域采样点有这么多个:</p>
+
+<p>\[ \frac {2B}{\frac {1}{L}} = 2BL = N \]</p>
+
+<p>对比上面的时域采样，频域采样也有同样数目的采样点**。</p>
+
+<p>频域的采样点横坐标列表如下：</p>
+
+<p>\[ s_{0} = 0, s_{1} = \frac {1}{L}, s_{2} = \frac {2}{L}, \cdots , s_{N-1} = \frac {N-1}{L} \]</p>
+
+<p>有了采样点，就可以做采样了。但是是对什么东西做采样？结果有点反直觉，我们是对刚才推导出来的\( \mathcal {F}[f_{discrete}(s)] \)做采样，而不是\( \mathcal {F}[f(s)] \)。</p>
+
+<p>设\( F(s) \mathcal {F}[f_{discrete}(s)] \)，则F(s)的离散版本是:</p>
+
+<p>\[ F(s_{0}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{0}t_{n} }, F(s_{1}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{1}t_{n} }, \cdots ,F(s_{N-1}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{N-1}t_{n} } \]</p>
+
+<p>将这串东西再简化下:</p>
+
+<p>\[ F(s_{m}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{m}t_{n} } \]</p>
+
+<p>于是我们有了一道从离散f(t)到离散F(s)的公式！</p>
+
+<p>好像和前面给出的标准形式不一样？没事，还可以再变一变。</p>
+
+<p>由:</p>
+
+<p>\[ t_{n} = \frac {n}{2B} \]
+\[ s_{m} = \frac {m}{L} \]</p>
+
+<p>有:</p>
+
+<p>\[ F(s_{m}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{m}t_{n} } \]
+\[ = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi i\frac {m}{L}\frac {n}{2B} } \]
+\[ = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi imn/2BL } \]
+\[ = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi imn/N } \]</p>
 
 <h3>傅里叶变换的应用</h3>
 
