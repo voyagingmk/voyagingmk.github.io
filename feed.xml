@@ -7,6 +7,87 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>狄拉克δ函数(Dirac delta)和狄拉克梳状函数(Dirac comb)</title>
+        <description>&lt;h2&gt;狄拉克δ函数(Dirac delta)&lt;/h2&gt;
+
+&lt;p&gt;在卷积那篇文章中，已经提到了狄拉克δ函数的定义:&lt;/p&gt;
+
+&lt;p&gt;\[ delta (t) =  \begin {cases} +\infty , t=0 \\  0, t\neq 0 \end {cases} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{-\infty }^{\infty }\delta (t)dt = 1 \]&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;下面介绍它的一些性质:&lt;/p&gt;
+
+&lt;h3&gt;对称性质&lt;/h3&gt;
+
+&lt;p&gt;从δ函数的波形图(或者定义)可以简单看出，δ函数是偶函数，即:&lt;/p&gt;
+
+&lt;p&gt;\[ delta (t) = delta (-t) \]&lt;/p&gt;
+
+&lt;h4&gt;缩放性质&lt;/h4&gt;
+
+&lt;p&gt;设有常数a，令u = at，再依据δ函数的积分特性，有:&lt;/p&gt;
+
+&lt;p&gt;\[ dt = \frac {1}{a}du \]&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{-\infty }^{\infty }\delta (at)dt = \int _{-\infty }^{\infty }\delta (u)\frac {1}{a}du = \frac {1}{a} \int _{-\infty }^{\infty }\delta (u)du = \frac {1}{a} \]&lt;/p&gt;
+
+&lt;p&gt;也即:&lt;/p&gt;
+
+&lt;p&gt;\[ \delta (at) = \frac {1}{a}\delta (t) \]&lt;/p&gt;
+
+&lt;p&gt;又因为它的对称性质，有:&lt;/p&gt;
+
+&lt;p&gt;\[ \delta (at) = \frac {1}{|a|}\delta (t) \]&lt;/p&gt;
+
+&lt;h4&gt;代数性质&lt;/h4&gt;
+
+&lt;p&gt;\[ t\delta (t) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;这个太简单了，从基本定义出发可以很快看出来这个式子的正确性。&lt;/p&gt;
+
+&lt;h4&gt;平移性质&lt;/h4&gt;
+
+&lt;p&gt;\[ \int _{-\infty }^{\infty }f(t)\delta (t - T)dt = f(T) \]&lt;/p&gt;
+
+&lt;p&gt;在&lt;a href=&quot;http://www.qiujiawei.com/convolution/&quot;&gt;理解卷积 Convolution&lt;/a&gt;中有对这个式子的详细讨论。当然从δ函数的定义去理解这个式子也很简单。&lt;/p&gt;
+
+&lt;h4&gt;δ函数的傅里叶变换&lt;/h4&gt;
+
+&lt;p&gt;\[ \mathcal {F}[\delta (s)] = \int _{-\infty }^{\infty }e^{-2\pi ist}\delta (t) = 1 \]&lt;/p&gt;
+
+&lt;p&gt;因为只有当x等于0时，δ函数才非0(等于1)，所以这个式子的计算结果等于1。&lt;/p&gt;
+
+&lt;p&gt;傅里叶变换后是一个常数1，这个性质看起来就很特别。&lt;/p&gt;
+
+&lt;h2&gt;狄拉克梳状函数(Dirac comb)&lt;/h2&gt;
+
+&lt;p&gt;这个函数在电子工程&lt;a href=&quot;https://en.wikipedia.org/wiki/Electrical_engineering&quot;&gt;electrical engineering&lt;/a&gt;中称为脉冲序列(impulse train)或采样函数(sampling function)。注意，有些文章会把它叫做Shah function。&lt;/p&gt;
+
+&lt;p&gt;它其实就是关于狄拉克δ函数的用周期T间隔的无穷级数(多个δ函数的合并)。(wiki原文是:&lt;strong&gt;A Dirac comb is an infinite series of Dirac delta functions spaced at intervals of T&lt;/strong&gt;）&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;用图表示:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/9.png&quot; alt=&quot;9.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(图片来自wiki）&lt;/p&gt;
+
+&lt;p&gt;公式表示:&lt;/p&gt;
+
+&lt;p&gt;\[ III_{T}(t) = \sum _{k=-\infty }^{\infty }\delta (t - kT)\]&lt;/p&gt;
+
+&lt;p&gt;这个公式和图片完全对应。&lt;/p&gt;
+</description>
+        <pubDate>Sun, 18 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/shah-function/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/shah-function/</guid>
+      </item>
+    
+      <item>
         <title>理解卷积 Convolution</title>
         <description>&lt;h2&gt;数学中的卷积&lt;/h2&gt;
 
@@ -724,7 +805,7 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;上面是时域到频域的讨论，接下来换个角度：想一下如何在频域中对连续的频域信号做采样，并转换到时域。也即&lt;strong&gt;离散的逆傅里叶变换&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;p&gt;在频域中做采样，那么就是做离散化，&lt;strong&gt;频率间隔&lt;/strong&gt;应该是多少(赫兹)？因为\( 0\leq t\leq L \)，所以采样频率是\( \frac {1}{L} \)（这里还没搞懂）。所以在频域中采样就是，从频率=0(赫兹)开始，间隔=1/L(赫兹)，到频率=2B(赫兹)结束，对F(s)进行采样。&lt;/p&gt;
+&lt;p&gt;在频域中做采样，那么就是做离散化，&lt;strong&gt;频率间隔&lt;/strong&gt;应该是多少(赫兹)？频率公式是\(f =  \frac {1}{T} \)，f的单位是赫兹，赫兹是指&lt;strong&gt;1秒内震动次数&lt;/strong&gt;，震动次数要看信号的周期T。如果把t的范围L当做周期的话，1除以L就是指\( \frac {1}{L} \)赫兹，注意，&lt;strong&gt;这是频率的下限&lt;/strong&gt;，频率的上限是前面已经给出的2B，而我们要做的是在频率这条横轴上做采样，即从频率=0(赫兹)开始，间隔=1/L(赫兹)，到频率=2B(赫兹)结束，对F(s)进行采样。&lt;/p&gt;
 
 &lt;p&gt;总共的频域采样点有这么多个:&lt;/p&gt;
 
@@ -764,6 +845,8 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;h3&gt;傅里叶变换的应用&lt;/h3&gt;
 
+&lt;p&gt;(如果理解了上面的DFT，基本不需要看这一节)&lt;/p&gt;
+
 &lt;h4&gt;采样和重建 Sampling and Reconstruction&lt;/h4&gt;
 
 &lt;p&gt;采样和重建这两个字花了我不少功夫去理解。其实并不复杂，举一个例子吧。&lt;/p&gt;
@@ -783,10 +866,10 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;经过采样后，原来的连续的f(t)变成了离散的\( f(t_{i})(i=[0,n]) \)(continuous to descrete)。对于这个\(f(t_{i})\)，我们可以根据这些坐标，重新构建一条新的曲线，也就是说，整出一条新的曲线，使得这条新曲线会通过所有的采样坐标点。这个过程叫做重建。&lt;/p&gt;
 
-&lt;p&gt;重点来了:&lt;strong&gt;采样和重建是通过傅里叶变换完成的&lt;/strong&gt;。这意味着什么？首先要记住，傅里叶变换，可以把时域的函数变成一个等价的频域的函数。我们还是按前面的做法，完成采样工作，但是采样点要尽量多，并且均匀。采样后，用傅里叶变换把\(f(t_{i})\)变成\(F(w_{i})\)，然后就可以&lt;strong&gt;在频域上完成真正的采样&lt;/strong&gt;。
+&lt;p&gt;重点来了:&lt;strong&gt;采样和重建是通过傅里叶变换完成的&lt;/strong&gt;。这意味着什么？首先要记住，傅里叶变换，可以把时域的函数变成一个等价的频域的函数。我们还是按前面的做法，在时域上完成‘采样’工作，但是采样点要足够多，并且均匀。采样后，用傅里叶变换把\(f(t_{i})\)变成\(F(w_{i})\)，然后就可以&lt;strong&gt;在频域上完成真正的采样(或叫过滤)&lt;/strong&gt;。
 在频域上采样，往往比在时域上采样要简单得多，比如说，你只对中高频信号感兴趣，那么就可以只采样那些频率高的点。对F(w_{i})采样后，得到F&amp;#39;(w_{i})，再通过&lt;strong&gt;逆傅里叶变换&lt;/strong&gt;，就可以得到一个新的f&amp;#39;(t)。整容完毕。&lt;/p&gt;
 
-&lt;p&gt;哦，还有一个细节要注意，上面用的傅里叶变换应该是&lt;strong&gt;离散傅里叶变换&lt;/strong&gt;。因为我们在时域采样了一些离散的点，并只对这些点做傅里叶变换。&lt;/p&gt;
+&lt;p&gt;哦，还有一个细节要注意，这个采样和重建用的傅里叶变换是&lt;strong&gt;离散傅里叶变换&lt;/strong&gt;。&lt;/p&gt;
 </description>
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/fourier-equation/</link>
@@ -2107,123 +2190,6 @@ vectors:**&lt;/p&gt;
         <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/pbrt-chapter2/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/pbrt-chapter2/</guid>
-      </item>
-    
-      <item>
-        <title>&lt;复习向&gt;线性代数之矩阵的特征值、特征向量、特征矩阵、迹</title>
-        <description>&lt;h2&gt;定义&lt;/h2&gt;
-
-&lt;p&gt;设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
-\[ A\alpha = \lambda \alpha \]
-则称\(\lambda \)为A的一个&lt;strong&gt;特征值(根)&lt;/strong&gt;(eigenvalue)，称\(\alpha \)为A的属于特征值\(\lambda \)的&lt;strong&gt;特征向量&lt;/strong&gt;(eigenvector)。&lt;/p&gt;
-
-&lt;p&gt;\( A\alpha \)和\(\alpha \)平行（即在同一个直线上。&lt;/p&gt;
-
-&lt;p&gt;\(\lambda E - A\)为A的&lt;strong&gt;特征矩阵&lt;/strong&gt;，行列式\(f(\lambda ) = |\lambda E - A|\)为A的&lt;strong&gt;特征多项式&lt;/strong&gt;，\(|\lambda E - A| = 0\)为A的&lt;strong&gt;特征方程&lt;/strong&gt;,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的&lt;strong&gt;齐次线性方程组&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;A的主对角线上元素之和称为A的&lt;strong&gt;迹&lt;/strong&gt;(trace)，记为tr(A)，即&lt;/p&gt;
-
-&lt;p&gt;\[ tr(A) = a_{11} + a_{11} + \cdots + a_{nn} \]&lt;/p&gt;
-
-&lt;p&gt;迹和特征值有很重要的联系：&lt;/p&gt;
-
-&lt;p&gt;\[ tr(A) = \lambda _{1} + \lambda _{2} + \cdots + \lambda _{n} \]&lt;/p&gt;
-
-&lt;p&gt;迹还和A的行列式有关系：&lt;/p&gt;
-
-&lt;p&gt;\[ |A| = \lambda _{1}\lambda _{2}\cdots \lambda _{n} \]&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;A的全部特征值和特征向量的求法&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;计算A的特征多项式&lt;/li&gt;
-&lt;li&gt;求特征方程的全部根，即矩阵A的全部特征值&lt;/li&gt;
-&lt;li&gt;对于A的每一个特征值\(\lambda \)，求其相应的齐次线性方程组的一个基础解系\(\eta _{1},\eta _{2},\cdots \eta _{n-r}\)，其中\(r=r(\lambda E - A)\)，即r为矩阵A的特征矩阵的秩，A的属于该\(\lambda \)的全部特征向量为:
-\[ k_{1}\eta _{1} + k_{2}\eta _{2} + \cdots + k_{n-r}\eta _{n-r} \]
-其中\(k_{1},k_{2},\cdots ,k_{n-r}\)是数域F上的一组不全为零的任意常数。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;特征值的性质&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;\(\lambda _{n} \)为矩阵\(A_{n} \)的特征值（n为正整数）&lt;/li&gt;
-&lt;li&gt;A可逆时，\(1/\lambda \)为\(A^{-1}\)的特征值&lt;/li&gt;
-&lt;li&gt;矩阵A与其转置矩阵\(A^{T}\)有相同的特征值&lt;/li&gt;
-&lt;li&gt;\(k\lambda \)是矩阵kA的特征值(k是任意常数)。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;迹的性质&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;\( tr(A + B) = tr(A) + tr(B) \)&lt;/li&gt;
-&lt;li&gt;\( tr(kA) = k\cdot tr(A) \)&lt;/li&gt;
-&lt;li&gt;\( tr(A^{T}) = tr(A) \)&lt;/li&gt;
-&lt;li&gt;\( tr(AB) = tr(BA) \)&lt;/li&gt;
-&lt;li&gt;\( tr(ABC) = tr(BCA) = tr(CAB) \)&lt;/li&gt;
-&lt;li&gt;设A、B为n阶方阵，P为n阶可逆矩阵，且\(P^{-1}AP = B \)，则有\(tr(A) = tr(B)\)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;当A为投影矩阵P时&lt;/h2&gt;
-
-&lt;p&gt;因为投影矩阵P可以把一个向量b投影到一个空间的某一个向量，也就是\(Pb = p\)，这个式子和\( A\alpha = \lambda \alpha \)有一致的地方。&lt;/p&gt;
-
-&lt;p&gt;那么P的特征向量是什么呢？前面已经说到，\( A\alpha \)和\( \alpha \)是平行关系，那么就是说，如果b在P的列空间之外，b就不是P的特征向量，当b在P的列空间内时，b是P的特征向量。&lt;/p&gt;
-
-&lt;p&gt;比如当P对应一个平面时，这个平面内的任意一个向量x都是特征向量（因为\(Px = x\)，P作用于x后还是得到x)&lt;/p&gt;
-
-&lt;p&gt;又因为\(Px = x = 1\cdot x\)，所以P的一个特征值是1。&lt;/p&gt;
-
-&lt;p&gt;但是，P还有其他的特征值。当向量x正交于P的列空间时，有\(Px = 0 \)。所以P的另一个特征值为0。&lt;/p&gt;
-
-&lt;h2&gt;当A为旋转矩阵Q时&lt;/h2&gt;
-
-&lt;p&gt;因为旋转矩阵可以改变一个向量的方向，那么这个矩阵是否有特征值？事实是有的，但是是复数。&lt;/p&gt;
-
-&lt;p&gt;\[ Q =  \left[ \begin{matrix} cos(90)&amp;amp;-sin(90)\\ sin(90)&amp;amp;cos(90)\\ \end{matrix} \right] =  \left[ \begin{matrix} 0&amp;amp;-1\\ 1&amp;amp;0\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ |Q| = 0 - (-1) = 1 = \lambda _{1}\lambda _{2} \]
-\[ tr(Q) = 0 = \lambda _{1} + \lambda _{2} \]&lt;/p&gt;
-
-&lt;p&gt;显然，\( \lambda _{1}\lambda _{2}\)无实数域的解，但是有复数解i和-i。&lt;/p&gt;
-
-&lt;h2&gt;A的对角化(diagonalize)&lt;/h2&gt;
-
-&lt;p&gt;设n阶方阵A存在n个线性无关的特征向量\(x_{i}\)，将这n个特征向量组成方阵S(也称为特征向量矩阵），则有：&lt;/p&gt;
-
-&lt;p&gt;\[ AS = A \left[ \begin{matrix} x_{1}&amp;amp;x_{2}&amp;amp;\cdots &amp;amp;x_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} \lambda _{1}x_{1}&amp;amp;\lambda _{2}x_{2}&amp;amp;\cdots &amp;amp;\lambda _{n}x_{n}\\ \end{matrix} \right] \] 
-\[    =  \left[ \begin{matrix} x_{1}&amp;amp;x_{2}&amp;amp;\cdots &amp;amp;x_{n}\\ \end{matrix} \right] \left[ \begin{matrix} \lambda _{1}&amp;amp;0&amp;amp;\cdots &amp;amp;0\\ 0&amp;amp;\lambda _{2}&amp;amp;\cdots &amp;amp;0\\ \vdots &amp;amp;\vdots&amp;amp; \cdots &amp;amp;\vdots\\ 0&amp;amp;0&amp;amp;\cdots &amp;amp;\lambda _{n}\\ \end{matrix} \right] \]
-\[ = S\Lambda \]&lt;/p&gt;
-
-&lt;p&gt;所以有：&lt;/p&gt;
-
-&lt;p&gt;\[ A = S\Lambda S^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;这个式子称为A的\(S\Lambda S^{-1}\)分解，或特征分解(Eigendecomposition)。&lt;/p&gt;
-
-&lt;p&gt;可以对角化的前提是A有n个线性无关的特征向量。A有n个线性无关的特征向量的前提是，所有的\(\lambda \)都不重复（没有重根）。&lt;/p&gt;
-
-&lt;p&gt;BTW，对于A的幂，有一个性质：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;如果有 \( Ax = \lambda x \)，则有\( A^{2}x = AAx = \lambda Ax = \lambda \lambda x = \lambda ^{2}x\) &lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( A^{2} = S\Lambda S^{-1}S\Lambda S^{-1} = S\Lambda ^{2}S^{-1} \)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这个性质说明，A的n次幂的特征值等于\(\lambda ^{n}\)，且无论n等于多少(当前n得是正整数），特征向量不变。&lt;/p&gt;
-
-&lt;p&gt;这也是求矩阵的n次幂的快速解法。&lt;/p&gt;
-
-&lt;p&gt;特征分解还有一个用法是，求A的逆矩阵:&lt;/p&gt;
-
-&lt;p&gt;\[ A^{-1} = (S\Lambda S^{-1})^{-1} =S\Lambda ^{-1}S^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;\(\Lambda\)的逆矩阵是非常容易求的，因为它是一个对角矩阵，所以把对角线上的\(\lambda \)都变成\(1/\lambda \)即可。&lt;/p&gt;
-</description>
-        <pubDate>Sat, 26 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-6/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-6/</guid>
       </item>
     
   </channel>

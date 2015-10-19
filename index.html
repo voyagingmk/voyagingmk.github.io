@@ -81,6 +81,78 @@
   
     <article class="post">
 
+      <h1><a href="/shah-function/">狄拉克δ函数(Dirac delta)和狄拉克梳状函数(Dirac comb)</a></h1>
+      <div class="date">
+        Written on October 18, 2015
+      </div>
+      <div class="entry">
+        <h2>狄拉克δ函数(Dirac delta)</h2>
+
+<p>在卷积那篇文章中，已经提到了狄拉克δ函数的定义:</p>
+
+<p>\[ delta (t) =  \begin {cases} +\infty , t=0 \\  0, t\neq 0 \end {cases} \]</p>
+
+<p>\[ \int _{-\infty }^{\infty }\delta (t)dt = 1 \]</p>
+
+<p><img src="../images/2015.10/8.png" alt="8.png"></p>
+
+<p>下面介绍它的一些性质:</p>
+
+<h3>对称性质</h3>
+
+<p>从δ函数的波形图(或者定义)可以简单看出，δ函数是偶函数，即:</p>
+
+<p>\[ delta (t) = delta (-t) \]</p>
+
+<h4>缩放性质</h4>
+
+<p>设有常数a，令u = at，再依据δ函数的积分特性，有:</p>
+
+<p>\[ dt = \frac {1}{a}du \]</p>
+
+<p>\[ \int _{-\infty }^{\infty }\delta (at)dt = \int _{-\infty }^{\infty }\delta (u)\frac {1}{a}du = \frac {1}{a} \int _{-\infty }^{\infty }\delta (u)du = \frac {1}{a} \]</p>
+
+<p>也即:</p>
+
+<p>\[ \delta (at) = \frac {1}{a}\delta (t) \]</p>
+
+<p>又因为它的对称性质，有:</p>
+
+<p>\[ \delta (at) = \frac {1}{|a|}\delta (t) \]</p>
+
+<h4>代数性质</h4>
+
+<p>\[ t\delta (t) = 0 \]</p>
+
+<p>这个太简单了，从基本定义出发可以很快看出来这个式子的正确性。</p>
+
+<h4>平移性质</h4>
+
+<p>\[ \int _{-\infty }^{\infty }f(t)\delta (t - T)dt = f(T) \]</p>
+
+<p>在<a href="http://www.qiujiawei.com/convolution/">理解卷积 Convolution</a>中有对这个式子的详细讨论。当然从δ函数的定义去理解这个式子也很简单。</p>
+
+<h4>δ函数的傅里叶变换</h4>
+
+<p>\[ \mathcal {F}[\delta (s)] = \int _{-\infty }^{\infty }e^{-2\pi ist}\delta (t) = 1 \]</p>
+
+<p>因为只有当x等于0时，δ函数才非0(等于1)，所以这个式子的计算结果等于1。</p>
+
+<p>傅里叶变换后是一个常数1，这个性质看起来就很特别。</p>
+
+<h2>狄拉克梳状函数(Dirac comb)</h2>
+
+<p>这个函数在电子工程<a href="https://en.wikipedia.org/wiki/Electrical_engineering">electrical engineering</a>中称为脉冲序列(impulse train)或采样函数(sampling function)。注意，有些文章会把它叫做Shah function。</p>
+
+<p>它其实就是关于狄拉克δ函数的用周期T间隔的无穷级数(多个δ函数的合并)。(wiki原文是:<strong>A Dirac comb is an infinite series of Dirac delta functions spaced at intervals of T</strong>）</p>
+
+      </div>
+
+      <a href="/shah-function/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
       <h1><a href="/convolution/">理解卷积 Convolution</a></h1>
       <div class="date">
         Written on October 18, 2015
