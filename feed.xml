@@ -252,6 +252,53 @@
 
 &lt;p&gt;这个还没搞懂，搞懂了再来填坑&lt;/p&gt;
 
+&lt;h2&gt;二维卷积以及图像中的卷积&lt;/h2&gt;
+
+&lt;p&gt;上面讨论的仅仅是一维的卷积。幸运的是，高维卷积可以简单地根据一维卷积得到，比如说二维的卷积：&lt;/p&gt;
+
+&lt;p&gt;\[ f(x,y)*g(x,y) = \sum _{x&amp;#39; }^{}\sum _{y&amp;#39; }^{}f(x&amp;#39;,y&amp;#39;)g(x - x&amp;#39;, y - y&amp;#39;)  \]&lt;/p&gt;
+
+&lt;p&gt;积分形式是：&lt;/p&gt;
+
+&lt;p&gt;\[ (f*g)(x,y) = \int \int f(x&amp;#39;,y&amp;#39;)g(x - x&amp;#39;, y - y&amp;#39;)dx&amp;#39;dy&amp;#39;  \]&lt;/p&gt;
+
+&lt;p&gt;如果给定一个范围r，则有：&lt;/p&gt;
+
+&lt;p&gt;\[ f(x,y)*g(x,y) = \sum _{x&amp;#39; = -r }^{x&amp;#39; = r}\sum _{y&amp;#39; = -r }^{y&amp;#39; = r }f(x&amp;#39;,y&amp;#39;)g(x - x&amp;#39;, y - y&amp;#39;)  \]&lt;/p&gt;
+
+&lt;p&gt;现在想象一下，把一幅图片(位图)当做是一个函数：&lt;/p&gt;
+
+&lt;p&gt;\[ f(x,y) = RGB\ value \]&lt;/p&gt;
+
+&lt;p&gt;先让自己对这个式子有一个几何空间上的想象：带有2个变量的函数，它的几何表示是三维的，三个坐标轴分别是：x、y、f(x,y)，所以f(x,y)表示的是三维空间里的一个连续表面(surface)。&lt;/p&gt;
+
+&lt;p&gt;然后，我们再来回顾下线性代数——矩阵。假设我们有一个128X128的bmp图像，可以用一个矩阵A(应该说是方阵)来表示它，A的每一个元素是一个rgb值。
+有了这个图像-&amp;gt;矩阵的转换关系后，我们就可以用线性代数的知识对这个图像做处理。&lt;/p&gt;
+
+&lt;p&gt;比如说，我们用矩阵乘法吧。假设有另一个和A同阶的方阵S，很显然，下面的等式成立：&lt;/p&gt;
+
+&lt;p&gt;\[ AS = A&amp;#39; \]&lt;/p&gt;
+
+&lt;p&gt;这个式子意味着，图像处理可以抽象成矩阵的线性运算。比如当S是单位矩阵I时，显然有\( AI = A \)，即A保持不变，什么都没做。&lt;/p&gt;
+
+&lt;p&gt;好了，明确了图像可以用线性代数的方法来加工处理后，要理解图像卷积就简单了。&lt;/p&gt;
+
+&lt;p&gt;上面说的‘转换’方阵S，是和A同阶的方阵。这个‘同阶’性质，是不是必要的？其实不是。只要你有办法使得A变成A&amp;#39;，就可以了。中间的S，代表的是一个转换过程。&lt;/p&gt;
+
+&lt;p&gt;卷积转换，是一个特殊的转换，首先，它有一个叫做&lt;strong&gt;窗口&lt;/strong&gt;的东西（或者叫卷积子），一般情况下这个窗口是一个比A的阶数小得多的方阵。&lt;/p&gt;
+
+&lt;p&gt;如果拿这个小方阵R去和A的&lt;strong&gt;局部区域&lt;/strong&gt;做线性变换(更具体地说，是&lt;strong&gt;点积运算&lt;/strong&gt;)，则有：&lt;/p&gt;
+
+&lt;p&gt;\[ A_{x,y,w,h}\cdot R_{w,h} = \sum _{x&amp;#39; = x - w/2}^{x&amp;#39; = x + w/2}\sum _{y&amp;#39; = y - h/2}^{y&amp;#39; = y + h/2}A[x&amp;#39;,y&amp;#39;]R[x&amp;#39; - x, y&amp;#39; - y] = new\ RGB\ value \]&lt;/p&gt;
+
+&lt;p&gt;把得到的这个RGB值赋给A[x,y]，就有：&lt;/p&gt;
+
+&lt;p&gt;\[ A[x,y]R = A&amp;#39;[x,y]  \]&lt;/p&gt;
+
+&lt;p&gt;简单地说就是，A[x,y]的值被R刷新了。如果对整幅图像的每一个像素都和R做一次点积运算，整幅图像就被刷新了。&lt;/p&gt;
+
+&lt;p&gt;这也就是图像卷积变换的本质了。&lt;/p&gt;
+
 &lt;h2&gt;找到的相关资料&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.eecg.toronto.edu/%7Eahouse/mirror/engi7824/course_notes_7824_part6.pdf&quot;&gt;The Convolution Sum for Discrete-Time LTI Systems. Andrew W. H. House&lt;/a&gt;&lt;/p&gt;
