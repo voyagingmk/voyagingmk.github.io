@@ -78,7 +78,19 @@
 
 &lt;p&gt;右边的东西符合特征分解的定义，所以上述两式子都是特征分解。&lt;/p&gt;
 
+&lt;h2&gt;SVD的几何意义以及应用&lt;/h2&gt;
+
+&lt;p&gt;推荐阅读这篇文章:&lt;a href=&quot;http://blog.chinaunix.net/uid-20761674-id-4040274.html&quot;&gt;http://blog.chinaunix.net/uid-20761674-id-4040274.html&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;英文原文:&lt;a href=&quot;http://www.ams.org/samplings/feature-column/fcarc-svd&quot;&gt;http://www.ams.org/samplings/feature-column/fcarc-svd&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;不过这文章只讲了和图像有关的应用，实际上，SVD的应用非常广泛，比如机器学习领域也在用。&lt;/p&gt;
+
 &lt;h2&gt;SVD的求法&lt;/h2&gt;
+
+&lt;p&gt;SVD的解法有很多种而且看起来很复杂，比如这篇文章就列举了很多种:&lt;a href=&quot;http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf&quot;&gt;http://www.cs.utexas.edu/users/inderjit/public&lt;em&gt;papers/HLA&lt;/em&gt;SVD.pdf&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;因为矩阵有稠密和稀疏之分，所以针对不同的矩阵就有不同的解法。学习SVD的解法想必是一件艰苦的事情。因为目前还没有深入学习SVD的需求，所以博主就此罢笔。&lt;/p&gt;
 
 &lt;h2&gt;参考资料&lt;/h2&gt;
 
@@ -1291,11 +1303,21 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;wiki:&lt;a href=&quot;https://en.wikipedia.org/wiki/Normal_matrix&quot;&gt;https://en.wikipedia.org/wiki/Normal_matrix&lt;/a&gt;。&lt;/p&gt;
 
-&lt;p&gt;当矩阵A满足:&lt;/p&gt;
+&lt;p&gt;当矩阵A满足下面的等式时，A是规范化矩阵:&lt;/p&gt;
 
 &lt;p&gt;\[ A^{*}A = AA^{*} \]&lt;/p&gt;
 
-&lt;p&gt;A即为Normal Matrix。&lt;/p&gt;
+&lt;p&gt;( \(A^{*}\) 代表A的共轭转置矩阵 )&lt;/p&gt;
+
+&lt;h2&gt;双对角矩阵 Bidiagonal matrix&lt;/h2&gt;
+
+&lt;p&gt;一图以言之:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.10/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(from wiki)&lt;/p&gt;
+
+&lt;p&gt;wiki:&lt;a href=&quot;https://en.wikipedia.org/wiki/Bidiagonal_matrix&quot;&gt;https://en.wikipedia.org/wiki/Bidiagonal_matrix&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-7/</link>
