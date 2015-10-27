@@ -7,6 +7,89 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之奇异值分解 SVD Decomposition</title>
+        <description>&lt;p&gt;在线性代数中，SVD是对实数矩阵(甚至复数矩阵)的一种因式分解。在信号、统计、图像图形学中都有应用。&lt;/p&gt;
+
+&lt;p&gt;SVD非常强大且实用，因为数学界前辈已经证明任意的一个矩阵都可以做SVD分解。这一点特别重要，因为相比SVD分解，和SVD相近的特征值分解只能应用于方阵。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;SVD的定义&lt;/h2&gt;
+
+&lt;p&gt;先给出公式的全貌：&lt;/p&gt;
+
+&lt;p&gt;设有一个m X n的矩阵M，它的SVD分解是：&lt;/p&gt;
+
+&lt;p&gt;\[ M = UΣV^{*} \]&lt;/p&gt;
+
+&lt;p&gt;其中：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;U是一个m X m的单式矩阵(&lt;a href=&quot;https://en.wikipedia.org/wiki/Unitary_matrix&quot;&gt;Unitary Matrix&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Σ是m X n的矩形对角矩阵(&lt;a href=&quot;https://en.wikipedia.org/wiki/Diagonal_matrix&quot;&gt;Rectangular Diagonal Matrix&lt;/a&gt;)，并且在对角线上的元素都是非负实数\(\sigma _{i}\)，称为M的奇异值&lt;/li&gt;
+&lt;li&gt;V*是一个n X n的单式矩阵，也是V的共轭转置矩阵(&lt;a href=&quot;https://en.wikipedia.org/wiki/Conjugate_transpose&quot;&gt;Conjugate Transpose Matrix&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;一些补充:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;U矩阵的m个列向量、V的n个列向量分别被称为M的左奇异向量，和M的右奇异向量&lt;/li&gt;
+&lt;li&gt;约定Σ矩阵的对角线上的奇异值\(\sigma _{i}\)用降序排列&lt;/li&gt;
+&lt;li&gt;由第2点可以看出，Σ矩阵完全由M决定，和U、V无关&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;SVD和特征值分解的联系&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;M的左奇异向量 是 \(MM^{*}\)的特征向量&lt;/li&gt;
+&lt;li&gt;M的右奇异向量 是 \(M^{*}M\)的特征向量&lt;/li&gt;
+&lt;li&gt;M的非零奇异值（即Σ的对角线上的元素）分别是\(M^{*}M\)以及\(MM^{*}\)的所有非零特征值的开平方&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;由单式矩阵的定义，知：&lt;/p&gt;
+
+&lt;p&gt;\[ U^{*}U = I = U^{-1}U \]&lt;/p&gt;
+
+&lt;p&gt;\[ V^{*}V = I = V^{-1}V \]&lt;/p&gt;
+
+&lt;p&gt;\[ U^{*} = U^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;\[ V^{*} = V^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;由矩形对角矩阵的定义，知：&lt;/p&gt;
+
+&lt;p&gt;\[ Σ_{m,n}Σ_{m,n}^{*} = Σ_{m,n}Σ&amp;#39;_{n,m} = D_{m,m} \]&lt;/p&gt;
+
+&lt;p&gt;\[ Σ_{m,n}^{*}Σ_{m,n} = Σ&amp;#39;_{n,m}Σ_{m,n} = D_{n,n} \]&lt;/p&gt;
+
+&lt;p&gt;(D = Diagonal Square Matrix)&lt;/p&gt;
+
+&lt;p&gt;即，Σ和Σ的转置相乘，等于一个新的方阵D，D的阶数等于左边的Σ矩阵的行数；D还是一个对角方阵，且对角线上的元素分别是Σ的对角线上的元素的平方。&lt;/p&gt;
+
+&lt;p&gt;再根据SVD公式：&lt;/p&gt;
+
+&lt;p&gt;\[ M = UΣV^{*} \]&lt;/p&gt;
+
+&lt;p&gt;有：&lt;/p&gt;
+
+&lt;p&gt;\[ M^{*}M = V\Sigma ^{*}U^{*}U\Sigma V^{*} = V\Sigma ^{*}(U^{*}U)\Sigma V^{*} = V\Sigma ^{*}\Sigma V^{*} = V(\Sigma  ^{*}\Sigma )V^{-1}  \]&lt;/p&gt;
+
+&lt;p&gt;\[ MM^{*} = U\Sigma V^{*}V\Sigma ^{*}U^{*} = U\Sigma (V^{*}V)\Sigma ^{*}U^{*} = U\Sigma \Sigma ^{*}U^{*} = U(\Sigma \Sigma ^{*})U^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;右边的东西符合特征分解的定义，所以上述两式子都是特征分解。&lt;/p&gt;
+
+&lt;h2&gt;SVD的求法&lt;/h2&gt;
+
+&lt;h2&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Singular_value_decomposition&quot;&gt;https://en.wikipedia.org/wiki/Singular&lt;em&gt;value&lt;/em&gt;decomposition&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 27 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-9/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-9/</guid>
+      </item>
+    
+      <item>
         <title>狄拉克δ函数(Dirac delta)和狄拉克梳状函数(Dirac comb)</title>
         <description>&lt;h2&gt;狄拉克δ函数(Dirac delta)&lt;/h2&gt;
 
@@ -297,7 +380,7 @@
 
 &lt;p&gt;简单地说就是，A[x,y]的值被R刷新了。如果对整幅图像的每一个像素都和R做一次点积运算，整幅图像就被刷新了。&lt;/p&gt;
 
-&lt;p&gt;这也就是图像卷积变换的本质了。&lt;/p&gt;
+&lt;p&gt;这就是图像的卷积变换的本质。&lt;/p&gt;
 
 &lt;h2&gt;找到的相关资料&lt;/h2&gt;
 
@@ -1158,6 +1241,8 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;h2&gt;单式矩阵 Unitary matrix&lt;/h2&gt;
 
+&lt;p&gt;其他名称：酉矩阵/幺正矩阵。&lt;/p&gt;
+
 &lt;p&gt;看名字有点像单位矩阵(Unit matrix)，但是公式上的定义是这样子的：&lt;/p&gt;
 
 &lt;p&gt;\[ U^{*}U = I \]&lt;/p&gt;
@@ -2004,273 +2089,6 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
         <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/understanding-quaternions/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/understanding-quaternions/</guid>
-      </item>
-    
-      <item>
-        <title>PBRT《章2》阅读笔记</title>
-        <description>&lt;p&gt;最近在看线代的公开课，顺便也把PBRT这个坑开了，合在一起学。&lt;/p&gt;
-
-&lt;p&gt;本文的cpp代码均来自&lt;a href=&quot;https://github.com/mmp/pbrt-v2&quot;&gt;https://github.com/mmp/pbrt-v2&lt;/a&gt;，木有修改。只为方便读者阅读。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;正文&lt;/h2&gt;
-
-&lt;p&gt;一个基本的渲染器，需要实现2点：输入场景数据、输出渲染图像。&lt;/p&gt;
-
-&lt;p&gt;输入场景数据这一步，就需要对3D世界各种东西进行抽象、并设计各种数据结构，比如比较fundamental的：3D空间向量、3D坐标系系统、光线，或者visible的：各种2D/3D几何体、纹理系统等。大概就是，这个渲染器要渲染的东西，程序上都会有一些对应的代码。渲染器不可能对未知的东西进行渲染。比如毛发、布这种高端的东西，一个基本的渲染器是无法渲染的，除非你写了一些代码来完成这个事情。&lt;/p&gt;
-
-&lt;p&gt;《PBRT》第二章就讲了这些基础的东西。&lt;/p&gt;
-
-&lt;p&gt;在前面的线代的文章中，提到了矩阵的基(basis)的概念。矩阵的基是一组线性无关的列向量，这个矩阵的列空间的任意一点，可以通过对矩阵的基的线性组合得到。&lt;/p&gt;
-
-&lt;p&gt;那么n维的情况下，定义一个向量的公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ v = s_{1}v_{1} + \cdots + s_{n}v_{n} \]&lt;/p&gt;
-
-&lt;p&gt;定义一个点的位置的公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ p = p_{0} + s_{1}v_{1} + \cdots + s_{n}v_{n} \]&lt;/p&gt;
-
-&lt;p&gt;对于渲染器的3维空间，要简化成：&lt;/p&gt;
-
-&lt;p&gt;\[ p_{0} = (0,0,0) \]
-\[ basis = (1,0,0) (0,1,0) (0,0,1) \]&lt;/p&gt;
-
-&lt;p&gt;这3个标准基向量对应的空间被称为世界空间(world space)。&lt;/p&gt;
-
-&lt;h3&gt;向量(vector)、点(point)的区别&lt;/h3&gt;
-
-&lt;p&gt;向量和点，区别在于点没有长度的概念，也就是说点是零维的，点代表空间里的一个&lt;strong&gt;位置&lt;/strong&gt;（pbrt的Point和Vector的差异是没有LengthSquared、Length函数)，而向量没有起点的概念，向量只是指明了一个&lt;strong&gt;方向&lt;/strong&gt;并且有长度。&lt;/p&gt;
-
-&lt;h3&gt;3维空间下，如何从一个向量出发，构造出一组标准正交基&lt;/h3&gt;
-
-&lt;p&gt;注意，这个问题是有重要意义的，因为一组标准正交基相当于一个坐标系。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;设\( v_{1}=(x_{1},y_{1},z_{1}) \)，并且v1已经单位化&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;随便选择v1的某一个分量，并将它变成0，再交换剩余的2个分量的位置，并对其中一个分量取反，就能得到和v1正交的v2。这是因为这样构造出来的v2，必然使得\(  v_{1}\cdot v_{2}=0 \)。比如当\( v_{2}=(-z_{1},0,x_{1}) \)时，有\( v_{1}\cdot v_{2}=(x_{1},y_{1},z_{1})\cdot (-z_{1},0,x_{1}) = 0\)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;上面的v2还有不足，因它不是单位化的。单位化的v2应该是\[v_{2}=\dfrac { (-z_{1},0,x_{1}) }{ \sqrt {z_{1}^{1}+x_{1}^{1}}} \]&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;有了v1、v2后，v3就等于v1和v2的叉积(cross product): \( v_{3} =v_{1} \times v_{2} \)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;法向量Normal&lt;/h3&gt;
-
-&lt;p&gt;(突然意识到，pbrt把向量、点、法向量写成3个没有继承关系的类，意义在于，防止程序员乱用并搞砸代码=。=)&lt;/p&gt;
-
-&lt;p&gt;** A surface normal is a vector that is perpendicular to a surface at a particular position.It can be defined as the cross product of any two nonparallel vectors
-that are tangent to the surface at a point. **&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;法向量是与某个平面垂直，并经过平面上某个特殊位置的向量。可以用平面上2个互不平行、与平面正切的向量的叉积来表示。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;法向量应该说是一种特殊的向量。pbrt也实现了一个以Vector为参数的Normal构造函数（但有explicit标志），允许通过向量构造出法向量。&lt;/p&gt;
-
-&lt;h3&gt;光线Ray&lt;/h3&gt;
-
-&lt;p&gt;光线是一条半无限长的线，用一个原点和一个方向向量来表示。&lt;/p&gt;
-
-&lt;p&gt;参数形式的光线表示：&lt;/p&gt;
-
-&lt;p&gt;\[ r(t) = o + td   \ \ \ 0\leq t\geq \infty \]&lt;/p&gt;
-
-&lt;p&gt;光线还有其他成员变量：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;mint maxt，用来限定t的范围&lt;/li&gt;
-&lt;li&gt;time 用于构建动画，当构建静态场景时不需要&lt;/li&gt;
-&lt;li&gt;depth 光线弹射深度。限制光线只能bounce多少次&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;微分光线Differential Ray&lt;/h3&gt;
-
-&lt;p&gt;先跳过&lt;/p&gt;
-
-&lt;h3&gt;包围盒&lt;/h3&gt;
-
-&lt;p&gt;包围盒的主要作用，是用来优化程序性能的，更具体的说，就是让复杂场景物件简化成简单的球形、方盒，使得光线快速剔除不相交的对象，计算得更快。&lt;/p&gt;
-
-&lt;p&gt;BBox&lt;/p&gt;
-
-&lt;p&gt;这玩意神奇的地方，我觉得是它的构造函数。输入是2个Point，就能构造一个盒子，并且也仅仅是花了2个Point来存储。这2个新的Point和输入的Point不同，被称为pMin和pMax:&lt;/p&gt;
-
-&lt;p&gt;\[ pMin = (min(p_{1}.x,p_{2}.x), min(p_{1}.y,p_{2}.y), min(p_{1}.z,p_{2}.z)) \]&lt;/p&gt;
-
-&lt;p&gt;\[ pMax = (max(p_{1}.x,p_{2}.x), max(p_{1}.y,p_{2}.y), max(p_{1}.z,p_{2}.z)) \]&lt;/p&gt;
-
-&lt;p&gt;需要注意的是，根据这个转换公式，要使得pMin和pMax足够定义一个BBox，那么他们必然是BBox的2个对角顶点。且因为BBox平行于x、y、z轴，那么pMin和pMax的任意一个分量都不能相等。（否则，pMin、pMax就只能是BBox的一对邻接顶点）&lt;/p&gt;
-
-&lt;p&gt;p1、p2和pMin、pMax是什么关系呢？其实，p1、p2也是这个BBox的某一组对角顶点。计算出来的pMin、pMax也只是这4组对角顶点的特定的一组，只不过pMin必然是BBox8个顶点中最靠近坐标系原点的顶点、pMax必然是最远离坐标系原点的顶点。&lt;/p&gt;
-
-&lt;h3&gt;转换Transformation&lt;/h3&gt;
-
-&lt;p&gt;** In general, a transformation T is a mapping from points to points and from vectors to
-vectors:**&lt;/p&gt;
-
-&lt;p&gt;\[ p^{\prime } = T(p) \]
-\[ v^{\prime } = T(v) \]&lt;/p&gt;
-
-&lt;p&gt;回想下线代的知识，就可以知道，这个T必然是一个方阵，阶数等于p(或v)的维数，T对p(或v)的转换，其实只是一次矩阵乘法。&lt;/p&gt;
-
-&lt;p&gt;T有很多种，大部分是无特殊转换意义的，但有小部分是有特定意义且能用在图形学里的。譬如：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Translation，我称之为位置转换&lt;/li&gt;
-&lt;li&gt;Scaling，缩放转换&lt;/li&gt;
-&lt;li&gt;Rotation，旋转转换&lt;/li&gt;
-&lt;li&gt;LookAt，视角转换&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Translation的一般形式：&lt;/p&gt;
-
-&lt;p&gt;\[ T(\vartriangle x,\vartriangle y,\vartriangle z) =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;\vartriangle x\\ 0&amp;amp;1&amp;amp;0&amp;amp;\vartriangle y\\ 0&amp;amp;0&amp;amp;1&amp;amp;\vartriangle z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;Scaling的一般形式：&lt;/p&gt;
-
-&lt;p&gt;\[ T(\vartriangle x,\vartriangle y,\vartriangle z) =  \left[ \begin{matrix} x&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;y&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;z&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;Rotation的一般形式，比较复杂，先分成3种情况考虑。所谓的旋转，都要有一个轴线，对任意一个3维坐标系来说，有3条轴，所以就有以3条轴为轴线的3个Rotation：&lt;/p&gt;
-
-&lt;p&gt;\[ R_{x}(\theta ) =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;cos\theta &amp;amp;-sin\theta &amp;amp;0\\ 0&amp;amp;sin\theta &amp;amp;cos\theta &amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ R_{y}(\theta ) =  \left[ \begin{matrix} cos\theta &amp;amp;0&amp;amp;sin\theta &amp;amp;0\\ 0&amp;amp;1&amp;amp;0&amp;amp;0\\ -sin\theta &amp;amp;0&amp;amp;cos\theta &amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ R_{z}(\theta ) =  \left[ \begin{matrix} cos\theta &amp;amp;-sin\theta &amp;amp;0&amp;amp;0\\ sin\theta &amp;amp;cos\theta &amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;以x轴的旋转分析一下：&lt;/p&gt;
-
-&lt;p&gt;因为：&lt;/p&gt;
-
-&lt;p&gt;\[ R_{x}(\theta )[x,y,z,w]^{T} = [x,cos\theta \cdot y - sin\theta \cdot z,sin\theta \cdot y + cos\theta \cdot z, w]^{T} \]&lt;/p&gt;
-
-&lt;p&gt;所以有：&lt;/p&gt;
-
-&lt;p&gt;\[ R_{x}(\theta )[1,0,0,0]^{T} = [1,0,0,0]^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[ R_{x}(\theta )[0,1,0,0]^{T} = [0,cos\theta ,sin\theta ,0]^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[ R_{x}(\theta )[0,0,1,0]^{T} = [0,-sin\theta ,cos\theta ,0]^{T} \]&lt;/p&gt;
-
-&lt;p&gt;可以看出，用Rx旋转x轴,x轴不变,旋转y、z轴，y、z轴会被顺时针旋转\(\theta \)度（左手坐标系时）。&lt;/p&gt;
-
-&lt;p&gt;Rotation有一些特性：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( R_{\alpha }(0) = I \) 这个0是指\(\theta=0\)，不是向量0&lt;/li&gt;
-&lt;li&gt;\( R_{\alpha }(\theta _{1})R_{\alpha }(\theta _{2}) = R_{\alpha }(\theta _{1} + \theta _{2}) \)&lt;/li&gt;
-&lt;li&gt;\( R_{\alpha }(\theta _{1})R_{\alpha }(\theta _{2}) = R_{\alpha }(\theta _{2})R_{\alpha }(\theta _{1}) \)&lt;/li&gt;
-&lt;li&gt;\( R_{\alpha }^{-1}(\theta ) = R_{\alpha }(-\theta ) = R_{\alpha }^{T}(\theta ) \)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;回想下正交矩阵的定义：&lt;strong&gt;如果实数域上的方阵A满足 \( A^{T}A = I \)，则称A为正交矩阵&lt;/strong&gt;，根据上面的第四条性质，R显然也是一个正交矩阵。正交矩阵的好处是，它的逆矩阵很简单，等于它的转置矩阵。&lt;/p&gt;
-
-&lt;p&gt;当需要围绕任意一个向量做旋转时，可以这样想：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;设轴向量为a，要被旋转的向量为v&lt;/li&gt;
-&lt;li&gt;把a向量当做一个x轴（y or z轴也行）；把v到a的error向量（如果不知道什么是error向量，请看我之前的文章）当做y轴&lt;/li&gt;
-&lt;li&gt;以x、y轴向量去计算正交的z轴向量（用叉积即可）&lt;/li&gt;
-&lt;li&gt;就得到了一个以a向量为x轴的xyz坐标系了&lt;/li&gt;
-&lt;li&gt;所以原问题就变成了，绕这个虚拟坐标系的x轴旋转&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;计算过程：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( v_{c} = a\parallel v\parallel cos\alpha = a(v\cdot a) \)&lt;/li&gt;
-&lt;li&gt;\( v_{1} = v - v_{c} \)&lt;/li&gt;
-&lt;li&gt;\( v_{2} = v_{1}\times a \)&lt;/li&gt;
-&lt;li&gt;\( v_{1}^{\prime } =  v_{1}cos\theta + v_{2}sin\theta \) &lt;/li&gt;
-&lt;li&gt;\( v^{\prime } = v_{c} + v_{1}^{\prime } \) &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;(书里没有标出来\( v_{c} \) ,红色的那段就是)&lt;/p&gt;
-
-&lt;p&gt;书里也没有解释上面第三个式子是怎么得到的。我的理解是，因为\( v_{1}^{\prime } \)和\( v_{1} \)等长，所以\( v_{1}^{\prime } \)在\( v_{1} \)上的投影(向量)等于\(v_{1}cos\theta \)，又因为\( v_{1} \)是一个坐标系的轴，所以这个投影就是\( v_{1}^{\prime } \)对应这个轴的分量；同理，\(v_{2}sin\theta \)，是\( v_{1}^{\prime } \)在\( v_{2} \)上的投影。这两个投影向量的和，就是\( v_{1}^{\prime } \)。&lt;/p&gt;
-
-&lt;p&gt;不过这个任意轴旋转的矩阵就不那么简单了，先设：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( c = cos\theta  \)&lt;/li&gt;
-&lt;li&gt;\( s = sin\theta  \)&lt;/li&gt;
-&lt;li&gt;\( x,y,z = normalize(x,y,z) \)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ R_{(x,y,z)}(\theta ) =  \left[ \begin{matrix} x^{2}+(1-x^{2})c&amp;amp;xy(1-c) -zs&amp;amp;xz(1-c)+ys&amp;amp;0\\ xy(1-c)+zs&amp;amp;y^{2}+(1-y^{2})c&amp;amp;yz(1-c)-xs&amp;amp;0\\ xz(1-c)-ys&amp;amp;yz(1-c)+xs&amp;amp;z^{2}+(1-z^{2})c&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;(好可怕的矩阵=。=，不过这世界上还有个东西叫四元数旋转。有空再写一篇四元数的文章）&lt;/p&gt;
-
-&lt;p&gt;LookAt转换&lt;/p&gt;
-
-&lt;p&gt;LookAt矩阵的第4列是摄像机在世界坐标系的坐标；第3列是单位化的视点朝向向量（摄像机的前方），即视点坐标减去第4列的坐标;第2列是单位化的up向量（摄像机的上方），以世界坐标系表示；第1列是摄像机坐标系的x向量在世界坐标系对应的向量。&lt;/p&gt;
-
-&lt;p&gt;第1列的x向量，是用第2列的up向量和第3列的朝向向量进行叉积得到。&lt;/p&gt;
-
-&lt;p&gt;设：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;pos是摄像机坐标（世界坐标）&lt;/li&gt;
-&lt;li&gt;up是用户提供的摄像机朝向上方的向量（世界坐标）&lt;/li&gt;
-&lt;li&gt;look是用户提供的摄像机视点的向量（世界坐标）&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;于是有：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;dir = Normalize(look - pos)，摄像机的朝向向量（世界坐标）&lt;/li&gt;
-&lt;li&gt;xaxis = Normalize(Cross(Normalize(up), dir))，摄像机的x轴单位向量（世界坐标）&lt;/li&gt;
-&lt;li&gt;newUp = Cross(Normalize(dir), xaxis)，新的单位化的up向量（世界坐标）。这里不太明白为什么不直接newUp = Normalize(up)。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} xaxis.x&amp;amp;newUp.x&amp;amp;dir.x&amp;amp;pos.x\\ xaxis.y&amp;amp;newUp.y&amp;amp;dir.y&amp;amp;pos.y\\ xaxis.z&amp;amp;newUp.z&amp;amp;dir.z&amp;amp;pos.z\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h3&gt;Tranform的应用原理&lt;/h3&gt;
-
-&lt;p&gt;Tranform对Vector和Point的作用过程，上面已经提到了，就是简单的矩阵相乘。&lt;/p&gt;
-
-&lt;p&gt;对Ray和BBox的转换，也不难，就是对Ray的o和d分量分别左乘T、对BBox的8个顶点分别左乘T。&lt;/p&gt;
-
-&lt;p&gt;这里要提一下法向量的Tranform。法向量是不能直接T(n)的，这是错误的。&lt;/p&gt;
-
-&lt;p&gt;直接贴公式：&lt;/p&gt;
-
-&lt;p&gt;\[ n\cdot t = n^{T}t = 0 \]
-\[ (n^{\prime })^{T}t^{\prime }= 0 \]
-\[ (Sn)^{T}Mt = 0 \]
-\[ n^{T}S^{T}Mt = 0 \]
-\[ S^{T}M = I \]
-\[ n^{\prime } = Sn = (M^{-1})^{T}n \]&lt;/p&gt;
-
-&lt;p&gt;M是某种转换，当M对一个面作用时，这个面的法向量要用上面最后那条公式转换。注意到公式里面有一个逆矩阵，所以这就是为什么Transform要存一个逆矩阵。&lt;/p&gt;
-
-&lt;h3&gt;旋转四元数-&amp;gt;旋转矩阵&lt;/h3&gt;
-
-&lt;p&gt;虽然可以用四元数来实现旋转变换，但是如果能变回矩阵的形式，也是有用的。实际上却是办得到。&lt;/p&gt;
-
-&lt;p&gt;设四元数的旋转轴为:
-\[ q = [cos\frac {\theta }{2}, sin\frac {\theta }{2}\hat {v}] = [q_{w}, q_{x}i + q_{y}j + q_{z}k] = (q_{x}, q_{y}, q_{z}, q_{w}) \]&lt;/p&gt;
-
-&lt;p&gt;被旋转的点的原坐标为p，旋转后的坐标为\(p&amp;#39;\)：&lt;/p&gt;
-
-&lt;p&gt;\[ p = [w, xi + yj + zk] = (x,y,z,0)  \]&lt;/p&gt;
-
-&lt;p&gt;四元数表示的旋转公式：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; = qpq^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;而矩阵表示的旋转公式是：
-\[ p&amp;#39; = Mp \]&lt;/p&gt;
-
-&lt;p&gt;M是未知的，目标就是算出M。把上面的p和q代入四元数旋转公式，就能得到一个新的四元数\(p&amp;#39;\),这个\(p&amp;#39;\)会有i、j、k分量，只要把i、j、k3个分量再按3个未知数x、y、z去分开，就得到一个9x9的矩阵，也就是M了。&lt;/p&gt;
-
-&lt;p&gt;我在纸上写了下推导公式，非常繁琐，不好弄成latex。直接贴上最终的公式吧：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.10/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-</description>
-        <pubDate>Mon, 28 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/pbrt-chapter2/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/pbrt-chapter2/</guid>
       </item>
     
   </channel>
