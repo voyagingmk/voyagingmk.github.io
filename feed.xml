@@ -1284,6 +1284,18 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 &lt;h2&gt;厄米特矩阵的正定矩阵&lt;/h2&gt;
 
 &lt;p&gt;参考正定矩阵，厄米特矩阵的正定矩阵的定义公式是:\( z^{*}Mz &amp;gt; 0\)，注意，算出来的值必须是实数，不能是复数。&lt;/p&gt;
+
+&lt;h2&gt;规范化矩阵 Normal Matrix&lt;/h2&gt;
+
+&lt;p&gt;又名：正规矩阵、正规阵、规范矩阵。&lt;/p&gt;
+
+&lt;p&gt;wiki:&lt;a href=&quot;https://en.wikipedia.org/wiki/Normal_matrix&quot;&gt;https://en.wikipedia.org/wiki/Normal_matrix&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;当矩阵A满足:&lt;/p&gt;
+
+&lt;p&gt;\[ A^{*}A = AA^{*} \]&lt;/p&gt;
+
+&lt;p&gt;A即为Normal Matrix。&lt;/p&gt;
 </description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-7/</link>
