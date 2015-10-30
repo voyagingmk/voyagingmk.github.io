@@ -156,36 +156,49 @@
     <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 <span class="p">}</span>
 
+<span class="n">Item</span> <span class="n">test5</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">Item</span><span class="p">(</span><span class="sc">&#39;e&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A a = test1()   --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item a = test1()   --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
     <span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">();</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A&amp;&amp; b = test2() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item&amp;&amp; b = test2() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
     <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">();</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A&amp;&amp; c = test3() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item&amp;&amp; c = test3() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
     <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">();</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A&amp;&amp; d = test4() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item&amp;&amp; d = test4() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
     <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;--------- Item&amp;&amp; e = test5() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">();</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">----------      test end  --------------</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">);</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>运行结果:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">----------</span><span class="n">A</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
+<p>Debug运行结果:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">----------</span><span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
 <span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="o">----------</span><span class="n">A</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
 <span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
 <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="o">----------</span><span class="n">A</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
 <span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="o">----------</span><span class="n">A</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
 <span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
 <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="o">---------</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
 <span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
 
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -198,6 +211,34 @@
 <li>其中test3的写法是错误的，看test3的打印以及test end之后的输出可以发现，变量c并没有被成功取到函数之外，c在test3返回时就被析构了。</li>
 <li>test2和test4几乎是一样的(根据打印来看的话)，所以test4相比test2多出来的std::move，让test4这种写法更加差劲。</li>
 </ul>
+
+<p>Release运行结果:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">----------</span><span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="p">,</span> <span class="mi">3805970</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="o">---------</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
+
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p>对比Debug版的输出，会发现test2函数被编译优化成test1了。</p>
+
+<p>当然，还是尽量把代码写成test1的写法吧。简洁得多。</p>
 
   </div>
 
