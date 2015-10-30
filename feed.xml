@@ -11,6 +11,8 @@
         <description>&lt;h2&gt;右值引用 和 返回值优化&lt;/h2&gt;
 
 &lt;p&gt;先贴一段代码(在vs2015编译通过):&lt;/p&gt;
+
+&lt;!--more--&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#include &amp;lt;utility&amp;gt;&lt;/span&gt;
 
