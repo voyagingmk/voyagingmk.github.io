@@ -74,10 +74,130 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/c%2B%2B.html" class="set-2">c++</a> <a href="/tag/complex.html" class="set-1">complex</a> <a href="/tag/fourier.html" class="set-1">fourier</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-4">linear algebra</a> <a href="/tag/math.html" class="set-2">math</a> <a href="/tag/maths.html" class="set-1">maths</a> <a href="/tag/matrix.html" class="set-4">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
+  <a href="/tag/c%2B%2B.html" class="set-3">c++</a> <a href="/tag/complex.html" class="set-1">complex</a> <a href="/tag/fourier.html" class="set-1">fourier</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-4">linear algebra</a> <a href="/tag/math.html" class="set-2">math</a> <a href="/tag/maths.html" class="set-1">maths</a> <a href="/tag/matrix.html" class="set-4">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/cpp-3/">关于c++11的一些特性</a></h1>
+      <div class="date">
+        Written on October 30, 2015
+      </div>
+      <div class="entry">
+        <h2>右值引用 和 返回值优化</h2>
+
+<p>先贴一段代码(在vs2015编译通过):</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;utility&gt;</span>
+
+
+<span class="n">class</span> <span class="n">Item</span> <span class="p">{</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="kt">char</span> <span class="n">name</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+<span class="nl">public</span><span class="p">:</span>
+    <span class="o">~</span><span class="n">Item</span><span class="p">(){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[dtor called] (%c, %i) </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="p">()</span><span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="sc">&#39;_&#39;</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[default ctor called] </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="p">(</span><span class="kt">char</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v</span><span class="p">)</span><span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[ctor called] (%c, %i) </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="p">(</span><span class="k">const</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[copy ctor called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="o">&amp;</span> <span class="n">operator</span> <span class="o">=</span> <span class="p">(</span><span class="k">const</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[operator = called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="n">this</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="o">&amp;</span> <span class="n">operator</span> <span class="o">=</span> <span class="p">(</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">a</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[move operator = called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="n">this</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Item</span> <span class="nf">test1</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">Item</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">Item</span> <span class="nf">test2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">&#39;b&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">test3</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">&#39;c&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">Item</span> <span class="n">test4</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">&#39;d&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A a = test1()   --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A&amp;&amp; b = test2() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A&amp;&amp; c = test3() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------A&amp;&amp; d = test4() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">----------      test end  --------------</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>运行结果:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">----------</span><span class="n">A</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">A</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">A</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">A</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
+
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p>从结果可以总结出:</p>
+
+<ul>
+<li>test1函数才是最正确的写法，胡乱使用&amp;&amp;符号反而多调用了几次函数。</li>
+<li>对比test2、test1会发现，如果要返回一个函数临时变量，最好写成匿名变量的形式(test1)，这样的写法编译器才能够做<strong>返回值优化</strong>。</li>
+<li>其中test3的写法是错误的，看test3的打印以及test end之后的输出可以发现，变量c并没有被成功取到函数之外，c在test3返回时就被析构了。</li>
+<li>test2和test4几乎是一样的(根据打印来看的话)，所以test4相比test2多出来的std::move，让test4这种写法更加差劲。</li>
+</ul>
+
+      </div>
+
+      <a href="/cpp-3/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 

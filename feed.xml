@@ -7,6 +7,121 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>关于c++11的一些特性</title>
+        <description>&lt;h2&gt;右值引用 和 返回值优化&lt;/h2&gt;
+
+&lt;p&gt;先贴一段代码(在vs2015编译通过):&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;utility&amp;gt;&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[dtor called] (%c, %i) &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;_&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[default ctor called] &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[ctor called] (%c, %i) &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[copy ctor called] (%c, %i) -&amp;gt; (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[operator = called] (%c, %i) -&amp;gt; (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[move operator = called] (%c, %i) -&amp;gt; (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;test1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;test2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;b&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;c&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;d&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;----------A a = test1()   --------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;----------A&amp;amp;&amp;amp; b = test2() --------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;----------A&amp;amp;&amp;amp; c = test3() --------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;----------A&amp;amp;&amp;amp; d = test4() --------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;----------      test end  --------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;运行结果:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;o&quot;&gt;----------&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;--------------&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;----------&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--------------&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;858993460&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;----------&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--------------&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;----------&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--------------&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;858993460&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;----------&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;--------------&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;从结果可以总结出:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;test1函数才是最正确的写法，胡乱使用&amp;amp;&amp;amp;符号反而多调用了几次函数。&lt;/li&gt;
+&lt;li&gt;对比test2、test1会发现，如果要返回一个函数临时变量，最好写成匿名变量的形式(test1)，这样的写法编译器才能够做&lt;strong&gt;返回值优化&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;其中test3的写法是错误的，看test3的打印以及test end之后的输出可以发现，变量c并没有被成功取到函数之外，c在test3返回时就被析构了。&lt;/li&gt;
+&lt;li&gt;test2和test4几乎是一样的(根据打印来看的话)，所以test4相比test2多出来的std::move，让test4这种写法更加差劲。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Fri, 30 Oct 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/cpp-3/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/cpp-3/</guid>
+      </item>
+    
+      <item>
         <title>线性代数之奇异值分解 SVD Decomposition</title>
         <description>&lt;p&gt;在线性代数中，SVD是对实数矩阵(甚至复数矩阵)的一种因式分解。在信号、统计、图像图形学中都有应用。&lt;/p&gt;
 
@@ -1322,807 +1437,6 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-7/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-7/</guid>
-      </item>
-    
-      <item>
-        <title>Understanding Quaternions 中文翻译《理解四元数》</title>
-        <description>&lt;p&gt;原文地址:&lt;a href=&quot;http://www.3dgep.com/understanding-quaternions/&quot;&gt;http://www.3dgep.com/understanding-quaternions/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2&gt;正文&lt;/h2&gt;
-
-&lt;p&gt;在这篇文章中我会尝试用简单的方式去解释四元数的概念，即用可视化的方式解释四元数以及几种对四元数的操作。我将把矩阵、欧拉角和四元数放在一起比较，并解释什么时候该用四元数、什么时候该用欧拉角或矩阵。&lt;/p&gt;
-
-&lt;h3&gt;内容结构&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;介绍&lt;/li&gt;
-&lt;li&gt;复数
-
-&lt;ul&gt;
-&lt;li&gt;复数的加减&lt;/li&gt;
-&lt;li&gt;复数的系数缩放&lt;/li&gt;
-&lt;li&gt;复数的积&lt;/li&gt;
-&lt;li&gt;复数的平方&lt;/li&gt;
-&lt;li&gt;共轭复数&lt;/li&gt;
-&lt;li&gt;复数的绝对值&lt;/li&gt;
-&lt;li&gt;两复数的商&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;i的幂&lt;/li&gt;
-&lt;li&gt;复数平面
-
-&lt;ul&gt;
-&lt;li&gt;旋转数（Rotors)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;四元数
-
-&lt;ul&gt;
-&lt;li&gt;作为有序数的四元数&lt;/li&gt;
-&lt;li&gt;四元数的加减&lt;/li&gt;
-&lt;li&gt;四元数的积&lt;/li&gt;
-&lt;li&gt;实四元数&lt;/li&gt;
-&lt;li&gt;四元数的系数缩放&lt;/li&gt;
-&lt;li&gt;纯四元数&lt;/li&gt;
-&lt;li&gt;四元数的加法形式&lt;/li&gt;
-&lt;li&gt;单位四元数&lt;/li&gt;
-&lt;li&gt;四元数的二元形式&lt;/li&gt;
-&lt;li&gt;共轭四元数&lt;/li&gt;
-&lt;li&gt;四元数范数&lt;/li&gt;
-&lt;li&gt;四元数规范化&lt;/li&gt;
-&lt;li&gt;四元数的逆&lt;/li&gt;
-&lt;li&gt;四元数的点乘&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;旋转&lt;/li&gt;
-&lt;li&gt;四元数的插值
-
-&lt;ul&gt;
-&lt;li&gt;SLERP
-
-&lt;ul&gt;
-&lt;li&gt;四元数的差&lt;/li&gt;
-&lt;li&gt;四元数的指数运算&lt;/li&gt;
-&lt;li&gt;2个四元数的分数差&lt;/li&gt;
-&lt;li&gt;注意事项&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;SQUARD&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;结论&lt;/li&gt;
-&lt;li&gt;下载Demo&lt;/li&gt;
-&lt;li&gt;引用&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!--more--&gt;
-
-&lt;h3&gt;介绍&lt;/h3&gt;
-
-&lt;p&gt;在计算机图形学中，我们使用转换矩阵来表示空间中的一个位置以及朝向。一个转换矩阵还可以表示对一个目标的缩放(scale)或错切(shear)等。   我们可以把转换矩阵想象成一个空间，当你用这个矩阵乘以向量、点（甚至矩阵）后， 你就把向量、点、矩阵转换进这个空间了。&lt;/p&gt;
-
-&lt;p&gt;在这篇文章中，我不会讨论转换矩阵的细节。你可以查看我前面的文章，文章中描述了转换矩阵的细节。&lt;/p&gt;
-
-&lt;p&gt;在这篇文章中，我想要讨论一个可替代的方案，即用四元数来描述空间里的物体的朝向。&lt;/p&gt;
-
-&lt;p&gt;四元数的概念是由爱尔兰数学家Sir William Rowan Hamilton发明的（1843年，都柏林）。Hamilton当时正和他的妻子前往爱尔兰皇家研究院，当他从Brougham桥通过皇家运河时，他领悟到了一个激动人心的东西，并立刻把它刻在桥的一个石头上：&lt;/p&gt;
-
-&lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/2.jpg&quot; alt=&quot;2.jpg&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;William Rowan Hamilton Plaque on Broome Bridge on the Royal Canal commemorating his discovery of the fundamental formula for quaternion multiplication.&lt;/p&gt;
-
-&lt;h3&gt;复数&lt;/h3&gt;
-
-&lt;p&gt;在我们能够完全理解四元数之前，我们必须先知道四元数是怎么来的。四元数的根源其实是&lt;strong&gt;复数&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;除了知名的数集（自然数、整数、实数、分数）之外，复数系统引入了一个新的数集——虚数。虚数的发明是为了解决一些特定的无解的方程，例如：
-\[ x^{2} + 1 = 0 \]
-要解决这个等式，必须让\(x^{2} = -1 \)，这当然是不行的，因为任意实数的平方都是非负数。&lt;/p&gt;
-
-&lt;p&gt;一般而言，数学家是不能忍受一个等式是无解的。于是，一个新的术语被发明了，它就是虚数，一个可以解决上面这个等式的数。&lt;/p&gt;
-
-&lt;p&gt;虚数有这样的形式：&lt;/p&gt;
-
-&lt;p&gt;\[ i^{2} = -1 \]&lt;/p&gt;
-
-&lt;p&gt;不要为这个术语较真，因为逻辑上这个数是不存在的。只要知道i是一个平方等于-1的东西即可。&lt;/p&gt;
-
-&lt;p&gt;虚数的集合可以用\( \mathbb{I} \)来表示。&lt;/p&gt;
-
-&lt;p&gt;复数的集合\( \mathbb{C} \)是一个实数和一个虚数的和，形式如下：&lt;/p&gt;
-
-&lt;p&gt;\[ z = a + bi \ a,b\in R,\ i^{2} = -1 \]&lt;/p&gt;
-
-&lt;p&gt;可以认为所有实数都是b=0的复数、所有虚数都是a=0的复数。&lt;/p&gt;
-
-&lt;h3&gt;复数的加减&lt;/h3&gt;
-
-&lt;p&gt;加法：&lt;/p&gt;
-
-&lt;p&gt;\[ (a_{1} + b_{1}i) + (a_{2} + b_{2}i) = (a_{1} + a_{2}) + (b_{1} + b_{2})i \]&lt;/p&gt;
-
-&lt;p&gt;减法：&lt;/p&gt;
-
-&lt;p&gt;\[ (a_{1} + b_{1}i) - (a_{2} + b_{2}i) = (a_{1} - a_{2}) + (b_{1} - b_{2})i \]&lt;/p&gt;
-
-&lt;h3&gt;复数的系数缩放&lt;/h3&gt;
-
-&lt;p&gt;\[ \lambda (a_{1} + b_{1}i) = \lambda  a_{1} + \lambda b_{1}i \]&lt;/p&gt;
-
-&lt;h3&gt;复数的积&lt;/h3&gt;
-
-&lt;p&gt;\[  z_{1} = (a_{1} + b_{1}i) \]
-\[  z_{2} = (a_{2} + b_{2}i) \]
-\[  z_{1}z_{2} = (a_{1} + b_{1}i)(a_{2} + b_{2}i) = a_{1}a_{2} + a_{1}b_{2}i + b_{1}a_{2}i+b_{1}b_{2}i^{2} \]
-\[ z_{1}z_{2} = (a_{1}a_{2} - b_{1}b_{2}) + (a_{1}b_{2} + b_{1}a_{2})i \]&lt;/p&gt;
-
-&lt;h3&gt;复数的平方&lt;/h3&gt;
-
-&lt;p&gt;\[ z = (a + bi) \]
-\[ z^{2} = (a + bi)(a + bi) \]
-\[ z^{2} = (a^{2} - b^{2}) + 2abi \]&lt;/p&gt;
-
-&lt;h3&gt;共轭复数&lt;/h3&gt;
-
-&lt;p&gt;复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(z^{*}\)。&lt;/p&gt;
-
-&lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
-
-&lt;p&gt;\[ z^{*} = (a - bi) \]&lt;/p&gt;
-
-&lt;p&gt;复数和它的共轭复数的乘积是：&lt;/p&gt;
-
-&lt;p&gt;\[ zz^{*} = (a + bi)(a - bi) = a^{2}-abi+abi+b^{2} = a^{2}+b^{2} \]&lt;/p&gt;
-
-&lt;h3&gt;复数的绝对值&lt;/h3&gt;
-
-&lt;p&gt;我们使用共轭复数来计算复数的绝对值：&lt;/p&gt;
-
-&lt;p&gt;\[ z = (a + bi) \]&lt;/p&gt;
-
-&lt;p&gt;\[ |z| = \sqrt {zz^{*}} = \sqrt {(a + bi)(a - bi)} = \sqrt {a^{2} + b^{2} } \]&lt;/p&gt;
-
-&lt;h3&gt;两复数的商&lt;/h3&gt;
-
-&lt;p&gt;\[  z_{1} = (a_{1} + b_{1}i) \]
-\[  z_{2} = (a_{2} + b_{2}i) \]
-\[ \frac {z_{1}}{z_{2}} = \frac {a_{1} + b_{1}i}{a_{2} + b_{2}i} = \frac {(a_{1} + b_{1}i)(a_{2} - b_{2}i)}{(a_{2} + b_{2}i)(a_{2} - b_{2}i)} \]
-\[  = \frac {a_{1}a_{2}-a_{1}b_{2}i+b_{1}a_{2}i-b_{1}b_{2}i^{2} }{a_{2}^{2} + b_{2}^{2}} \]&lt;/p&gt;
-
-&lt;p&gt;\[ = \frac {a_{1}a_{2} + b_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}   + \frac {b_{1}a_{2} - a_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}i \]&lt;/p&gt;
-
-&lt;h2&gt;i的幂&lt;/h2&gt;
-
-&lt;p&gt;如果i的平方等于-1，那么i的n次幂也应该存在：&lt;/p&gt;
-
-&lt;p&gt;\[ i^{0} = 1 \]
-\[ i^{1} = i \]
-\[ i^{2} = -1 \]
-\[ i^{3} = ii^{2} = -i \]
-\[ i^{4} = i^{2}i^{2} = 1 \]
-\[ i^{5} = ii^{4} = i \]
-\[ i^{6} = ii^{5} = i^{2} = -1 \]&lt;/p&gt;
-
-&lt;p&gt;如果按照这个顺序写下去，会出现这样一个模式：
-(1,i,-1,-i,1,...)&lt;/p&gt;
-
-&lt;p&gt;一个类似的模式也出现在递增的负数幂：&lt;/p&gt;
-
-&lt;p&gt;\[ i^{0} = 1 \]
-\[ i^{-1} = -i \]
-\[ i^{-2} = -1 \]
-\[ i^{-3} = i \]
-\[ i^{-4} = 1 \]
-\[ i^{-5} = -i \]
-\[ i^{-6} = -1 \]&lt;/p&gt;
-
-&lt;p&gt;你可能已经在数学里头见过类似的模式，但是是以（x,y,-x,-y,x,...)的形式，这是在2D笛卡尔平面对一个点逆时针旋转90度时生成的；（x,-y,-x,y,x,...)则是在2D笛卡尔平面对一个点顺时针旋转90度时生成的。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;h2&gt;复数平面&lt;/h2&gt;
-
-&lt;p&gt;我们也能够把复数映射到一个2D网格平面——复数平面，只需要把实数映射到横轴、虚数映射到纵轴。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;如前面的序列所示，我们可以认为，对一个复数乘以i，这个复数就在复数平面上旋转了90度。&lt;/p&gt;
-
-&lt;p&gt;让我们看看这是不是真的。我们随机地在复数平面上取一个点：&lt;/p&gt;
-
-&lt;p&gt;\[ p = 2 + i \]&lt;/p&gt;
-
-&lt;p&gt;p乘以i后得到q：
-\[ q = pi = (2+i)i = 2i+i^{2} = -1+2i \]&lt;/p&gt;
-
-&lt;p&gt;q乘以i后得到r：
-\[ r = qi = (-1+2i)i = -i+2i^{2} = -2-i \]&lt;/p&gt;
-
-&lt;p&gt;r乘以i后得到s：
-\[ s = ri = (-2-i)i = -2i-i^{2} = 1-2i \]&lt;/p&gt;
-
-&lt;p&gt;s乘以i后得到t：
-\[ t = si = (1-2i)i = i-2i^{2} = 2+i \]&lt;/p&gt;
-
-&lt;p&gt;t刚好是开始的p。如果我们把这些复数放到复数平面上，就得到下面的图：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;我们也可以按顺时针方向旋转，只需要把上面的乘数i改成-i。&lt;/p&gt;
-
-&lt;h3&gt;旋转数（Rotors)&lt;/h3&gt;
-
-&lt;p&gt;我们也可以在复数平面上进行任意角度的旋转，只需要定义下面这个复数：
-\[q = cos\theta +isin\theta \]&lt;/p&gt;
-
-&lt;p&gt;任意的复数乘以q：&lt;/p&gt;
-
-&lt;p&gt;\[ p = a + bi \]
-\[ q = cos\theta + isin\theta \]
-\[ pq = (a + bi)(cos\theta + isin\theta ) \]
-\[ a&amp;#39; + b&amp;#39;i = acos\theta -bsin\theta + (asin\theta +bcos\theta )i \] &lt;/p&gt;
-
-&lt;p&gt;也可以写成矩阵的形式：&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} a&amp;#39;&amp;amp;-b&amp;#39;\\ b&amp;#39;&amp;amp;a&amp;#39;\\ \end{matrix} \right] =  \left[ \begin{matrix} cos\theta &amp;amp;-sin\theta \\ sin\theta &amp;amp;cos\theta \\ \end{matrix} \right] \left[ \begin{matrix} a&amp;amp;-b\\ b&amp;amp;a\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;这也是一个在复数平面绕原点逆时针旋转任意点的方法。（译注：这句话应该是在说旋转矩阵）&lt;/p&gt;
-
-&lt;h2&gt;四元数&lt;/h2&gt;
-
-&lt;p&gt;了解了复数系统和复数平面后，我们可以额外增加2个虚数到我们的复数系统，从而把这些概念拓展到3维空间。&lt;/p&gt;
-
-&lt;p&gt;四元数的一般形式：&lt;/p&gt;
-
-&lt;p&gt;\[ q = s + xi + yj + zk \ \ \ s,x,y,z \in \mathbb{R} \]&lt;/p&gt;
-
-&lt;p&gt;上面的公式是根据Hamilton的著名的表达式得到的：&lt;/p&gt;
-
-&lt;p&gt;\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]&lt;/p&gt;
-
-&lt;p&gt;以及：&lt;/p&gt;
-
-&lt;p&gt;\[ ij = k \ \ \ jk = i \ \ \ ki = j \]
-\[ ji = -k \ \ \ kj = -i \ \ \ ik = -j \]&lt;/p&gt;
-
-&lt;p&gt;你可能已经注意到了，i、j、k之间的关系非常像笛卡尔坐标系下单位向量的叉积规则：&lt;/p&gt;
-
-&lt;p&gt;\[ x\times y = z \ \ \ y\times z = x \ \ \ z\times x = y \]
-\[ y\times x = -z \ \ \ z\times y = -x \ \ \ x\times z = -y \]&lt;/p&gt;
-
-&lt;p&gt;Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( i^{2} = j^{2} = k^{2} = -1 \)。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/6.png&quot; alt=&quot;6.png&quot;&gt;
-（ij, jk, ki这几个性质的可视化）&lt;/p&gt;
-
-&lt;p&gt;上图展示了如何用i、j、k作为笛卡尔坐标系的单位向量。&lt;/p&gt;
-
-&lt;h3&gt;作为有序数的四元数&lt;/h3&gt;
-
-&lt;p&gt;我们可以用有序对的形式，来表示四元数：
-\[ [s,v] \ \ \ s\in \mathbb{R},v\in \mathbb{R^{3}} \]&lt;/p&gt;
-
-&lt;p&gt;其中的v，也可以用它各自独立的3个分量表示：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,xi + yj + zk] \ \ \ s,x,y,z\in \mathbb{R} \]&lt;/p&gt;
-
-&lt;p&gt;使用这种表示法，我们可以更容易地展示四元数和复数之间的相似性。&lt;/p&gt;
-
-&lt;h3&gt;四元数的加减&lt;/h3&gt;
-
-&lt;p&gt;和复数类似，四元数也可以被加减：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a} = [s_{a},a] \]
-\[ q_{b} = [s_{b},b] \]
-\[ q_{a} + q_{b} = [s_{a} + s_{b},a + b] \]
-\[ q_{a} - q_{b} = [s_{a} - s_{b},a - b] \]&lt;/p&gt;
-
-&lt;h3&gt;四元数的积&lt;/h3&gt;
-
-&lt;p&gt;我们也可以表示四元数的乘积：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a}q_{b} = [s_{a},a][s_{b},b] \]
-\[ = (s_{a} + x_{a}i + y_{a}j +z_{a}k)(s_{b} + x_{b}i + y_{b}j +z_{b}k) \]
-\[ = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}) \]
-\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i \]
-\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j \]
-\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k \]&lt;/p&gt;
-
-&lt;p&gt;可以看到，四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：&lt;/p&gt;
-
-&lt;p&gt;\[ i = [0,i]\ \ \  j = [0,j]\ \ \  k = [0,k] \]&lt;/p&gt;
-
-&lt;p&gt;以及还有[1,0] = 1，将它们代入前面的表达式，就得到了：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a}q_{b} = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b})[1,0] \]
-\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})[0,i] \]
-\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})[0,j] \]
-\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})[0,k] \]&lt;/p&gt;
-
-&lt;p&gt;再把这个表达式扩展成多个有序对的和：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
-\[ + [0,(s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i] \]
-\[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j] \]
-\[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
-
-&lt;p&gt;如果把后3个四元数相加，并提取公共部分，就可以把等式改写成：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
-\[ + [0,s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
-\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
-
-&lt;p&gt;这个等式是2个有序对的和。第1个有序对是一个&lt;strong&gt;实&lt;/strong&gt;四元数，第2个是一个&lt;strong&gt;纯&lt;/strong&gt;四元数。这两个四元数也可以合并成一个：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}), \]
-\[ s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
-\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]&lt;/p&gt;
-
-&lt;p&gt;如果把下面的表达式代入上面的等式：&lt;/p&gt;
-
-&lt;p&gt;\[ a = x_{a}i + y_{a}j + z_{a}k\]
-\[ b = x_{b}i + y_{b}j + z_{b}k\]
-\[ a\cdot b = x_{a}x_{b}i^{2}+y_{a}y_{b}j^{2}+z_{a}z_{b}k^{2} \]
-\[ a\times b = (y_{a}z_{b}-y_{b}z_{a})i + (z_{a}x_{b} - z_{b}x_{a})j + (x_{a}y_{b} - x_{b}y_{a})k  \]&lt;/p&gt;
-
-&lt;p&gt;（译注：注意，第三条和第四条并不是四元数的点积和叉积，而是向量的点积和叉积）&lt;/p&gt;
-
-&lt;p&gt;我们就得到了：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]&lt;/p&gt;
-
-&lt;p&gt;这就是四元数乘积的一般式。&lt;/p&gt;
-
-&lt;h3&gt;实四元数&lt;/h3&gt;
-
-&lt;p&gt;一个实四元数是一个虚部向量为零向量的四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,0] \]&lt;/p&gt;
-
-&lt;p&gt;两个实四元数的乘积是另一个实四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a} = [s_{a},0] \]
-\[ q_{b} = [s_{b},0] \]
-\[ q_{a}q_{b} = [s_{a},0] [s_{b},0] = [s_{a}s_{b},0]  \]&lt;/p&gt;
-
-&lt;p&gt;这和2个虚部为0的复数的乘积几乎一样：&lt;/p&gt;
-
-&lt;p&gt;\[ z_{1} = a_{1} + 0i \]
-\[ z_{2} = a_{2} + 0i \]
-\[ z_{1}z_{2} = (a_{1} + 0i)(a_{2} + 0i) = a_{1}a_{2} \] &lt;/p&gt;
-
-&lt;h3&gt;四元数的系数缩放&lt;/h3&gt;
-
-&lt;p&gt;我们也可以用一个系数（实数）去乘四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,v] \]
-\[ \lambda q = \lambda [s,v] = [\lambda s,\lambda v] \]&lt;/p&gt;
-
-&lt;p&gt;我们可以用实四元数与普通四元数的乘积，来确认这个等式是否正确：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,v] \]
-\[ \lambda = [\lambda ,0] \]
-\[ \lambda q = [\lambda ,0][s,v] = [\lambda s,\lambda v] \]&lt;/p&gt;
-
-&lt;h3&gt;纯四元数&lt;/h3&gt;
-
-&lt;p&gt;和实四元数相似，Hamilton也定义了纯四元数。纯四元数是s=0的四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [0,v] \]&lt;/p&gt;
-
-&lt;p&gt;也可以写成下面的形式：&lt;/p&gt;
-
-&lt;p&gt;\[ q = xi + yj + zk \]&lt;/p&gt;
-
-&lt;p&gt;然后是2个纯四元数的乘积：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{a} = [0,a] \]
-\[ q_{b} = [0,b] \]
-\[ q_{a}q_{b} = [0,a] [0,b] = [-a\cdot b, a\times b]  \]&lt;/p&gt;
-
-&lt;h3&gt;四元数的加法形式&lt;/h3&gt;
-
-&lt;p&gt;我们可以把四元数写成实四元数和纯四元数的和：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,v] \]
-\[ = [s,0] + [0,v] \]&lt;/p&gt;
-
-&lt;h3&gt;单位四元数&lt;/h3&gt;
-
-&lt;p&gt;给定任意的向量v，我们可以把这个向量写成一个系数和一个单位方向向量的乘积：&lt;/p&gt;
-
-&lt;p&gt;\[ v = \mathbf {v}\hat {v}\ \ \mathbf {v}=|v|,|\hat {v}|=1\]&lt;/p&gt;
-
-&lt;p&gt;将这个定义和纯四元数的定义结合，就得到了：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [0,v] \]
-\[ = [0,\mathbf {v} \hat {v}] \]
-\[ = \mathbf {v} [0,\hat {v}] \]&lt;/p&gt;
-
-&lt;p&gt;然后，我们可以定义单位四元数了，它是一个s=0、v为单位向量的四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ \hat {q} = [0, \hat {v}] \]&lt;/p&gt;
-
-&lt;h3&gt;四元数的二元形式&lt;/h3&gt;
-
-&lt;p&gt;我们现在可以把单位四元数的定义和四元数的加法形式结合到一起，就创造了一种新的四元数的表示法，这种表示法和复数的表示法形似：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,v] \]
-\[ = [s,0] + [0,v] \]
-\[ = [s,0] + \mathbf {v} [0,\hat {v}] \]
-\[ = s + \mathbf {v} \hat {q} \]&lt;/p&gt;
-
-&lt;p&gt;这就给了我们一种和复数非常相似的四元数表示法：&lt;/p&gt;
-
-&lt;p&gt;\[ z = a + bi \]
-\[ q = s + \mathbf {v} \hat {q} \]&lt;/p&gt;
-
-&lt;h3&gt;共轭四元数&lt;/h3&gt;
-
-&lt;p&gt;共轭四元数的计算，就是将四元数的虚向量取反：&lt;/p&gt;
-
-&lt;p&gt;\[  q = [s,v] \]
-\[  q^{*} = [s,-v] \]&lt;/p&gt;
-
-&lt;p&gt;四元数和它的共轭四元数的乘积：&lt;/p&gt;
-
-&lt;p&gt;\[  qq^{*} = [s,v][s,-v] \]
-\[ = [s^{2} - v\cdot -v,-sv+sv+v\times -v] \]
-\[ = [s^{2} + v\cdot v,0] \]
-\[ = [s^{2} + v^{2},0] \]&lt;/p&gt;
-
-&lt;h3&gt;四元数范数&lt;/h3&gt;
-
-&lt;p&gt;回忆下复数范数的定义：&lt;/p&gt;
-
-&lt;p&gt;\[ |z| = \sqrt {a^{2}+b^{2}} \]
-\[ zz^{*} = |z|^{2} \]&lt;/p&gt;
-
-&lt;p&gt;类似的，四元数的范数可以这样定义：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,v] \]
-\[ |q| = \sqrt {s^{2} + v^{2}} \]&lt;/p&gt;
-
-&lt;p&gt;这也让我们可以这样表达四元数范数：&lt;/p&gt;
-
-&lt;p&gt;\[ qq^{*} = |q|^{2} \]&lt;/p&gt;
-
-&lt;h3&gt;四元数规范化&lt;/h3&gt;
-
-&lt;p&gt;利用四元数范数的定义，就可以对四元数进行规范化。要让一个四元数规范化，只需要让这个四元数去除以它的范数：&lt;/p&gt;
-
-&lt;p&gt;\[ q&amp;#39; = \frac {q}{\sqrt {s^{2}+v^{2}}} \]&lt;/p&gt;
-
-&lt;p&gt;举一个例子，让我们规范化下面这个四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [1, 4i + 4j - 4k] \]&lt;/p&gt;
-
-&lt;p&gt;第一步，先计算q的范数：&lt;/p&gt;
-
-&lt;p&gt;\[ |q| = \sqrt {1^{2}+4^{2}+4^{2}+(-4)^{2}} \]
-\[ = \sqrt {49} = 7 \]&lt;/p&gt;
-
-&lt;p&gt;然后，q除以|q|:&lt;/p&gt;
-
-&lt;p&gt;\[ q&amp;#39; = \frac {q}{|q|} \]
-\[ = \frac {(1+4i+4j-4k)}{7} \]
-\[ = \frac {1}{7}+\frac {4}{7}i+\frac {4}{7}j-\frac {4}{7}k \]&lt;/p&gt;
-
-&lt;h3&gt;四元数的逆&lt;/h3&gt;
-
-&lt;p&gt;四元数的逆用\(q^{-1} \)表示。要计算四元数的逆，需要用四元数的共轭四元数去除以四元数的范数的平方：&lt;/p&gt;
-
-&lt;p&gt;\[ q^{-1} = \frac {q^{*}}{|q|^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;为了证明这个式子，我们先根据&lt;strong&gt;逆&lt;/strong&gt;的定义，有：&lt;/p&gt;
-
-&lt;p&gt;\[ qq^{-1} = [1,0] = 1 \]&lt;/p&gt;
-
-&lt;p&gt;两边都左乘共轭四元数\(q^{&lt;em&gt;} \)：
-\[ q^{&lt;/em&gt;}qq^{-1} = q^{*} \]&lt;/p&gt;
-
-&lt;p&gt;将上文中的\( qq^{*} = |q|^{2} \)代入这个式子，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ |q|^{2}q^{-1} = q^{*} \] &lt;/p&gt;
-
-&lt;p&gt;\[ q^{-1} = \frac {q^{*}}{|q|^{2}} \] &lt;/p&gt;
-
-&lt;p&gt;对于单位四元数，它的范数是1，所以可以写成：&lt;/p&gt;
-
-&lt;p&gt;\[ q^{-1} = q^{*} \]&lt;/p&gt;
-
-&lt;h3&gt;四元数的点积&lt;/h3&gt;
-
-&lt;p&gt;和向量的点积相似，我们也可以计算2个四元数的点积，只需要将各个对应的系数相乘，然后相加:&lt;/p&gt;
-
-&lt;p&gt;\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
-\[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
-\[ q_{1}\cdot q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
-
-&lt;p&gt;我们也可以利用四元数点积，来计算四元数之间的角度差：&lt;/p&gt;
-
-&lt;p&gt;\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]&lt;/p&gt;
-
-&lt;p&gt;对于单位四元数，我们可以简化上面的等式：
-\[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]&lt;/p&gt;
-
-&lt;h2&gt;旋转&lt;/h2&gt;
-
-&lt;p&gt;前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
-\[ q = cos\theta + isin\theta \]&lt;/p&gt;
-
-&lt;p&gt;根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
-\[ q = [cos\theta, sin\theta v] \]&lt;/p&gt;
-
-&lt;p&gt;让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：&lt;/p&gt;
-
-&lt;p&gt;\[ p = [0,\textbf {p}] \]&lt;/p&gt;
-
-&lt;p&gt;以及单位四元数q：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [s,\lambda \hat {v}] \]&lt;/p&gt;
-
-&lt;p&gt;从而：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; = qp = [s,\lambda \hat {v}] [0,\textbf {p}] \]
-\[ =  [-\lambda \hat {v}\cdot \textbf {p}, s\textbf {p} + \lambda \hat {v}\times \textbf {p} ] \]&lt;/p&gt;
-
-&lt;p&gt;我们可以看到结果是一个同时有系数、有虚向量的四元数。&lt;/p&gt;
-
-&lt;p&gt;让我们先考虑特殊的情形：\( \textbf {p} \)与\( \hat {v} \)正交。这种情况下，点乘部分等于0：\(-\lambda \hat {v}\cdot \textbf {p} = 0\)。所以上面的四元数就变成了纯四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; =  [0, s\textbf {p} + \lambda \hat {v}\times \textbf {p}] \]&lt;/p&gt;
-
-&lt;p&gt;这时候，要使\( \textbf {p} \)绕\( \hat {v} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; =  [0, cos\theta \textbf {p} + sin\theta \hat {v}\times \textbf {p}] \]&lt;/p&gt;
-
-&lt;p&gt;现在，让我们找一个例子来测试上面的公式。譬如绕z轴(就是k轴)旋转45度，那么我们的四元数q就变成：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [cos\theta ,sin\theta k] \]
-\[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}k] \]&lt;/p&gt;
-
-&lt;p&gt;然后，选一个特殊的p，并且p要和k轴正交，譬如把p放到i轴上，也就是：
-\[ p = [0, 2i] \]&lt;/p&gt;
-
-&lt;p&gt;好了，现在计算下qp：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; = qp \]
-\[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}k] [0,2i] \]
-\[ = [0,2\frac {\sqrt {2}}{2}i + 2\frac {\sqrt {2}}{2}k\times i]  \]
-\[  = [0, \sqrt {2}i + \sqrt {2}j] \]&lt;/p&gt;
-
-&lt;p&gt;结果是一个绕了k轴转了45度的纯四元数。
-我们可以确认这个四元数的向量部分的长度是：&lt;/p&gt;
-
-&lt;p&gt;\[  p&amp;#39; = \sqrt { \sqrt {2}^{2} + \sqrt {2}^{2} }  =  2 \]&lt;/p&gt;
-
-&lt;p&gt;这正是我们所期望的！&lt;/p&gt;
-
-&lt;p&gt;我们可以用图像展示旋转过程：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;现在，让我们考虑更一般化的四元数，即和p不正交的四元数。现在让我们把p的向量部分偏移45度：&lt;/p&gt;
-
-&lt;p&gt;\[ \hat {v} = \frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k \]&lt;/p&gt;
-
-&lt;p&gt;\[ \textbf {p} = 2i \]&lt;/p&gt;
-
-&lt;p&gt;\[ q = [cos\theta , sin\theta \hat {v}] \]&lt;/p&gt;
-
-&lt;p&gt;\[ p = [0, \textbf {p}] \]&lt;/p&gt;
-
-&lt;p&gt;然后算qp：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; = qp \]
-\[ = [cos\theta ,sin\theta \hat {v}] [0, \mathbf {p} ]  \]
-\[ [-sin\theta \hat {v}\cdot \mathbf {p}, cos\theta \mathbf {p}+sin\theta \hat {v}\times \mathbf {p}] \]&lt;/p&gt;
-
-&lt;p&gt;代入我们设定的\(\hat {v}, \mathbf {p}\)，以及\(\theta = 45^{\circ } \)，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ p&amp;#39; = [-\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)\cdot (2i), \frac {\sqrt {2}}{2}2i+\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)\times 2i] \]
-\[ = [-1, \sqrt {2}i + j] \]
-注意，算出来的结果已经不是纯四元数了，并且，它并没有旋转45度、范数也不再是2(反而变小了，变成\(\sqrt {3}\))&lt;/p&gt;
-
-&lt;p&gt;我们可以用图像展示旋转过程：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;严格来说，这样子在3维空间中表示\(p&amp;#39;\)是不正确的。因为它其实是一个4维的向量！为了简单起见，我只将这个四元数的向量部分显示出来。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;然而，还有一线生机。Hamilton发现（但没有正式宣布），如果对qp右乘q的逆，出来的结果是一个纯四元数，并且四元数向量部分的范数可以保持不变。让我们试试应用在我们的例子里。&lt;/p&gt;
-
-&lt;p&gt;首先计算:&lt;/p&gt;
-
-&lt;p&gt;\[ q =  [cos\theta ,  sin\theta (\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]&lt;/p&gt;
-
-&lt;p&gt;\[ q^{-1} =  [cos\theta ,  -sin\theta (\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]&lt;/p&gt;
-
-&lt;p&gt;(译注：这里\(q^{-1}=q^{*}\)是因为q是单位四元数)&lt;/p&gt;
-
-&lt;p&gt;再代入\(\theta = 45^{\circ } \)，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ q^{-1} =  [\frac {\sqrt {2}}{2},  -\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}i + \frac {\sqrt {2}}{2}k)] \]&lt;/p&gt;
-
-&lt;p&gt;\[ \frac {1}{2}[\sqrt {2}, -i-k] \]&lt;/p&gt;
-
-&lt;p&gt;现在，把前面算出来的qp再次拿出来：&lt;/p&gt;
-
-&lt;p&gt;\[ qp = [-1, \sqrt {2}i + j] \]
-\[ qpq^{-1}  = [-1, \sqrt {2}i + j]\frac {1}{2}[\sqrt {2}, -i-k] \]
-\[ = \frac {1}{2}[-\sqrt {2}-(\sqrt {2}i+j)\cdot (-i-k), i+k+\sqrt {2}(\sqrt {2}i+j)-i+\sqrt {2}j+k] \]
-\[ = \frac {1}{2}[-\sqrt {2}+\sqrt {2},i+k+2i+\sqrt {2}j-i+\sqrt {2}j+k] \]
-\[ = [0,i+\sqrt {2}j+k] \]&lt;/p&gt;
-
-&lt;p&gt;这下是纯四元数了，并且它的范数是：&lt;/p&gt;
-
-&lt;p&gt;\[ |qpq^{-1}| = \sqrt {1^{2} + \sqrt {2}^{2} + 1^{2} } = \sqrt {4} = 2 \]&lt;/p&gt;
-
-&lt;p&gt;这和原始的p的范数一致。&lt;/p&gt;
-
-&lt;p&gt;下面的图像展示了旋转结果：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/9.png&quot; alt=&quot;9.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;所以我们可以看到，这个结果是一个纯四元数，并且原四元数的向量的范数也保持住了。但是还有一个问题：向量被旋转了90度而不是45度。这刚好是我们需要的度数的两倍！为了正确地让一个向量绕某个轴向量旋转某个角度，我们必须以目标角度的一半来计算。因此，我们构造了下面的四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [cos\frac {1}{2}\theta ,sin\frac {1}{2}\theta \hat {v}] \]&lt;/p&gt;
-
-&lt;p&gt;这就是&lt;strong&gt;旋转四元数&lt;/strong&gt;的一般形式！&lt;/p&gt;
-
-&lt;h2&gt;四元数插值&lt;/h2&gt;
-
-&lt;p&gt;在计算机图形学中使用四元数，其中一个重要原因是四元数非常适合用来表示空间中的旋转。四元数解决了其他3维空间旋转算法会遇到的恼人的问题，比如使用欧拉角来表示旋转操作时会遇到的万向节锁问题(&lt;a href=&quot;https://en.wikipedia.org/wiki/Gimbal_lock&quot;&gt;Gimbal lock&lt;/a&gt;)。&lt;/p&gt;
-
-&lt;p&gt;使用四元数，我们可以定义好几种方案来表示3维空间的转动插值。第一种是SLERP，它被用来把一个点(物体)从一个朝向平滑地插值到另一个朝向。第二个是SLERP的扩展版本，被称为SQAD，它被用来处理用一系列朝向定义得到的一条路径的插值。&lt;/p&gt;
-
-&lt;h2&gt;SLERP&lt;/h2&gt;
-
-&lt;p&gt;SLERP代表&lt;strong&gt;S&lt;/strong&gt;pherical &lt;strong&gt;L&lt;/strong&gt;inear Int&lt;strong&gt;erp&lt;/strong&gt;olation。SLERP可以在2个朝向之间平滑地插值。&lt;/p&gt;
-
-&lt;p&gt;第一个朝向设为\( q_{1}\)，第二个朝向设为\( q_{2}\)。被插值前的点设为\( \mathbf {p} \)，插值后的点设为\( \mathbf {p}&amp;#39; \)。而插值参数t，当t=0时会把\(\mathbf {p}\)转到\( q_{1}\)，当t=1时会转到\( q_{2}\)。&lt;/p&gt;
-
-&lt;p&gt;标准的线性插值公式是(译注：这个公式是笛卡尔坐标系下的，不是指四元数)：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf {p}&amp;#39; = \mathbf {p}_{1} + t(\mathbf {p}_{2} - \mathbf {p}_{1} ) \]&lt;/p&gt;
-
-&lt;p&gt;应用这个等式的一般步骤是：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;计算\( \mathbf {p}_{1} 、\mathbf {p}_{2}\)之间的差。&lt;/li&gt;
-&lt;li&gt;根据参数t，计算两个点的差的小数值(因为0&amp;lt;=t&amp;lt;=1)&lt;/li&gt;
-&lt;li&gt;把第二步的值加上原始点的值，算出结果&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;我们可以把这个基础公式，套用到2个用四元数表示的朝向的插值上。&lt;/p&gt;
-
-&lt;h3&gt;四元数的差&lt;/h3&gt;
-
-&lt;p&gt;根据上面的公式的第一步，我们必须先计算\( q_{1}、 q_{2}\)的差。对于四元数来说，这等价于计算2个四元数的角度差：&lt;/p&gt;
-
-&lt;p&gt;\[ diff =  q_{1}^{-1}q_{2} \]&lt;/p&gt;
-
-&lt;p&gt;（译注：这个公式用到了上述的四元数点积公式）&lt;/p&gt;
-
-&lt;h3&gt;四元数的指数&lt;/h3&gt;
-
-&lt;p&gt;接下来是计算上面的角度差的分数值，方法是计算四元数的t次幂(就是上面的那个插值参数t)。&lt;/p&gt;
-
-&lt;p&gt;四元数的指数的一般化公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ q^{t} = exp(t \log q) \]&lt;/p&gt;
-
-&lt;p&gt;其中，(纯)四元数的exp函数的公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ e^{q} = exp(q) = exp([0,\theta \hat {v}]) \]
-\[ = [cos\theta ,sin\theta \hat {v} ] \]&lt;/p&gt;
-
-&lt;p&gt;(纯)四元数的对数公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ \log q = \log (cos\theta + sin \theta \hat {v}) \]
-\[ = \log (exp(\theta \hat {v} )) \]
-\[ = \theta \hat {v} \]
-\[ = [0, \theta \hat {v}] \]&lt;/p&gt;
-
-&lt;p&gt;(译注：上述的2次公式推导，其实省略了很多证明过程。具体可以参考：&lt;a href=&quot;http://bpeers.com/blog/?itemid=861&quot;&gt;http://bpeers.com/blog/?itemid=861&lt;/a&gt;,&lt;a href=&quot;http://bpeers.com/blog/?itemid=863&quot;&gt;http://bpeers.com/blog/?itemid=863&lt;/a&gt;,&lt;a href=&quot;http://bpeers.com/blog/?itemid=866&quot;&gt;http://bpeers.com/blog/?itemid=866&lt;/a&gt;, &lt;a href=&quot;http://bpeers.com/blog/?itemid=1001&quot;&gt;http://bpeers.com/blog/?itemid=1001&lt;/a&gt; )&lt;/p&gt;
-
-&lt;p&gt;对于t = 0，我们有：&lt;/p&gt;
-
-&lt;p&gt;\[ q^{0} = exp(0\log q) \]
-\[ = exp([cos(0), sin(0)\hat {v}]) \]
-\[ = exp([1,0]) \]
-\[ = [1,0] \]&lt;/p&gt;
-
-&lt;p&gt;而对于t = 1，有：&lt;/p&gt;
-
-&lt;p&gt;\[ q^{1} = exp(1\log q) = q \]&lt;/p&gt;
-
-&lt;h3&gt;2个四元数的分数差&lt;/h3&gt;
-
-&lt;p&gt;对于角旋转的插值计算，我们利用q1和q2的角度分数差来调整原始朝向q1：&lt;/p&gt;
-
-&lt;p&gt;\[ q&amp;#39; = q_{1}(q_{1}^{-1}q_{2})^{t} \]&lt;/p&gt;
-
-&lt;p&gt;这也就是使用四元数的球面线性插值的一般形式。然而，这不是slerp函数的常用形式。&lt;/p&gt;
-
-&lt;p&gt;我们可以应用类似的用于计算向量的球面插值公式，到四元数里。计算向量的球面插值的一般形式定义如下：&lt;/p&gt;
-
-&lt;p&gt;\[ v_{t} = \frac {sin((1-t)\theta )}{sin\theta }v_{1} + \frac {sin(t\theta )}{sin\theta }v_{2} \]&lt;/p&gt;
-
-&lt;p&gt;用图像表示如下：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.9/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这个公式可以原封不动地应用到四元数：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{t} = \frac {sin((1-t)\theta )}{sin\theta }q_{1} + \frac {sin(t\theta )}{sin\theta }q_{2} \]&lt;/p&gt;
-
-&lt;p&gt;但这个公式需要提供角度\(\theta \)，我们可以计算\(q_{1}\)和\(q_{2}\)的点积从而得出角度\(\theta \)：&lt;/p&gt;
-
-&lt;p&gt;\[ cos\theta  = \frac {q_{1}\cdot q_{2}}{ |q_{1}||q_{2}| } \]&lt;/p&gt;
-
-&lt;p&gt;\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \theta = cos^{-1}(\frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|}) \]&lt;/p&gt;
-
-&lt;h3&gt;注意事项&lt;/h3&gt;
-
-&lt;p&gt;这个方案有2个问题，必须在实现过程中加以考虑。&lt;/p&gt;
-
-&lt;p&gt;第一，如果四元数点积的结果是负值，那么后面的插值就会在4D球面上绕远路，这并不是我们想要的。为了解决这个问题，我们测试点积的结果，当结果是负值时，我们将2个四元数的其中一个取反，取反它的系数和向量部分，并不会改变它代表的朝向。而经过这一步操作，可以保证这个旋转走的是最短路径。&lt;/p&gt;
-
-&lt;p&gt;当\(q_{1}\)和\(q_{2}\)的角度差非常小，小到导致\(sin\theta = 0\)时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(q_{1}\)和\(q_{2}\)的线性插值。&lt;/p&gt;
-
-&lt;h2&gt;SQUAD&lt;/h2&gt;
-
-&lt;p&gt;正如一个SLERP可以被用来计算四元数之间的插值，一个SQUAD (&lt;strong&gt;S&lt;/strong&gt;pherical and &lt;strong&gt;Quad&lt;/strong&gt;rangle)可以被用来对旋转路径进行平滑插值。&lt;/p&gt;
-
-&lt;p&gt;如果我们有四元数序列：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{1},q_{2},q_{3},\cdots,q_{n-2},q_{n-1},q_{n}\]&lt;/p&gt;
-
-&lt;p&gt;然后我们再定义一个&amp;quot;辅助&amp;quot;四元数(\(s_{i}\))，它是一个中间控制点：&lt;/p&gt;
-
-&lt;p&gt;\[ s_{i} = exp( - \frac {\log(q_{i+1}q_{i}^{-1})+\log(q_{i-1}q_{i}^{-1})}{4})q_{i} \]&lt;/p&gt;
-
-&lt;p&gt;所以，沿着子曲线的朝向可以定义为：&lt;/p&gt;
-
-&lt;p&gt;\[ q_{i-1},q_{i},q_{i+1},q_{i+2} \]&lt;/p&gt;
-
-&lt;p&gt;在t时刻的朝向就是：&lt;/p&gt;
-
-&lt;p&gt;\[ squad(q_{i},q_{i+1},s_{i},s_{i+1},t ) = slerp(slerp(q_{i},q_{i+1},t),slerp(s_{i},s_{i+1},t),2t(1-t)) \]&lt;/p&gt;
-
-&lt;h2&gt;总结&lt;/h2&gt;
-
-&lt;p&gt;除了特别难理解之外，相比矩阵或欧拉角，四元数在表示旋转这个事情上，拥有一些明显的优点。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;SLERP和SQUAD，提供了一种使得在朝向之间可以平滑过渡的方法。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;使用四元数来串联&amp;quot;旋转&amp;quot;，要比使用矩阵快得多。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;对于单位四元数，逆向旋转可以通过对向量部分取反来实现。而计算一个矩阵的逆矩阵是被认为比较慢的，如果这个矩阵未被标准正交化的话(标准正交矩阵的逆矩阵是它的转置矩阵)。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;从四元数转换到矩阵，要比从欧拉角转换到矩阵快一点。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;四元数只需要4个数字(如果旋转四元数已经单位化了那么只需要3个，实数部分可以在运行时计算)来表示一个旋转，而矩阵需要至少9个数字。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;尽管使用四元数有这么多优点，还是有缺点存在的。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;因为浮点数的舍入运算错误，四元数可能会变无效。不过，这个错误可以通过重新单位化四元数来避免。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;使用四元数最具威慑性的地方，还是四元数的理解难度大。我希望这个问题可以通过阅读本文来解决。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;存在一些已经实现了四元数、并且是正确的的数学程序库。在我的个人经验里，我发现GLM(OpenGL Math Library)是一个优秀的数学库，它的四元数的实现极其不错。如果你对在你的程序中使用四元数感兴趣，那么我会推荐你使用这个数学库。&lt;/p&gt;
-
-&lt;h2&gt;下载Demo&lt;/h2&gt;
-
-&lt;p&gt;我实现了一个小demo来演示一个四元数如何被用来旋转一个3维物体。这个demo是用Unity3.5.2实现的，你可以免费下载它和阅读它的脚本。zip文件也包含了一个Windows版的Unity程序。当然你可以自己构建一个Mac的版本。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://docs.google.com/open?id=0B0ND0J8HHfaXdzM0dmdGUzBLV1U&quot;&gt;Understanding Quaternions.zip&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Wed, 30 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/understanding-quaternions/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/understanding-quaternions/</guid>
       </item>
     
   </channel>

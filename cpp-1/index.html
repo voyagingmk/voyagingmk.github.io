@@ -488,6 +488,83 @@ double asDouble() const; //good
 
 <h3>条款24：了解virtual functions、multiple inheritance、virtual base classes、runtime type identification的成本</h3>
 
+<p>暂时跳过</p>
+
+<h2>技术 Techniques</h2>
+
+<h3>条款25: 将construtor和non-member functions虚化</h3>
+
+<p>所谓virtual constructor是某种函数，视其获得的输入，可产生不同类型的对象。</p>
+
+<p>也就是说，constructor无法被真正虚化。而是借虚化的成员函数来实现构造函数的虚化。</p>
+
+<h4>virtual copy constructor</h4>
+
+<p>virtual copy constructor，或者叫clone函数，会返回一个指针，指向对象自己的一个新副本。</p>
+
+<p>注意：重载父类的虚函数时，允许改变返回类型。</p>
+
+<h4>将non-member functions的行为虚化</h4>
+
+<p>和constructor无法被真正虚化一样，non-member functions也不行。但是可以用技巧实现。</p>
+
+<p>首先写一个虚成员函数做实际工作，再写一个什么都不做的内联的非虚非成员函数(inline non-member function)，只负责调用这个虚成员函数。</p>
+
+<h3>条款26: 限制某个class所能产生的对象数量</h3>
+
+<h4>允许0个或1个对象</h4>
+
+<p>每当即将产生一个对象，我们确知一件事情：会有一个构造函数被调用。</p>
+
+<p>将构造函数声明为private，就可以禁止每个人产出对象的权利。这是0个对象的实现方法。</p>
+
+<p>如果要使得一个雷有且只有1个对象，要用到一些‘技巧’，比如说用static:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">A</span><span class="p">{</span>
+<span class="n">friend</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">();</span>
+<span class="nl">private</span><span class="p">:</span>
+    <span class="n">A</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">(){</span>
+    <span class="k">static</span> <span class="n">A</span> <span class="n">a</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>三个要点：1)构造函数private；2)全局函数被声明为friend，使得theA不受A的private的约束；3)theA里的static。</p>
+
+<p>或者把theA写成静态成员函数(static member function)：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">class</span> <span class="n">A</span><span class="p">{</span>
+<span class="k">static</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">();</span>
+<span class="nl">private</span><span class="p">:</span>
+    <span class="n">A</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="n">A</span><span class="o">&amp;</span> <span class="n">A</span><span class="o">::</span><span class="n">theA</span><span class="p">(){</span>
+    <span class="k">static</span> <span class="n">A</span> <span class="n">a</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>改写成这样的好处是，去掉了全局函数；坏处是，调用theA变麻烦了，要A::theA()。(其实也没多麻烦吧)</p>
+
+<p>还可以把A和theA放进一个namespace：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">namespace</span> <span class="n">Test</span><span class="p">{</span>
+
+<span class="n">class</span> <span class="n">A</span><span class="p">{</span>
+<span class="n">friend</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">();</span>
+<span class="nl">private</span><span class="p">:</span>
+    <span class="n">A</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">(){</span>
+    <span class="k">static</span> <span class="n">A</span> <span class="n">a</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>然后调用方法就是: Test::theA()。</p>
+
+<p>或者先执行: using Test::theA，然后就可以直接执行 theA()。</p>
+
   </div>
 
   <div class="date">
