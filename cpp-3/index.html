@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>关于c++11的一些特性 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+    <title>关于c++11的一些特性(1) 右值引用&返回值优化 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -9,20 +9,16 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="右值引用 和 返回值优化
-
-先贴一段代码(在vs2015编译通过):
+    <meta name="description" content="先贴一段代码(在vs2015编译通过):
 " />
-    <meta property="og:description" content="右值引用 和 返回值优化
-
-先贴一段代码(在vs2015编译通过):
+    <meta property="og:description" content="先贴一段代码(在vs2015编译通过):
 " />
     
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="关于c++11的一些特性" />
-    <meta property="twitter:title" content="关于c++11的一些特性" />
+    <meta property="og:title" content="关于c++11的一些特性(1) 右值引用&返回值优化" />
+    <meta property="twitter:title" content="关于c++11的一些特性(1) 右值引用&返回值优化" />
     
 
     <!--[if lt IE 9]>
@@ -43,7 +39,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/cpp-3/',
-		  'title': '关于c++11的一些特性'
+		  'title': '关于c++11的一些特性(1) 右值引用&返回值优化'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -86,12 +82,10 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1>关于c++11的一些特性</h1>
+  <h1>关于c++11的一些特性(1) 右值引用&返回值优化</h1>
   <h3>Tags: <a href="/tag/c%2B%2B.html" rel="tag">c++</a></h3>
   <div class="entry">
-    <h2>右值引用 和 返回值优化</h2>
-
-<p>先贴一段代码(在vs2015编译通过):</p>
+    <p>先贴一段代码(在vs2015编译通过):</p>
 
 <!--more-->
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;stdio.h&gt;</span>
@@ -209,7 +203,7 @@
 <li>test1函数才是最正确的写法，胡乱使用&amp;&amp;符号反而多调用了几次函数。</li>
 <li>对比test2、test1会发现，如果要返回一个函数临时变量，最好写成匿名变量的形式(test1)，这样的写法编译器才能够做<strong>返回值优化</strong>。</li>
 <li>其中test3的写法是错误的，看test3的打印以及test end之后的输出可以发现，变量c并没有被成功取到函数之外，c在test3返回时就被析构了。</li>
-<li>test2和test4几乎是一样的(根据打印来看的话)，所以test4相比test2多出来的std::move，让test4这种写法更加差劲。</li>
+<li>test2、test4、test5几乎是一样的(根据打印来看的话)，但test2是三者中最简洁的写法。</li>
 </ul>
 
 <p>Release运行结果:</p>
