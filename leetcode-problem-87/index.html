@@ -14,204 +14,12 @@
 设s1，s2是两个长度都为len的字符串（把s1、s2当做字符数组理解）
 
 设状态量res[n][i][j]，(n &lt; len, i &lt;= n, j &lt;= n), 元素是bool值
-
-res的含义：
-
-长度为n，以i位置为起点的子串s1[i, i + n], 以j位置为起点的子串s2[i, i + n], res[n][i][j]标志了这2个子串是不是Scramble
-
-那么很显然，res[len-1][0][0]就是我们要的解。
-
-状态转移方程：
-
-res[n][i][j] = ( res[k][i][j] &amp;&amp; res[n - k][i + k][j + k] ) || ( res[k][i][j + n - k] &amp;&amp; res[n - k][i + k][j] )    ** (1&lt;=k&lt;n) **
-
-这个式子看起来很吓人。先做个分解：
-
-设 A = res[k][i][j] &amp;&amp; res[n - k][i + k][j + k] = A1 &amp;&amp; A2
-
-设 B = res[k][i][j + n - k] &amp;&amp; res[n - k][i + k][j] = B1 &amp;&amp; B2
-
-设 C = res[n][i][j] = A || B
-
-也就是说，只要A、B中有一个为T，那么C就为T; 而A、B为T的条件分别是，A1和A2同时为真、B1和B2同时为真。
-
-A1、A2、B1、B2的含义是什么呢？举例说明一下：
-great
-rgtae
-
-n = 5, k = 1, i = 0, j = 0 时：
-res[k][i][j]           &amp;&amp;     res[n - k][i + k][j + k]
-   g|****                          *|reat
-   r|****                          *|gtae
-   A1 = F                          A2 = F
-
-res[k][i][j + n - k]   &amp;&amp;      res[n - k][i + k][j]
-   g|****                          *|reat
-   ****|e                          rgta|*
-   B1 = F                          B2 = F
-
-显然 C = A || B = (F &amp;&amp; F) || (F &amp;&amp; F) = F
-
-n = 5, k = 2, i = 0, j = 0 时：
-res[k][i][j]           &amp;&amp;     res[n - k][i + k][j + k]
-   gr|***                          **|eat
-   rg|***                          **|tae
-   A1 = T                          A2 = T
-
-res[k][i][j + n - k]   &amp;&amp;      res[n - k][i + k][j]
-   gr|***                          **|eat
-   ***|ae                          rgt|**
-   B1 = F                          B2 = F
-
-显然 C = A || B = (T &amp;&amp; T) || (F &amp;&amp; F) = T
-
-
-当(A1 &amp;&amp; A2) = T时， s1-left和s2-left互为Scramble， s1-right和s2-right互为Scramble； 
-当(B1 &amp;&amp; B2) = T时， s1-left和s2-right互为Scramble， s1-right和s2-left互为Scramble。
-
-
-状态转移方程有了，还差个初始化状态:
-
-n = 0时，s1、s2退化成s1[i]和s2[j]，那么res[0][i][j] 等于 s1[i] == s2[j]
-
-代码如下:
-    bool isScramble(string s1, string s2) {
-        int len = s1.length();
-        if (len != s2.length()){
-            return false;
-        }
-        if (len == 0){
-            return true;
-        }
-        vector&lt;vector&lt;vector&lt;bool&gt;&gt;&gt; result(len);
-        for (int i = 0; i&lt;len; ++i){
-            result[i].resize(len);
-            for (int j = 0; j&lt;len; ++j){
-                result[i][j].resize(len);
-                for (int k = 0; k&lt;len; ++k)
-                    result[i][j][k] = false;
-                result[0][i][j] = (s1[i] == s2[j]);//tricky
-            }
-        }
-
-        for (int n = 2; n &lt;= len; ++n){
-            for (int i = len - n; i &gt;= 0; --i){
-                for (int j = len - n; j &gt;= 0; --j){
-                    bool r = false;
-                    for (int k = 1; k &lt; n &amp;&amp; !r; ++k){
-                        r = (result[k - 1][i][j] &amp;&amp; result[n - k - 1][i + k][j + k]) 
-                            || (result[k - 1][i][j + n - k] &amp;&amp; result[n - k - 1][i + k][j]);
-                    }
-                    result[n - 1][i][j] = r;
-                }
-            }
-        }
-        return result[len - 1][0][0];
-    }
-
-rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP计算导致这么慢的，必须全部状态都算出来才可以返回最终结果。
 " />
     <meta property="og:description" content="题解：
 
 设s1，s2是两个长度都为len的字符串（把s1、s2当做字符数组理解）
 
 设状态量res[n][i][j]，(n &lt; len, i &lt;= n, j &lt;= n), 元素是bool值
-
-res的含义：
-
-长度为n，以i位置为起点的子串s1[i, i + n], 以j位置为起点的子串s2[i, i + n], res[n][i][j]标志了这2个子串是不是Scramble
-
-那么很显然，res[len-1][0][0]就是我们要的解。
-
-状态转移方程：
-
-res[n][i][j] = ( res[k][i][j] &amp;&amp; res[n - k][i + k][j + k] ) || ( res[k][i][j + n - k] &amp;&amp; res[n - k][i + k][j] )    ** (1&lt;=k&lt;n) **
-
-这个式子看起来很吓人。先做个分解：
-
-设 A = res[k][i][j] &amp;&amp; res[n - k][i + k][j + k] = A1 &amp;&amp; A2
-
-设 B = res[k][i][j + n - k] &amp;&amp; res[n - k][i + k][j] = B1 &amp;&amp; B2
-
-设 C = res[n][i][j] = A || B
-
-也就是说，只要A、B中有一个为T，那么C就为T; 而A、B为T的条件分别是，A1和A2同时为真、B1和B2同时为真。
-
-A1、A2、B1、B2的含义是什么呢？举例说明一下：
-great
-rgtae
-
-n = 5, k = 1, i = 0, j = 0 时：
-res[k][i][j]           &amp;&amp;     res[n - k][i + k][j + k]
-   g|****                          *|reat
-   r|****                          *|gtae
-   A1 = F                          A2 = F
-
-res[k][i][j + n - k]   &amp;&amp;      res[n - k][i + k][j]
-   g|****                          *|reat
-   ****|e                          rgta|*
-   B1 = F                          B2 = F
-
-显然 C = A || B = (F &amp;&amp; F) || (F &amp;&amp; F) = F
-
-n = 5, k = 2, i = 0, j = 0 时：
-res[k][i][j]           &amp;&amp;     res[n - k][i + k][j + k]
-   gr|***                          **|eat
-   rg|***                          **|tae
-   A1 = T                          A2 = T
-
-res[k][i][j + n - k]   &amp;&amp;      res[n - k][i + k][j]
-   gr|***                          **|eat
-   ***|ae                          rgt|**
-   B1 = F                          B2 = F
-
-显然 C = A || B = (T &amp;&amp; T) || (F &amp;&amp; F) = T
-
-
-当(A1 &amp;&amp; A2) = T时， s1-left和s2-left互为Scramble， s1-right和s2-right互为Scramble； 
-当(B1 &amp;&amp; B2) = T时， s1-left和s2-right互为Scramble， s1-right和s2-left互为Scramble。
-
-
-状态转移方程有了，还差个初始化状态:
-
-n = 0时，s1、s2退化成s1[i]和s2[j]，那么res[0][i][j] 等于 s1[i] == s2[j]
-
-代码如下:
-    bool isScramble(string s1, string s2) {
-        int len = s1.length();
-        if (len != s2.length()){
-            return false;
-        }
-        if (len == 0){
-            return true;
-        }
-        vector&lt;vector&lt;vector&lt;bool&gt;&gt;&gt; result(len);
-        for (int i = 0; i&lt;len; ++i){
-            result[i].resize(len);
-            for (int j = 0; j&lt;len; ++j){
-                result[i][j].resize(len);
-                for (int k = 0; k&lt;len; ++k)
-                    result[i][j][k] = false;
-                result[0][i][j] = (s1[i] == s2[j]);//tricky
-            }
-        }
-
-        for (int n = 2; n &lt;= len; ++n){
-            for (int i = len - n; i &gt;= 0; --i){
-                for (int j = len - n; j &gt;= 0; --j){
-                    bool r = false;
-                    for (int k = 1; k &lt; n &amp;&amp; !r; ++k){
-                        r = (result[k - 1][i][j] &amp;&amp; result[n - k - 1][i + k][j + k]) 
-                            || (result[k - 1][i][j + n - k] &amp;&amp; result[n - k - 1][i + k][j]);
-                    }
-                    result[n - 1][i][j] = r;
-                }
-            }
-        }
-        return result[len - 1][0][0];
-    }
-
-rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP计算导致这么慢的，必须全部状态都算出来才可以返回最终结果。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -288,6 +96,8 @@ rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP�
 
 <p>设状态量res[n][i][j]，(n &lt; len, i &lt;= n, j &lt;= n), 元素是bool值</p>
 
+<!--more-->
+
 <p>res的含义：</p>
 
 <p><strong>长度为n，以i位置为起点的子串s1[i, i + n], 以j位置为起点的子串s2[i, i + n], res[n][i][j]标志了这2个子串是不是Scramble</strong></p>
@@ -309,35 +119,36 @@ rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP�
 <p>也就是说，只要A、B中有一个为T，那么C就为T; 而A、B为T的条件分别是，A1和A2同时为真、B1和B2同时为真。</p>
 
 <p>A1、A2、B1、B2的含义是什么呢？举例说明一下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">great</span>
-<span class="n">rgtae</span>
 
-<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
-<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>           <span class="o">&amp;&amp;</span>     <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
-   <span class="n">g</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">reat</span>
-   <span class="n">r</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">gtae</span>
-   <span class="n">A1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">A2</span> <span class="o">=</span> <span class="n">F</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="n">great</span>
+<span class="lineno"> 2</span> <span class="n">rgtae</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
+<span class="lineno"> 5</span> <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>           <span class="o">&amp;&amp;</span>     <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
+<span class="lineno"> 6</span>    <span class="n">g</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">reat</span>
+<span class="lineno"> 7</span>    <span class="n">r</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">gtae</span>
+<span class="lineno"> 8</span>    <span class="n">A1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">A2</span> <span class="o">=</span> <span class="n">F</span>
+<span class="lineno"> 9</span> 
+<span class="lineno">10</span> <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span>   <span class="o">&amp;&amp;</span>      <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+<span class="lineno">11</span>    <span class="n">g</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">reat</span>
+<span class="lineno">12</span>    <span class="o">****|</span><span class="n">e</span>                          <span class="n">rgta</span><span class="o">|*</span>
+<span class="lineno">13</span>    <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
+<span class="lineno">14</span> 
+<span class="lineno">15</span> <span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">F</span>
+<span class="lineno">16</span> 
+<span class="lineno">17</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
+<span class="lineno">18</span> <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>           <span class="o">&amp;&amp;</span>     <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
+<span class="lineno">19</span>    <span class="n">gr</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">eat</span>
+<span class="lineno">20</span>    <span class="n">rg</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">tae</span>
+<span class="lineno">21</span>    <span class="n">A1</span> <span class="o">=</span> <span class="n">T</span>                          <span class="n">A2</span> <span class="o">=</span> <span class="n">T</span>
+<span class="lineno">22</span> 
+<span class="lineno">23</span> <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span>   <span class="o">&amp;&amp;</span>      <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+<span class="lineno">24</span>    <span class="n">gr</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">eat</span>
+<span class="lineno">25</span>    <span class="o">***|</span><span class="n">ae</span>                          <span class="n">rgt</span><span class="o">|**</span>
+<span class="lineno">26</span>    <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
+<span class="lineno">27</span> 
+<span class="lineno">28</span> <span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">&amp;&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">T</span></code></pre></div>
 
-<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span>   <span class="o">&amp;&amp;</span>      <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
-   <span class="n">g</span><span class="o">|****</span>                          <span class="o">*|</span><span class="n">reat</span>
-   <span class="o">****|</span><span class="n">e</span>                          <span class="n">rgta</span><span class="o">|*</span>
-   <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
-
-<span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">F</span>
-
-<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
-<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>           <span class="o">&amp;&amp;</span>     <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
-   <span class="n">gr</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">eat</span>
-   <span class="n">rg</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">tae</span>
-   <span class="n">A1</span> <span class="o">=</span> <span class="n">T</span>                          <span class="n">A2</span> <span class="o">=</span> <span class="n">T</span>
-
-<span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span>   <span class="o">&amp;&amp;</span>      <span class="n">res</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
-   <span class="n">gr</span><span class="o">|***</span>                          <span class="o">**|</span><span class="n">eat</span>
-   <span class="o">***|</span><span class="n">ae</span>                          <span class="n">rgt</span><span class="o">|**</span>
-   <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
-
-<span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">&amp;&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">T</span>
-</code></pre></div>
 <ol>
 <li><p><strong>当(A1 &amp;&amp; A2) = T时， s1-left和s2-left互为Scramble， s1-right和s2-right互为Scramble；</strong> </p></li>
 <li><p><strong>当(B1 &amp;&amp; B2) = T时， s1-left和s2-right互为Scramble， s1-right和s2-left互为Scramble。</strong></p></li>
@@ -348,40 +159,41 @@ rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP�
 <p><strong>n = 0时，s1、s2退化成s1[i]和s2[j]，那么res[0][i][j] 等于 s1[i] == s2[j]</strong></p>
 
 <p>代码如下:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">bool</span> <span class="nf">isScramble</span><span class="p">(</span><span class="n">string</span> <span class="n">s1</span><span class="p">,</span> <span class="n">string</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">s1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">!=</span> <span class="n">s2</span><span class="p">.</span><span class="n">length</span><span class="p">()){</span>
-            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;&gt;&gt;</span> <span class="n">result</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
-                <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">)</span>
-                    <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-                <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">s2</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span><span class="c1">//tricky</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">n</span><span class="p">){</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">len</span> <span class="o">-</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">){</span>
-                <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">len</span> <span class="o">-</span> <span class="n">n</span><span class="p">;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">j</span><span class="p">){</span>
-                    <span class="kt">bool</span> <span class="n">r</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-                    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">r</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">){</span>
-                        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span> 
-                            <span class="o">||</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
-                    <span class="p">}</span>
-                    <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-    <span class="p">}</span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">bool</span> <span class="nf">isScramble</span><span class="p">(</span><span class="n">string</span> <span class="n">s1</span><span class="p">,</span> <span class="n">string</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span>      <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">s1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+<span class="lineno"> 3</span>      <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">!=</span> <span class="n">s2</span><span class="p">.</span><span class="n">length</span><span class="p">()){</span>
+<span class="lineno"> 4</span>          <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="lineno"> 5</span>      <span class="p">}</span>
+<span class="lineno"> 6</span>      <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+<span class="lineno"> 7</span>          <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="lineno"> 8</span>      <span class="p">}</span>
+<span class="lineno"> 9</span>      <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;&gt;&gt;</span> <span class="n">result</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+<span class="lineno">10</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno">11</span>          <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+<span class="lineno">12</span>          <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+<span class="lineno">13</span>              <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+<span class="lineno">14</span>              <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">)</span>
+<span class="lineno">15</span>                  <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="lineno">16</span>              <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">s2</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span><span class="c1">//tricky</span>
+<span class="lineno">17</span>          <span class="p">}</span>
+<span class="lineno">18</span>      <span class="p">}</span>
+<span class="lineno">19</span> 
+<span class="lineno">20</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">n</span><span class="p">){</span>
+<span class="lineno">21</span>          <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">len</span> <span class="o">-</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno">22</span>              <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">len</span> <span class="o">-</span> <span class="n">n</span><span class="p">;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">j</span><span class="p">){</span>
+<span class="lineno">23</span>                  <span class="kt">bool</span> <span class="n">r</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="lineno">24</span>                  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">r</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">){</span>
+<span class="lineno">25</span>                      <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span> 
+<span class="lineno">26</span>                          <span class="o">||</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+<span class="lineno">27</span>                  <span class="p">}</span>
+<span class="lineno">28</span>                  <span class="n">result</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+<span class="lineno">29</span>              <span class="p">}</span>
+<span class="lineno">30</span>          <span class="p">}</span>
+<span class="lineno">31</span>      <span class="p">}</span>
+<span class="lineno">32</span>      <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+<span class="lineno">33</span>  <span class="p">}</span></code></pre></div>
+
 <p>rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP计算导致这么慢的，必须全部状态都算出来才可以返回最终结果。</p>
 
   </div>

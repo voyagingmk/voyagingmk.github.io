@@ -19,34 +19,6 @@ In a complete binary tree every level, except possibly the last, is completely f
 题意：
 
 求一颗完全二叉树得节点的数量。
-
-题解：
-
-看了这道题的discuss，发现一个挺有意思的解决方案（也可能是最快的方案了），这里分析一下。
-    int countNodes(TreeNode* root) {
-
-        if(!root) return 0;
-
-        int hl=0, hr=0;
-
-        TreeNode *l=root, *r=root;
-
-        while(l) {hl++;l=l-&gt;left;}
-
-        while(r) {hr++;r=r-&gt;right;}
-
-        if(hl==hr) return pow(2,hl)-1;
-
-        return 1+countNodes(root-&gt;left)+countNodes(root-&gt;right);
-    }
-
-函数内第4、5行，2个while循环，获得了root的最左节点和最右节点的深度，然后判断深度是否一样，一样的话，说明root是一棵满二叉树，于是可以用公式直接返回该子树的节点个数。
-
-再利用分而治之的思想，就可以得到总的节点的个数了：
-
-countNodes(root) = 一棵完全二叉树的节点个数 = 1（即根节点） + countNodes(左子树) + countNodes(右子树)
-
-而因为完全二叉树的性质，可以知道root的左子树和右子树中肯定有一棵是满二叉树。所以这个算法是很快的，当countNodes遇到满二叉树时，一次lgn的迭代运算后，即可以返回该树的节点个数。因为只有满二叉树可以让递归中止，所以总的耗时就是计算各个满二叉树的总耗时。
 " />
     <meta property="og:description" content="
 Given a complete binary tree, count the number of nodes.
@@ -58,34 +30,6 @@ In a complete binary tree every level, except possibly the last, is completely f
 题意：
 
 求一颗完全二叉树得节点的数量。
-
-题解：
-
-看了这道题的discuss，发现一个挺有意思的解决方案（也可能是最快的方案了），这里分析一下。
-    int countNodes(TreeNode* root) {
-
-        if(!root) return 0;
-
-        int hl=0, hr=0;
-
-        TreeNode *l=root, *r=root;
-
-        while(l) {hl++;l=l-&gt;left;}
-
-        while(r) {hr++;r=r-&gt;right;}
-
-        if(hl==hr) return pow(2,hl)-1;
-
-        return 1+countNodes(root-&gt;left)+countNodes(root-&gt;right);
-    }
-
-函数内第4、5行，2个while循环，获得了root的最左节点和最右节点的深度，然后判断深度是否一样，一样的话，说明root是一棵满二叉树，于是可以用公式直接返回该子树的节点个数。
-
-再利用分而治之的思想，就可以得到总的节点的个数了：
-
-countNodes(root) = 一棵完全二叉树的节点个数 = 1（即根节点） + countNodes(左子树) + countNodes(右子树)
-
-而因为完全二叉树的性质，可以知道root的左子树和右子树中肯定有一棵是满二叉树。所以这个算法是很快的，当countNodes遇到满二叉树时，一次lgn的迭代运算后，即可以返回该树的节点个数。因为只有满二叉树可以让递归中止，所以总的耗时就是计算各个满二叉树的总耗时。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -167,26 +111,29 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 <p>求一颗完全二叉树得节点的数量。</p>
 
+<!--more-->
+
 <h3>题解：</h3>
 
 <p>看了这道题的discuss，发现一个挺有意思的解决方案（也可能是最快的方案了），这里分析一下。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">countNodes</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
 
-        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">int</span> <span class="nf">countNodes</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span> 
+<span class="lineno"> 3</span>         <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 4</span> 
+<span class="lineno"> 5</span>         <span class="kt">int</span> <span class="n">hl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hr</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span>         <span class="n">TreeNode</span> <span class="o">*</span><span class="n">l</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">root</span><span class="p">;</span>
+<span class="lineno"> 8</span> 
+<span class="lineno"> 9</span>         <span class="k">while</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span><span class="n">hl</span><span class="o">++</span><span class="p">;</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;}</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span>         <span class="k">while</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span><span class="n">hr</span><span class="o">++</span><span class="p">;</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;}</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span>         <span class="k">if</span><span class="p">(</span><span class="n">hl</span><span class="o">==</span><span class="n">hr</span><span class="p">)</span> <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">hl</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="lineno">14</span> 
+<span class="lineno">15</span>         <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+<span class="lineno">16</span>     <span class="p">}</span></code></pre></div>
 
-        <span class="kt">int</span> <span class="n">hl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hr</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-
-        <span class="n">TreeNode</span> <span class="o">*</span><span class="n">l</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">root</span><span class="p">;</span>
-
-        <span class="k">while</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span><span class="n">hl</span><span class="o">++</span><span class="p">;</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;}</span>
-
-        <span class="k">while</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span><span class="n">hr</span><span class="o">++</span><span class="p">;</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;}</span>
-
-        <span class="k">if</span><span class="p">(</span><span class="n">hl</span><span class="o">==</span><span class="n">hr</span><span class="p">)</span> <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">hl</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-
-        <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-    <span class="p">}</span>
-</code></pre></div>
 <p>函数内第4、5行，2个while循环，获得了root的最左节点和最右节点的深度，然后判断深度是否一样，一样的话，说明root是一棵满二叉树，于是可以用公式直接返回该子树的节点个数。</p>
 
 <p>再利用分而治之的思想，就可以得到总的节点的个数了：</p>

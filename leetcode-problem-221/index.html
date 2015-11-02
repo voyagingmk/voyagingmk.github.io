@@ -28,72 +28,6 @@ Return 4.
 题意：
 
 给定一个01矩阵，求矩阵里最大的1字正方形的面积
-
-题解：
-
-考虑动态规划来解题。
-
-设DP(i,j)是子矩阵p(0,0)-&gt;p(i,j)里，以p(i,j)为右下顶点的正方形的最大边长(i属于x轴，j属于y轴）。那么DP(i,j)的最大值的平方，就是所要求的解。
-
-以题目的矩阵来说，可以很容易看出DP(i,j)值：
-
-DP(0,0) = 1  DP(1,0) = 0  DP(2,0) = 1  DP(3,0) = 0  DP(4,0) = 0
-
-DP(0,1) = 1  DP(1,1) = 0  DP(2,1) = 1  DP(3,1) = 1  DP(4,1) = 1
-
-DP(0,2) = 1  DP(1,2) = 1  DP(2,2) = 1  DP(3,2) = 2  DP(4,2) = 2
-
-DP(0,3) = 1  DP(1,3) = 0  DP(2,3) = 0  DP(3,3) = 1  DP(4,3) = 0
-
-DP(i,j)的值很好算，有一些规律存在：（下面是python伪代码）
-
-if j == 0: DP(i,0) = M(i,0)
-
-elif i == 0: DP(0,j) = M(0,j)
-
-elif M(i,j)==0: DP(i,j) = 0
-
-else: DP(i,j) = min( DP(i - 1, j), DP(i, j - 1), DP(i - 1, j - 1)) + 1
-
-前2个if处理了DP(i,j)的边界值问题，后2个if就是DP(i,j)的状态转移方程了。
-
-我的实现代码如下（runtime 12 ms）：
-    int maximalSquare(vector&lt;vector&lt;char&gt;&gt;&amp; matrix) {
-        if (matrix.size() == 0)
-            return 0;
-        if (matrix[0].size() == 0)
-            return 0;
-        int m, n;//row col
-        char result = &#39;0&#39;;
-        m = matrix.size();
-        n = matrix[0].size();
-        vector&lt;vector&lt;char&gt; &gt; dp(m);
-        for (int i = 0; i &lt; m; ++i){
-            dp[i].resize(n);
-        }
-        for (int i = 0; i &lt; m; ++i){
-            dp[i][0] = matrix[i][0];
-            if (result &lt; dp[i][0])
-                result = dp[i][0];
-        }
-        for (int i = 0; i &lt; n; ++i){
-            dp[0][i] = matrix[0][i];
-            if (result &lt;dp[0][i])
-                result = dp[0][i];
-        }
-        for (int i = 1; i &lt; m ; ++i)
-            for (int j = 1; j &lt; n; ++j){
-                if (matrix[i][j] == &#39;0&#39;)
-                    dp[i][j] = &#39;0&#39;;
-                else
-                {
-                    dp[i][j] = std::min(std::min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
-                    if (result &lt; dp[i][j])
-                        result = dp[i][j];
-                }
-            }
-        return int(result - &#39;0&#39;) * int(result - &#39;0&#39;);
-    }
 " />
     <meta property="og:description" content="
 Given a 2D binary matrix filled with 0&#39;s and 1&#39;s, find the largest square containing all 1&#39;s and return its area.
@@ -114,72 +48,6 @@ Return 4.
 题意：
 
 给定一个01矩阵，求矩阵里最大的1字正方形的面积
-
-题解：
-
-考虑动态规划来解题。
-
-设DP(i,j)是子矩阵p(0,0)-&gt;p(i,j)里，以p(i,j)为右下顶点的正方形的最大边长(i属于x轴，j属于y轴）。那么DP(i,j)的最大值的平方，就是所要求的解。
-
-以题目的矩阵来说，可以很容易看出DP(i,j)值：
-
-DP(0,0) = 1  DP(1,0) = 0  DP(2,0) = 1  DP(3,0) = 0  DP(4,0) = 0
-
-DP(0,1) = 1  DP(1,1) = 0  DP(2,1) = 1  DP(3,1) = 1  DP(4,1) = 1
-
-DP(0,2) = 1  DP(1,2) = 1  DP(2,2) = 1  DP(3,2) = 2  DP(4,2) = 2
-
-DP(0,3) = 1  DP(1,3) = 0  DP(2,3) = 0  DP(3,3) = 1  DP(4,3) = 0
-
-DP(i,j)的值很好算，有一些规律存在：（下面是python伪代码）
-
-if j == 0: DP(i,0) = M(i,0)
-
-elif i == 0: DP(0,j) = M(0,j)
-
-elif M(i,j)==0: DP(i,j) = 0
-
-else: DP(i,j) = min( DP(i - 1, j), DP(i, j - 1), DP(i - 1, j - 1)) + 1
-
-前2个if处理了DP(i,j)的边界值问题，后2个if就是DP(i,j)的状态转移方程了。
-
-我的实现代码如下（runtime 12 ms）：
-    int maximalSquare(vector&lt;vector&lt;char&gt;&gt;&amp; matrix) {
-        if (matrix.size() == 0)
-            return 0;
-        if (matrix[0].size() == 0)
-            return 0;
-        int m, n;//row col
-        char result = &#39;0&#39;;
-        m = matrix.size();
-        n = matrix[0].size();
-        vector&lt;vector&lt;char&gt; &gt; dp(m);
-        for (int i = 0; i &lt; m; ++i){
-            dp[i].resize(n);
-        }
-        for (int i = 0; i &lt; m; ++i){
-            dp[i][0] = matrix[i][0];
-            if (result &lt; dp[i][0])
-                result = dp[i][0];
-        }
-        for (int i = 0; i &lt; n; ++i){
-            dp[0][i] = matrix[0][i];
-            if (result &lt;dp[0][i])
-                result = dp[0][i];
-        }
-        for (int i = 1; i &lt; m ; ++i)
-            for (int j = 1; j &lt; n; ++j){
-                if (matrix[i][j] == &#39;0&#39;)
-                    dp[i][j] = &#39;0&#39;;
-                else
-                {
-                    dp[i][j] = std::min(std::min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
-                    if (result &lt; dp[i][j])
-                        result = dp[i][j];
-                }
-            }
-        return int(result - &#39;0&#39;) * int(result - &#39;0&#39;);
-    }
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -270,6 +138,8 @@ else: DP(i,j) = min( DP(i - 1, j), DP(i, j - 1), DP(i - 1, j - 1)) + 1
 
 <p>给定一个01矩阵，求矩阵里最大的1字正方形的面积</p>
 
+<!--more-->
+
 <h3>题解：</h3>
 
 <p>考虑动态规划来解题。</p>
@@ -299,43 +169,44 @@ else: DP(i,j) = min( DP(i - 1, j), DP(i, j - 1), DP(i - 1, j - 1)) + 1
 <p>前2个if处理了DP(i,j)的边界值问题，后2个if就是DP(i,j)的状态转移方程了。</p>
 
 <p>我的实现代码如下（runtime 12 ms）：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">int</span> <span class="nf">maximalSquare</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;&gt;&amp;</span> <span class="n">matrix</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span><span class="c1">//row col</span>
-        <span class="kt">char</span> <span class="n">result</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
-        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">dp</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-            <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span><span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span>
-                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-                <span class="k">else</span>
-                <span class="p">{</span>
-                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
-                        <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="k">return</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
-    <span class="p">}</span>
-</code></pre></div>
+
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">int</span> <span class="nf">maximalSquare</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;&gt;&amp;</span> <span class="n">matrix</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span>      <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno"> 3</span>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 4</span>      <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno"> 5</span>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 6</span>      <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span><span class="c1">//row col</span>
+<span class="lineno"> 7</span>      <span class="kt">char</span> <span class="n">result</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+<span class="lineno"> 8</span>      <span class="n">m</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+<span class="lineno"> 9</span>      <span class="n">n</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">();</span>
+<span class="lineno">10</span>      <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">dp</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+<span class="lineno">11</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno">12</span>          <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">resize</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<span class="lineno">13</span>      <span class="p">}</span>
+<span class="lineno">14</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno">15</span>          <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+<span class="lineno">16</span>          <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="lineno">17</span>              <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+<span class="lineno">18</span>      <span class="p">}</span>
+<span class="lineno">19</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno">20</span>          <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
+<span class="lineno">21</span>          <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span><span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+<span class="lineno">22</span>              <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">];</span>
+<span class="lineno">23</span>      <span class="p">}</span>
+<span class="lineno">24</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="lineno">25</span>          <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+<span class="lineno">26</span>              <span class="k">if</span> <span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span>
+<span class="lineno">27</span>                  <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+<span class="lineno">28</span>              <span class="k">else</span>
+<span class="lineno">29</span>              <span class="p">{</span>
+<span class="lineno">30</span>                  <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">31</span>                  <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+<span class="lineno">32</span>                      <span class="n">result</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
+<span class="lineno">33</span>              <span class="p">}</span>
+<span class="lineno">34</span>          <span class="p">}</span>
+<span class="lineno">35</span>      <span class="k">return</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="kt">int</span><span class="p">(</span><span class="n">result</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+<span class="lineno">36</span>  <span class="p">}</span></code></pre></div>
+
   </div>
 
   <div class="date">
