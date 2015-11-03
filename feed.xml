@@ -8,9 +8,21 @@
     
       <item>
         <title>关于c++11的一些特性(2) 完美转发</title>
-        <description>&lt;!--more--&gt;
+        <description>&lt;p&gt;本文测试环境: &lt;/p&gt;
 
-&lt;p&gt;测试代码:&lt;/p&gt;
+&lt;p&gt;系统：Linux ubuntu 4.2.0-16-generic #19-Ubuntu SMP x86_64 GNU/Linux&lt;/p&gt;
+
+&lt;p&gt;gcc版本: gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2)&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1&gt;神奇的emplace_back函数&lt;/h1&gt;
+
+&lt;p&gt;使用std::vector时，要么存储的是指针类型，要么是值类型。指针类型是指，我把一个对象放在别的地方，比如说堆内存，然后把这个对象的内存地址放在vector里；值类型是值，我不把对象放别的地方了，而是直接放到vector自己的内存空间里。&lt;/p&gt;
+
+&lt;p&gt;对于值类型的情况，要考虑一个问题：往vector插入对象，这个操作可能开销会很大。&lt;/p&gt;
+
+&lt;p&gt;比如看下面这段测试代码:&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#include &amp;lt;vector&amp;gt;&lt;/span&gt;
@@ -19,44 +31,50 @@
 &lt;span class=&quot;lineno&quot;&gt; 5&lt;/span&gt; 
 &lt;span class=&quot;lineno&quot;&gt; 6&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Item&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt; 7&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;10&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[dtor called] (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;_&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[default ctor called] &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt;     &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[dtor called] (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;_&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[default ctor called] &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt; 
-&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[ctor called] (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[move ctor called] (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[ctor called] (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;[move ctor called] (%c, %i)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;26&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;27&lt;/span&gt; 
 &lt;span class=&quot;lineno&quot;&gt;28&lt;/span&gt; 
 &lt;span class=&quot;lineno&quot;&gt;29&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;emplace_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;-----------------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reserve&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;emplace_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;b&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;-----------------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;push_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&amp;#39;c&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;-----------------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;44&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;emplace_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;-----------------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reserve&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;emplace_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;b&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;-----------------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Item&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;push_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&amp;#39;c&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;-----------------------&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;44&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;45&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;编译:&lt;/p&gt;
+
+&lt;p&gt;gcc test.cpp -o test.out -std=gnu++11 -lstdc++&lt;/p&gt;
+
+&lt;p&gt;运行结果：&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -84,7 +102,331 @@
 &lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dtor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;h2&gt;参考资料&lt;/h2&gt;
+&lt;p&gt;观察发现：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;第一段测试，有多余的函数调用：move构造函数以及析构函数&lt;/li&gt;
+&lt;li&gt;第二段测试，没有多余的调用&lt;/li&gt;
+&lt;li&gt;第三段测试，有多余的函数调用：move构造函数以及析构函数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以第二种写法是性能最好的。能够直接在vector的内存空间中构造对象。其他写法都会生成临时对象。&lt;/p&gt;
+
+&lt;p&gt;然而实际编程中，并不是总能这样子写，因为reverse的参数该填多少，需要细心考虑；如果vector存的是基类指针类型，那么上面任意一种写法差别都不大(最多拷贝一个指针地址而已)。&lt;/p&gt;
+
+&lt;p&gt;这些问题另当别论，现在回到本文主题上。&lt;/p&gt;
+
+&lt;p&gt;这个例子中的：v2.emplace_back(&amp;#39;b&amp;#39;, i)，其实就是用&lt;strong&gt;完美转发&lt;/strong&gt;实现的。&lt;/p&gt;
+
+&lt;h1&gt;Imperfect forwarding&lt;/h1&gt;
+
+&lt;p&gt;理解完美转发之前，先搞懂什么是不完美转发。下面会用一些测试代码来分析一下。&lt;/p&gt;
+
+&lt;p&gt;前置说明:&lt;/p&gt;
+
+&lt;p&gt;func是随便写的一个普通函数；wrapper是对func的一层封装；测试过程是控制变量法，针对特定的wrapper函数写法，不断修改func的参数的类型以及wrapper的调用方式，测试程序是否可以编译并且wrapper函数是否能够正确完成作为一个“封装函数”的基本要求。&lt;/p&gt;
+
+&lt;h3&gt;第1组测试&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 3&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 4&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 5&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 6&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 7&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;10&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//used for switching the two test cases below&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#define TEST_FUNC&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#if defined(TEST_FUNC)&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;26&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;27&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;28&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;29&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#else&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;44&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;第1组测试，wrapper函数就和func表现得不一致了。&lt;/p&gt;
+
+&lt;h3&gt;第2组测试&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 3&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 4&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 5&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 6&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 7&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;10&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//used for switching the two test cases below&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#define TEST_FUNC&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#if defined(TEST_FUNC)&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;26&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;27&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;28&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;29&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#else&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;44&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;结果和第1组一样。&lt;/p&gt;
+
+&lt;h3&gt;第3组测试&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 3&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 4&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 5&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 6&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 7&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;10&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#define TEST_FUNC&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#if defined(TEST_FUNC)&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: binding ‘const int’ to reference of type ‘int&amp;amp;’ discards qualifiers&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: binding ‘const int’ to reference of type ‘int&amp;amp;’ discards qualifiers&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;26&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;27&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#else&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;29&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: binding ‘const int’ to reference of type ‘int&amp;amp;’ discards qualifiers&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: binding ‘const int’ to reference of type ‘int&amp;amp;’ discards qualifiers&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;这个情况，其实编译结果还是不一致的。若想知道具体细节请自己编译一遍。&lt;/p&gt;
+
+&lt;h3&gt;第4组测试&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 3&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 4&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 5&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 6&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 7&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;10&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//used for switching the two test cases below&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#define TEST_FUNC&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#if defined(TEST_FUNC)&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;26&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;27&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;28&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;29&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#else&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error: invalid initialization of non-const reference of type ‘int&amp;amp;’ from an rvalue of type ‘int’&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;44&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;结果和第1、2组一样。&lt;/p&gt;
+
+&lt;h3&gt;小结&lt;/h3&gt;
+
+&lt;p&gt;测试先到这里。由测试结果可以知道，这个wrapper是失败的(第1、2、4组测试，连最基本的编译结果都不一样)。&lt;/p&gt;
+
+&lt;p&gt;在c++11之前，对上面的不一致问题，是用非常暴力的方式的解决的，方式就是重载出N个wrapper的函数。&lt;/p&gt;
+
+&lt;p&gt;比如，把上面的第1组测试的代码改成：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 3&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 4&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 5&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 6&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 7&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt; 8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt; 9&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;10&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/*--- a override of wrapper ---*/&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;12&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;13&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;14&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;15&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//used for switching the two test cases below&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#define TEST_FUNC&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#if defined(TEST_FUNC)&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;22&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;23&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;24&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;25&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;26&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;27&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;28&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;29&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;30&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;31&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;32&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;33&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;34&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#else&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;35&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;36&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;37&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;38&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;39&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;40&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;41&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;42&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;43&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;44&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;45&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;46&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;wrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// ok&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;47&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;lineno&quot;&gt;48&lt;/span&gt; 
+&lt;span class=&quot;lineno&quot;&gt;49&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;增加了这段代码:
+&lt;code&gt;cpp
+template &amp;lt;typename T1&amp;gt;
+void wrapper(const T1&amp;amp; p) { func(p); }
+&lt;/code&gt;
+test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂且忽略运行结果的一致性)&lt;/p&gt;
+
+&lt;p&gt;由此可以思考一下：如果func有N个参数，每个参数都要写const和非const两个版本，那么总共要写的wrapper函数就有2的n次方个！多么可怕。&lt;/p&gt;
+
+&lt;h1&gt;reference deduction (collapsing)&lt;/h1&gt;
+
+&lt;p&gt;引用推导(或引用折叠)规则，是c++11开始才有的一个说法，具体是怎么回事呢？请看下面的代码：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;lref&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rref&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;lref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;r1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// type of r1 is int&amp;amp;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;lref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// type of r2 is int&amp;amp;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;rref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;r3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// type of r3 is int&amp;amp;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;rref&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r4&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// type of r4 is int&amp;amp;&amp;amp;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;(摘自&lt;a href=&quot;http://en.cppreference.com/w/cpp/language/reference&quot;&gt;http://en.cppreference.com/w/cpp/language/reference&lt;/a&gt; )&lt;/p&gt;
+
+&lt;p&gt;我用visual studio 2015跑了下这段代码：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.11/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;看来是没错的。&lt;/p&gt;
+
+&lt;p&gt;总结了下这套推导规则：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A&amp;amp; &amp;amp; -&amp;gt; A&amp;amp;&lt;/li&gt;
+&lt;li&gt;A&amp;amp; &amp;amp;&amp;amp; -&amp;gt; A&amp;amp;&lt;/li&gt;
+&lt;li&gt;A&amp;amp;&amp;amp; &amp;amp; -&amp;gt; A&amp;amp;&lt;/li&gt;
+&lt;li&gt;A&amp;amp;&amp;amp; &amp;amp;&amp;amp; -&amp;gt; A&amp;amp;&amp;amp;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;(记忆方法：只要有&amp;amp;，结果肯定是&amp;amp;)&lt;/p&gt;
+
+&lt;h1&gt;rvalue&lt;/h1&gt;
+
+&lt;p&gt;C++中，有一对重要的兄弟：lvalue(左值)、rvalue(右值)。如何区分？简单来说就是，具名的是左值，不具名的是右值。&lt;/p&gt;
+
+&lt;h1&gt;Perfect forwarding&lt;/h1&gt;
+
+&lt;h1&gt;universal references&lt;/h1&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/&quot;&gt;http://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/&lt;/a&gt;&lt;/p&gt;
 </description>

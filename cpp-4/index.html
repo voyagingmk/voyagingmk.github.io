@@ -9,8 +9,18 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="" />
-    <meta property="og:description" content="" />
+    <meta name="description" content="本文测试环境: 
+
+系统：Linux ubuntu 4.2.0-16-generic #19-Ubuntu SMP x86_64 GNU/Linux
+
+gcc版本: gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2)
+" />
+    <meta property="og:description" content="本文测试环境: 
+
+系统：Linux ubuntu 4.2.0-16-generic #19-Ubuntu SMP x86_64 GNU/Linux
+
+gcc版本: gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2)
+" />
     
     <meta name="author" content="Wyman的技术博客" />
 
@@ -83,9 +93,21 @@
   <h1>关于c++11的一些特性(2) 完美转发</h1>
   <h3>Tags: <a href="/tag/c%2B%2B.html" rel="tag">c++</a></h3>
   <div class="entry">
-    <!--more-->
+    <p>本文测试环境: </p>
 
-<p>测试代码:</p>
+<p>系统：Linux ubuntu 4.2.0-16-generic #19-Ubuntu SMP x86_64 GNU/Linux</p>
+
+<p>gcc版本: gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2)</p>
+
+<!--more-->
+
+<h1>神奇的emplace_back函数</h1>
+
+<p>使用std::vector时，要么存储的是指针类型，要么是值类型。指针类型是指，我把一个对象放在别的地方，比如说堆内存，然后把这个对象的内存地址放在vector里；值类型是值，我不把对象放别的地方了，而是直接放到vector自己的内存空间里。</p>
+
+<p>对于值类型的情况，要考虑一个问题：往vector插入对象，这个操作可能开销会很大。</p>
+
+<p>比如看下面这段测试代码:</p>
 
 <div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;stdio.h&gt;</span>
 <span class="lineno"> 2</span> <span class="cp">#include &lt;vector&gt;</span>
@@ -94,44 +116,50 @@
 <span class="lineno"> 5</span> 
 <span class="lineno"> 6</span> <span class="k">class</span> <span class="nc">Item</span> <span class="p">{</span>
 <span class="lineno"> 7</span> <span class="k">public</span><span class="o">:</span>
-<span class="lineno"> 8</span>  <span class="kt">char</span> <span class="n">name</span><span class="p">;</span>
-<span class="lineno"> 9</span>  <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+<span class="lineno"> 8</span>     <span class="kt">char</span> <span class="n">name</span><span class="p">;</span>
+<span class="lineno"> 9</span>     <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
 <span class="lineno">10</span> <span class="k">public</span><span class="o">:</span>
-<span class="lineno">11</span>  <span class="o">~</span><span class="n">Item</span><span class="p">()</span> <span class="p">{</span>
-<span class="lineno">12</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[dtor called] (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="lineno">13</span>  <span class="p">}</span>
-<span class="lineno">14</span>  <span class="n">Item</span><span class="p">()</span> <span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="sc">&#39;_&#39;</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">15</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[default ctor called] </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="lineno">16</span>  <span class="p">}</span>
+<span class="lineno">11</span>     <span class="o">~</span><span class="n">Item</span><span class="p">()</span> <span class="p">{</span>
+<span class="lineno">12</span>         <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[dtor called] (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+<span class="lineno">13</span>     <span class="p">}</span>
+<span class="lineno">14</span>     <span class="n">Item</span><span class="p">()</span> <span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="sc">&#39;_&#39;</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">15</span>         <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[default ctor called] </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="lineno">16</span>     <span class="p">}</span>
 <span class="lineno">17</span> 
-<span class="lineno">18</span>  <span class="n">Item</span><span class="p">(</span><span class="kt">char</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v</span><span class="p">)</span> <span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">19</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[ctor called] (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="lineno">20</span>  <span class="p">}</span>
-<span class="lineno">21</span>  <span class="n">Item</span><span class="p">(</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">22</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[move ctor called] (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">);</span>
-<span class="lineno">23</span>      <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
-<span class="lineno">24</span>      <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
-<span class="lineno">25</span>  <span class="p">}</span>
+<span class="lineno">18</span>     <span class="n">Item</span><span class="p">(</span><span class="kt">char</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v</span><span class="p">)</span> <span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">19</span>         <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[ctor called] (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+<span class="lineno">20</span>     <span class="p">}</span>
+<span class="lineno">21</span>     <span class="n">Item</span><span class="p">(</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">22</span>         <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[move ctor called] (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">);</span>
+<span class="lineno">23</span>         <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+<span class="lineno">24</span>         <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+<span class="lineno">25</span>     <span class="p">}</span>
 <span class="lineno">26</span> <span class="p">};</span>
 <span class="lineno">27</span> 
 <span class="lineno">28</span> 
 <span class="lineno">29</span> <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="lineno">30</span>  <span class="n">vector</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span> <span class="n">v1</span><span class="p">;</span>
-<span class="lineno">31</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">32</span>      <span class="n">v1</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-<span class="lineno">33</span>  <span class="p">}</span>
-<span class="lineno">34</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="lineno">35</span>  <span class="n">vector</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span> <span class="n">v2</span><span class="p">;</span>
-<span class="lineno">36</span>  <span class="n">v2</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-<span class="lineno">37</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">38</span>      <span class="n">v2</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">(</span><span class="sc">&#39;b&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-<span class="lineno">39</span>  <span class="p">}</span>
-<span class="lineno">40</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="lineno">41</span>  <span class="n">vector</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span> <span class="n">v3</span><span class="p">;</span>
-<span class="lineno">42</span>  <span class="n">v3</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span> <span class="sc">&#39;c&#39;</span><span class="p">,</span> <span class="mi">3</span> <span class="p">});</span>
-<span class="lineno">43</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="lineno">44</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno">30</span>     <span class="n">vector</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span> <span class="n">v1</span><span class="p">;</span>
+<span class="lineno">31</span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">32</span>         <span class="n">v1</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+<span class="lineno">33</span>     <span class="p">}</span>
+<span class="lineno">34</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="lineno">35</span>     <span class="n">vector</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span> <span class="n">v2</span><span class="p">;</span>
+<span class="lineno">36</span>     <span class="n">v2</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="lineno">37</span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">38</span>         <span class="n">v2</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">(</span><span class="sc">&#39;b&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+<span class="lineno">39</span>     <span class="p">}</span>
+<span class="lineno">40</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="lineno">41</span>     <span class="n">vector</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span> <span class="n">v3</span><span class="p">;</span>
+<span class="lineno">42</span>     <span class="n">v3</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span> <span class="sc">&#39;c&#39;</span><span class="p">,</span> <span class="mi">3</span> <span class="p">});</span>
+<span class="lineno">43</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="lineno">44</span>     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="lineno">45</span> <span class="p">}</span></code></pre></div>
+
+<p>编译:</p>
+
+<p>gcc test.cpp -o test.out -std=gnu++11 -lstdc++</p>
+
+<p>运行结果：</p>
 
 <div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="lineno"> 2</span> <span class="p">[</span><span class="n">move</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -159,7 +187,331 @@
 <span class="lineno">24</span> <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="lineno">25</span> <span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></code></pre></div>
 
-<h2>参考资料</h2>
+<p>观察发现：</p>
+
+<ul>
+<li>第一段测试，有多余的函数调用：move构造函数以及析构函数</li>
+<li>第二段测试，没有多余的调用</li>
+<li>第三段测试，有多余的函数调用：move构造函数以及析构函数</li>
+</ul>
+
+<p>所以第二种写法是性能最好的。能够直接在vector的内存空间中构造对象。其他写法都会生成临时对象。</p>
+
+<p>然而实际编程中，并不是总能这样子写，因为reverse的参数该填多少，需要细心考虑；如果vector存的是基类指针类型，那么上面任意一种写法差别都不大(最多拷贝一个指针地址而已)。</p>
+
+<p>这些问题另当别论，现在回到本文主题上。</p>
+
+<p>这个例子中的：v2.emplace_back(&#39;b&#39;, i)，其实就是用<strong>完美转发</strong>实现的。</p>
+
+<h1>Imperfect forwarding</h1>
+
+<p>理解完美转发之前，先搞懂什么是不完美转发。下面会用一些测试代码来分析一下。</p>
+
+<p>前置说明:</p>
+
+<p>func是随便写的一个普通函数；wrapper是对func的一层封装；测试过程是控制变量法，针对特定的wrapper函数写法，不断修改func的参数的类型以及wrapper的调用方式，测试程序是否可以编译并且wrapper函数是否能够正确完成作为一个“封装函数”的基本要求。</p>
+
+<h3>第1组测试</h3>
+
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="kt">int</span> <span class="nf">number99</span><span class="p">(){</span>
+<span class="lineno"> 5</span>  <span class="k">return</span> <span class="mi">99</span><span class="p">;</span>
+<span class="lineno"> 6</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T1</span><span class="o">&gt;</span>
+<span class="lineno"> 9</span> <span class="kt">void</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">T1</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="p">}</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span> <span class="c1">//used for switching the two test cases below</span>
+<span class="lineno">12</span> <span class="cp">#define TEST_FUNC</span>
+<span class="lineno">13</span> 
+<span class="lineno">14</span> <span class="cp">#if defined(TEST_FUNC)</span>
+<span class="lineno">15</span> 
+<span class="lineno">16</span> <span class="kt">void</span> <span class="n">test_func</span><span class="p">(){</span>
+<span class="lineno">17</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">18</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">19</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">20</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">21</span>  <span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">22</span>  <span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">23</span>  <span class="n">func</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">24</span>  <span class="n">func</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">25</span>  <span class="n">func</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">26</span>  <span class="n">func</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// ok</span>
+<span class="lineno">27</span> <span class="p">}</span>
+<span class="lineno">28</span> 
+<span class="lineno">29</span> <span class="cp">#else</span>
+<span class="lineno">30</span> 
+<span class="lineno">31</span> <span class="kt">void</span> <span class="n">test_wrapper</span><span class="p">(){</span>
+<span class="lineno">32</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">33</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">34</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">35</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">36</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">37</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">38</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">39</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">40</span>  <span class="n">wrapper</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">41</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">42</span> <span class="p">}</span>
+<span class="lineno">43</span> 
+<span class="lineno">44</span> <span class="cp">#endif</span></code></pre></div>
+
+<p>第1组测试，wrapper函数就和func表现得不一致了。</p>
+
+<h3>第2组测试</h3>
+
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="kt">int</span> <span class="nf">number99</span><span class="p">(){</span>
+<span class="lineno"> 5</span>  <span class="k">return</span> <span class="mi">99</span><span class="p">;</span>
+<span class="lineno"> 6</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T1</span><span class="o">&gt;</span>
+<span class="lineno"> 9</span> <span class="kt">void</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">T1</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="p">}</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span> <span class="c1">//used for switching the two test cases below</span>
+<span class="lineno">12</span> <span class="cp">#define TEST_FUNC</span>
+<span class="lineno">13</span> 
+<span class="lineno">14</span> <span class="cp">#if defined(TEST_FUNC)</span>
+<span class="lineno">15</span> 
+<span class="lineno">16</span> <span class="kt">void</span> <span class="n">test_func</span><span class="p">(){</span>
+<span class="lineno">17</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">18</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">19</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">20</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">21</span>  <span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">22</span>  <span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">23</span>  <span class="n">func</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">24</span>  <span class="n">func</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">25</span>  <span class="n">func</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">26</span>  <span class="n">func</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// ok</span>
+<span class="lineno">27</span> <span class="p">}</span>
+<span class="lineno">28</span> 
+<span class="lineno">29</span> <span class="cp">#else</span>
+<span class="lineno">30</span> 
+<span class="lineno">31</span> <span class="kt">void</span> <span class="n">test_wrapper</span><span class="p">(){</span>
+<span class="lineno">32</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">33</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">34</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">35</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">36</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">37</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">38</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">39</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">40</span>  <span class="n">wrapper</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">41</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">42</span> <span class="p">}</span>
+<span class="lineno">43</span> 
+<span class="lineno">44</span> <span class="cp">#endif</span></code></pre></div>
+
+<p>结果和第1组一样。</p>
+
+<h3>第3组测试</h3>
+
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="kt">int</span> <span class="nf">number99</span><span class="p">(){</span>
+<span class="lineno"> 5</span>  <span class="k">return</span> <span class="mi">99</span><span class="p">;</span>
+<span class="lineno"> 6</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T1</span><span class="o">&gt;</span>
+<span class="lineno"> 9</span> <span class="kt">void</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">T1</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="p">}</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span> <span class="cp">#define TEST_FUNC</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span> <span class="cp">#if defined(TEST_FUNC)</span>
+<span class="lineno">14</span> 
+<span class="lineno">15</span> <span class="kt">void</span> <span class="n">test_func</span><span class="p">(){</span>
+<span class="lineno">16</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">17</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">18</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">19</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">20</span>  <span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">21</span>  <span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// error: binding ‘const int’ to reference of type ‘int&amp;’ discards qualifiers</span>
+<span class="lineno">22</span>  <span class="n">func</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">23</span>  <span class="n">func</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// error: binding ‘const int’ to reference of type ‘int&amp;’ discards qualifiers</span>
+<span class="lineno">24</span>  <span class="n">func</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">25</span>  <span class="n">func</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">26</span> <span class="p">}</span>
+<span class="lineno">27</span> 
+<span class="lineno">28</span> <span class="cp">#else</span>
+<span class="lineno">29</span> 
+<span class="lineno">30</span> <span class="kt">void</span> <span class="n">test_wrapper</span><span class="p">(){</span>
+<span class="lineno">31</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">32</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">33</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">34</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">35</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">36</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// error: binding ‘const int’ to reference of type ‘int&amp;’ discards qualifiers</span>
+<span class="lineno">37</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">38</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// error: binding ‘const int’ to reference of type ‘int&amp;’ discards qualifiers</span>
+<span class="lineno">39</span>  <span class="n">wrapper</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">40</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">41</span> <span class="p">}</span>
+<span class="lineno">42</span> 
+<span class="lineno">43</span> <span class="cp">#endif</span></code></pre></div>
+
+<p>这个情况，其实编译结果还是不一致的。若想知道具体细节请自己编译一遍。</p>
+
+<h3>第4组测试</h3>
+
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="kt">int</span> <span class="nf">number99</span><span class="p">(){</span>
+<span class="lineno"> 5</span>  <span class="k">return</span> <span class="mi">99</span><span class="p">;</span>
+<span class="lineno"> 6</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T1</span><span class="o">&gt;</span>
+<span class="lineno"> 9</span> <span class="kt">void</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">T1</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="p">}</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span> <span class="c1">//used for switching the two test cases below</span>
+<span class="lineno">12</span> <span class="cp">#define TEST_FUNC</span>
+<span class="lineno">13</span> 
+<span class="lineno">14</span> <span class="cp">#if defined(TEST_FUNC)</span>
+<span class="lineno">15</span> 
+<span class="lineno">16</span> <span class="kt">void</span> <span class="n">test_func</span><span class="p">(){</span>
+<span class="lineno">17</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">18</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">19</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">20</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">21</span>  <span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">22</span>  <span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">23</span>  <span class="n">func</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">24</span>  <span class="n">func</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">25</span>  <span class="n">func</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">26</span>  <span class="n">func</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// ok</span>
+<span class="lineno">27</span> <span class="p">}</span>
+<span class="lineno">28</span> 
+<span class="lineno">29</span> <span class="cp">#else</span>
+<span class="lineno">30</span> 
+<span class="lineno">31</span> <span class="kt">void</span> <span class="n">test_wrapper</span><span class="p">(){</span>
+<span class="lineno">32</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">33</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">34</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">35</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">36</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">37</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">38</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">39</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">40</span>  <span class="n">wrapper</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">41</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// error: invalid initialization of non-const reference of type ‘int&amp;’ from an rvalue of type ‘int’</span>
+<span class="lineno">42</span> <span class="p">}</span>
+<span class="lineno">43</span> 
+<span class="lineno">44</span> <span class="cp">#endif</span></code></pre></div>
+
+<p>结果和第1、2组一样。</p>
+
+<h3>小结</h3>
+
+<p>测试先到这里。由测试结果可以知道，这个wrapper是失败的(第1、2、4组测试，连最基本的编译结果都不一样)。</p>
+
+<p>在c++11之前，对上面的不一致问题，是用非常暴力的方式的解决的，方式就是重载出N个wrapper的函数。</p>
+
+<p>比如，把上面的第1组测试的代码改成：</p>
+
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="kt">int</span> <span class="nf">number99</span><span class="p">(){</span>
+<span class="lineno"> 5</span>  <span class="k">return</span> <span class="mi">99</span><span class="p">;</span>
+<span class="lineno"> 6</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T1</span><span class="o">&gt;</span>
+<span class="lineno"> 9</span> <span class="kt">void</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">T1</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="p">}</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span> <span class="cm">/*--- a override of wrapper ---*/</span>
+<span class="lineno">12</span> <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T1</span><span class="o">&gt;</span>
+<span class="lineno">13</span> <span class="kt">void</span> <span class="n">wrapper</span><span class="p">(</span><span class="k">const</span> <span class="n">T1</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="p">}</span>
+<span class="lineno">14</span> 
+<span class="lineno">15</span> 
+<span class="lineno">16</span> <span class="c1">//used for switching the two test cases below</span>
+<span class="lineno">17</span> <span class="cp">#define TEST_FUNC</span>
+<span class="lineno">18</span> 
+<span class="lineno">19</span> <span class="cp">#if defined(TEST_FUNC)</span>
+<span class="lineno">20</span> 
+<span class="lineno">21</span> <span class="kt">void</span> <span class="n">test_func</span><span class="p">(){</span>
+<span class="lineno">22</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">23</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">24</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">25</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">26</span>  <span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">27</span>  <span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">28</span>  <span class="n">func</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">29</span>  <span class="n">func</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">30</span>  <span class="n">func</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">31</span>  <span class="n">func</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// ok</span>
+<span class="lineno">32</span> <span class="p">}</span>
+<span class="lineno">33</span> 
+<span class="lineno">34</span> <span class="cp">#else</span>
+<span class="lineno">35</span> 
+<span class="lineno">36</span> <span class="kt">void</span> <span class="n">test_wrapper</span><span class="p">(){</span>
+<span class="lineno">37</span>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">38</span>  <span class="k">const</span> <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">39</span>  <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span> 
+<span class="lineno">40</span>  <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="lineno">41</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">42</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">43</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">c</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">44</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">45</span>  <span class="n">wrapper</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="lineno">46</span>  <span class="n">wrapper</span><span class="p">(</span><span class="n">number99</span><span class="p">());</span> <span class="c1">// ok</span>
+<span class="lineno">47</span> <span class="p">}</span>
+<span class="lineno">48</span> 
+<span class="lineno">49</span> <span class="cp">#endif</span></code></pre></div>
+
+<p>增加了这段代码:
+<code>cpp
+template &lt;typename T1&gt;
+void wrapper(const T1&amp; p) { func(p); }
+</code>
+test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂且忽略运行结果的一致性)</p>
+
+<p>由此可以思考一下：如果func有N个参数，每个参数都要写const和非const两个版本，那么总共要写的wrapper函数就有2的n次方个！多么可怕。</p>
+
+<h1>reference deduction (collapsing)</h1>
+
+<p>引用推导(或引用折叠)规则，是c++11开始才有的一个说法，具体是怎么回事呢？请看下面的代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="kt">int</span><span class="o">&amp;</span>  <span class="n">lref</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="kt">int</span><span class="o">&amp;&amp;</span> <span class="n">rref</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="n">lref</span><span class="o">&amp;</span>  <span class="n">r1</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// type of r1 is int&amp;</span>
+<span class="n">lref</span><span class="o">&amp;&amp;</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// type of r2 is int&amp;</span>
+<span class="n">rref</span><span class="o">&amp;</span>  <span class="n">r3</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// type of r3 is int&amp;</span>
+<span class="n">rref</span><span class="o">&amp;&amp;</span> <span class="n">r4</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// type of r4 is int&amp;&amp;</span>
+</code></pre></div>
+<p>(摘自<a href="http://en.cppreference.com/w/cpp/language/reference">http://en.cppreference.com/w/cpp/language/reference</a> )</p>
+
+<p>我用visual studio 2015跑了下这段代码：</p>
+
+<p><img src="../images/2015.11/1.png" alt="1.png"></p>
+
+<p>看来是没错的。</p>
+
+<p>总结了下这套推导规则：</p>
+
+<ul>
+<li>A&amp; &amp; -&gt; A&amp;</li>
+<li>A&amp; &amp;&amp; -&gt; A&amp;</li>
+<li>A&amp;&amp; &amp; -&gt; A&amp;</li>
+<li>A&amp;&amp; &amp;&amp; -&gt; A&amp;&amp;</li>
+</ul>
+
+<p>(记忆方法：只要有&amp;，结果肯定是&amp;)</p>
+
+<h1>rvalue</h1>
+
+<p>C++中，有一对重要的兄弟：lvalue(左值)、rvalue(右值)。如何区分？简单来说就是，具名的是左值，不具名的是右值。</p>
+
+<h1>Perfect forwarding</h1>
+
+<h1>universal references</h1>
+
+<h1>参考资料</h1>
 
 <p><a href="http://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/">http://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/</a></p>
 
