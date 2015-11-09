@@ -99,7 +99,7 @@
 
 <ul>
 <li>用{}来初始化变量，可以避免程序员不期望的隐式类型转换(更具体地说应该是narrowing conversions，收缩转换)；</li>
-<li>用{}替代()，可以避免Widget a()被编译器解析(parsed)成函数声明的问题；</li>
+<li>用{}替代()，可以避免A a()被编译器解析(parsed)成函数声明的问题；</li>
 </ul>
 
 <h3>缺点：</h3>
@@ -154,7 +154,7 @@
 
 <p>还有就是，c++11 enum支持前置声明(类似class的前置声明)。</p>
 
-<h2>条款10：在成员函数声明后面加 = delete</h2>
+<h2>条款11：新功能：在成员函数声明后面加 = delete</h2>
 
 <p>这样子写:</p>
 <div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
@@ -197,6 +197,65 @@
 <span class="k">template</span><span class="o">&lt;&gt;</span>
 <span class="kt">void</span> <span class="n">A</span><span class="o">::</span><span class="n">foo</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// still public, but deleted</span>
 </code></pre></div>
+<p>再引用下作者的一段话:</p>
+
+<blockquote>
+<p>the C++98 approach is not as good as the real thing. It doesn’t work outside classes, it doesn’t always work inside classes, and when it does work, it may not work until link-time. So stick to deleted functions.</p>
+</blockquote>
+
+<h3>条款12-1：新功能：引用限定符 reference qualifiers</h3>
+
+<p>这样子玩:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="err">…</span>
+<span class="kt">void</span> <span class="n">doWork</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span> <span class="c1">// this version of doWork applies</span>
+<span class="c1">// only when *this is an lvalue</span>
+<span class="kt">void</span> <span class="n">doWork</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span> <span class="c1">// this version of doWork applies</span>
+<span class="p">};</span> <span class="c1">// only when *this is an rvalue</span>
+<span class="err">…</span>
+<span class="n">A</span> <span class="n">makeA</span><span class="p">();</span> <span class="c1">// factory function (returns rvalue)</span>
+<span class="n">A</span> <span class="n">w</span><span class="p">;</span> <span class="c1">// normal object (an lvalue)</span>
+<span class="err">…</span>
+<span class="n">w</span><span class="p">.</span><span class="n">doWork</span><span class="p">();</span> <span class="c1">// calls A::doWork for lvalues</span>
+<span class="c1">// (i.e., A::doWork &amp;)</span>
+<span class="n">makeA</span><span class="p">().</span><span class="n">doWork</span><span class="p">();</span> <span class="c1">// calls A::doWork for rvalues</span>
+<span class="c1">// (i.e., A::doWork &amp;&amp;)</span>
+</code></pre></div>
+<h3>条款12-2：新功能：覆盖限定符 override qualifiers</h3>
+
+<p>这个限定符是用来防止程序员粗心写错重载的。</p>
+
+<p>错误例子:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">Base</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf2</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">();</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>Derived的前3个函数一点没有覆盖掉基类的实现。因为派生类函数和基类对应的函数，函数签名不完全一样。</p>
+
+<p>c++11给出了优雅的解决办法：</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">()</span> <span class="k">override</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="k">override</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf4</span><span class="p">()</span> <span class="k">const</span> <span class="k">override</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>Derived的mf1、mf2、mf3这3个覆盖函数无法编译通过，因为编译器在Base中找不到对应的函数。</p>
+
   </div>
 
   <div class="date">
