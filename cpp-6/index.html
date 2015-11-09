@@ -9,9 +9,9 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="Note：为避免各种侵权问题，本文并没有复制原书任意内容。需要原书完整中文翻译的读者请等待官方译本的发布。
+    <meta name="description" content="Note：为避免各种侵权问题，本文并没有复制原书任意文字(代码除外，作者已经声明代码可以被使用)。需要原书完整中文翻译的读者请等待官方译本的发布。
 " />
-    <meta property="og:description" content="Note：为避免各种侵权问题，本文并没有复制原书任意内容。需要原书完整中文翻译的读者请等待官方译本的发布。
+    <meta property="og:description" content="Note：为避免各种侵权问题，本文并没有复制原书任意文字(代码除外，作者已经声明代码可以被使用)。需要原书完整中文翻译的读者请等待官方译本的发布。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -85,7 +85,7 @@
   <h1>《Effective Modern C++》读书笔记</h1>
   <h3>Tags: <a href="/tag/c%2B%2B.html" rel="tag">c++</a></h3>
   <div class="entry">
-    <p>Note：为避免各种侵权问题，本文并没有复制原书任意内容。需要原书完整中文翻译的读者请等待官方译本的发布。</p>
+    <p>Note：为避免各种侵权问题，本文并没有复制原书任意文字(代码除外，作者已经声明代码可以被使用)。需要原书完整中文翻译的读者请等待官方译本的发布。</p>
 
 <!--more-->
 
@@ -127,6 +127,76 @@
 
 <p>nullptr的好处在哪，请阅读书中的例子。这个条款十分简单：不要再用0和NULL来表示空指针，而是用c++11的nullptr，只有好处，没有坏处。</p>
 
+<h2>条款9：用using代替typedef</h2>
+
+<p>同条款8，大部分情况下都可以用using代替typedef。</p>
+
+<h2>条款10：具有作用域的enum</h2>
+
+<p>写法如下:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">enum</span> <span class="k">class</span> <span class="nc">Color</span> <span class="p">{</span> <span class="n">black</span><span class="p">,</span> <span class="n">white</span><span class="p">,</span> <span class="n">red</span> <span class="p">};</span> <span class="c1">// black, white, red</span>
+<span class="c1">// are scoped to Color</span>
+<span class="k">auto</span> <span class="n">white</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="c1">// fine, no othe</span>
+<span class="n">Color</span> <span class="n">c</span> <span class="o">=</span> <span class="n">white</span><span class="p">;</span> <span class="c1">// error! no enumerator named</span>
+<span class="c1">// &quot;white&quot; is in this scope</span>
+<span class="n">Color</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Color</span><span class="o">::</span><span class="n">white</span><span class="p">;</span> <span class="c1">// fine</span>
+<span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Color</span><span class="o">::</span><span class="n">white</span><span class="p">;</span> <span class="c1">// also fine (and in accord</span>
+<span class="c1">// with Item 5&#39;s advice)</span>
+</code></pre></div>
+<p>我觉得主要好处是避免名空间污染。</p>
+
+<p>c++11还允许给enum指定underlying type：</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">enum</span> <span class="k">class</span> <span class="nc">Status</span><span class="o">:</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">;</span> <span class="c1">// underlying type for</span>
+<span class="c1">// Status is std::uint32_t</span>
+<span class="c1">// (from &lt;cstdint&gt;)</span>
+</code></pre></div>
+<p>意思是，Status的每一个元素都是std::uint32_t类型。缺省类型是int。</p>
+
+<p>还有就是，c++11 enum支持前置声明(类似class的前置声明)。</p>
+
+<h2>条款10：在成员函数声明后面加 = delete</h2>
+
+<p>这样子写:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">A</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span> <span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+    <span class="n">A</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>想比c++98的做法(把函数声明为private，并不定义实现)：</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="k">private</span><span class="o">:</span>
+    <span class="n">A</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span> <span class="p">);</span>
+    <span class="n">A</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>用 = delete会更好，因为被声明 = delete的函数，编译器保证什么代码都不能调用它们(会编译报错)，如果是c++98，有可能是链接时才报错。</p>
+
+<p>注意到 = delete声明的函数，是public的，其实是为了让报错内容更准确。想一下，如果 = delete的函数是private，然后这个函数被外部调用，编译器可能只是给出&quot;不能调用private函数&quot;的错误信息。这可能会误导调用者。</p>
+
+<p>= delete的另一个特性是，它并不是只能用在类成员函数，而是任意函数。看这段代码:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">bool</span> <span class="nf">isLucky</span><span class="p">(</span><span class="kt">int</span> <span class="n">number</span><span class="p">);</span> <span class="c1">// original function</span>
+<span class="kt">bool</span> <span class="n">isLucky</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject chars</span>
+<span class="kt">bool</span> <span class="n">isLucky</span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject bools</span>
+<span class="kt">bool</span> <span class="n">isLucky</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject doubles and floats</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error! call to deleted function</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="nb">true</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error!</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="mf">3.5f</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error!</span>
+</code></pre></div>
+<p>把后3个函数重载给delete掉，保证了那3种调用方式不能被编译！也就是说，=delete可以用来阻止隐式转换陷阱。</p>
+
+<p>用= delete还有一个高端的好处：在class内部的函数模板，它的访问类型只能是public、protected、private其中一种，不能又有public又有private的实例化，所以c++98的&quot;delete&quot;方案对函数模板没辙。还好，C++11解决了这个问题，用= delete即可：</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">T</span><span class="o">*</span> <span class="n">ptr</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+<span class="p">};</span>
+
+<span class="k">template</span><span class="o">&lt;&gt;</span>
+<span class="kt">void</span> <span class="n">A</span><span class="o">::</span><span class="n">foo</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// still public, but deleted</span>
+</code></pre></div>
   </div>
 
   <div class="date">
