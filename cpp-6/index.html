@@ -256,6 +256,68 @@
 </code></pre></div>
 <p>Derived的mf1、mf2、mf3这3个覆盖函数无法编译通过，因为编译器在Base中找不到对应的函数。</p>
 
+<h3>条款13: 尽可能使用const_iterators</h3>
+
+<p>c++11/c++14可以这么写:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">;</span>
+<span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="c1">// it是const_iterators</span>
+<span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">values</span><span class="p">.</span><span class="n">cbegin</span><span class="p">(),</span><span class="n">values</span><span class="p">.</span><span class="n">cend</span><span class="p">(),</span> <span class="mi">1983</span><span class="p">);</span>
+<span class="n">values</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="mi">1998</span><span class="p">);</span>
+</code></pre></div>
+<p>注意，cbegin和cend是成员函数。在c++11中，有非成员函数的begin和end，但没有非成员函数的cbegin和cend(c++14才有)。</p>
+
+<p>所以要写泛型函数时，c++14这么写:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">C</span><span class="p">,</span> <span class="k">typename</span> <span class="n">V</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">findAndInsert</span><span class="p">(</span><span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">,</span> <span class="k">const</span> <span class="n">V</span><span class="o">&amp;</span> <span class="n">targetVal</span><span class="p">,</span> <span class="k">const</span> <span class="n">V</span><span class="o">&amp;</span> <span class="n">insertVal</span><span class="p">)</span>
+    <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">cbegin</span><span class="p">;</span>
+    <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">cend</span><span class="p">;</span>
+    <span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">cbegin</span><span class="p">(</span><span class="n">container</span><span class="p">),</span> <span class="n">cend</span><span class="p">(</span><span class="n">container</span><span class="p">),</span> <span class="n">targetVal</span><span class="p">);</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">insertVal</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>c++11则不能，但可以先定义2个函数，使得可以和c++14保持一致:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">C</span><span class="o">&gt;</span>
+<span class="k">auto</span> <span class="n">cbegin</span><span class="p">(</span><span class="k">const</span> <span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">)</span><span class="o">-&gt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">C</span><span class="o">&gt;</span>
+<span class="k">auto</span> <span class="n">cend</span><span class="p">(</span><span class="k">const</span> <span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">)</span><span class="o">-&gt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">end</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3>条款14: 如果函数保证不会抛出异常，请给它加上 noexcept声明</h3>
+
+<p>(这个标题怎么有点像《三体》里的安全声明:如果你的文明确定没有攻击性，请给你的星球加个光速黑洞=。=)</p>
+
+<p>在c++98中，允许声明一个函数会抛出什么样的异常，客户端可以根据异常声明去安排自己的代码。然并卵，因为这产生了耦合性：如果一个函数的异常声明被改动了，客户端代码也得跟着改了。所以最终大家都不用这个特性。</p>
+
+<p>在modern c++中，把这个东西废掉了，并加入noexcept关键字。从而只需要声明一个函数<strong>是否抛出异常</strong>即可。</p>
+
+<p>noexcept的威力在于，它告诉编译器的优化器可以多大程度地优化函数代码生成。当noexcept被声明时，运行时栈不需要保存一个可解状态(可解状态是指，这函数里的局部变量可以按照构造顺序的反序去析构)。即干掉这个函数的不必要信息，让它更轻量。</p>
+
+<p>noexcept在标准库里部有很重要的应用，具体请阅读原书。</p>
+
+<p>noexcept还是支持表达式计算的。可以这样子玩:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">N</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">swap</span><span class="p">(</span><span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">a</span><span class="p">)[</span><span class="n">N</span><span class="p">],</span> <span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="p">)[</span><span class="n">N</span><span class="p">])</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">b</span><span class="p">)));</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T1</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T2</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">pair</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="n">swap</span><span class="p">(</span><span class="n">pair</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
+                                  <span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">second</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">second</span><span class="p">)));</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>解释下第二个swap：一个pair对象和另一个pair对象进行swap，当前仅当swap(first, p.first)和swap(second, p.second)都是noexcept时，pair::swap才是noexcept。</p>
+
+<p>虽然noexcept很强大，但是乱用是不好的。譬如如果你声明一个函数是noexcept，但有一天你反悔了，你可能想去掉noexcept声明，但这对客户端代码的影响不小，或者你不管noexcept声明了，硬是在函数里抛出异常！Oh，那当这个异常抛出来的时候，程序就强制终止了。</p>
+
+<p>解决上述问题的唯一办法就是<strong>谨慎</strong>，只对关键的、底层的、频繁调用的函数考虑加上noexcept声明。一来，函数是底层函数，函数内部很可能没有调用其他函数，或者调用的函数也都是noexcept的，于是这个函数可以妥妥地加上noexcept。</p>
+
+<p>在modern c++中，用户定义的析构函数亦或是编译器生成的析构函数，都隐式声明了noexcept。</p>
+
   </div>
 
   <div class="date">
