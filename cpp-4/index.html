@@ -542,9 +542,9 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
 <span class="lineno">16</span>  <span class="k">typedef</span> <span class="n">_Ty</span> <span class="n">type</span><span class="p">;</span>
 <span class="lineno">17</span>  <span class="p">};</span></code></pre></div>
 
-<p>这个东西，其实一目了然了，用3个重载保证remove<em>reference&lt;类型&gt;::type肯定没有&amp;符号。后面的2个重载是必须的，当只定义了不带&amp;符号的remove</em>reference时，remove_reference会没有效果。</p>
+<p>这个东西，其实一目了然了，用3个重载保证remove_reference&lt;类型&gt;::type肯定没有&amp;符号。后面的2个重载是必须的，当只定义了不带&amp;符号的remove_reference时，remove_reference会没有效果。</p>
 
-<p>其中比较诡异的是，后面的2个同名是不能单独存在的(会编译报错)，必须先定义不带&amp;符号的remove<em>reference，才能定义带&amp;符号的remove</em>reference。(可以自己编译试试)</p>
+<p>其中比较诡异的是，后面的2个同名是不能单独存在的(会编译报错)，必须先定义不带&amp;符号的remove_reference，才能定义带&amp;符号的remove_reference。(可以自己编译试试)</p>
 
 <p>remove_reference在std::forward里会被使用。</p>
 

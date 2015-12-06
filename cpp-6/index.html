@@ -108,12 +108,12 @@
 <li>和auto结合得不友好，auto遇到{}，auto推导成了std::initializer_list，这不是所期望的；</li>
 <li>当类的多个构造函数里，有一个是用std::initializer_list时，要注意其他构造函数不能用{}语法；</li>
 <li>当类有类型转换函数时，第二个缺点会变得更严重：复制构造函数可能不会被调用；</li>
-<li>当存在std::initializer<em>list构造函数时，即使构造代码不正确，编译器也不会转而使用其他构造函数来构造(即使其他构造函数更加match)，而是报错。(一种例外情况是当{...}里的元素不能被转换成std::initializer</em>list的T时，编译器才会转而使用其他构造函数)；</li>
+<li>当存在std::initializer_list构造函数时，即使构造代码不正确，编译器也不会转而使用其他构造函数来构造(即使其他构造函数更加match)，而是报错。(一种例外情况是当{...}里的元素不能被转换成std::initializer_list的T时，编译器才会转而使用其他构造函数)；</li>
 </ul>
 
 <h3>编写类构造函数的最佳实践</h3>
 
-<p>当你要给自定义的类加上std::initializer<em>list构造函数时，要细心考虑这个类被使用时，用{}和()是否一致，是否会有反直觉的结果。也就是说，为了避免上面所说的缺点，为了不坑自己或你的代码的用户，你需要在编写一个class时保持警惕。如无必要，应尽可能不添加td::initializer</em>list构造函数。</p>
+<p>当你要给自定义的类加上std::initializer_list构造函数时，要细心考虑这个类被使用时，用{}和()是否一致，是否会有反直觉的结果。也就是说，为了避免上面所说的缺点，为了不坑自己或你的代码的用户，你需要在编写一个class时保持警惕。如无必要，应尽可能不添加td::initializer_list构造函数。</p>
 
 <h3>c++11创造了2个阵营</h3>
 
@@ -351,19 +351,34 @@
 
 <p>注释掉c++11的版本，然后试试c++14的版本吧，执行指令：</p>
 
-<p>time gcc test.cpp -o test.out -std=gnu++14 -lstdc++</p>
+<p><strong>time gcc test.cpp -o test.out -std=gnu++14 -lstdc++</strong></p>
 
 <p>指令执行耗时：</p>
 
-<p>real    0m1.190s
-user    0m1.108s
-sys     0m0.052s</p>
+<p>real    0m1.190s</p>
+
+<p>user    0m1.108s</p>
+
+<p>sys     0m0.052s</p>
 
 <p>哇，用了1秒多，这1秒多花在哪了呢？其实就是gcc编译器在编译时期就把constexpr int result = times(a, b);计算了。（然而有些诡异的是，times仅仅循环100W，就花了一秒。）</p>
 
 <p>不过这也值得高兴了，这个特性可以让程序性能有了进一步提高，譬如可以把复杂的静态class常量变成constexpr，使得在编译器就把变量生成了，而不是等到运行期(即使你说运行期只创建一次)。</p>
 
 <p>总的来说就是，constexpr使得本来在运行期执行的工作，可以提前到编译期，只要你加上constexpr声明即可。</p>
+
+<h3>条款16: 关于编译器自动生成的成员函数</h3>
+
+<p>移动构造函数(move constructor)和移动赋值操作符(move assignment operator)，是modern c++新补充的generated member function。</p>
+
+<p>对于这2个函数的任意一个，当前仅当满足下面的条件时，编译器才会自动生成它们：</p>
+
+<ul>
+<li>有地方需要用到它</li>
+<li>用户没有自定义复制操作函数(copy operations)，即复制构造函数(copy constructor)和赋值操作符(copy assignment operator)</li>
+<li>用户没有自定义移动操作函数(move operations)</li>
+<li>用户没有自定义析构函数</li>
+</ul>
 
   </div>
 

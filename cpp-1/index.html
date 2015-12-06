@@ -141,7 +141,7 @@
 <span class="lineno"> 9</span> <span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">BSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//OK</span>
 <span class="lineno">10</span> <span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">bBSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//Not OK</span></code></pre></div>
 
-<p>array[i]其实是一个“指针算术表达式”的简写；它代表的其实是* (array+i)。array所指内存和array+i所指内存的距离是i<em>sizeof(数组中的单个元素)。而因为printBSTArray中，声明了array的元素的类型为BST，所以距离是i</em>sizeof(BST)。但当传入的是BalanceBST的数组时，就会出错了。</p>
+<p>array[i]其实是一个“指针算术表达式”的简写；它代表的其实是* (array+i)。array所指内存和array+i所指内存的距离是i*sizeof(数组中的单个元素)。而因为printBSTArray中，声明了array的元素的类型为BST，所以距离是i*sizeof(BST)。但当传入的是BalanceBST的数组时，就会出错了。</p>
 
 <p>在删除数组时，也有这个问题，C++语言规范中说，通过base class指针删除一个由derived classes objects构成的数组，其结果未定义。</p>
 

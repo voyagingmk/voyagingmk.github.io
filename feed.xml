@@ -31,12 +31,12 @@
 &lt;li&gt;和auto结合得不友好，auto遇到{}，auto推导成了std::initializer_list，这不是所期望的；&lt;/li&gt;
 &lt;li&gt;当类的多个构造函数里，有一个是用std::initializer_list时，要注意其他构造函数不能用{}语法；&lt;/li&gt;
 &lt;li&gt;当类有类型转换函数时，第二个缺点会变得更严重：复制构造函数可能不会被调用；&lt;/li&gt;
-&lt;li&gt;当存在std::initializer&lt;em&gt;list构造函数时，即使构造代码不正确，编译器也不会转而使用其他构造函数来构造(即使其他构造函数更加match)，而是报错。(一种例外情况是当{...}里的元素不能被转换成std::initializer&lt;/em&gt;list的T时，编译器才会转而使用其他构造函数)；&lt;/li&gt;
+&lt;li&gt;当存在std::initializer_list构造函数时，即使构造代码不正确，编译器也不会转而使用其他构造函数来构造(即使其他构造函数更加match)，而是报错。(一种例外情况是当{...}里的元素不能被转换成std::initializer_list的T时，编译器才会转而使用其他构造函数)；&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3&gt;编写类构造函数的最佳实践&lt;/h3&gt;
 
-&lt;p&gt;当你要给自定义的类加上std::initializer&lt;em&gt;list构造函数时，要细心考虑这个类被使用时，用{}和()是否一致，是否会有反直觉的结果。也就是说，为了避免上面所说的缺点，为了不坑自己或你的代码的用户，你需要在编写一个class时保持警惕。如无必要，应尽可能不添加td::initializer&lt;/em&gt;list构造函数。&lt;/p&gt;
+&lt;p&gt;当你要给自定义的类加上std::initializer_list构造函数时，要细心考虑这个类被使用时，用{}和()是否一致，是否会有反直觉的结果。也就是说，为了避免上面所说的缺点，为了不坑自己或你的代码的用户，你需要在编写一个class时保持警惕。如无必要，应尽可能不添加td::initializer_list构造函数。&lt;/p&gt;
 
 &lt;h3&gt;c++11创造了2个阵营&lt;/h3&gt;
 
@@ -274,19 +274,34 @@
 
 &lt;p&gt;注释掉c++11的版本，然后试试c++14的版本吧，执行指令：&lt;/p&gt;
 
-&lt;p&gt;time gcc test.cpp -o test.out -std=gnu++14 -lstdc++&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;time gcc test.cpp -o test.out -std=gnu++14 -lstdc++&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;指令执行耗时：&lt;/p&gt;
 
-&lt;p&gt;real    0m1.190s
-user    0m1.108s
-sys     0m0.052s&lt;/p&gt;
+&lt;p&gt;real    0m1.190s&lt;/p&gt;
+
+&lt;p&gt;user    0m1.108s&lt;/p&gt;
+
+&lt;p&gt;sys     0m0.052s&lt;/p&gt;
 
 &lt;p&gt;哇，用了1秒多，这1秒多花在哪了呢？其实就是gcc编译器在编译时期就把constexpr int result = times(a, b);计算了。（然而有些诡异的是，times仅仅循环100W，就花了一秒。）&lt;/p&gt;
 
 &lt;p&gt;不过这也值得高兴了，这个特性可以让程序性能有了进一步提高，譬如可以把复杂的静态class常量变成constexpr，使得在编译器就把变量生成了，而不是等到运行期(即使你说运行期只创建一次)。&lt;/p&gt;
 
 &lt;p&gt;总的来说就是，constexpr使得本来在运行期执行的工作，可以提前到编译期，只要你加上constexpr声明即可。&lt;/p&gt;
+
+&lt;h3&gt;条款16: 关于编译器自动生成的成员函数&lt;/h3&gt;
+
+&lt;p&gt;移动构造函数(move constructor)和移动赋值操作符(move assignment operator)，是modern c++新补充的generated member function。&lt;/p&gt;
+
+&lt;p&gt;对于这2个函数的任意一个，当前仅当满足下面的条件时，编译器才会自动生成它们：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;有地方需要用到它&lt;/li&gt;
+&lt;li&gt;用户没有自定义复制操作函数(copy operations)，即复制构造函数(copy constructor)和赋值操作符(copy assignment operator)&lt;/li&gt;
+&lt;li&gt;用户没有自定义移动操作函数(move operations)&lt;/li&gt;
+&lt;li&gt;用户没有自定义析构函数&lt;/li&gt;
+&lt;/ul&gt;
 </description>
         <pubDate>Sun, 08 Nov 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-6/</link>
@@ -805,9 +820,9 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
 &lt;span class=&quot;lineno&quot;&gt;16&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_Ty&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;这个东西，其实一目了然了，用3个重载保证remove&lt;em&gt;reference&amp;lt;类型&amp;gt;::type肯定没有&amp;amp;符号。后面的2个重载是必须的，当只定义了不带&amp;amp;符号的remove&lt;/em&gt;reference时，remove_reference会没有效果。&lt;/p&gt;
+&lt;p&gt;这个东西，其实一目了然了，用3个重载保证remove_reference&amp;lt;类型&amp;gt;::type肯定没有&amp;amp;符号。后面的2个重载是必须的，当只定义了不带&amp;amp;符号的remove_reference时，remove_reference会没有效果。&lt;/p&gt;
 
-&lt;p&gt;其中比较诡异的是，后面的2个同名是不能单独存在的(会编译报错)，必须先定义不带&amp;amp;符号的remove&lt;em&gt;reference，才能定义带&amp;amp;符号的remove&lt;/em&gt;reference。(可以自己编译试试)&lt;/p&gt;
+&lt;p&gt;其中比较诡异的是，后面的2个同名是不能单独存在的(会编译报错)，必须先定义不带&amp;amp;符号的remove_reference，才能定义带&amp;amp;符号的remove_reference。(可以自己编译试试)&lt;/p&gt;
 
 &lt;p&gt;remove_reference在std::forward里会被使用。&lt;/p&gt;
 
@@ -1415,13 +1430,13 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
 
 &lt;h2&gt;SVD的求法&lt;/h2&gt;
 
-&lt;p&gt;SVD的解法有很多种而且看起来很复杂，比如这篇文章就列举了很多种:&lt;a href=&quot;http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf&quot;&gt;http://www.cs.utexas.edu/users/inderjit/public&lt;em&gt;papers/HLA&lt;/em&gt;SVD.pdf&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;SVD的解法有很多种而且看起来很复杂，比如这篇文章就列举了很多种:&lt;a href=&quot;http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf&quot;&gt;http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;因为矩阵有稠密和稀疏之分，所以针对不同的矩阵就有不同的解法。学习SVD的解法想必是一件艰苦的事情。因为目前还没有深入学习SVD的需求，所以博主就此罢笔。&lt;/p&gt;
 
 &lt;h2&gt;参考资料&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Singular_value_decomposition&quot;&gt;https://en.wikipedia.org/wiki/Singular&lt;em&gt;value&lt;/em&gt;decomposition&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Singular_value_decomposition&quot;&gt;https://en.wikipedia.org/wiki/Singular_value_decomposition&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 27 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-9/</link>
@@ -1744,7 +1759,7 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
 
 &lt;p&gt;在&lt;a href=&quot;https://gcc.gnu.org/mirrors.html&quot;&gt;https://gcc.gnu.org/mirrors.html&lt;/a&gt;下载源码包到机器上并解压：&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;wget http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;wget &lt;a href=&quot;http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz&quot;&gt;http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;tar -xzvf gcc-4.9.3.tar.gz&lt;/strong&gt;&lt;/p&gt;
 
@@ -1768,7 +1783,7 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
 &lt;h3&gt;坑1&lt;/h3&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;configure: error: Building GCC requires GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+. Try the --with-gmp, --with-mpfr and/or --with-mpc options to specify their locations.  Source code for these libraries can be found at their respective hosting sites as well as at ftp://gcc.gnu.org/pub/gcc/infrastructure/.  See also http://gcc.gnu.org/install/prerequisites.html for additional info.  If you obtained GMP, MPFR and/or MPC from a vendor distribution package, make sure that you have installed both the libraries and the header files.  They may be located in separate packages.&lt;/p&gt;
+&lt;p&gt;configure: error: Building GCC requires GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+. Try the --with-gmp, --with-mpfr and/or --with-mpc options to specify their locations.  Source code for these libraries can be found at their respective hosting sites as well as at &lt;a href=&quot;ftp://gcc.gnu.org/pub/gcc/infrastructure/&quot;&gt;ftp://gcc.gnu.org/pub/gcc/infrastructure/&lt;/a&gt;.  See also &lt;a href=&quot;http://gcc.gnu.org/install/prerequisites.html&quot;&gt;http://gcc.gnu.org/install/prerequisites.html&lt;/a&gt; for additional info.  If you obtained GMP, MPFR and/or MPC from a vendor distribution package, make sure that you have installed both the libraries and the header files.  They may be located in separate packages.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;说是需要GMP 4.2+、MPFR 2.4.0+、MPC 0.8.0+。不知道是什么鬼。上次编译好像也有见到这个提示。&lt;/p&gt;
@@ -2075,9 +2090,9 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;于是，积分等式就只剩下：&lt;/p&gt;
 
-&lt;p&gt;\[ \int _{0}^{1}c_{k}dt = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+&lt;p&gt;\[ \int _{0}&lt;sup&gt;{1}c_{k}dt&lt;/sup&gt; = \int _{0}&lt;sup&gt;{1}e^{-2\pi&lt;/sup&gt; ikt }f(t)dt \]&lt;/p&gt;
 
-&lt;p&gt;\[ (1-0)c_{k} = c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+&lt;p&gt;\[ (1-0)c_{k} = c_{k} = \int _{0}&lt;sup&gt;{1}e^{-2\pi&lt;/sup&gt; ikt }f(t)dt \]&lt;/p&gt;
 
 &lt;p&gt;这就是\(c_{k}\)的积分形式。&lt;/p&gt;
 
@@ -2089,7 +2104,7 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;那么其中的\(c_{k}\)必然满足：&lt;/p&gt;
 
-&lt;p&gt;\[ c_{k} = \int _{0}^{1}e^{-2\pi ikt }f(t)dt \]&lt;/p&gt;
+&lt;p&gt;\[ c_{k} = \int _{0}&lt;sup&gt;{1}e^{-2\pi&lt;/sup&gt; ikt }f(t)dt \]&lt;/p&gt;
 
 &lt;h3&gt;求解\(c_{k}\)的非积分形式&lt;/h3&gt;
 
@@ -2137,7 +2152,7 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
 
 &lt;p&gt;其中的\(c_{k}\)有一个专门的notation：\( \hat {f}(t) \)，代入后得到：&lt;/p&gt;
 
-&lt;p&gt;\[ \hat {f}(t) = \int _{-\frac {1}{2} }^{\frac {1}{2} }f(t)e^{-2\pi ikt}dt \]&lt;/p&gt;
+&lt;p&gt;\[ \hat {f}(t) = \int _{-\frac {1}{2} }&lt;sup&gt;{\frac&lt;/sup&gt; {1}{2} }f(t)e^{-2\pi ikt}dt \]&lt;/p&gt;
 
 &lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }\hat {f}(t)e^{2\pi ikt} \]&lt;/p&gt;
 

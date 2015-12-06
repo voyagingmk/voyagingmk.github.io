@@ -148,24 +148,24 @@
 <li><p>矩阵可以做幂运算：</p>
 
 <ol>
-<li>\( \mathbf{ A^{k}A^{t} = A^{k+t} } \)</li>
-<li>\( \mathbf{ (A^{k})^{t} = A^{kt} } \)</li>
-<li>若 AB = BA，则 \( \mathbf{ (AB)^{k} = A^{k}B^{k} } \)</li>
-<li>注意，即使 \( \mathbf{ A^{k} = O } \)，也并不意味着\( \mathbf{  A = O } \)</li>
+<li>\( \mathbf{ A<sup>{k}A<sup>{t}</sup></sup> = A<sup>{k+t}</sup> } \)</li>
+<li>\( \mathbf{ (A<sup>{k})<sup>{t}</sup></sup> = A<sup>{kt}</sup> } \)</li>
+<li>若 AB = BA，则 \( \mathbf{ (AB)<sup>{k}</sup> = A<sup>{k}B<sup>{k}</sup></sup> } \)</li>
+<li>注意，即使 \( \mathbf{ A<sup>{k}</sup> = O } \)，也并不意味着\( \mathbf{  A = O } \)</li>
 </ol></li>
 </ol>
 
 <h2>矩阵的转置</h2>
 
-<p>将\( m\times n \)矩阵 A = \( a_{ij} \)的行和列互换，得到的\( n\times m \)矩阵，称为矩阵A的转置矩阵，简称A的转置，记为\( A^{T} \)。</p>
+<p>将\( m\times n \)矩阵 A = \( a_{ij} \)的行和列互换，得到的\( n\times m \)矩阵，称为矩阵A的转置矩阵，简称A的转置，记为\( A<sup>{T}</sup> \)。</p>
 
 <p>矩阵的转置有以下性质：</p>
 
 <ol>
-<li>\( \mathbf{ (A^{T})^{T} = A }  \)</li>
-<li>\( \mathbf{ (A+B)^{T}=A^{T}+B^{T} } \)</li>
-<li>\( \mathbf{ (kA)^{T}=kA^{T} } \)</li>
-<li>\( \mathbf{ (AB)^{T}=B^{T}A^{T} } \)</li>
+<li>\( \mathbf{ (A<sup>{T})<sup>{T}</sup></sup> = A }  \)</li>
+<li>\( \mathbf{ (A+B)<sup>{T}=A<sup>{T}+B<sup>{T}</sup></sup></sup> } \)</li>
+<li>\( \mathbf{ (kA)<sup>{T}=kA<sup>{T}</sup></sup> } \)</li>
+<li>\( \mathbf{ (AB)<sup>{T}=B<sup>{T}A<sup>{T}</sup></sup></sup> } \)</li>
 </ol>
 
 <h2>方阵的行列式</h2>
@@ -218,10 +218,10 @@
 
 <h3>行列式</h3>
 
-<p>定义：由 \( n^{2} \)个元素\( a_{ij} \) 排成n行n列组成的式子：</p>
+<p>定义：由 \( n<sup>{2}</sup> \)个元素\( a_{ij} \) 排成n行n列组成的式子：</p>
 
 <p>\( \left| \begin{matrix} a_{11}\ a_{12}\ \ldots\ a_{1n}\\ a_{21}\ a_{22}\ \ldots\ a_{2n}\\ \vdots\ \ \ \ \ \vdots\ \ \ \ \ \vdots\ \ \ \ \ \vdots\ \ \ \ \\ a_{n1}\ a_{n2}\ \ldots\ a_{nn}\\ \end{matrix} \right| \)
-\( = \sum _{ j_{1}j_{2}\ldots j_{n} }(-1)^{\gamma (j_{1}j_{2}\ldots j_{n} ) }a_{1 j_{1}}a_{2 j_{2} }\ldots a_{n j_{n} } \)</p>
+\( = \sum _{ j_{1}j_{2}\ldots j_{n} }(-1)<sup>{\gamma</sup> (j_{1}j_{2}\ldots j_{n} ) }a_{1 j_{1}}a_{2 j_{2} }\ldots a_{n j_{n} } \)</p>
 
 <p>它的计算结果被称为行列式(Determinant)。</p>
 
@@ -231,7 +231,7 @@
 <p>行列式的性质：</p>
 
 <ol>
-<li>\( D^{T} = D \)</li>
+<li>\( D<sup>{T}</sup> = D \)</li>
 <li>交换行列式的两行(列)，行列式变号</li>
 <li>用数k乘行列式的某一行(列)，等于用数k乘此行列式</li>
 <li>若行列式有一行(列)的元素全为零，则行列式等于零</li>
@@ -246,7 +246,7 @@
 
 <p>在n阶行列式 D = det( \( a_{ij} \) )中，划去元素\( a_{ij} \)所在的第i行和第j列后，余下的元素按原来的相对位置构成的n-1阶行列式，称为D中元素\( a_{ij} \)的余子式，记为\( M_{ij} \)。</p>
 
-<p>再记\( A_{ij} =(-1)^{i+j}M_{ij} \)，称\( A_{ij} \)为元素\( a_{ij} \)的代数余子式。</p>
+<p>再记\( A_{ij} =(-1)<sup>{i+j}M_{ij}</sup> \)，称\( A_{ij} \)为元素\( a_{ij} \)的代数余子式。</p>
 
 <p>引理:</p>
 
@@ -265,11 +265,11 @@
 <h2>行列式与转置矩阵之间的一些公式：</h2>
 
 <ol>
-<li>\( \mathbf{ |A^{T}| = |A| } \)</li>
-<li>\( \mathbf{ |kA| = k^{n}|A| } \)</li>
+<li>\( \mathbf{ |A<sup>{T}|</sup> = |A| } \)</li>
+<li>\( \mathbf{ |kA| = k<sup>{n}|A|</sup> } \)</li>
 <li>\( \mathbf{ |AB| = |A||B| } \)</li>
 <li>\( \mathbf{ |AB| = |BA| } \)</li>
-<li>\( \mathbf{ |A^{n}| = |A|^{n} } \)</li>
+<li>\( \mathbf{ |A<sup>{n}|</sup> = |A|<sup>{n}</sup> } \)</li>
 </ol>
 
 <h2>线性方程组与行列式</h2>
