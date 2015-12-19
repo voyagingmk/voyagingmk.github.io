@@ -18,6 +18,10 @@
 
 &lt;p&gt;\[ A = LL^{T} \]&lt;/p&gt;
 
+&lt;p&gt;L是下三角矩阵。&lt;/p&gt;
+
+&lt;h2&gt;推导过程&lt;/h2&gt;
+
 &lt;p&gt;因为A是对称的矩阵，所以设A为：&lt;/p&gt;
 
 &lt;p&gt;\[ A =  \left[ \begin{matrix} a_{11}&amp;amp;A_{21}^{T}\\ A_{21}&amp;amp;A_{22}\\ \end{matrix} \right] \]&lt;/p&gt;
@@ -42,7 +46,7 @@
 
 &lt;p&gt;\[ l_{11} = \sqrt {a_{11}} \]&lt;/p&gt;
 
-&lt;p&gt;\[ L_{21} = l_{11}A_{21} \]&lt;/p&gt;
+&lt;p&gt;\[ L_{21} = \frac {1}{l_{11}}A_{21} \]&lt;/p&gt;
 
 &lt;p&gt;\[ L_{22}L_{22}^{T} =  A_{22} - L_{21}L_{21}^{T} \]&lt;/p&gt;
 
@@ -62,9 +66,29 @@
 
 &lt;p&gt;设:&lt;/p&gt;
 
-&lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{11}&amp;amp;0&amp;amp;0\\ l_{21}&amp;amp;l_{22}&amp;amp;0\\ l_{31}&amp;amp;l_{32}&amp;amp;l_{33}\\ \end{matrix} \right] \left[ \begin{matrix} l_{11}&amp;amp;l_{21}&amp;amp;l_{31}\\ 0&amp;amp;l_{22}&amp;amp;l_{32}\\ 0&amp;amp;0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
 
-&lt;p&gt;Cholesky分解证明过程(略)。&lt;/p&gt;
+&lt;p&gt;\[ l_{11} = \sqrt { a_{11} } = 5 \]
+\[ L_{21} = \frac {1}{l_{11}}A_{21} = \frac {1}{5} \left[ \begin{matrix} 15\\ -5\\ \end{matrix} \right] =  \left[ \begin{matrix} 3\\ -1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{22} - L_{21}L_{21}^{T}  =  L_{22}L_{22}^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{22} - L_{21}L_{21}^{T}  =  L_{22}L_{22}^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} 18&amp;amp;0\\ 0&amp;amp;11\\ \end{matrix} \right] -  \left[ \begin{matrix} 3\\ -1\\ \end{matrix} \right] \left[ \begin{matrix} 3&amp;amp;-1\\ \end{matrix} \right] =   \left[ \begin{matrix} l_{22}&amp;amp;0\\ l_{32}&amp;amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;amp;l_{32}\\ 0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} 18&amp;amp;0\\ 0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{22}&amp;amp;0\\ l_{32}&amp;amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;amp;l_{32}\\ 0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;(注意，这里已经是n-1阶的Cholesky分解)&lt;/p&gt;
+
+&lt;p&gt;\[ l_{22} = \sqrt { 9 } = 3 \]
+\[ l_{32} = \frac {1}{3}3 = 1 \]
+\[ 10 = 1 + l_{33}^{2} \]
+\[ l_{33} = \sqrt {10 - 1} = 3 \]&lt;/p&gt;
+
+&lt;p&gt;综上：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} 5&amp;amp;0&amp;amp;0\\ 3&amp;amp;3&amp;amp;0\\ -1&amp;amp;1&amp;amp;3\\ \end{matrix} \right] \left[ \begin{matrix} 5&amp;amp;3&amp;amp;-1\\ 0&amp;amp;3&amp;amp;1\\ 0&amp;amp;0&amp;amp;3\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-11/</link>
