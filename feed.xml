@@ -16,7 +16,9 @@
 然后对A&amp;#39;进行高斯消元，也就是通过row operation不断对A&amp;#39;做变换，直到A&amp;#39;的左边的A变成单位矩阵时，A&amp;#39;的右边部分就是A的逆矩阵了。
 要注意的是，A不一定有逆矩阵，当A没有逆矩阵时，这个高斯消元过程中肯定会出现A的某row全是0的情况。&lt;/p&gt;
 
-&lt;p&gt;举例说明（例子：&lt;/p&gt;
+&lt;!--more--&gt;
+
+&lt;p&gt;举例说明：&lt;/p&gt;
 
 &lt;p&gt;设A：&lt;/p&gt;
 
@@ -85,23 +87,23 @@
 
 &lt;p&gt;\[ A =  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3\\ 2&amp;amp;5&amp;amp;3\\ 1&amp;amp;0&amp;amp;8\\ \end{matrix} \right] \]&lt;/p&gt;
 
-&lt;p&gt;\[ A_{11} = (-1)^{1+1}   \left| \begin{matrix} 5\ 3\\ 0\ 8\\ \end{matrix} \right| = 40 \]&lt;/p&gt;
+&lt;p&gt;\( A_{11} = (-1)^{1+1}   \left| \begin{matrix} 5\ 3\\ 0\ 8\\ \end{matrix} \right| = 40 \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{12} = (-1)^{1+2}   \left| \begin{matrix} 2\ 3\\ 1\ 8\\ \end{matrix} \right| = -13\]&lt;/p&gt;
+&lt;p&gt;\( A_{12} = (-1)^{1+2}   \left| \begin{matrix} 2\ 3\\ 1\ 8\\ \end{matrix} \right| = -13\)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{13} = (-1)^{1+3}   \left| \begin{matrix} 2\ 5\\ 1\ 0\\ \end{matrix} \right| = -5\]&lt;/p&gt;
+&lt;p&gt;\( A_{13} = (-1)^{1+3}   \left| \begin{matrix} 2\ 5\\ 1\ 0\\ \end{matrix} \right| = -5 \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{21} = (-1)^{2+1}   \left| \begin{matrix} 2\ 3\\ 0\ 8\\ \end{matrix} \right| = -16\]&lt;/p&gt;
+&lt;p&gt;\( A_{21} = (-1)^{2+1}   \left| \begin{matrix} 2\ 3\\ 0\ 8\\ \end{matrix} \right| = -16 \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{22} = (-1)^{2+2}   \left| \begin{matrix} 1\ 3\\ 1\ 8\\ \end{matrix} \right| = 5 \]&lt;/p&gt;
+&lt;p&gt;\( A_{22} = (-1)^{2+2}   \left| \begin{matrix} 1\ 3\\ 1\ 8\\ \end{matrix} \right| = 5  \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{23} = (-1)^{2+3}   \left| \begin{matrix} 1\ 2\\ 1\ 0\\ \end{matrix} \right| = 2 \]&lt;/p&gt;
+&lt;p&gt;\( A_{23} = (-1)^{2+3}   \left| \begin{matrix} 1\ 2\\ 1\ 0\\ \end{matrix} \right| = 2  \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{31} = (-1)^{3+1}   \left| \begin{matrix} 2\ 3\\ 5\ 3\\ \end{matrix} \right| = -9 \]&lt;/p&gt;
+&lt;p&gt;\( A_{31} = (-1)^{3+1}   \left| \begin{matrix} 2\ 3\\ 5\ 3\\ \end{matrix} \right| = -9  \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{32} = (-1)^{3+2}   \left| \begin{matrix} 1\ 3\\ 2\ 3\\ \end{matrix} \right| = 3 \]&lt;/p&gt;
+&lt;p&gt;\( A_{32} = (-1)^{3+2}   \left| \begin{matrix} 1\ 3\\ 2\ 3\\ \end{matrix} \right| = 3  \)&lt;/p&gt;
 
-&lt;p&gt;\[ A_{33} = (-1)^{3+3}   \left| \begin{matrix} 1\ 2\\ 2\ 5\\ \end{matrix} \right| = 1 \]&lt;/p&gt;
+&lt;p&gt;\( A_{33} = (-1)^{3+3}   \left| \begin{matrix} 1\ 2\\ 2\ 5\\ \end{matrix} \right| = 1  \)&lt;/p&gt;
 
 &lt;p&gt;于是:&lt;/p&gt;
 
@@ -113,7 +115,8 @@
 
 &lt;h2&gt;参考资料&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://www.mathportal.org/linear-algebra/matrices/gauss-jordan.php&quot;&gt;Inverse of a matrix by Gauss-Jordan elimination&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.mathportal.org/linear-algebra/matrices/gauss-jordan.php&quot;&gt;Inverse of a matrix by Gauss-Jordan elimination&lt;/a&gt;
+&lt;a href=&quot;http://www.sosmath.com/matrix/inverse/inverse.html&quot;&gt;Determinant and Inverse of Matrices&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-10/</link>
