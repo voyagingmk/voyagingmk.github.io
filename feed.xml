@@ -7,6 +7,120 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之逆矩阵</title>
+        <description>&lt;p&gt;逆矩阵是一个很基本的概念，这里就不说定义了。本文只介绍求解方法。&lt;/p&gt;
+
+&lt;h2&gt;高斯消元法(Gauss-Jordan elimination)&lt;/h2&gt;
+
+&lt;p&gt;先在要求解逆矩阵的A的右边增加一个临时的单位矩阵（阶数显然和A一致）。那么A就变成了一个n行、2n列的矩阵A&amp;#39;。
+然后对A&amp;#39;进行高斯消元，也就是通过row operation不断对A&amp;#39;做变换，直到A&amp;#39;的左边的A变成单位矩阵时，A&amp;#39;的右边部分就是A的逆矩阵了。
+要注意的是，A不一定有逆矩阵，当A没有逆矩阵时，这个高斯消元过程中肯定会出现A的某row全是0的情况。&lt;/p&gt;
+
+&lt;p&gt;举例说明（例子：&lt;/p&gt;
+
+&lt;p&gt;设A：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3\\ 2&amp;amp;5&amp;amp;3\\ 1&amp;amp;0&amp;amp;8\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;扩展A，在A的右边增加(Adjoin)一个单位矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ A&amp;#39; =  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 2&amp;amp;5&amp;amp;3&amp;amp;0&amp;amp;1&amp;amp;0\\ 1&amp;amp;0&amp;amp;8&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;开始变换：&lt;/p&gt;
+
+&lt;p&gt;\(  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 2&amp;amp;5&amp;amp;3&amp;amp;0&amp;amp;1&amp;amp;0\\ 1&amp;amp;0&amp;amp;8&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \xrightarrow{ R_{2}=R_{2}-2R_{1}, R_{3}=R_{3}-R_{1} }   \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 2-2*1&amp;amp;5-2*2&amp;amp;3-2*3&amp;amp;0-2*1&amp;amp;1-2*0&amp;amp;0-2*0\\ 1-1&amp;amp;0-2&amp;amp;8-3&amp;amp;0-1&amp;amp;0-0&amp;amp;1-0\\ \end{matrix} \right]\)&lt;/p&gt;
+
+&lt;p&gt;\(  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;-3&amp;amp;-2&amp;amp;1&amp;amp;0\\ 0&amp;amp;-2&amp;amp;5&amp;amp;-1&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \xrightarrow{ R_{3}=R_{3}+2R_{2} }   \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;-3&amp;amp;-2&amp;amp;1&amp;amp;0\\ 0+2*0&amp;amp;-2+2*1&amp;amp;5+2*(-3)&amp;amp;-1+2*(-2)&amp;amp;0+2*1&amp;amp;1+2*0\\ \end{matrix} \right]\)&lt;/p&gt;
+
+&lt;p&gt;\(  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;-3&amp;amp;-2&amp;amp;1&amp;amp;0\\ 0&amp;amp;-0&amp;amp;-1&amp;amp;-5&amp;amp;2&amp;amp;1\\ \end{matrix} \right] \xrightarrow{ R_{3}=-R_{3} }   \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;-3&amp;amp;-2&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1&amp;amp;5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right]\)&lt;/p&gt;
+
+&lt;p&gt;\(  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3&amp;amp;1&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;-3&amp;amp;-2&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;1&amp;amp;5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right] \xrightarrow{ R_{1}=R_{1}-3R_{3},R_{2}=R_{2}+3R_{3} }   \left[ \begin{matrix} 1&amp;amp;2&amp;amp;0&amp;amp;-14&amp;amp;6&amp;amp;3\\ 0&amp;amp;1&amp;amp;0&amp;amp;13&amp;amp;-5&amp;amp;-3\\ 0&amp;amp;0&amp;amp;1&amp;amp;5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right]\)&lt;/p&gt;
+
+&lt;p&gt;\(  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;0&amp;amp;-14&amp;amp;6&amp;amp;3\\ 0&amp;amp;1&amp;amp;0&amp;amp;13&amp;amp;-5&amp;amp;-3\\ 0&amp;amp;0&amp;amp;1&amp;amp;5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right] \xrightarrow{ R_{1}=R_{1}-2R_{2} }   \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;-40&amp;amp;16&amp;amp;9\\ 0&amp;amp;1&amp;amp;0&amp;amp;13&amp;amp;-5&amp;amp;-3\\ 0&amp;amp;0&amp;amp;1&amp;amp;5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right]\)&lt;/p&gt;
+
+&lt;p&gt;所以A的逆矩阵为：&lt;/p&gt;
+
+&lt;p&gt;\[  A^{-1} =  \left[ \begin{matrix} -40&amp;amp;16&amp;amp;9\\ 13&amp;amp;-5&amp;amp;-3\\ 5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h2&gt;伴随矩阵求逆法&lt;/h2&gt;
+
+&lt;p&gt;先回顾下2个定理：&lt;/p&gt;
+
+&lt;p&gt;1.n阶行列式\(D=det(a_{ij}) \)等于它的任一行(列)的各元素与其代数余子式乘积之和，即：&lt;/p&gt;
+
+&lt;p&gt;\[ D = a_{i1}A_{i1}+a_{i2}A_{i2}+\cdots + a_{in}A_{in} , i = 1,2,\cdots ,n \]
+\[ D = a_{1j}A_{1j}+a_{2j}A_{2j}+\cdots + a_{nj}A_{nj} , j = 1,2,\cdots ,n \]&lt;/p&gt;
+
+&lt;p&gt;2.n阶行列式\(D=det(a_{ij}) \)的某一行(列)的元素与另一行(列)对应元素的代数余子式乘积之和等于零，即：&lt;/p&gt;
+
+&lt;p&gt;\[ D = a_{i1}A_{s1}+a_{i2}A_{s2}+\cdots + a_{in}A_{sn} , i \neq s \]
+\[ D = a_{1j}A_{1t}+a_{2j}A_{2t}+\cdots + a_{nj}A_{nt} , j \neq t \]&lt;/p&gt;
+
+&lt;p&gt;以及伴随矩阵的定义：&lt;/p&gt;
+
+&lt;p&gt;设\(A=(a_{ij})_{nXm}\)，\(A_{ij}\)是A的行列式\( |A|=det(a_{ij}) \)的元素\( a_{ij} \)的代数余子式\( (i,j=1,2,\cdots,n)\), 则有：&lt;/p&gt;
+
+&lt;p&gt;\[ (A^{*}) ^{T} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;\ldots&amp;amp;A_{1n}\\ A_{21}&amp;amp;A_{22}&amp;amp;\ldots&amp;amp;A_{2n}\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{n1}&amp;amp;A_{n2}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ A^{*} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;\ldots&amp;amp;A_{n1}\\ A_{12}&amp;amp;A_{22}&amp;amp;\ldots &amp;amp;A_{n2}\\ \vdots \ \ \ \ &amp;amp;\vdots  \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{1n}&amp;amp;A_{2n}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\(A^{*} \)称为伴随矩阵。&lt;/p&gt;
+
+&lt;p&gt;利用上面2条定理，计算\(AA^{*}\):&lt;/p&gt;
+
+&lt;p&gt;\[ AA^{*} =  \left[ \begin{matrix} a_{11}&amp;amp;a_{12}&amp;amp;\ldots&amp;amp;a_{1n}\\ a_{21}&amp;amp;a_{22}&amp;amp;\ldots&amp;amp;a_{2n}\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ a_{n1}&amp;amp;a_{n2}&amp;amp;\ldots &amp;amp;a_{nn}\\ \end{matrix} \right] \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;\ldots&amp;amp;A_{n1}\\ A_{12}&amp;amp;A_{22}&amp;amp;\ldots &amp;amp;A_{n2}\\ \vdots \ \ \ \ &amp;amp;\vdots  \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{1n}&amp;amp;A_{2n}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]\]&lt;/p&gt;
+
+&lt;p&gt;\[  =  \left[ \begin{matrix} |A|&amp;amp;0&amp;amp;\ldots&amp;amp;0\\ 0&amp;amp;|A|&amp;amp;\ldots&amp;amp;0\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ 0&amp;amp;0&amp;amp;\ldots &amp;amp;|A|\\ \end{matrix} \right]  = |A|E \]&lt;/p&gt;
+
+&lt;p&gt;即:
+\[ AA^{*}  = |A|E \]&lt;/p&gt;
+
+&lt;p&gt;从而有：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{-1}  = \frac {1}{|A|}A^{*} \]&lt;/p&gt;
+
+&lt;p&gt;因为用这条公式求逆矩阵要计算\( A^{*}  \)和|A|，这个计算太慢了。所以可以认为这个解法对阶数&amp;lt;=3的矩阵才实用。&lt;/p&gt;
+
+&lt;p&gt;现在用伴随矩阵求逆法来求第一节中的A的逆矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 1&amp;amp;2&amp;amp;3\\ 2&amp;amp;5&amp;amp;3\\ 1&amp;amp;0&amp;amp;8\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{11} = (-1)^{1+1}   \left| \begin{matrix} 5\ 3\\ 0\ 8\\ \end{matrix} \right| = 40 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{12} = (-1)^{1+2}   \left| \begin{matrix} 2\ 3\\ 1\ 8\\ \end{matrix} \right| = -13\]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{13} = (-1)^{1+3}   \left| \begin{matrix} 2\ 5\\ 1\ 0\\ \end{matrix} \right| = -5\]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{21} = (-1)^{2+1}   \left| \begin{matrix} 2\ 3\\ 0\ 8\\ \end{matrix} \right| = -16\]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{22} = (-1)^{2+2}   \left| \begin{matrix} 1\ 3\\ 1\ 8\\ \end{matrix} \right| = 5 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{23} = (-1)^{2+3}   \left| \begin{matrix} 1\ 2\\ 1\ 0\\ \end{matrix} \right| = 2 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{31} = (-1)^{3+1}   \left| \begin{matrix} 2\ 3\\ 5\ 3\\ \end{matrix} \right| = -9 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{32} = (-1)^{3+2}   \left| \begin{matrix} 1\ 3\\ 2\ 3\\ \end{matrix} \right| = 3 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A_{33} = (-1)^{3+3}   \left| \begin{matrix} 1\ 2\\ 2\ 5\\ \end{matrix} \right| = 1 \]&lt;/p&gt;
+
+&lt;p&gt;于是:&lt;/p&gt;
+
+&lt;p&gt;\[ A^{*} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;A_{31}\\ A_{12}&amp;amp;A_{22}&amp;amp;A_{32}\\ A_{13}&amp;amp;A_{23}&amp;amp;A_{33}\\ \end{matrix} \right] =  \left[ \begin{matrix} 40&amp;amp;-16&amp;amp;-9\\ -13&amp;amp;5&amp;amp;3\\ -5&amp;amp;2&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ |A| =  a_{31}A_{31} + a_{32}A_{32} + a_{33}A_{33} = 1*(-9) + 0*3 + 8*1 = -1 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A^{-1}  = \frac {1}{|A|}A^{*} =  \left[ \begin{matrix} -40&amp;amp;16&amp;amp;9\\ 13&amp;amp;-5&amp;amp;-3\\ 5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right]   \]&lt;/p&gt;
+
+&lt;h2&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.mathportal.org/linear-algebra/matrices/gauss-jordan.php&quot;&gt;Inverse of a matrix by Gauss-Jordan elimination&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-10/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-10/</guid>
+      </item>
+    
+      <item>
         <title>《Effective Modern C++》读书笔记</title>
         <description>&lt;p&gt;Note：为避免各种侵权问题，本文并没有复制原书任意文字(代码除外，作者已经声明代码可以被使用)。需要原书完整中文翻译的读者请等待官方译本的发布。&lt;/p&gt;
 
@@ -2392,94 +2506,6 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
         <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/fourier-equation/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/fourier-equation/</guid>
-      </item>
-    
-      <item>
-        <title>复数和三角函数</title>
-        <description>&lt;h2&gt;欧拉公式&lt;/h2&gt;
-
-&lt;p&gt;复数和三角函数有密切的联系，因为大神欧拉发现了这样的公式：&lt;/p&gt;
-
-&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.10/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;(图片来自
-&lt;a href=&quot;https://en.wikipedia.org/wiki/Euler%27s_formula&quot;&gt;wikipedia-Euler-formula&lt;/a&gt;)&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;怎么推导出欧拉公式?&lt;/h2&gt;
-
-&lt;p&gt;设z是复数平面的一个复数，且用三角函数来表示它的实数和虚数：&lt;/p&gt;
-
-&lt;p&gt;\[ z = \cos \theta + i\sin \theta \]&lt;/p&gt;
-
-&lt;p&gt;两边算微分:&lt;/p&gt;
-
-&lt;p&gt;\[ dz = (-\sin \theta + i\cos \theta)d\theta \]&lt;/p&gt;
-
-&lt;p&gt;提取i:&lt;/p&gt;
-
-&lt;p&gt;\[ dz = i( \cos \theta + i\sin \theta )d\theta \]&lt;/p&gt;
-
-&lt;p&gt;注意看，括号内的东西，不就是z嘛，所以有:&lt;/p&gt;
-
-&lt;p&gt;\[ dz = izd\theta \]&lt;/p&gt;
-
-&lt;p&gt;换个写法:&lt;/p&gt;
-
-&lt;p&gt;\[ \frac {1}{z}dz = id\theta \]&lt;/p&gt;
-
-&lt;p&gt;两边求积分:&lt;/p&gt;
-
-&lt;p&gt;\[ \int_{}^{} \frac {1}{z}dz = \int_{}^{} id\theta \]&lt;/p&gt;
-
-&lt;p&gt;\[ \ln z = i\theta \]&lt;/p&gt;
-
-&lt;p&gt;注意，右边的积分，是把i当做常数看待的，所以i直接被提取出来。&lt;/p&gt;
-
-&lt;p&gt;再写出这个式子的指数形式:&lt;/p&gt;
-
-&lt;p&gt;\[ e^{\ln z} = e^{i\theta } \]&lt;/p&gt;
-
-&lt;p&gt;\[ z = e^{i\theta } = \cos \theta + i\sin \theta \]&lt;/p&gt;
-
-&lt;p&gt;推导完毕。&lt;/p&gt;
-
-&lt;h2&gt;欧拉公式的延伸特性&lt;/h2&gt;
-
-&lt;p&gt;由:&lt;/p&gt;
-
-&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
-
-&lt;p&gt;得到:&lt;/p&gt;
-
-&lt;p&gt;\[ e^{-ix} = \cos (-x) + i\sin (-x) = \cos x - i\sin x \]&lt;/p&gt;
-
-&lt;p&gt;上面两个等式相加:&lt;/p&gt;
-
-&lt;p&gt;\[ e^{ix} + e^{-ix} = (\cos x + i\sin x) + (\cos x - i\sin x) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = 2\cos x \]&lt;/p&gt;
-
-&lt;p&gt;所以有:&lt;/p&gt;
-
-&lt;p&gt;\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]&lt;/p&gt;
-
-&lt;p&gt;同样的，把上面2个等式相减:&lt;/p&gt;
-
-&lt;p&gt;\[ e^{ix} - e^{-ix} = (\cos x + i\sin x) - (\cos x - i\sin x) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = 2i\sin x \]&lt;/p&gt;
-
-&lt;p&gt;所以有:&lt;/p&gt;
-
-&lt;p&gt;\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]&lt;/p&gt;
-</description>
-        <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/complex-1/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/complex-1/</guid>
       </item>
     
   </channel>
