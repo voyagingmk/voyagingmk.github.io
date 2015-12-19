@@ -20,6 +20,8 @@
 
 &lt;p&gt;L是下三角矩阵。&lt;/p&gt;
 
+&lt;!--more--&gt;
+
 &lt;h2&gt;推导过程&lt;/h2&gt;
 
 &lt;p&gt;因为A是对称的矩阵，所以设A为：&lt;/p&gt;
