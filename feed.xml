@@ -7,6 +7,71 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之Cholesky分解</title>
+        <description>&lt;p&gt;又到了矩阵分解时间。这次介绍的是&lt;strong&gt;Cholesky分解&lt;/strong&gt;。这个方法只适用于符合厄米特矩阵、正定矩阵定义的矩阵。&lt;/p&gt;
+
+&lt;h2&gt;算法原理&lt;/h2&gt;
+
+&lt;p&gt;设A是一个n阶厄米特正定矩阵(Hermitian positive-definite matrix)。&lt;/p&gt;
+
+&lt;p&gt;Cholesky分解的目标是把A变成:&lt;/p&gt;
+
+&lt;p&gt;\[ A = LL^{T} \]&lt;/p&gt;
+
+&lt;p&gt;因为A是对称的矩阵，所以设A为：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} a_{11}&amp;amp;A_{21}^{T}\\ A_{21}&amp;amp;A_{22}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;(注意：细心观察此式子可以发现\(A_{21}\)是一个列向量，\(A_{22}\)是一个n-1阶的方阵)&lt;/p&gt;
+
+&lt;p&gt;设L：&lt;/p&gt;
+
+&lt;p&gt;\[ L =  \left[ \begin{matrix} l_{11}&amp;amp;0\\ L_{21}&amp;amp;L_{22}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;则有:&lt;/p&gt;
+
+&lt;p&gt;\[ L^{T} =  \left[ \begin{matrix} l_{11}&amp;amp;L_{21}^{T}\\ 0&amp;amp;L_{22}^{T}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;设\( A = LL^{T} \)，得到：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} a_{11}&amp;amp;A_{21}^{T}\\ A_{21}&amp;amp;A_{22}\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{11}&amp;amp;0\\ L_{21}&amp;amp;L_{22}\\ \end{matrix} \right] \left[ \begin{matrix} l_{11}&amp;amp;L_{21}^{T}\\ 0&amp;amp;L_{22}^{T}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ =  \left[ \begin{matrix} l_{11}^{2}&amp;amp;l_{11}L_{21}^{T}\\ l_{11}L_{21}&amp;amp;L_{21}L_{21}^{T}+L_{22}L_{22}^{T}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;其中，未知量是\( l_{11},L_{21},L_{22} \)，这3个未知量的求解公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ l_{11} = \sqrt {a_{11}} \]&lt;/p&gt;
+
+&lt;p&gt;\[ L_{21} = l_{11}A_{21} \]&lt;/p&gt;
+
+&lt;p&gt;\[ L_{22}L_{22}^{T} =  A_{22} - L_{21}L_{21}^{T} \]&lt;/p&gt;
+
+&lt;p&gt;显然，\( l_{11},L_{21} \)是易求的，而\( L_{22} \)的求解救有意思了。&lt;/p&gt;
+
+&lt;p&gt;观察可以发现，\( A_{22} - L_{21}L_{21}^{T} \)也很好求，\( A_{22} \)已知，\( L_{21}L_{21}^{T} \)是一个对角线矩阵，对角线上的元素只是一个平方，好求。&lt;/p&gt;
+
+&lt;p&gt;那么设\(A_{22}&amp;#39; = A_{22} - L_{21}L_{21}^{T} \)，则剩下的问题就是求:&lt;/p&gt;
+
+&lt;p&gt;\[ A_{22}&amp;#39; = L_{22}L_{22}^{T} \]&lt;/p&gt;
+
+&lt;p&gt;啊，这不也是Cholesky分解！被分解的矩阵是A的右下角的n-1阶子方阵！&lt;/p&gt;
+
+&lt;p&gt;所以这个算法具有递归性质。&lt;/p&gt;
+
+&lt;p&gt;附上一个实例：&lt;/p&gt;
+
+&lt;p&gt;设:&lt;/p&gt;
+
+&lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;Cholesky分解证明过程(略)。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-11/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-11/</guid>
+      </item>
+    
+      <item>
         <title>线性代数之逆矩阵</title>
         <description>&lt;p&gt;逆矩阵是一个很基本的概念，这里就不说定义了。本文只介绍求解方法。&lt;/p&gt;
 
@@ -2022,493 +2087,6 @@ gnattools target-libada target-libgfortran target-libgo target-libffi target-lib
         <pubDate>Thu, 15 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-2/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/cpp-2/</guid>
-      </item>
-    
-      <item>
-        <title>学习傅里叶变换</title>
-        <description>&lt;p&gt;本文主要写的是公式层面的推导，关于傅里叶变换的应用，请到知乎搜索&amp;#39;傅里叶&amp;#39;，能找到很多不错的文章。&lt;/p&gt;
-
-&lt;p&gt;本文主要参考了斯坦福大学Brad Osgood的公开课:&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://open.163.com/special/opencourse/fouriertransforms.html&quot;&gt;http://open.163.com/special/opencourse/fouriertransforms.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;youtube的比较高清:&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=gZNm7L96pfY&quot;&gt;https://www.youtube.com/watch?v=gZNm7L96pfY&lt;/a&gt;&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;傅里叶级数 fourier series&lt;/h2&gt;
-
-&lt;h3&gt;基础&lt;/h3&gt;
-
-&lt;p&gt;翻译一下wiki的fourier series：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;在数学中，傅里叶级数是一个&lt;strong&gt;可以把(有波形的)函数表示成多个简单的sin函数的叠加&lt;/strong&gt;的方法。更形式地说，傅里叶级数能够把任意周期函数(信号)分解成&lt;strong&gt;有限(或无限)个简单的震荡函数的叠加&lt;/strong&gt;，这些震荡函数可以是正弦函数、余弦函数或复指数。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;傅里叶级数的公式定义（不要问为什么长这样，这只是一个定义，不是推出来的公式)：&lt;/p&gt;
-
-&lt;p&gt;\[ S = \sum_{k=1}^{n}A_{k}\sin (2\pi kt+\phi _{k}) \]&lt;/p&gt;
-
-&lt;p&gt;(如果不清楚什么是级数，请戳 &lt;a href=&quot;https://en.wikipedia.org/wiki/Series_(mathematics)&quot;&gt;https://en.wikipedia.org/wiki/Series_(mathematics)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;使用三角函数的一道公式:&lt;/p&gt;
-
-&lt;p&gt;\[ \sin (\alpha + \beta ) = \sin \alpha \cos \beta + \cos \alpha \sin \beta \]&lt;/p&gt;
-
-&lt;p&gt;代入到傅里叶级数，得：&lt;/p&gt;
-
-&lt;p&gt;\[ \sin (2\pi kt + \phi _{k}) =\sin 2\pi kt \cos \phi _{k} + \cos 2\pi kt \sin \phi _{k} \]&lt;/p&gt;
-
-&lt;p&gt;\[ S = \sum_{k=1}^{n}A_{k}\sin 2\pi kt \cos \phi _{k} + \sum_{k=1}^{n}A_{k}\cos 2\pi kt \sin \phi _{k} \]&lt;/p&gt;
-
-&lt;p&gt;再设:&lt;/p&gt;
-
-&lt;p&gt;\[ a_{k} = A_{k}\cos \phi _{k} \]&lt;/p&gt;
-
-&lt;p&gt;\[ b_{k} = A_{k}\sin \phi _{k} \]&lt;/p&gt;
-
-&lt;p&gt;则上面的傅里叶级数被简化成:&lt;/p&gt;
-
-&lt;p&gt;\[ S = \sum_{k=1}^{n}a_{k}\sin 2\pi kt + \sum_{k=1}^{n}b_{k}\cos 2\pi kt \]
-\[  S(x) = \sum_{k=1}^{n}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
-
-&lt;p&gt;这是傅里叶级数的&lt;strong&gt;常用形式1&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;常用形式2&lt;/strong&gt;是这样的：&lt;/p&gt;
-
-&lt;p&gt;\[  S = \frac {A_{0}}{2} + \sum_{k=1}^{n}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
-
-&lt;p&gt;前面多出来的那个东西，先不管它。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;常用形式3&lt;/strong&gt;，是最重要的：用复指数来表示傅里叶级数。&lt;/p&gt;
-
-&lt;p&gt;推导过程，要用到&lt;strong&gt;欧拉公式&lt;/strong&gt;：&lt;/p&gt;
-
-&lt;p&gt;\[ e^{ix} = \cos x + i\sin x\]&lt;/p&gt;
-
-&lt;p&gt;（关于欧拉公式的推导，可以看我的另一篇文章:&lt;a href=&quot;http://www.qiujiawei.com/complex-1&quot;&gt;复数和三角函数&lt;/a&gt; )&lt;/p&gt;
-
-&lt;p&gt;把 \( x = 2\pi kt \)代入到欧拉公式，得到:&lt;/p&gt;
-
-&lt;p&gt;\[   e^{i2\pi kt} = \cos 2\pi kt + i\sin 2\pi kt\]&lt;/p&gt;
-
-&lt;p&gt;再搬出另外两条欧拉公式的推论:&lt;/p&gt;
-
-&lt;p&gt;\[ \cos x = \frac {e^{ix} + e^{-ix}}{2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \sin x = \frac {e^{ix} - e^{-ix}}{2i} \]&lt;/p&gt;
-
-&lt;p&gt;也把 \( x = 2\pi kt \)代入，得到:&lt;/p&gt;
-
-&lt;p&gt;\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]&lt;/p&gt;
-
-&lt;p&gt;这时候，教授突然说，傅里叶级数可以写成:&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;这个式子确实是常用形式3——复指数表示的傅里叶级数。
-但是，这究竟是怎么得到的呢。&lt;/p&gt;
-
-&lt;p&gt;请耐心看下文。&lt;/p&gt;
-
-&lt;h3&gt;复指数形式的傅里叶级数的\(c_{k}\)的性质&lt;/h3&gt;
-
-&lt;p&gt;对于傅里叶级数f(t)，假设它是一个&amp;quot;实信号(real signal)&amp;quot;（一般来说，傅里叶变换处理的目标都是实信号)，
-那么就有等式:&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \overline {f(t)} \]&lt;/p&gt;
-
-&lt;p&gt;即是说，f(t)没有虚部。而又因为：&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \overline {\sum_{k=-n}^{n}c_{k}e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}\overline {e^{2\pi ikt}} = \sum_{k=-n}^{n}\overline {c_{k}}e^{-2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;然后，要注意一个事实是：这个级数是从-n到n的累加，根据加法交换律，这个级数也可以变成从n到-n的累加，也即:&lt;/p&gt;
-
-&lt;p&gt;\[ \sum_{k=-n}^{n} = \sum_{k=n}^{-n}  \]&lt;/p&gt;
-
-&lt;p&gt;于是，把傅里叶级数的k变成-k，就有:&lt;/p&gt;
-
-&lt;p&gt;\[ \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} = \sum_{-k=-n}^{n}c_{-k}e^{-2\pi ikt} = \sum_{k=n}^{-n}c_{-k}e^{-2\pi ikt} = \sum_{k=-n}^{n}c_{-k}e^{-2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;再对比上面的推导，就会发现：&lt;/p&gt;
-
-&lt;p&gt;\[ c_{-k} = \overline {c_{k}} \]&lt;/p&gt;
-
-&lt;p&gt;先记住这个性质，然后继续往下看。&lt;/p&gt;
-
-&lt;p&gt;设有复数z，它必然会满足一个性质：&lt;/p&gt;
-
-&lt;p&gt;\[ z + \overline {z} = 2Re\{ z \} \]&lt;/p&gt;
-
-&lt;p&gt;Re{···}代表取出花括号的复数表达式的实部。&lt;/p&gt;
-
-&lt;p&gt;对于傅里叶级数，也可以把它当成一个复数，再利用刚刚推导出来的\(c_{-k} = \overline {c_{k}} \)，就有：&lt;/p&gt;
-
-&lt;p&gt;\[ c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} = c_{k}e^{2\pi ikt} + c_{-k}e^{-2\pi ikt}\]
-\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}}e^{\overline {2\pi ikt}} \]
-\[ = c_{k}e^{2\pi ikt} + \overline {c_{k}e^{2\pi ikt}} \]
-\[ = 2Re\{ c_{k}e^{2\pi ikt} \} \]&lt;/p&gt;
-
-&lt;p&gt;这个结果表明，\(c_{k}e^{2\pi ikt} + c_{-k}e^{2\pi i(-k)t} \)是一个实数。把这个结论代入到傅里叶级数，就可以得到：&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]
-\[ = \sum_{k=0}^{n}2Re\{ c_{k}e^{2\pi ikt} \} \]
-\[ = 2Re\{ \sum_{k=0}^{n}c_{k}e^{2\pi ikt} \} \]&lt;/p&gt;
-
-&lt;p&gt;注意，这个式子是把0和-0都算进去的。如果不允许signed zero，就要对k=0的情况特殊处理。&lt;/p&gt;
-
-&lt;h3&gt;求解\(c_{k}\)的积分形式&lt;/h3&gt;
-
-&lt;p&gt;回到前面的那个傅里叶级数f(t)：&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;其实是这样子搞出来的：
-先假设傅里叶的&lt;strong&gt;常用形式2&lt;/strong&gt;可以变换成这个等式，然后求\(c_{k}\)，求得出来的话，式子不就成立了嘛。&lt;/p&gt;
-
-&lt;p&gt;为了搞定这个事情，要使用新的招数：积分。&lt;/p&gt;
-
-&lt;p&gt;( 在教授的notes(&lt;a href=&quot;https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf&quot;&gt;https://see.stanford.edu/materials/lsoftaee261/book-fall-07.pdf&lt;/a&gt;]的第10-12页第1.5小节Lost at c，清楚地推导了一遍\(c_{k}\)。 )&lt;/p&gt;
-
-&lt;p&gt;这里我按自己对原文的理解，翻译下。&lt;/p&gt;
-
-&lt;p&gt;我们先随便取了一个k(k在-n到n之间)，然后，对上面的傅里叶级数等式两边同时乘以\( e^{-2\pi ikt } \)：&lt;/p&gt;
-
-&lt;p&gt;\[ e^{-2\pi ikt }f(t) = e^{-2\pi ikt }\sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;把右边的式子展开，得到:&lt;/p&gt;
-
-&lt;p&gt;\[ e^{-2\pi ikt }f(t) = \cdots + e^{-2\pi ikt }c_{k}e^{2\pi ikt} + \cdots \]
-\[ = \cdots + c_{k}e^{-2\pi ikt}e^{2\pi ikt } + \cdots \]
-\[ = \cdots + c_{k}e^{-2\pi ikt + 2\pi ikt } + \cdots \]
-\[ = \cdots + c_{k} + \cdots \]&lt;/p&gt;
-
-&lt;p&gt;这时候，可以把\(c_{k}\)移到等式左边，左边的那个东东移到右边，就得到了一个\(c_{k}\)的表达式:&lt;/p&gt;
-
-&lt;p&gt;\[ c_{k}  = e^{-2\pi ikt }f(t) - \sum_{k&amp;#39;=-n\,k&amp;#39;\neq k}^{n}c_{k&amp;#39;}e^{2\pi ik&amp;#39;t}e^{-2\pi ikt } \]
-\[ e^{-2\pi ikt }f(t) - \sum_{k&amp;#39;=-n\,k&amp;#39;\neq k}^{n}c_{k&amp;#39;}e^{2\pi i(k&amp;#39;-k)t} \]&lt;/p&gt;
-
-&lt;p&gt;然后再放大招：对等式两边同时积分，范围是0到1（f(t)的t的周期为1）。&lt;/p&gt;
-
-&lt;p&gt;积分的时候，会发现有这么个神奇的等式:&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{0}^{1}e^{2\pi i(k&amp;#39;-k)t}dt = \left  [ \frac {2\pi i(k&amp;#39;-k)}{1}e^{2\pi i(k&amp;#39;-k)t}\right ]_{0}^{1} \]
-\[ = \frac {2\pi i(k&amp;#39;-k)}{1}(e^{2\pi i(k&amp;#39;-k)} - e^{0})\]
-\[ = \frac {2\pi i(k&amp;#39;-k)}{1}(1-1) = 0\]&lt;/p&gt;
-
-&lt;p&gt;最后那个1-1=0的前面那个1，其实用上欧拉公式就懂了，&lt;strong&gt;\( 2\pi i(k&amp;#39;-k) \)&lt;/strong&gt;，代表\(\phi =2\pi (k&amp;#39;-k)\) ,又因为k&amp;#39;-k必然是整数，所以\(\phi \)代表了复数平面的坐标(1,0)，所以整个式子就等于1。&lt;/p&gt;
-
-&lt;p&gt;于是，积分等式就只剩下：&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{0}&lt;sup&gt;{1}c_{k}dt&lt;/sup&gt; = \int _{0}&lt;sup&gt;{1}e^{-2\pi&lt;/sup&gt; ikt }f(t)dt \]&lt;/p&gt;
-
-&lt;p&gt;\[ (1-0)c_{k} = c_{k} = \int _{0}&lt;sup&gt;{1}e^{-2\pi&lt;/sup&gt; ikt }f(t)dt \]&lt;/p&gt;
-
-&lt;p&gt;这就是\(c_{k}\)的积分形式。&lt;/p&gt;
-
-&lt;p&gt;做一个小结：&lt;/p&gt;
-
-&lt;p&gt;如果对于一个已知的周期为1的周期函数f(t)，它可以写成这样的形式：&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-n}^{n}c_{k}e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;那么其中的\(c_{k}\)必然满足：&lt;/p&gt;
-
-&lt;p&gt;\[ c_{k} = \int _{0}&lt;sup&gt;{1}e^{-2\pi&lt;/sup&gt; ikt }f(t)dt \]&lt;/p&gt;
-
-&lt;h3&gt;求解\(c_{k}\)的非积分形式&lt;/h3&gt;
-
-&lt;p&gt;回到傅里叶级数的常用形式2:&lt;/p&gt;
-
-&lt;p&gt;\[  f(t) = \frac {A_{0}}{2} + \sum_{k=1}^{n}(a_{k}\sin 2\pi kt + b_{k}\cos 2\pi kt) \]&lt;/p&gt;
-
-&lt;p&gt;代入下面这2个式子:&lt;/p&gt;
-
-&lt;p&gt;\[ \cos 2\pi kt = \frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \sin 2\pi kt = \frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} \]&lt;/p&gt;
-
-&lt;p&gt;得:&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \frac {A_{0}}{2} + \sum_{k=1}^{n}(a_{k}\frac {e^{i2\pi kt} - e^{-i2\pi kt}}{2i} + b_{k}\frac {e^{i2\pi kt} + e^{-i2\pi kt}}{2}) \]
-\[  = \frac {A_{0}}{2} + \sum_{k=1}^{n}(\frac {b_{k} - ia_{k}}{2}e^{i2\pi kt} + \frac {b_{k} + ia_{k}}{2}e^{-i2\pi  kt})  \]&lt;/p&gt;
-
-&lt;p&gt;设:&lt;/p&gt;
-
-&lt;p&gt;\[ c_{0} = \frac {1}{2}A_{0} \]
-\[ c_{k} = \frac {1}{2}(b_{k} - ia_{k}) \]
-\[ c_{-k} = \overline {c_{k}} = \frac {1}{2}(b_{k} + ia_{k}) \]&lt;/p&gt;
-
-&lt;p&gt;（注意，第三个式子是利用了前面的结论 ）&lt;/p&gt;
-
-&lt;p&gt;则:&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = c_{0} + \sum_{k=1}^{n}(c_{k}e^{i2\pi kt} + c_{-k}e^{-i2\pi  kt}) \]
-\[ = c_{0} + \sum_{k=1}^{n}c_{k}e^{i2\pi kt} + \sum_{k=1}^{n}c_{-k}e^{-i2\pi  kt} \]
-\[ = c_{0} + \sum_{k=1}^{n}c_{k}e^{i2\pi kt} + \sum_{k=-1}^{-n}c_{k}e^{i2\pi  kt} \]
-\[ = c_{0} +  \sum_{k=-n,k\neq 0}^{n}c_{k}e^{i2\pi kt}   \]&lt;/p&gt;
-
-&lt;p&gt;和那个常用形式3非常接近了，只需要把\(c_{0}\)也合并到级数里即可。但，这需要有一个前提：\( c_{0} = \frac {1}{2}A_{0} \)和k=0时的f(t)的\( c_{0} \)相等，而这是不一定的。&lt;/p&gt;
-
-&lt;p&gt;傅里叶级数是很不错的东西，但是实际应用时，要考虑很多细节，不是随便用就可以的。&lt;/p&gt;
-
-&lt;h3&gt;大跃进，终极的傅里叶级数的复指数形式&lt;/h3&gt;
-
-&lt;p&gt;终极的傅里叶级数的复指数形式是(fourier series exponential form  )：&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }c_{k}e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;p&gt;前面的傅里叶级数是finite的，这个是infinite的。&lt;/p&gt;
-
-&lt;p&gt;其中的\(c_{k}\)有一个专门的notation：\( \hat {f}(t) \)，代入后得到：&lt;/p&gt;
-
-&lt;p&gt;\[ \hat {f}(t) = \int _{-\frac {1}{2} }&lt;sup&gt;{\frac&lt;/sup&gt; {1}{2} }f(t)e^{-2\pi ikt}dt \]&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \sum_{k=-\infty }^{\infty }\hat {f}(t)e^{2\pi ikt} \]&lt;/p&gt;
-
-&lt;h2&gt;傅里叶变换 fourier transform&lt;/h2&gt;
-
-&lt;p&gt;(以下内容摘选自《复变函数与积分变换(华东理工大学出版社)》，有删改)&lt;/p&gt;
-
-&lt;h3&gt;傅里叶积分定理 fourier integrate&lt;/h3&gt;
-
-&lt;p&gt;若函数f(t)在\(-\infty ,+\infty \)上的任一有限区间内满足Dirichlet条件，并且在\( (-\infty ,+\infty) \)上绝对可积（即积分\( \int _{-\infty }^{+\infty }|f(t)|dt\)收敛)，则有：
-\[ \frac {1}{2\pi }\int _{-\infty }^{+\infty }\left [ \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt\right ]e^{i\omega t}d\omega =  \begin {cases} f(t), 当t为f(t)的连续点; \\  \frac {f(t+0)+f(t-0)}{2},当t为f(t)的间断点。 \end {cases} \]&lt;/p&gt;
-
-&lt;p&gt;令:&lt;/p&gt;
-
-&lt;p&gt;\[ F(\omega ) = \int _{-\infty }^{+\infty }f(t)e^{-i\omega t}dt \]&lt;/p&gt;
-
-&lt;p&gt;则:&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \frac {1}{2\pi }\int _{-\infty }^{+\infty }F(\omega )e^{i\omega t}d\omega \]&lt;/p&gt;
-
-&lt;p&gt;上两式子表明\( F(\omega ) 和 f(t) \)通过指定的积分运算可以相互表示。&lt;/p&gt;
-
-&lt;p&gt;第一个式子称为f(t)的&lt;strong&gt;傅里叶变换&lt;/strong&gt;，记为:&lt;/p&gt;
-
-&lt;p&gt;\[ F(\omega ) = \mathcal {F}[f(t)] \]&lt;/p&gt;
-
-&lt;p&gt;函数为\(F(\omega ) \)称为f(t)的&lt;strong&gt;像函数&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;第二个式子称为\(F(\omega ) \)的&lt;strong&gt;逆傅里叶变换&lt;/strong&gt;，记为:&lt;/p&gt;
-
-&lt;p&gt;\[ f(t) = \mathcal {F}^{-1}[ F(\omega ) ] \]&lt;/p&gt;
-
-&lt;p&gt;函数f(t)称为为\(F(\omega ) \)的&lt;strong&gt;像原函数&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h3&gt;傅里叶变换的性质&lt;/h3&gt;
-
-&lt;h4&gt;线性性质&lt;/h4&gt;
-
-&lt;p&gt;设：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;\( \mathcal {F}[f_{1}(t)] = F_{1}(\omega )\)&lt;/li&gt;
-&lt;li&gt;\( \mathcal {F}[f_{2}(t)] = F_{2}(\omega )\)&lt;/li&gt;
-&lt;li&gt;\( \alpha \beta \)为常数&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;则:&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[\alpha f_{1}(t) + \beta f_{2}(t)] = \alpha F_{1}(\omega ) + \beta F_{2}(\omega ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}^{-1}[\alpha F_{1}(\omega ) + \beta F_{2}(\omega )] = \alpha f_{1}(t) + \beta f_{2}(t) \]&lt;/p&gt;
-
-&lt;h4&gt;位移性质&lt;/h4&gt;
-
-&lt;p&gt;设\( \mathcal {F}[f(t)] = F(\omega )\)，\( f(t) = \mathcal {F}^{-1}[ F(\omega ) ] \)，则:&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[f(t\pm t_{0})] = e^{\pm i\omega t_{0}}F(\omega )\]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}^{-1}[F(\omega )\mp F_{0}(\omega )] = e^{\pm i\omega _{0}t}f(t) \]&lt;/p&gt;
-
-&lt;p&gt;其中\( t_{0},\omega _{0} \)为常数。&lt;/p&gt;
-
-&lt;h4&gt;微分性质&lt;/h4&gt;
-
-&lt;p&gt;若f(t)在\( (-\infty ,+\infty) \)内连续或只有有限个可去间断点，且：&lt;/p&gt;
-
-&lt;p&gt;\[ \lim _{|t|\to +\infty }f(t) = 0 \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[f(t)] = F(\omega )\]&lt;/p&gt;
-
-&lt;p&gt;则：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[f&amp;#39;(t)] = i\omega F(\omega )\]&lt;/p&gt;
-
-&lt;h4&gt;像函数的微分性质&lt;/h4&gt;
-
-&lt;p&gt;设\( \mathcal {F}[f(t)] = F(\omega )\)，则:&lt;/p&gt;
-
-&lt;p&gt;\[ \frac {d}{d\omega }F(\omega ) = -i\mathcal {F}[tf(t)] \]&lt;/p&gt;
-
-&lt;h4&gt;积分性质&lt;/h4&gt;
-
-&lt;p&gt;设\( g(t) = \int _{-\infty }^{t}f(t)dt\)，若：&lt;/p&gt;
-
-&lt;p&gt;\[ \lim _{t\to +\infty }g(t) = 0 \]&lt;/p&gt;
-
-&lt;p&gt;则:&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[g(t)]=\frac {1}{i\omega }\mathcal {F}[f(t)] \]&lt;/p&gt;
-
-&lt;h4&gt;对称性质&lt;/h4&gt;
-
-&lt;p&gt;若\( F(\omega ) = \mathcal {F}[f(t)] \)，则：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[F(t)] = 2\pi f(-\omega ) \]&lt;/p&gt;
-
-&lt;h4&gt;相似性质&lt;/h4&gt;
-
-&lt;p&gt;设\( F(\omega ) = \mathcal {F}[f(t)] \)，a为非零常数，则：&lt;/p&gt;
-
-&lt;p&gt;\[  \mathcal {F}[f(at)] = \frac {1}{|a|}F(\frac {\omega }{a}) \]&lt;/p&gt;
-
-&lt;h3&gt;离散傅里叶变换 discrete fourier transform&lt;/h3&gt;
-
-&lt;p&gt;wiki:&lt;a href=&quot;https://en.wikibooks.org/wiki/Digital_Signal_Processing/Discrete_Fourier_Transform&quot;&gt;Digital Signal Processing/Discrete Fourier Transform&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;设在时域上有离散的采样点\( f = (f[0],f[1],\cdots ,f[N-1]) \)，对f做离散傅里叶变换(DFT)，可以得到频域上的离散点\( F = (F[0],F[1],\cdots ,F[N-1]) \)，且：&lt;/p&gt;
-
-&lt;p&gt;\[ F[m] =  \sum_{n=0}^{N-1}f[n]e^{-2\pi imn/N}, m = 0,1,\dots ,N-1 \]&lt;/p&gt;
-
-&lt;p&gt;这个就是DFT的标准公式。&lt;/p&gt;
-
-&lt;p&gt;解释一下:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;f(t)是原信号(时域)，\( f(n_{0}) \) 到 \( f(n_{N - 1}) \)是所谓的采样点，也就是说f(t)被离散成了这些点；&lt;/li&gt;
-&lt;li&gt;F(w)是转换后的频域信号，\( F(m_{0}) \) 到 \( F(m_{N - 1} )\)是频域里均匀分布的N个点；&lt;/li&gt;
-&lt;li&gt;那么上面的公式就是指，对于每个m值，都求出这n个采样点f(n)的傅里叶级数，这个级数就是F(m)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;要推导出这个这个公式并不容易，其中还要用到卷积的知识。&lt;/p&gt;
-
-&lt;p&gt;先大概地讲一遍：&lt;/p&gt;
-
-&lt;p&gt;给信号函数f(t)设定一个有限的时间范围L：\( 0\leq t\leq L \)；给f(t)的傅里叶转换F(w)设定一个有限的频率范围2B：\( 0\leq w\leq 2B \)。&lt;/p&gt;
-
-&lt;p&gt;这里为什么是2B呢？这需要先认识一下&lt;strong&gt;采样定理&lt;/strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem#Introduction&quot;&gt;Nyquist–Shannon sampling theorem&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;香农指出，如果一个信号函数f(t)的频率不高于B赫兹，那么用时间间隔\( \frac {1}{2B} \)秒去采样f(t)而得到的f(t&amp;#39;)，相当于f(t)。&lt;/p&gt;
-
-&lt;p&gt;简单来说，如果要完美地采样一个函数f(t)，采样间隔必须小于或等于\( \frac {1}{2B} \)秒（大于或等于2B赫兹），B是这个f(t)的频域的最大赫兹。&lt;/p&gt;
-
-&lt;p&gt;继续推导。&lt;/p&gt;
-
-&lt;p&gt;既然时域的范围是L，完美的采样频率是2B，那么理论上要采样的点共有这么多个：&lt;/p&gt;
-
-&lt;p&gt;\[ N = \frac {L}{1/2B} = 2BL \]&lt;/p&gt;
-
-&lt;p&gt;时域的采样点横坐标列表如下：&lt;/p&gt;
-
-&lt;p&gt;\[ t_{0} = 0, t_{1} = \frac {1}{2B}, t_{2} = \frac {2}{2B}, \cdots , t_{N-1} = \frac {N-1}{2B} \]&lt;/p&gt;
-
-&lt;p&gt;所以，f(t)的离散版本\( f_{discrete}(t) \)就是这个采样点列表\( f(t_{0}), f(t_{1}),\cdots , f(t_{N-1}) \)。&lt;/p&gt;
-
-&lt;p&gt;接下来轮到&lt;strong&gt;卷积&lt;/strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Convolution&quot;&gt;Convolution&lt;/a&gt;和&lt;strong&gt;狄拉克梳状函数&lt;/strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Dirac_comb&quot;&gt;Dirac comb&lt;/a&gt;登场。&lt;/p&gt;
-
-&lt;p&gt;(关于卷积和狄拉克梳状函数，请阅读我的其他文章&lt;a href=&quot;http://www.qiujiawei.com/convolution&quot;&gt;理解卷积&lt;/a&gt;，&lt;a href=&quot;http://www.qiujiawei.com/shah-function&quot;&gt;狄拉克梳状函数&lt;/a&gt; )。&lt;/p&gt;
-
-&lt;p&gt;继续讨论。因为上面得到的\( f_{discrete}(t) \)是不连续的，所以不能直接用傅里叶变换把它转换用到频域（标准傅里叶变换是处理连续函数的）。要把不连续信号转成连续信号，就是用卷积，即把离散信号和连续信号‘合并’。&lt;/p&gt;
-
-&lt;p&gt;狄拉克梳状函数：&lt;/p&gt;
-
-&lt;p&gt;\[ III_{T}(t) = \sum _{k=-\infty }^{\infty }\delta (t - kT)\]&lt;/p&gt;
-
-&lt;p&gt;代入我们的离散横坐标\( (t_{0}, t_{1}, \cdots , t_{N-1} \)，则有：&lt;/p&gt;
-
-&lt;p&gt;\[ III_{T=\frac {1}{2B}}(t) = \sum _{n=0 }^{N-1 }\delta (t - t_{n})\]&lt;/p&gt;
-
-&lt;p&gt;定义一个\( f_{discrete}(t) \)，代表f(t)离散化后和shah函数合并:&lt;/p&gt;
-
-&lt;p&gt;\[ f_{discrete}(t)  = \sum _{n=0 }^{N-1 }f(t_{n})\delta (t - t_{n}) \]&lt;/p&gt;
-
-&lt;p&gt;这个式子是连续的(因为t的取值是连续的)。这个式子也叫做&lt;strong&gt;f(t)的采样形式&lt;/strong&gt;(the sampled form of f(t))。它的傅里叶变换是:&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[f_{discrete}(s)] =  \sum _{n=0 }^{N-1 }f(t_{n})\mathcal {F}[\delta (t - t_{n})] = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi ist_{n} } \]&lt;/p&gt;
-
-&lt;p&gt;注意，这个傅里叶变换也是连续的。&lt;/p&gt;
-
-&lt;p&gt;上面是时域到频域的讨论，接下来换个角度：想一下如何在频域中对连续的频域信号做采样，并转换到时域。也即&lt;strong&gt;离散的逆傅里叶变换&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;在频域中做采样，那么就是做离散化，&lt;strong&gt;频率间隔&lt;/strong&gt;应该是多少(赫兹)？频率公式是\(f =  \frac {1}{T} \)，f的单位是赫兹，赫兹是指&lt;strong&gt;1秒内震动次数&lt;/strong&gt;，震动次数要看信号的周期T。如果把t的范围L当做周期的话，1除以L就是指\( \frac {1}{L} \)赫兹，注意，&lt;strong&gt;这是频率的下限&lt;/strong&gt;，频率的上限是前面已经给出的2B，而我们要做的是在频率这条横轴上做采样，即从频率=0(赫兹)开始，间隔=1/L(赫兹)，到频率=2B(赫兹)结束，对F(s)进行采样。&lt;/p&gt;
-
-&lt;p&gt;总共的频域采样点有这么多个:&lt;/p&gt;
-
-&lt;p&gt;\[ \frac {2B}{\frac {1}{L}} = 2BL = N \]&lt;/p&gt;
-
-&lt;p&gt;对比上面的时域采样，频域采样也有同样数目的采样点**。&lt;/p&gt;
-
-&lt;p&gt;频域的采样点横坐标列表如下：&lt;/p&gt;
-
-&lt;p&gt;\[ s_{0} = 0, s_{1} = \frac {1}{L}, s_{2} = \frac {2}{L}, \cdots , s_{N-1} = \frac {N-1}{L} \]&lt;/p&gt;
-
-&lt;p&gt;有了采样点，就可以做采样了。但是是对什么东西做采样？结果有点反直觉，我们是对刚才推导出来的\( \mathcal {F}[f_{discrete}(s)] \)做采样，而不是\( \mathcal {F}[f(s)] \)。&lt;/p&gt;
-
-&lt;p&gt;设\( F(s) \mathcal {F}[f_{discrete}(s)] \)，则F(s)的离散版本是:&lt;/p&gt;
-
-&lt;p&gt;\[ F(s_{0}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{0}t_{n} }, F(s_{1}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{1}t_{n} }, \cdots ,F(s_{N-1}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{N-1}t_{n} } \]&lt;/p&gt;
-
-&lt;p&gt;将这串东西再简化下:&lt;/p&gt;
-
-&lt;p&gt;\[ F(s_{m}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{m}t_{n} } \]&lt;/p&gt;
-
-&lt;p&gt;于是我们有了一道从离散f(t)到离散F(s)的公式！&lt;/p&gt;
-
-&lt;p&gt;好像和前面给出的标准形式不一样？没事，还可以再变一变。&lt;/p&gt;
-
-&lt;p&gt;由:&lt;/p&gt;
-
-&lt;p&gt;\[ t_{n} = \frac {n}{2B} \]
-\[ s_{m} = \frac {m}{L} \]&lt;/p&gt;
-
-&lt;p&gt;有:&lt;/p&gt;
-
-&lt;p&gt;\[ F(s_{m}) = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi is_{m}t_{n} } \]
-\[ = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi i\frac {m}{L}\frac {n}{2B} } \]
-\[ = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi imn/2BL } \]
-\[ = \sum _{n=0 }^{N-1 }f(t_{n})e^{-2\pi imn/N } \]&lt;/p&gt;
-
-&lt;h3&gt;傅里叶变换的应用&lt;/h3&gt;
-
-&lt;p&gt;(如果理解了上面的DFT，基本不需要看这一节)&lt;/p&gt;
-
-&lt;h4&gt;采样和重建 Sampling and Reconstruction&lt;/h4&gt;
-
-&lt;p&gt;采样和重建这两个字花了我不少功夫去理解。其实并不复杂，举一个例子吧。&lt;/p&gt;
-
-&lt;p&gt;假设现在有一个你不太喜欢的信号函数f(t)，可以想象成一个充满毛刺的、扭曲的正弦波形曲线(理论上不必须是波形)。你觉得它太丑了，想给它整容，变成你喜欢的模样。那么，就可以这样子做：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;采样&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;在横轴上挑选一些你觉得不错的坐标t，代入f(t)，这样就得到了一个坐标集合\( (t_{i},f(t_{i}))(i=[0,n]) \)。
-这个过程叫做采样，这些坐标对样本，对应的t坐标叫做采样点。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;重建&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;经过采样后，原来的连续的f(t)变成了离散的\( f(t_{i})(i=[0,n]) \)(continuous to descrete)。对于这个\(f(t_{i})\)，我们可以根据这些坐标，重新构建一条新的曲线，也就是说，整出一条新的曲线，使得这条新曲线会通过所有的采样坐标点。这个过程叫做重建。&lt;/p&gt;
-
-&lt;p&gt;重点来了:&lt;strong&gt;采样和重建是通过傅里叶变换完成的&lt;/strong&gt;。这意味着什么？首先要记住，傅里叶变换，可以把时域的函数变成一个等价的频域的函数。我们还是按前面的做法，在时域上完成‘采样’工作，但是采样点要足够多，并且均匀。采样后，用傅里叶变换把\(f(t_{i})\)变成\(F(w_{i})\)，然后就可以&lt;strong&gt;在频域上完成真正的采样(或叫过滤)&lt;/strong&gt;。
-在频域上采样，往往比在时域上采样要简单得多，比如说，你只对中高频信号感兴趣，那么就可以只采样那些频率高的点。对F(w_{i})采样后，得到F&amp;#39;(w_{i})，再通过&lt;strong&gt;逆傅里叶变换&lt;/strong&gt;，就可以得到一个新的f&amp;#39;(t)。整容完毕。&lt;/p&gt;
-
-&lt;p&gt;哦，还有一个细节要注意，这个采样和重建用的傅里叶变换是&lt;strong&gt;离散傅里叶变换&lt;/strong&gt;。&lt;/p&gt;
-</description>
-        <pubDate>Sat, 10 Oct 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/fourier-equation/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/fourier-equation/</guid>
       </item>
     
   </channel>

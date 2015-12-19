@@ -74,10 +74,80 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/c%2B%2B.html" class="set-4">c++</a> <a href="/tag/fourier.html" class="set-1">fourier</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-4">linear algebra</a> <a href="/tag/math.html" class="set-3">math</a> <a href="/tag/matrix.html" class="set-4">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
+  <a href="/tag/c%2B%2B.html" class="set-4">c++</a> <a href="/tag/fourier.html" class="set-1">fourier</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-5">linear algebra</a> <a href="/tag/math.html" class="set-3">math</a> <a href="/tag/matrix.html" class="set-5">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/linear-algebra-11/">线性代数之Cholesky分解</a></h1>
+      <div class="date">
+        Written on December 19, 2015
+      </div>
+      <div class="entry">
+        <p>又到了矩阵分解时间。这次介绍的是<strong>Cholesky分解</strong>。这个方法只适用于符合厄米特矩阵、正定矩阵定义的矩阵。</p>
+
+<h2>算法原理</h2>
+
+<p>设A是一个n阶厄米特正定矩阵(Hermitian positive-definite matrix)。</p>
+
+<p>Cholesky分解的目标是把A变成:</p>
+
+<p>\[ A = LL^{T} \]</p>
+
+<p>因为A是对称的矩阵，所以设A为：</p>
+
+<p>\[ A =  \left[ \begin{matrix} a_{11}&amp;A_{21}^{T}\\ A_{21}&amp;A_{22}\\ \end{matrix} \right] \]</p>
+
+<p>(注意：细心观察此式子可以发现\(A_{21}\)是一个列向量，\(A_{22}\)是一个n-1阶的方阵)</p>
+
+<p>设L：</p>
+
+<p>\[ L =  \left[ \begin{matrix} l_{11}&amp;0\\ L_{21}&amp;L_{22}\\ \end{matrix} \right] \]</p>
+
+<p>则有:</p>
+
+<p>\[ L^{T} =  \left[ \begin{matrix} l_{11}&amp;L_{21}^{T}\\ 0&amp;L_{22}^{T}\\ \end{matrix} \right] \]</p>
+
+<p>设\( A = LL^{T} \)，得到：</p>
+
+<p>\[  \left[ \begin{matrix} a_{11}&amp;A_{21}^{T}\\ A_{21}&amp;A_{22}\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{11}&amp;0\\ L_{21}&amp;L_{22}\\ \end{matrix} \right] \left[ \begin{matrix} l_{11}&amp;L_{21}^{T}\\ 0&amp;L_{22}^{T}\\ \end{matrix} \right] \]</p>
+
+<p>\[ =  \left[ \begin{matrix} l_{11}^{2}&amp;l_{11}L_{21}^{T}\\ l_{11}L_{21}&amp;L_{21}L_{21}^{T}+L_{22}L_{22}^{T}\\ \end{matrix} \right] \]</p>
+
+<p>其中，未知量是\( l_{11},L_{21},L_{22} \)，这3个未知量的求解公式是：</p>
+
+<p>\[ l_{11} = \sqrt {a_{11}} \]</p>
+
+<p>\[ L_{21} = l_{11}A_{21} \]</p>
+
+<p>\[ L_{22}L_{22}^{T} =  A_{22} - L_{21}L_{21}^{T} \]</p>
+
+<p>显然，\( l_{11},L_{21} \)是易求的，而\( L_{22} \)的求解救有意思了。</p>
+
+<p>观察可以发现，\( A_{22} - L_{21}L_{21}^{T} \)也很好求，\( A_{22} \)已知，\( L_{21}L_{21}^{T} \)是一个对角线矩阵，对角线上的元素只是一个平方，好求。</p>
+
+<p>那么设\(A_{22}&#39; = A_{22} - L_{21}L_{21}^{T} \)，则剩下的问题就是求:</p>
+
+<p>\[ A_{22}&#39; = L_{22}L_{22}^{T} \]</p>
+
+<p>啊，这不也是Cholesky分解！被分解的矩阵是A的右下角的n-1阶子方阵！</p>
+
+<p>所以这个算法具有递归性质。</p>
+
+<p>附上一个实例：</p>
+
+<p>设:</p>
+
+<p>\[ A =  \left[ \begin{matrix} 25&amp;15&amp;-5\\ 15&amp;18&amp;0\\ -5&amp;0&amp;11\\ \end{matrix} \right] \]</p>
+
+<p>Cholesky分解证明过程(略)。</p>
+
+      </div>
+
+      <a href="/linear-algebra-11/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 
