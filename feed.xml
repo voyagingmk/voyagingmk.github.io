@@ -62,26 +62,26 @@
 
 &lt;p&gt;设\(A=(a_{ij})_{nXm}\)，\(A_{ij}\)是A的行列式\( |A|=det(a_{ij}) \)的元素\( a_{ij} \)的代数余子式\( (i,j=1,2,\cdots,n)\), 则有：&lt;/p&gt;
 
-&lt;p&gt;\[ (A^{*}) ^{T} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;\ldots&amp;amp;A_{1n}\\ A_{21}&amp;amp;A_{22}&amp;amp;\ldots&amp;amp;A_{2n}\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{n1}&amp;amp;A_{n2}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]  \]&lt;/p&gt;
+&lt;p&gt;\[ (adj(A)) ^{T} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{12}&amp;amp;\ldots&amp;amp;A_{1n}\\ A_{21}&amp;amp;A_{22}&amp;amp;\ldots&amp;amp;A_{2n}\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{n1}&amp;amp;A_{n2}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]  \]&lt;/p&gt;
 
-&lt;p&gt;\[ A^{*} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;\ldots&amp;amp;A_{n1}\\ A_{12}&amp;amp;A_{22}&amp;amp;\ldots &amp;amp;A_{n2}\\ \vdots \ \ \ \ &amp;amp;\vdots  \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{1n}&amp;amp;A_{2n}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]  \]&lt;/p&gt;
+&lt;p&gt;\[ adj(A) =  \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;\ldots&amp;amp;A_{n1}\\ A_{12}&amp;amp;A_{22}&amp;amp;\ldots &amp;amp;A_{n2}\\ \vdots \ \ \ \ &amp;amp;\vdots  \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{1n}&amp;amp;A_{2n}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]  \]&lt;/p&gt;
 
-&lt;p&gt;\(A^{*} \)称为伴随矩阵。&lt;/p&gt;
+&lt;p&gt;adj(A)称为伴随矩阵。&lt;/p&gt;
 
-&lt;p&gt;利用上面2条定理，计算\(AA^{*}\):&lt;/p&gt;
+&lt;p&gt;利用上面2条定理，计算\(Aadj(A)\):&lt;/p&gt;
 
-&lt;p&gt;\[ AA^{*} =  \left[ \begin{matrix} a_{11}&amp;amp;a_{12}&amp;amp;\ldots&amp;amp;a_{1n}\\ a_{21}&amp;amp;a_{22}&amp;amp;\ldots&amp;amp;a_{2n}\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ a_{n1}&amp;amp;a_{n2}&amp;amp;\ldots &amp;amp;a_{nn}\\ \end{matrix} \right] \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;\ldots&amp;amp;A_{n1}\\ A_{12}&amp;amp;A_{22}&amp;amp;\ldots &amp;amp;A_{n2}\\ \vdots \ \ \ \ &amp;amp;\vdots  \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{1n}&amp;amp;A_{2n}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]\]&lt;/p&gt;
+&lt;p&gt;\[ Aadj(A) =  \left[ \begin{matrix} a_{11}&amp;amp;a_{12}&amp;amp;\ldots&amp;amp;a_{1n}\\ a_{21}&amp;amp;a_{22}&amp;amp;\ldots&amp;amp;a_{2n}\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ a_{n1}&amp;amp;a_{n2}&amp;amp;\ldots &amp;amp;a_{nn}\\ \end{matrix} \right] \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;\ldots&amp;amp;A_{n1}\\ A_{12}&amp;amp;A_{22}&amp;amp;\ldots &amp;amp;A_{n2}\\ \vdots \ \ \ \ &amp;amp;\vdots  \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ A_{1n}&amp;amp;A_{2n}&amp;amp;\ldots &amp;amp;A_{nn}\\ \end{matrix} \right]\]&lt;/p&gt;
 
 &lt;p&gt;\[  =  \left[ \begin{matrix} |A|&amp;amp;0&amp;amp;\ldots&amp;amp;0\\ 0&amp;amp;|A|&amp;amp;\ldots&amp;amp;0\\ \vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ &amp;amp;\vdots \ \ \ \ \\ 0&amp;amp;0&amp;amp;\ldots &amp;amp;|A|\\ \end{matrix} \right]  = |A|E \]&lt;/p&gt;
 
 &lt;p&gt;即:
-\[ AA^{*}  = |A|E \]&lt;/p&gt;
+\[ Aadj(A)  = |A|E \]&lt;/p&gt;
 
 &lt;p&gt;从而有：&lt;/p&gt;
 
-&lt;p&gt;\[ A^{-1}  = \frac {1}{|A|}A^{*} \]&lt;/p&gt;
+&lt;p&gt;\[ A^{-1}  = \frac {1}{|A|}adj(A) \]&lt;/p&gt;
 
-&lt;p&gt;因为用这条公式求逆矩阵要计算\( A^{*}  \)和|A|，这个计算太慢了。所以可以认为这个解法对阶数&amp;lt;=3的矩阵才实用。&lt;/p&gt;
+&lt;p&gt;因为用这条公式求逆矩阵要计算adj(A)和|A|，这个计算太慢了。所以可以认为这个解法对阶数&amp;lt;=3的矩阵才实用。&lt;/p&gt;
 
 &lt;p&gt;现在用伴随矩阵求逆法来求第一节中的A的逆矩阵：&lt;/p&gt;
 
@@ -107,11 +107,11 @@
 
 &lt;p&gt;于是:&lt;/p&gt;
 
-&lt;p&gt;\[ A^{*} =  \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;A_{31}\\ A_{12}&amp;amp;A_{22}&amp;amp;A_{32}\\ A_{13}&amp;amp;A_{23}&amp;amp;A_{33}\\ \end{matrix} \right] =  \left[ \begin{matrix} 40&amp;amp;-16&amp;amp;-9\\ -13&amp;amp;5&amp;amp;3\\ -5&amp;amp;2&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;\[ adj(A) =  \left[ \begin{matrix} A_{11}&amp;amp;A_{21}&amp;amp;A_{31}\\ A_{12}&amp;amp;A_{22}&amp;amp;A_{32}\\ A_{13}&amp;amp;A_{23}&amp;amp;A_{33}\\ \end{matrix} \right] =  \left[ \begin{matrix} 40&amp;amp;-16&amp;amp;-9\\ -13&amp;amp;5&amp;amp;3\\ -5&amp;amp;2&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 
 &lt;p&gt;\[ |A| =  a_{31}A_{31} + a_{32}A_{32} + a_{33}A_{33} = 1*(-9) + 0*3 + 8*1 = -1 \]&lt;/p&gt;
 
-&lt;p&gt;\[ A^{-1}  = \frac {1}{|A|}A^{*} =  \left[ \begin{matrix} -40&amp;amp;16&amp;amp;9\\ 13&amp;amp;-5&amp;amp;-3\\ 5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right]   \]&lt;/p&gt;
+&lt;p&gt;\[ A^{-1}  = \frac {1}{|A|}adj(A) =  \left[ \begin{matrix} -40&amp;amp;16&amp;amp;9\\ 13&amp;amp;-5&amp;amp;-3\\ 5&amp;amp;-2&amp;amp;-1\\ \end{matrix} \right]   \]&lt;/p&gt;
 
 &lt;h2&gt;参考资料&lt;/h2&gt;
 

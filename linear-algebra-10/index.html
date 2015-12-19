@@ -151,26 +151,26 @@
 
 <p>设\(A=(a_{ij})_{nXm}\)，\(A_{ij}\)是A的行列式\( |A|=det(a_{ij}) \)的元素\( a_{ij} \)的代数余子式\( (i,j=1,2,\cdots,n)\), 则有：</p>
 
-<p>\[ (A^{*}) ^{T} =  \left[ \begin{matrix} A_{11}&amp;A_{12}&amp;\ldots&amp;A_{1n}\\ A_{21}&amp;A_{22}&amp;\ldots&amp;A_{2n}\\ \vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ A_{n1}&amp;A_{n2}&amp;\ldots &amp;A_{nn}\\ \end{matrix} \right]  \]</p>
+<p>\[ (adj(A)) ^{T} =  \left[ \begin{matrix} A_{11}&amp;A_{12}&amp;\ldots&amp;A_{1n}\\ A_{21}&amp;A_{22}&amp;\ldots&amp;A_{2n}\\ \vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ A_{n1}&amp;A_{n2}&amp;\ldots &amp;A_{nn}\\ \end{matrix} \right]  \]</p>
 
-<p>\[ A^{*} =  \left[ \begin{matrix} A_{11}&amp;A_{21}&amp;\ldots&amp;A_{n1}\\ A_{12}&amp;A_{22}&amp;\ldots &amp;A_{n2}\\ \vdots \ \ \ \ &amp;\vdots  \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ A_{1n}&amp;A_{2n}&amp;\ldots &amp;A_{nn}\\ \end{matrix} \right]  \]</p>
+<p>\[ adj(A) =  \left[ \begin{matrix} A_{11}&amp;A_{21}&amp;\ldots&amp;A_{n1}\\ A_{12}&amp;A_{22}&amp;\ldots &amp;A_{n2}\\ \vdots \ \ \ \ &amp;\vdots  \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ A_{1n}&amp;A_{2n}&amp;\ldots &amp;A_{nn}\\ \end{matrix} \right]  \]</p>
 
-<p>\(A^{*} \)称为伴随矩阵。</p>
+<p>adj(A)称为伴随矩阵。</p>
 
-<p>利用上面2条定理，计算\(AA^{*}\):</p>
+<p>利用上面2条定理，计算\(Aadj(A)\):</p>
 
-<p>\[ AA^{*} =  \left[ \begin{matrix} a_{11}&amp;a_{12}&amp;\ldots&amp;a_{1n}\\ a_{21}&amp;a_{22}&amp;\ldots&amp;a_{2n}\\ \vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ a_{n1}&amp;a_{n2}&amp;\ldots &amp;a_{nn}\\ \end{matrix} \right] \left[ \begin{matrix} A_{11}&amp;A_{21}&amp;\ldots&amp;A_{n1}\\ A_{12}&amp;A_{22}&amp;\ldots &amp;A_{n2}\\ \vdots \ \ \ \ &amp;\vdots  \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ A_{1n}&amp;A_{2n}&amp;\ldots &amp;A_{nn}\\ \end{matrix} \right]\]</p>
+<p>\[ Aadj(A) =  \left[ \begin{matrix} a_{11}&amp;a_{12}&amp;\ldots&amp;a_{1n}\\ a_{21}&amp;a_{22}&amp;\ldots&amp;a_{2n}\\ \vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ a_{n1}&amp;a_{n2}&amp;\ldots &amp;a_{nn}\\ \end{matrix} \right] \left[ \begin{matrix} A_{11}&amp;A_{21}&amp;\ldots&amp;A_{n1}\\ A_{12}&amp;A_{22}&amp;\ldots &amp;A_{n2}\\ \vdots \ \ \ \ &amp;\vdots  \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ A_{1n}&amp;A_{2n}&amp;\ldots &amp;A_{nn}\\ \end{matrix} \right]\]</p>
 
 <p>\[  =  \left[ \begin{matrix} |A|&amp;0&amp;\ldots&amp;0\\ 0&amp;|A|&amp;\ldots&amp;0\\ \vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ &amp;\vdots \ \ \ \ \\ 0&amp;0&amp;\ldots &amp;|A|\\ \end{matrix} \right]  = |A|E \]</p>
 
 <p>即:
-\[ AA^{*}  = |A|E \]</p>
+\[ Aadj(A)  = |A|E \]</p>
 
 <p>从而有：</p>
 
-<p>\[ A^{-1}  = \frac {1}{|A|}A^{*} \]</p>
+<p>\[ A^{-1}  = \frac {1}{|A|}adj(A) \]</p>
 
-<p>因为用这条公式求逆矩阵要计算\( A^{*}  \)和|A|，这个计算太慢了。所以可以认为这个解法对阶数&lt;=3的矩阵才实用。</p>
+<p>因为用这条公式求逆矩阵要计算adj(A)和|A|，这个计算太慢了。所以可以认为这个解法对阶数&lt;=3的矩阵才实用。</p>
 
 <p>现在用伴随矩阵求逆法来求第一节中的A的逆矩阵：</p>
 
@@ -196,11 +196,11 @@
 
 <p>于是:</p>
 
-<p>\[ A^{*} =  \left[ \begin{matrix} A_{11}&amp;A_{21}&amp;A_{31}\\ A_{12}&amp;A_{22}&amp;A_{32}\\ A_{13}&amp;A_{23}&amp;A_{33}\\ \end{matrix} \right] =  \left[ \begin{matrix} 40&amp;-16&amp;-9\\ -13&amp;5&amp;3\\ -5&amp;2&amp;1\\ \end{matrix} \right] \]</p>
+<p>\[ adj(A) =  \left[ \begin{matrix} A_{11}&amp;A_{21}&amp;A_{31}\\ A_{12}&amp;A_{22}&amp;A_{32}\\ A_{13}&amp;A_{23}&amp;A_{33}\\ \end{matrix} \right] =  \left[ \begin{matrix} 40&amp;-16&amp;-9\\ -13&amp;5&amp;3\\ -5&amp;2&amp;1\\ \end{matrix} \right] \]</p>
 
 <p>\[ |A| =  a_{31}A_{31} + a_{32}A_{32} + a_{33}A_{33} = 1*(-9) + 0*3 + 8*1 = -1 \]</p>
 
-<p>\[ A^{-1}  = \frac {1}{|A|}A^{*} =  \left[ \begin{matrix} -40&amp;16&amp;9\\ 13&amp;-5&amp;-3\\ 5&amp;-2&amp;-1\\ \end{matrix} \right]   \]</p>
+<p>\[ A^{-1}  = \frac {1}{|A|}adj(A) =  \left[ \begin{matrix} -40&amp;16&amp;9\\ 13&amp;-5&amp;-3\\ 5&amp;-2&amp;-1\\ \end{matrix} \right]   \]</p>
 
 <h2>参考资料</h2>
 
