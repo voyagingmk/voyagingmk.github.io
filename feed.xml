@@ -70,6 +70,8 @@
 
 &lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{11}&amp;amp;0&amp;amp;0\\ l_{21}&amp;amp;l_{22}&amp;amp;0\\ l_{31}&amp;amp;l_{32}&amp;amp;l_{33}\\ \end{matrix} \right] \left[ \begin{matrix} l_{11}&amp;amp;l_{21}&amp;amp;l_{31}\\ 0&amp;amp;l_{22}&amp;amp;l_{32}\\ 0&amp;amp;0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
 
+&lt;p&gt;根据上文的公式，有：&lt;/p&gt;
+
 &lt;p&gt;\[ l_{11} = \sqrt { a_{11} } = 5 \]
 \[ L_{21} = \frac {1}{l_{11}}A_{21} = \frac {1}{5} \left[ \begin{matrix} 15\\ -5\\ \end{matrix} \right] =  \left[ \begin{matrix} 3\\ -1\\ \end{matrix} \right] \]&lt;/p&gt;
 
