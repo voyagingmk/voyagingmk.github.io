@@ -178,13 +178,13 @@ L是下三角矩阵。
 
 <p>\[  \left[ \begin{matrix} 18&amp;0\\ 0&amp;11\\ \end{matrix} \right] -  \left[ \begin{matrix} 3\\ -1\\ \end{matrix} \right] \left[ \begin{matrix} 3&amp;-1\\ \end{matrix} \right] =   \left[ \begin{matrix} l_{22}&amp;0\\ l_{32}&amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;l_{32}\\ 0&amp;l_{33}\\ \end{matrix} \right] \]</p>
 
-<p>\[  \left[ \begin{matrix} 18&amp;0\\ 0&amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{22}&amp;0\\ l_{32}&amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;l_{32}\\ 0&amp;l_{33}\\ \end{matrix} \right] \]</p>
+<p>\[  \left[ \begin{matrix} 9&amp;3\\ 3&amp;10\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{22}&amp;0\\ l_{32}&amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;l_{32}\\ 0&amp;l_{33}\\ \end{matrix} \right] \]</p>
 
 <p>(注意，这里已经是n-1阶的Cholesky分解)</p>
 
 <p>\[ l_{22} = \sqrt { 9 } = 3 \]
 \[ l_{32} = \frac {1}{3}3 = 1 \]
-\[ 10 = 1 + l_{33}^{2} \]
+\[ 10 = l_{32}^{2} + l_{33}^{2} = 1 + l_{33}^{2} \]
 \[ l_{33} = \sqrt {10 - 1} = 3 \]</p>
 
 <p>综上：</p>
