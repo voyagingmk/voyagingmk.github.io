@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><复习向>线性代数之矩阵与行列式(3) – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+    <title><复习向>线性代数之PLU分解 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -37,8 +37,8 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="<复习向>线性代数之矩阵与行列式(3)" />
-    <meta property="twitter:title" content="<复习向>线性代数之矩阵与行列式(3)" />
+    <meta property="og:title" content="<复习向>线性代数之PLU分解" />
+    <meta property="twitter:title" content="<复习向>线性代数之PLU分解" />
     
 
     <!--[if lt IE 9]>
@@ -59,7 +59,7 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/linear-algebra-3/',
-		  'title': '<复习向>线性代数之矩阵与行列式(3)'
+		  'title': '<复习向>线性代数之PLU分解'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -102,7 +102,7 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1><复习向>线性代数之矩阵与行列式(3)</h1>
+  <h1><复习向>线性代数之PLU分解</h1>
   <h3>Tags: <a href="/tag/matrix.html" rel="tag">matrix</a>, <a href="/tag/linear-algebra.html" rel="tag">linear algebra</a></h3>
   <div class="entry">
     <h1>行列式的求解</h1>
@@ -115,9 +115,11 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 
 <p>LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三角矩阵和上三角矩阵。</p>
 
-<p>下面手动演示下LU分解过程：
-&lt;!--more--&gt;
-设A：</p>
+<p>下面手动演示下LU分解过程：</p>
+
+<!--more-->
+
+<p>设A：</p>
 
 <p>\[ A =  \left[ \begin{matrix} 9&amp;6&amp;0\\ 6&amp;5&amp;4\\ 3&amp;4&amp;10\\ \end{matrix} \right] \]</p>
 
@@ -201,7 +203,7 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 
 <p>\[ A =  \left[ \begin{matrix} 10^{-20}&amp;1\\ 1&amp;1\\ \end{matrix} \right]  =  \left[ \begin{matrix} 1&amp;0\\ 10^{20}&amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 10^{-20}&amp;1\\ 0&amp;1-10^{20}\\ \end{matrix} \right] = L_{0}U_{0} \]</p>
 
-<p>直接分解后得到的L、U矩阵，出现了<strong>大数</strong>，程序员读者们肯定会意识到:&quot;大数！这不是要越界的节奏吗！&quot;。所以这是不能接受的。</p>
+<p>直接分解后得到的L、U矩阵，出现了<strong>大数</strong>。所以这是不能接受的。</p>
 
 <p>而神奇的是，对A做一些P置换后，再来LU分解，是可以变稳定的：</p>
 
@@ -209,7 +211,7 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 
 <p>L、U中没有出现大数，于是认为这样的分解是稳定的。</p>
 
-<p>PA的P，需要对P做一些检测后才可以得到，策略就是：沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(E_{i}\)。最后按顺序算\(E_{i}\)的乘积就得到了P。</p>
+<p>PA的P，需要对A做一些检测后才可以得到，策略就是：<strong>沿着对角线从左上角到右下角遍历A，并检测当前列的最大元素在下方的哪一行（当前行上方的行保持不变），找到后就将当前行和目标行交换，并记录下一个\(P_{i}\)。最后按顺序算\(P_{i}\)的乘积就得到了P。</strong></p>
 
 <h2>A的行列式</h2>
 
@@ -225,14 +227,14 @@ LU分别代表：Lower Triangular Matrix 和 Upper Triangular Matrix，即下三
 
 <ul>
 <li>L、U矩阵分别是下三角矩阵和上三角矩阵，它们的行列式等于对角线上元素的乘积</li>
-<li>L矩阵上的元素都为1</li>
+<li>L矩阵对角线上的元素都为1</li>
 </ul>
 
 <p>于是有：</p>
 
 <p>\[ det(A) = det(P^{-1})u_{11}u_{22}\cdots u_{nn} \]</p>
 
-<p>因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P_T) = det(P) \)，所以问题变成了求det(P)。</p>
+<p>因为： \( PP^{-1} = PP^{T} =  1 \)，\( det(P^{T}) = det(P) \)，所以问题变成了求det(P)。</p>
 
 <p>P怎么求？首先，P相当于多个\(E_i\)矩阵的乘积，而又有\( det(E_i)=-1 \)  (行列式的基本性质：交换行列式的两行，行列式变号），所以有：</p>
 
