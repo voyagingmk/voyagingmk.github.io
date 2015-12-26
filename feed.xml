@@ -7,6 +7,29 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>曲线数学之贝塞尔曲线Bézier Curves</title>
+        <description>&lt;p&gt;本文主要关注的是公式的推导。&lt;/p&gt;
+
+&lt;p&gt;在讲贝塞尔曲线之前先复习下组合数学&lt;/p&gt;
+
+&lt;h2&gt;组合数学&lt;/h2&gt;
+
+&lt;h3&gt;排列 permutation&lt;/h3&gt;
+
+&lt;p&gt;注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。&lt;/p&gt;
+
+&lt;p&gt;permutation的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ P(n,k) = P_{n}^{k} \]&lt;/p&gt;
+
+&lt;p&gt;combination permutation&lt;/p&gt;
+</description>
+        <pubDate>Sat, 26 Dec 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/bezier-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/bezier-1/</guid>
+      </item>
+    
+      <item>
         <title>线性代数之Cholesky分解</title>
         <description>&lt;p&gt;又到了矩阵分解时间。这次介绍的是&lt;strong&gt;Cholesky分解&lt;/strong&gt;。这个方法只适用于符合厄米特矩阵、正定矩阵定义的矩阵。&lt;/p&gt;
 
@@ -93,6 +116,8 @@
 &lt;p&gt;综上：&lt;/p&gt;
 
 &lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} 5&amp;amp;0&amp;amp;0\\ 3&amp;amp;3&amp;amp;0\\ -1&amp;amp;1&amp;amp;3\\ \end{matrix} \right] \left[ \begin{matrix} 5&amp;amp;3&amp;amp;-1\\ 0&amp;amp;3&amp;amp;1\\ 0&amp;amp;0&amp;amp;3\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h2&gt;参考资料&lt;/h2&gt;
 </description>
         <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-11/</link>
@@ -1953,168 +1978,6 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
         <pubDate>Sun, 18 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/convolution/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/convolution/</guid>
-      </item>
-    
-      <item>
-        <title>gcc-4.9.3 编译过程笔记</title>
-        <description>&lt;p&gt;官方的编译指南：&lt;a href=&quot;https://gcc.gnu.org/install/&quot;&gt;https://gcc.gnu.org/install/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2&gt;唠叨几句&lt;/h2&gt;
-
-&lt;p&gt;之前升级了我的阿里云的gcc，记得是费了些功夫的，有些坑。可惜忘了记笔记。今天编译node.js时发现我编译的gcc有些问题，要重新编译下，悲催的是gcc的编译目录都删掉了。全部得重来过。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;准备&lt;/h2&gt;
-
-&lt;p&gt;在&lt;a href=&quot;https://gcc.gnu.org/mirrors.html&quot;&gt;https://gcc.gnu.org/mirrors.html&lt;/a&gt;下载源码包到机器上并解压：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;wget &lt;a href=&quot;http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz&quot;&gt;http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;tar -xzvf gcc-4.9.3.tar.gz&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2&gt;配置&lt;/h2&gt;
-
-&lt;p&gt;To configure GCC:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt; % mkdir objdir
- % cd objdir
- % srcdir/configure [options] [target]
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;即，在gcc-4.9.3目录里建立objdir子目录，并在这个子目录里执行configure。&lt;/p&gt;
-
-&lt;p&gt;configure要填什么参数，这个因人而异了。就不说了。官方文档是&lt;a href=&quot;https://gcc.gnu.org/install/configure.html&quot;&gt;https://gcc.gnu.org/install/configure.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;我只需要用c++，所以我执行了:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;~/download/gcc-4.9.3/configure --enable-languages=c,c++&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;然后就遇到第一个坑：&lt;/p&gt;
-
-&lt;h3&gt;坑1&lt;/h3&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;configure: error: Building GCC requires GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+. Try the --with-gmp, --with-mpfr and/or --with-mpc options to specify their locations.  Source code for these libraries can be found at their respective hosting sites as well as at &lt;a href=&quot;ftp://gcc.gnu.org/pub/gcc/infrastructure/&quot;&gt;ftp://gcc.gnu.org/pub/gcc/infrastructure/&lt;/a&gt;.  See also &lt;a href=&quot;http://gcc.gnu.org/install/prerequisites.html&quot;&gt;http://gcc.gnu.org/install/prerequisites.html&lt;/a&gt; for additional info.  If you obtained GMP, MPFR and/or MPC from a vendor distribution package, make sure that you have installed both the libraries and the header files.  They may be located in separate packages.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;说是需要GMP 4.2+、MPFR 2.4.0+、MPC 0.8.0+。不知道是什么鬼。上次编译好像也有见到这个提示。&lt;/p&gt;
-
-&lt;p&gt;它叫我去翻看&lt;a href=&quot;https://gcc.gnu.org/install/prerequisites.html&quot;&gt;https://gcc.gnu.org/install/prerequisites.html&lt;/a&gt;，好咯。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Several support libraries are necessary to build GCC, some are required, others optional. While any sufficiently new version of required tools usually work, library requirements are generally stricter. Newer versions may work in some cases, but it&amp;#39;s safer to use the exact versions documented. We appreciate bug reports about problems with newer versions, though. If your OS vendor provides packages for the support libraries then using those packages may be the simplest way to install the libraries.&lt;/p&gt;
-
-&lt;p&gt;GNU Multiple Precision Library (GMP) version 4.3.2 (or later)&lt;/p&gt;
-
-&lt;p&gt;MPFR Library version 2.4.2 (or later)&lt;/p&gt;
-
-&lt;p&gt;MPC Library version 0.8.1 (or later)&lt;/p&gt;
-
-&lt;p&gt;ISL Library version 0.15, 0.14, 0.13, or 0.12.2&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;看起来很复杂的样子，其实gcc自己给出了简单的解决办法，但是又不在这个页面写出来，这是傲娇吗=。=&lt;/p&gt;
-
-&lt;p&gt;方法就是，在gcc-4.9.3目录执行:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;sh ./contrib/download_prerequisites&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;哗啦啦的就把各个依赖库下载好了。好棒。&lt;/p&gt;
-
-&lt;h3&gt;坑2&lt;/h3&gt;
-
-&lt;p&gt;回到objdir目录，再次执行:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;~/download/gcc-4.9.3/configure --enable-languages=c,c++&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;出现一些warning：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;configure: WARNING: using in-tree ISL, disabling version check&lt;/p&gt;
-
-&lt;p&gt;configure: WARNING: using in-tree CLooG, disabling version check&lt;/p&gt;
-
-&lt;p&gt;*** This configuration is not supported in the following subdirectories:
-gnattools target-libada target-libgfortran target-libgo target-libffi target-libbacktrace target-zlib target-libjava target-libobjc target-boehm-gc
-(Any other directories should still work fine.)&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;这些目录是什么东西，懒得了解了，只是warning的话先不管了。重点是还出现以下的error提示：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;/usr/bin/ld: cannot find crt1.o: No such file or directory&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find crti.o: No such file or directory&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: skipping incompatible /usr/local/lib/gcc/x86_64-unknown-linux-gnu/4.9.3/libgcc.a when searching for -lgcc&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find -lgcc&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find -lgcc_s&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find -lc&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: skipping incompatible /usr/local/lib/gcc/x86_64-unknown-linux-gnu/4.9.3/libgcc.a when searching for -lgcc&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find -lgcc&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find -lgcc_s&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/ld: cannot find crtn.o: No such file or directory&lt;/p&gt;
-
-&lt;p&gt;collect2: error: ld returned 1 exit status&lt;/p&gt;
-
-&lt;p&gt;configure: error: I suspect your system does not have 32-bit developement libraries (libc and headers). If you have them, rerun configure with --enable-multilib. If you do not have them, and want to build a 64-bit-only compiler, rerun configure with --disable-multilib.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;这个意思应该是，我编译配置是默认支持32位和64位，但是32位的dev lib不齐全，建议我关掉32位。好咯。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;~/download/gcc-4.9.3/configure --disable-multilib --enable-languages=c,c++&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;然后就天晴了，那些cannot find和error不见了（除了那个warning），没有其他异常提示：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;configure: creating ./config.status&lt;/p&gt;
-
-&lt;p&gt;config.status: creating Makefile&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2&gt;开始编译&lt;/h2&gt;
-
-&lt;p&gt;还是在objdir，执行:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;make&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;经过漫长的等待，终于，出现了坑3。&lt;/p&gt;
-
-&lt;h3&gt;坑3&lt;/h3&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;make[3]: *** [s-attrtab] Killed&lt;/p&gt;
-
-&lt;p&gt;make[3]: Leaving directory `/root/download/gcc-4.9.3/objdir/gcc&amp;#39;&lt;/p&gt;
-
-&lt;p&gt;make[2]: *** [all-stage1-gcc] Error 2&lt;/p&gt;
-
-&lt;p&gt;make[2]: Leaving directory `/root/download/gcc-4.9.3/objdir&amp;#39;&lt;/p&gt;
-
-&lt;p&gt;make[1]: *** [stage1-bubble] Error 2&lt;/p&gt;
-
-&lt;p&gt;make[1]: Leaving directory `/root/download/gcc-4.9.3/objdir&amp;#39;&lt;/p&gt;
-
-&lt;p&gt;make: *** [all] Error 2&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;查了下，这个是因为我的vps内存不足导致的，看官们的机器应该不会出现这个错误T_T。&lt;/p&gt;
-
-&lt;p&gt;重启下vps再编译，看看能不能解决。&lt;/p&gt;
-
-&lt;p&gt;Oh，编译成功了。接着执行make install就完成了。&lt;/p&gt;
-
-&lt;p&gt;End。&lt;/p&gt;
-</description>
-        <pubDate>Thu, 15 Oct 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/cpp-2/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/cpp-2/</guid>
       </item>
     
   </channel>

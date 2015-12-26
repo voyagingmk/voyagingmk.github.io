@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+    <title>曲线数学之贝塞尔曲线Bézier Curves – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -9,11 +9,44 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="伪技术宅，兴趣点：服务器编程、游戏开发、人工智能">
-    <meta property="og:description" content="伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" />
+    <meta name="description" content="本文主要关注的是公式的推导。
+
+在讲贝塞尔曲线之前先复习下组合数学
+
+组合数学
+
+排列 permutation
+
+注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。
+
+permutation的公式是：
+
+\[ P(n,k) = P_{n}^{k} \]
+
+combination permutation
+" />
+    <meta property="og:description" content="本文主要关注的是公式的推导。
+
+在讲贝塞尔曲线之前先复习下组合数学
+
+组合数学
+
+排列 permutation
+
+注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。
+
+permutation的公式是：
+
+\[ P(n,k) = P_{n}^{k} \]
+
+combination permutation
+" />
     
     <meta name="author" content="Wyman的技术博客" />
 
+    
+    <meta property="og:title" content="曲线数学之贝塞尔曲线Bézier Curves" />
+    <meta property="twitter:title" content="曲线数学之贝塞尔曲线Bézier Curves" />
     
 
     <!--[if lt IE 9]>
@@ -33,8 +66,8 @@
 
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
-		  'page': '/tag/gamejam.html',
-		  'title': ''
+		  'page': '/bezier-1/',
+		  'title': '曲线数学之贝塞尔曲线Bézier Curves'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -73,35 +106,55 @@
     </div>
 
     <div id="main" role="main" class="container">
-      <h2>gamejam</h2>
-<ul>
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>曲线数学之贝塞尔曲线Bézier Curves</h1>
+  <h3>Tags: <a href="/tag/curve.html" rel="tag">curve</a></h3>
+  <div class="entry">
+    <p>本文主要关注的是公式的推导。</p>
 
-  <li>
-  	<h3><a href="/gamejam-tech/">Gamejam作品 《虐之太空》 技术分享</a></h3>
-    <div class="date">
-    	Written on July 15, 2015
-  	</div>
-    <div>
-    	Tags: <a href="/tag/gamejam.html" rel="tag">gamejam</a>
-    </div>
-  </li>
+<p>在讲贝塞尔曲线之前先复习下组合数学</p>
 
-  <li>
-  	<h3><a href="/gamejam/">IndieAce Gamejam 广州站</a></h3>
-    <div class="date">
-    	Written on July 15, 2015
-  	</div>
-    <div>
-    	Tags: <a href="/tag/gamejam.html" rel="tag">gamejam</a>
-    </div>
-  </li>
+<h2>组合数学</h2>
 
-</ul>
+<h3>排列 permutation</h3>
 
-<p>All tags:</p>
-<div id="tag-cloud">
-  <a href="/tag/c%2B%2B.html" class="set-4">c++</a> <a href="/tag/curve.html" class="set-1">curve</a> <a href="/tag/fourier.html" class="set-1">fourier</a> <a href="/tag/gamejam.html" class="set-1">gamejam</a> <a href="/tag/jekyll.html" class="set-1">jekyll</a> <a href="/tag/leetcode.html" class="set-5">leetcode</a> <a href="/tag/linear-algebra.html" class="set-5">linear algebra</a> <a href="/tag/math.html" class="set-3">math</a> <a href="/tag/matrix.html" class="set-5">matrix</a> <a href="/tag/nopoll.html" class="set-1">nopoll</a> <a href="/tag/pbrt.html" class="set-1">pbrt</a> <a href="/tag/quaternion.html" class="set-1">quaternion</a> <a href="/tag/raytrace.html" class="set-1">raytrace</a>
+<p>注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。</p>
+
+<p>permutation的公式是：</p>
+
+<p>\[ P(n,k) = P_{n}^{k} \]</p>
+
+<p>combination permutation</p>
+
+  </div>
+
+  <div class="date">
+    Written on December 26, 2015
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+
+</article>
+
+
     </div>
 
     <div class="wrapper-footer">
