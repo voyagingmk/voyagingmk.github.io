@@ -11,35 +11,11 @@
     
     <meta name="description" content="本文主要关注的是公式的推导。
 
-在讲贝塞尔曲线之前先复习下组合数学
-
-组合数学
-
-排列 permutation
-
-注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。
-
-permutation的公式是：
-
-\[ P(n,k) = P_{n}^{k} \]
-
-combination permutation
+在讲贝塞尔曲线之前先复习下组合数学。
 " />
     <meta property="og:description" content="本文主要关注的是公式的推导。
 
-在讲贝塞尔曲线之前先复习下组合数学
-
-组合数学
-
-排列 permutation
-
-注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。
-
-permutation的公式是：
-
-\[ P(n,k) = P_{n}^{k} \]
-
-combination permutation
+在讲贝塞尔曲线之前先复习下组合数学。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -115,7 +91,9 @@ combination permutation
   <div class="entry">
     <p>本文主要关注的是公式的推导。</p>
 
-<p>在讲贝塞尔曲线之前先复习下组合数学</p>
+<p>在讲贝塞尔曲线之前先复习下组合数学。</p>
+
+<!--more-->
 
 <h2>组合数学</h2>
 
@@ -125,9 +103,68 @@ combination permutation
 
 <p>permutation的公式是：</p>
 
-<p>\[ P(n,k) = P_{n}^{k} \]</p>
+<p>\[ P(n,k) = P_{n}^{k} = \frac {n!}{(n-k)!} \]</p>
 
-<p>combination permutation</p>
+<p>含义：从n个数取出某k个数总共有多少种排列。</p>
+
+<p>所以，排列是<strong>有顺序</strong>的。</p>
+
+<h3>组合 combination</h3>
+
+<p>组合这个东西可以用“排列”来理解，比如对于某3个不同的数a、b、c，有\[ P_{3}^{3} = \frac {3!}{(3-3)!} = 6 \]种排列: abc、acb、bac、bca、cab、cba，然而，组合数只有一个，也就是[a、b、c]。</p>
+
+<p>所以，组合是<strong>没有顺序</strong>的。</p>
+
+<p>combination的公式是：</p>
+
+<p>\[ C(n,k)  = C_{n}^{k} = \frac { P_{n}^{k} } { P_{k}^{k} } = \frac {n!}{(n-k)!k!} , 0 &lt; k &lt;= n\]</p>
+
+<p>combination有一条公式要注意下：</p>
+
+<p>\[ C_{n}^{k} = C_{n-1}^{k-1} + C_{n-1}^{k} , 0 &lt; k &lt; n \]</p>
+
+<p>顺便给个简单证明：</p>
+
+<p>\( C_{n-1}^{k-1} + C_{n-1}^{k} = \)</p>
+
+<p>\( \frac {(n-1)!}{(n-1-(k-1))!(k-1)!} + \frac {(n-1)!}{(n-1-k)!k!}  = \)</p>
+
+<p>\( \frac {(n-1)!}{(n-k)!(k-1)!} + \frac {(n-1)!}{(n-1-k)!k!}  = \)</p>
+
+<p>\( \frac {k(n-1)!}{k(n-k)!(k-1)!} + \frac {(n-k)(n-1)!}{(n-k)(n-1-k)!k!}  = \)</p>
+
+<p>\( \frac {k(n-1)!}{(n-k)!k!} + \frac {(n-k)(n-1)!}{(n-k)!k!}  = \)</p>
+
+<p>\( \frac {k(n-1)!+(n-k)(n-1)!}{(n-k)!k!}  = \)</p>
+
+<p>\( \frac {n(n-1)!}{(n-k)!k!}  =  \frac {n!}{(n-k)!k!}  =   C_{n}^{k} \)</p>
+
+<h2>贝塞尔曲线</h2>
+
+<h3>定义</h3>
+
+<p>给定n个控制点\(P_{0},P_{1},\cdots ,P_{n}\)，贝塞尔曲线的公式如下：</p>
+
+<p>\[ P(t) = \sum_{i=0}^{n}P_{i}B_{i,n}(t) , t\in [0,1] \]</p>
+
+<p>其中的\( B_{i,n}(t) \)叫Bernstein polynomial，定义如下：</p>
+
+<p>\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i}, i=0,1,\cdots ,n \]</p>
+
+<h3>\( B_{i,n}(t) \)的特性</h3>
+
+<h4>递归性</h4>
+
+<p>\[ B_{i,n}(t) = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t)  i=0,1,\cdots ,n \]</p>
+
+<p>证明：</p>
+
+<p>\( B_{i,n}(t) \)
+\( = C_{n}^{i}t^{i}(1-t)^{n-i} \)
+\( = (C_{n-1}^{i-1} + C_{n-1}^{i})t^{i}(1-t)^{n-i} \)
+\( = C_{n-1}^{i-1}t^{i}(1-t)^{n-i} + C_{n-1}^{i}t^{i}(1-t)^{n-i} \)
+\( = (1-t)C_{n-1}^{i}t^{i}(1-t)^{(n-1)-i} + tC_{n-1}^{i-1}t^{i-1}(1-t)^{(n-1)-(i-1)} \)
+\( = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t) \)</p>
 
   </div>
 

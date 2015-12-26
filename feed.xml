@@ -10,7 +10,9 @@
         <title>曲线数学之贝塞尔曲线Bézier Curves</title>
         <description>&lt;p&gt;本文主要关注的是公式的推导。&lt;/p&gt;
 
-&lt;p&gt;在讲贝塞尔曲线之前先复习下组合数学&lt;/p&gt;
+&lt;p&gt;在讲贝塞尔曲线之前先复习下组合数学。&lt;/p&gt;
+
+&lt;!--more--&gt;
 
 &lt;h2&gt;组合数学&lt;/h2&gt;
 
@@ -20,9 +22,68 @@
 
 &lt;p&gt;permutation的公式是：&lt;/p&gt;
 
-&lt;p&gt;\[ P(n,k) = P_{n}^{k} \]&lt;/p&gt;
+&lt;p&gt;\[ P(n,k) = P_{n}^{k} = \frac {n!}{(n-k)!} \]&lt;/p&gt;
 
-&lt;p&gt;combination permutation&lt;/p&gt;
+&lt;p&gt;含义：从n个数取出某k个数总共有多少种排列。&lt;/p&gt;
+
+&lt;p&gt;所以，排列是&lt;strong&gt;有顺序&lt;/strong&gt;的。&lt;/p&gt;
+
+&lt;h3&gt;组合 combination&lt;/h3&gt;
+
+&lt;p&gt;组合这个东西可以用“排列”来理解，比如对于某3个不同的数a、b、c，有\[ P_{3}^{3} = \frac {3!}{(3-3)!} = 6 \]种排列: abc、acb、bac、bca、cab、cba，然而，组合数只有一个，也就是[a、b、c]。&lt;/p&gt;
+
+&lt;p&gt;所以，组合是&lt;strong&gt;没有顺序&lt;/strong&gt;的。&lt;/p&gt;
+
+&lt;p&gt;combination的公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ C(n,k)  = C_{n}^{k} = \frac { P_{n}^{k} } { P_{k}^{k} } = \frac {n!}{(n-k)!k!} , 0 &amp;lt; k &amp;lt;= n\]&lt;/p&gt;
+
+&lt;p&gt;combination有一条公式要注意下：&lt;/p&gt;
+
+&lt;p&gt;\[ C_{n}^{k} = C_{n-1}^{k-1} + C_{n-1}^{k} , 0 &amp;lt; k &amp;lt; n \]&lt;/p&gt;
+
+&lt;p&gt;顺便给个简单证明：&lt;/p&gt;
+
+&lt;p&gt;\( C_{n-1}^{k-1} + C_{n-1}^{k} = \)&lt;/p&gt;
+
+&lt;p&gt;\( \frac {(n-1)!}{(n-1-(k-1))!(k-1)!} + \frac {(n-1)!}{(n-1-k)!k!}  = \)&lt;/p&gt;
+
+&lt;p&gt;\( \frac {(n-1)!}{(n-k)!(k-1)!} + \frac {(n-1)!}{(n-1-k)!k!}  = \)&lt;/p&gt;
+
+&lt;p&gt;\( \frac {k(n-1)!}{k(n-k)!(k-1)!} + \frac {(n-k)(n-1)!}{(n-k)(n-1-k)!k!}  = \)&lt;/p&gt;
+
+&lt;p&gt;\( \frac {k(n-1)!}{(n-k)!k!} + \frac {(n-k)(n-1)!}{(n-k)!k!}  = \)&lt;/p&gt;
+
+&lt;p&gt;\( \frac {k(n-1)!+(n-k)(n-1)!}{(n-k)!k!}  = \)&lt;/p&gt;
+
+&lt;p&gt;\( \frac {n(n-1)!}{(n-k)!k!}  =  \frac {n!}{(n-k)!k!}  =   C_{n}^{k} \)&lt;/p&gt;
+
+&lt;h2&gt;贝塞尔曲线&lt;/h2&gt;
+
+&lt;h3&gt;定义&lt;/h3&gt;
+
+&lt;p&gt;给定n个控制点\(P_{0},P_{1},\cdots ,P_{n}\)，贝塞尔曲线的公式如下：&lt;/p&gt;
+
+&lt;p&gt;\[ P(t) = \sum_{i=0}^{n}P_{i}B_{i,n}(t) , t\in [0,1] \]&lt;/p&gt;
+
+&lt;p&gt;其中的\( B_{i,n}(t) \)叫Bernstein polynomial，定义如下：&lt;/p&gt;
+
+&lt;p&gt;\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i}, i=0,1,\cdots ,n \]&lt;/p&gt;
+
+&lt;h3&gt;\( B_{i,n}(t) \)的特性&lt;/h3&gt;
+
+&lt;h4&gt;递归性&lt;/h4&gt;
+
+&lt;p&gt;\[ B_{i,n}(t) = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t)  i=0,1,\cdots ,n \]&lt;/p&gt;
+
+&lt;p&gt;证明：&lt;/p&gt;
+
+&lt;p&gt;\( B_{i,n}(t) \)
+\( = C_{n}^{i}t^{i}(1-t)^{n-i} \)
+\( = (C_{n-1}^{i-1} + C_{n-1}^{i})t^{i}(1-t)^{n-i} \)
+\( = C_{n-1}^{i-1}t^{i}(1-t)^{n-i} + C_{n-1}^{i}t^{i}(1-t)^{n-i} \)
+\( = (1-t)C_{n-1}^{i}t^{i}(1-t)^{(n-1)-i} + tC_{n-1}^{i-1}t^{i-1}(1-t)^{(n-1)-(i-1)} \)
+\( = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t) \)&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/bezier-1/</link>
