@@ -14,7 +14,7 @@
 
 &lt;!--more--&gt;
 
-&lt;h2&gt;组合数学&lt;/h2&gt;
+&lt;h1&gt;组合数学&lt;/h1&gt;
 
 &lt;h3&gt;排列 permutation&lt;/h3&gt;
 
@@ -78,7 +78,7 @@
 
 &lt;p&gt;\( \frac {n(n-1)!}{(n-k)!k!}  =  \frac {n!}{(n-k)!k!}  =   C_{n}^{k} \)&lt;/p&gt;
 
-&lt;h2&gt;贝塞尔曲线&lt;/h2&gt;
+&lt;h1&gt;贝塞尔曲线&lt;/h1&gt;
 
 &lt;h3&gt;定义&lt;/h3&gt;
 
@@ -176,11 +176,17 @@
 
 &lt;p&gt;\( = C_{n}^{n-i}t^{n-i}(1-t)^{i}  \)&lt;/p&gt;
 
-&lt;p&gt;\( = C_{n}^{n-i}[1-(1-t)]^{n - (n-i)}(1-t)^{n-i} \)&lt;/p&gt;
+&lt;p&gt;\( = C_{n}^{i}t^{n-i}(1-t)^{i} \)&lt;/p&gt;
 
-&lt;p&gt;\( = C_{n}^{i}t^{i}(1-t)^{n-i} \)&lt;/p&gt;
+&lt;p&gt;\( B_{i,n}(1 - t) =  C_{n}^{i}(1 - t)^{i}(1-(1 - t))^{n-i} \)&lt;/p&gt;
 
-&lt;p&gt;\( = B_{i,n}(1 - t) \)&lt;/p&gt;
+&lt;p&gt;\( = C_{n}^{i}(1 - t)^{i}t^{n-i} \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n}^{i}t^{n-i}(1-t)^{i} \)&lt;/p&gt;
+
+&lt;p&gt;得证。&lt;/p&gt;
+
+&lt;h4&gt;非负性&lt;/h4&gt;
 </description>
         <pubDate>Sat, 26 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/bezier-1/</link>
