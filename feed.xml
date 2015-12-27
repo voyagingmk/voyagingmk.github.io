@@ -305,7 +305,25 @@
 
 &lt;p&gt;n = 2时：&lt;/p&gt;
 
-&lt;p&gt;\[ B = \]&lt;/p&gt;
+&lt;p&gt;\( b_{k,i} = C_{2}^{k} C_{k}^{i}(-1)^{k - i} \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{0,0} = C_{2}^{0} C_{0}^{0}(-1)^{0 - 0} =  1*1=1 \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{1,0} = C_{2}^{1} C_{1}^{0}(-1)^{1 - 0} =  2*1*(-1)=-2 \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{2,0} = C_{2}^{2} C_{2}^{0}(-1)^{2 - 0} =  1*1=1 \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{1,1} = C_{2}^{1} C_{1}^{1}(-1)^{1 - 1} =  2*1=2 \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{2,1} = C_{2}^{2} C_{2}^{1}(-1)^{2 - 1} =  1*2*(-1)=-2 \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{2,2} = C_{2}^{2} C_{2}^{2}(-1)^{2 - 2} =  1*1=1 \)&lt;/p&gt;
+
+&lt;p&gt;\[ B =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0\\ -2&amp;amp;2&amp;amp;0\\ 1&amp;amp;-2&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;n = 3时：&lt;/p&gt;
+
+&lt;p&gt;\[ B =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;0\\ -3&amp;amp;3&amp;amp;0&amp;amp;0\\ 3&amp;amp;-6&amp;amp;3&amp;amp;0\\ -1&amp;amp;3&amp;amp;-3&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/bezier-1/</link>
