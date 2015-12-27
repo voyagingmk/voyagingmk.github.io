@@ -36,9 +36,29 @@
 
 &lt;p&gt;combination的公式是：&lt;/p&gt;
 
-&lt;p&gt;\[ C(n,k)  = C_{n}^{k} = \frac { P_{n}^{k} } { P_{k}^{k} } = \frac {n!}{(n-k)!k!} , 0 &amp;lt; k &amp;lt;= n\]&lt;/p&gt;
+&lt;p&gt;\[ C(n,k)  = C_{n}^{k} = \frac { P_{n}^{k} } { P_{k}^{k} } = \frac {n!}{k!(n-k)!} , 0 &amp;lt; k &amp;lt;= n\]&lt;/p&gt;
 
-&lt;p&gt;combination有一条公式要注意下：&lt;/p&gt;
+&lt;p&gt;性质1：&lt;/p&gt;
+
+&lt;p&gt;\(  C_{n}^{k} = \frac {n!}{k!(n-k)!} \)&lt;/p&gt;
+
+&lt;p&gt;\( = \frac {n!}{(n-(n-k))!(n-k)!} \)&lt;/p&gt;
+
+&lt;p&gt;\( = \frac {n!}{(n-k)!(n-(n-k))!} \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n}^{n-k} \)&lt;/p&gt;
+
+&lt;p&gt;性质2：&lt;/p&gt;
+
+&lt;p&gt;\[  C_{n}^{k} = \frac {n!}{k!(n-k)!} = 0 【 k &amp;lt; 0 ， k &amp;gt; n】 \] &lt;/p&gt;
+
+&lt;p&gt;(当k&lt;0或k&gt;n时，右边的式子会出现负数的阶乘。负数阶乘在组合数公式的计算中，可以认为等于0)&lt;/p&gt;
+
+&lt;p&gt;combination很重要，比如说二项式定理里的展开式就用到了它：&lt;/p&gt;
+
+&lt;p&gt;\[ (a+b)^{n} = \sum_{r=0}^{n}C_{n}^{r}a^{n-r}b^{r} \]&lt;/p&gt;
+
+&lt;p&gt;combination还有一条公式要注意下：&lt;/p&gt;
 
 &lt;p&gt;\[ C_{n}^{k} = C_{n-1}^{k-1} + C_{n-1}^{k} , 0 &amp;lt; k &amp;lt; n \]&lt;/p&gt;
 
@@ -68,22 +88,99 @@
 
 &lt;p&gt;其中的\( B_{i,n}(t) \)叫Bernstein polynomial，定义如下：&lt;/p&gt;
 
-&lt;p&gt;\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i}, i=0,1,\cdots ,n \]&lt;/p&gt;
+&lt;p&gt;\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i} 【i=0,1,\cdots ,n】 \]&lt;/p&gt;
 
 &lt;h3&gt;\( B_{i,n}(t) \)的特性&lt;/h3&gt;
 
 &lt;h4&gt;递归性&lt;/h4&gt;
 
-&lt;p&gt;\[ B_{i,n}(t) = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t)  i=0,1,\cdots ,n \]&lt;/p&gt;
+&lt;p&gt;\[ B_{i,n}(t) = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t)   【i=0,1,\cdots ,n】 \]&lt;/p&gt;
 
 &lt;p&gt;证明：&lt;/p&gt;
 
-&lt;p&gt;\( B_{i,n}(t) \)
-\( = C_{n}^{i}t^{i}(1-t)^{n-i} \)
-\( = (C_{n-1}^{i-1} + C_{n-1}^{i})t^{i}(1-t)^{n-i} \)
-\( = C_{n-1}^{i-1}t^{i}(1-t)^{n-i} + C_{n-1}^{i}t^{i}(1-t)^{n-i} \)
-\( = (1-t)C_{n-1}^{i}t^{i}(1-t)^{(n-1)-i} + tC_{n-1}^{i-1}t^{i-1}(1-t)^{(n-1)-(i-1)} \)
-\( = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t) \)&lt;/p&gt;
+&lt;p&gt;\( B_{i,n}(t) \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n}^{i}t^{i}(1-t)^{n-i} \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n-1}^{i-1} + C_{n-1}^{i})t^{i}(1-t)^{n-i} \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n-1}^{i-1}t^{i}(1-t)^{n-i} + C_{n-1}^{i}t^{i}(1-t)^{n-i} \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t)C_{n-1}^{i}t^{i}(1-t)^{(n-1)-i} + tC_{n-1}^{i-1}t^{i-1}(1-t)^{(n-1)-(i-1)} \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t) \)&lt;/p&gt;
+
+&lt;h4&gt;归一性&lt;/h4&gt;
+
+&lt;p&gt;\[ \sum_{i=0}^{n}B_{i,n}(t) \equiv 1   【t\in (0,1)】 \]&lt;/p&gt;
+
+&lt;p&gt;证明：&lt;/p&gt;
+
+&lt;p&gt;根据二项式定理有：&lt;/p&gt;
+
+&lt;p&gt;\[ \sum_{i=0}^{n}B_{i,n}(t) \]
+\[ = \sum_{i=0}^{n}C_{n}^{i}t^{i}(1-t)^{n-i} \]
+\[ [(1-t)+t]^{n} \equiv 1  \]&lt;/p&gt;
+
+&lt;h4&gt;Partition of Unity&lt;/h4&gt;
+
+&lt;p&gt;\[ \sum_{i=0}^{n}B_{i,n}(t) = \sum_{i=0}^{n-1}B_{i,n-1}(t) = 1 \]&lt;/p&gt;
+
+&lt;p&gt;证明:&lt;/p&gt;
+
+&lt;p&gt;利用递归公式，有：&lt;/p&gt;
+
+&lt;p&gt;\( \sum_{i=0}^{n}B_{i,n}(t) \)&lt;/p&gt;
+
+&lt;p&gt;\( = \sum_{i=0}^{n}[(1-t)B_{i,n-1}(t) + tB_{i-1,n-1}(t)] \)&lt;/p&gt;
+
+&lt;p&gt;\( = \sum_{i=0}^{n}[(1-t)B_{i,n-1}(t)] + \sum_{i=0}^{n}[tB_{i-1,n-1}(t)] \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t)\sum_{i=0}^{n}[B_{i,n-1}(t)] + t\sum_{i=0}^{n}[B_{i-1,n-1}(t)] \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t)[\sum_{i=0}^{n-1}B_{i,n-1}(t) + B_{n,n-1}(t) ] + t[\sum_{i=1}^{n}B_{i-1,n-1}(t) + B_{-1,n-1}(t) ] \)&lt;/p&gt;
+
+&lt;p&gt;因为:&lt;/p&gt;
+
+&lt;p&gt;\[ B_{n,n-1}(t) = C_{n-1}^{n}t^{n}(1-t)^{n-1-n} = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ B_{-1,n-1}(t) = C_{n-1}^{-1}t^{-1}(1-t)^{(n-1)-(-1)} = 0 \]&lt;/p&gt;
+
+&lt;p&gt;(这里利用了上文提到的组合数公式性质2)&lt;/p&gt;
+
+&lt;p&gt;所以可简化为：&lt;/p&gt;
+
+&lt;p&gt;\( \sum_{i=0}^{n}B_{i,n}(t) \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t)[\sum_{i=0}^{n-1}B_{i,n-1}(t)] + t[\sum_{i=1}^{n}B_{i-1,n-1}(t)] \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t)[\sum_{i=0}^{n-1}B_{i,n-1}(t)] + t[\sum_{i=0}^{n-1}B_{i,n-1}(t)] \)&lt;/p&gt;
+
+&lt;p&gt;\( = (1-t+t)[\sum_{i=0}^{n-1}B_{i,n-1}(t)] \)&lt;/p&gt;
+
+&lt;p&gt;\( = \sum_{i=0}^{n-1}B_{i,n-1}(t) \)&lt;/p&gt;
+
+&lt;h4&gt;对称性&lt;/h4&gt;
+
+&lt;p&gt;\[ B_{i,n}(1 - t) = B_{n-i,n}(t) \]&lt;/p&gt;
+
+&lt;p&gt;证明：&lt;/p&gt;
+
+&lt;p&gt;由定义：&lt;/p&gt;
+
+&lt;p&gt;\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} \]&lt;/p&gt;
+
+&lt;p&gt;有：&lt;/p&gt;
+
+&lt;p&gt;\( B_{n-i,n}(t) = C_{n}^{n-i}t^{n-i}(1-t)^{n-(n-i)}  \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n}^{n-i}t^{n-i}(1-t)^{i}  \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n}^{n-i}[1-(1-t)]^{n - (n-i)}(1-t)^{n-i} \)&lt;/p&gt;
+
+&lt;p&gt;\( = C_{n}^{i}t^{i}(1-t)^{n-i} \)&lt;/p&gt;
+
+&lt;p&gt;\( = B_{i,n}(1 - t) \)&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/bezier-1/</link>
