@@ -97,7 +97,7 @@
 
 <h1>组合数学</h1>
 
-<h3>排列 permutation</h3>
+<h2>排列 permutation</h2>
 
 <p>注意，排列的英文是permutation，这个词也就是线性代数里的“置换”。联想置换矩阵的概念，就可以近似理解“排列”的意义。</p>
 
@@ -109,7 +109,7 @@
 
 <p>所以，排列是<strong>有顺序</strong>的。</p>
 
-<h3>组合 combination</h3>
+<h2>组合 combination</h2>
 
 <p>组合这个东西可以用“排列”来理解，比如对于某3个不同的数a、b、c，有\[ P_{3}^{3} = \frac {3!}{(3-3)!} = 6 \]种排列: abc、acb、bac、bca、cab、cba，然而，组合数只有一个，也就是[a、b、c]。</p>
 
@@ -161,7 +161,7 @@
 
 <h1>贝塞尔曲线</h1>
 
-<h3>定义</h3>
+<h2>定义</h2>
 
 <p>给定n个控制点\(P_{0},P_{1},\cdots ,P_{n}\)，贝塞尔曲线的公式如下：</p>
 
@@ -171,7 +171,7 @@
 
 <p>\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i} 【i=0,1,\cdots ,n】 \]</p>
 
-<h3>\( B_{i,n}(t) \)的特性</h3>
+<h2>Bernstein polynomial的特性</h2>
 
 <h4>递归性</h4>
 
@@ -268,6 +268,125 @@
 <p>得证。</p>
 
 <h4>非负性</h4>
+
+<p>当 t = 0 时：</p>
+
+<p>\[ B_{i,n}(0) = 0 , 【i &gt; 0】\]</p>
+
+<p>\[ B_{i,n}(0) = 1 , 【i = 0】\]</p>
+
+<p>当 t = 1 时：</p>
+
+<p>\[ B_{i,n}(0) = 0 , 【i &gt; 0】\]</p>
+
+<p>\[ B_{i,n}(0) = 1 , 【i = 0】\]</p>
+
+<p>当 t= (0,1) 时：</p>
+
+<p>\[ B_{i,n}(t) &gt; 0 , 【i =0,1,2,\cdots ,n-1】\]</p>
+
+<p>证明：把数值代入定义公式就可以了。</p>
+
+<h2>Bernstein基(Bernstein Basis)到幂基(Power Basis)的转换</h2>
+
+<p>由二项式定理：</p>
+
+<p>\[ (a+b)^{n} = \sum_{r=0}^{n}C_{n}^{r}a^{n-r}b^{r} \]</p>
+
+<p>得到：</p>
+
+<p>\[ (1-t)^{n} = \sum_{r=0}^{n}C_{n}^{r}1^{n-r}(-t)^{r} = \sum_{r=0}^{n}C_{n}^{r}(-t)^{r}\]</p>
+
+<p>所以：</p>
+
+<p>\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} \]</p>
+
+<p>\[ = C_{n}^{i}t^{i}\sum _{k=0}^{n-i}C_{n-i}^{k}(-t)^{k} \]</p>
+
+<p>\[ = C_{n}^{i}t^{i}\sum _{k=0}^{n-i}C_{n-i}^{k}(-1)^{k}t^{k} \]</p>
+
+<p>\[ = \sum _{k=0}^{n-i}C_{n}^{i}t^{i}C_{n-i}^{k}(-1)^{k}t^{k} \]</p>
+
+<p>\[ = \sum _{k=0}^{n-i}C_{n}^{i}C_{n-i}^{k}(-1)^{k}t^{k+i} \]</p>
+
+<p>这时设g = k + i ，则有 k = g - i，i = g - k，上式变成：</p>
+
+<p>\[ = \sum _{g - i=0}^{n-(g-k)}C_{n}^{i}C_{n-i}^{g - i}(-1)^{g - i}t^{g} \]</p>
+
+<p>\[ = \sum _{g=i}^{n-g+k}C_{n}^{i}C_{n-i}^{g - i}(-1)^{g - i}t^{g}\]</p>
+
+<p>把g换成k，上式变成：</p>
+
+<p>\[ = \sum _{k=i}^{n-k+k}C_{n}^{i}C_{n-i}^{k - i}(-1)^{k - i}t^{k} \]</p>
+
+<p>\[ = \sum _{k=i}^{n}C_{n}^{i}C_{n-i}^{k - i}(-1)^{k - i}t^{k} \]</p>
+
+<p>其中\(C_{n}^{i}C_{n-i}^{k - i}\)可以进一步简化：</p>
+
+<p>\( C_{n}^{i} C_{n-i}^{k - i} \)
+\( = \frac {n!}{i!(n-i)!} \frac {(n-i)!}{(k-i)!((n-i)-(k-i))!}  \)</p>
+
+<p>\( = \frac {n!}{i!(n-i)!} \frac {(n-i)!}{(k-i)!((n-k)!}  \)</p>
+
+<p>\( = \frac {n!(n-i)!}{i!(n-i)!(k-i)!((n-k)!} \)</p>
+
+<p>\( = \frac {n!}{i!(k-i)!((n-k)!} \)</p>
+
+<p>\( = \frac {n!k!}{i!(k-i)!((n-k)!k!} \)</p>
+
+<p>\( = \frac {n!}{k!(n-k)!} \frac {k!}{i!((k-i)!} \)</p>
+
+<p>\( = C_{n}^{k} C_{k}^{i} \)</p>
+
+<p>所以：</p>
+
+<p>\[ = \sum _{k=i}^{n}C_{n}^{i}C_{n-i}^{k - i}(-1)^{k - i}t^{k} \]</p>
+
+<p>\[ = \sum _{k=i}^{n}C_{n}^{k} C_{k}^{i}(-1)^{k - i}t^{k} \]</p>
+
+<p>综上:</p>
+
+<p>\[  B_{i,n}(t) = \sum _{k=i}^{n}C_{n}^{k} C_{k}^{i}(-1)^{k - i}t^{k} \]</p>
+
+<p>设\( b_{k,i} = C_{n}^{k} C_{k}^{i}(-1)^{k - i} \)</p>
+
+<p>则上式变成：</p>
+
+<p>\[  B_{i,n}(t) = \sum _{k=i}^{n}b_{k,i}t^{k} \]</p>
+
+<p>展开后：</p>
+
+<p>\[  B_{i,n}(t) = b_{i,i}t^{i} + b_{i+1,i}t^{i+1} + \cdots + b_{n,i}t^{n} \]</p>
+
+<h1>Bezier曲线的矩阵形式</h1>
+
+<p>由上一节推导出来的2条式子：</p>
+
+<p>\[ b_{k,i} = C_{n}^{k} C_{k}^{i}(-1)^{k - i} \]</p>
+
+<p>\[  B_{i,n}(t) = \sum _{k=i}^{n}b_{k,i}t^{k} = b_{i,i}t^{i} + b_{i+1,i}t^{i+1} + \cdots + b_{n,i}t^{n} \]</p>
+
+<p>可以推导出矩阵：</p>
+
+<p>\[  \left[ \begin{matrix} B_{0,n}(t)&amp;B_{1,n}(t)&amp;\cdots &amp;B_{n,n}(t)\\ \end{matrix} \right] \]</p>
+
+<p>\[ =  \left[ \begin{matrix} \sum _{k=0}^{n}b_{k,0}t^{k}&amp;\sum _{k=1}^{n}b_{k,1}t^{k}&amp;\cdots &amp;\sum _{k=n}^{n}b_{k,n}t^{k}\\ \end{matrix} \right] \]</p>
+
+<p>\[ =  \left[ \begin{matrix} t^{0}&amp;t^{1}&amp;t^{2}&amp;\cdots &amp;t^{n}\\ \end{matrix} \right] \left[ \begin{matrix} b_{0,0}&amp;0&amp;0&amp;\cdots &amp;0\\  b_{1,0}&amp;b_{1,1}&amp;0&amp;\cdots &amp;0\\  b_{2,0}&amp;b_{2,1}&amp;b_{2,2}&amp;\cdots &amp;0\\  \vdots &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots \\  b_{n,0}&amp;b_{n,1}&amp;b_{n,2}&amp;\cdots &amp;b_{n,n}\\ \end{matrix} \right] \]</p>
+
+<p>再由bezier曲线的公式：</p>
+
+<p>\[ P(t) = \sum_{i=0}^{n}P_{i}B_{i,n}(t) , t\in [0,1] \]</p>
+
+<p>有：</p>
+
+<p>\[ P(t) =  \left[ \begin{matrix} t^{0}&amp;t^{1}&amp;t^{2}&amp;\cdots &amp;t^{n}\\ \end{matrix} \right] \left[ \begin{matrix} b_{0,0}&amp;0&amp;0&amp;\cdots &amp;0\\  b_{1,0}&amp;b_{1,1}&amp;0&amp;\cdots &amp;0\\  b_{2,0}&amp;b_{2,1}&amp;b_{2,2}&amp;\cdots &amp;0\\  \vdots &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots \\  b_{n,0}&amp;b_{n,1}&amp;b_{n,2}&amp;\cdots &amp;b_{n,n}\\ \end{matrix} \right]  \left[ \begin{matrix} P^{0}\\ P^{1}\\ P^{2}\\ \vdots \\ P^{n}\\ \end{matrix} \right] \]</p>
+
+<p>注意，中间的矩阵B是常量(取决于阶数):</p>
+
+<p>n = 2时：</p>
+
+<p>\[ B = \]</p>
 
   </div>
 
