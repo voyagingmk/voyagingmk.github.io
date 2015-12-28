@@ -87,7 +87,7 @@
 </script>
 <article class="post">
   <h1>曲线数学之贝塞尔曲线Bézier Curves</h1>
-  <h3>Tags: <a href="/tag/curve.html" rel="tag">curve</a></h3>
+  <h3>Tags: <a href="/tag/math.html" rel="tag">math</a>, <a href="/tag/curve.html" rel="tag">curve</a></h3>
   <div class="entry">
     <p>本文主要关注的是公式的推导。</p>
 
@@ -171,7 +171,7 @@
 
 <p>\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i} 【i=0,1,\cdots ,n】 \]</p>
 
-<h2>bezier曲线的特性</h2>
+<h2>Bézier曲线的特性</h2>
 
 <p>特性1：改变单个控制点会引起整条曲线的改变。</p>
 
@@ -362,7 +362,29 @@
 
 <p>\[  B_{i,n}(t) = b_{i,i}t^{i} + b_{i+1,i}t^{i+1} + \cdots + b_{n,i}t^{n} \]</p>
 
-<h1>Bezier曲线的矩阵形式</h1>
+<h1>Bézier曲线的递推形式(de Casteljau算法)</h1>
+
+<p>前面讲的是Bézier曲线的曲线方程定义，现在介绍一个简单实用的算法:de Casteljau&#39;s Algorithm。</p>
+
+<p>先分享我找到的一些演示程序：</p>
+
+<p><a href="http://myst729.github.io/bezier-curve/">http://myst729.github.io/bezier-curve/</a>。</p>
+
+<p><a href="https://www.jasondavies.com/animated-bezier/">https://www.jasondavies.com/animated-bezier/</a>。</p>
+
+<p>以及油管上的:<a href="https://www.youtube.com/watch?v=YATikPP2q70">https://www.youtube.com/watch?v=YATikPP2q70</a>。</p>
+
+<p>递推公式如下：</p>
+
+<p>\[ P_{i}^{k} =\begin {cases} P_{i}  【k=0】 \\  (1-t)P_{i}^{k-1}+tP_{i+1}^{k-1} 【k=1,2,\cdots ,n,i=0,1,\cdots ,n-k】 \end {cases}  \]</p>
+
+<p><img src="../images/2015.12/2.png" alt="2.png"></p>
+
+<p>以上图为例：因为有\(P_{0},P_{1},P_{2},P_{3}\)4个控制点，所以n的值是3(要减1)。</p>
+
+<p>然后求该贝塞尔曲线在 t = 1/2时的坐标点B(1/2)：</p>
+
+<h1>Bézier曲线的矩阵形式</h1>
 
 <p>由上一节推导出来的2条式子：</p>
 
@@ -378,7 +400,7 @@
 
 <p>\[ =  \left[ \begin{matrix} t^{0}&amp;t^{1}&amp;t^{2}&amp;\cdots &amp;t^{n}\\ \end{matrix} \right] \left[ \begin{matrix} b_{0,0}&amp;0&amp;0&amp;\cdots &amp;0\\  b_{1,0}&amp;b_{1,1}&amp;0&amp;\cdots &amp;0\\  b_{2,0}&amp;b_{2,1}&amp;b_{2,2}&amp;\cdots &amp;0\\  \vdots &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots \\  b_{n,0}&amp;b_{n,1}&amp;b_{n,2}&amp;\cdots &amp;b_{n,n}\\ \end{matrix} \right] \]</p>
 
-<p>再由bezier曲线的公式：</p>
+<p>再由Bézier曲线的公式：</p>
 
 <p>\[ P(t) = \sum_{i=0}^{n}P_{i}B_{i,n}(t) , t\in [0,1] \]</p>
 
@@ -411,36 +433,46 @@
 <p>\[ B =  \left[ \begin{matrix} 1&amp;0&amp;0&amp;0\\ -3&amp;3&amp;0&amp;0\\ 3&amp;-6&amp;3&amp;0\\ -1&amp;3&amp;-3&amp;1\\ \end{matrix} \right] \]</p>
 
 <h2>测试一下正确性</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">Matrix3x3</span> <span class="n">P</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mf">20.f</span><span class="p">,</span> <span class="mf">20.f</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P0</span>
-    <span class="mf">770.f</span><span class="p">,</span> <span class="mf">30.f</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P1</span>
-    <span class="mf">400.f</span><span class="p">,</span> <span class="mf">780.f</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P2</span>
-<span class="p">};</span>
 
-<span class="n">Matrix3x3</span> <span class="n">B</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
-    <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
-    <span class="mi">1</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
-<span class="p">};</span>
+<p>测试代码基于我正在开发中的<a href="https://github.com/voyagingmk/renderer">renderer</a></p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &quot;transform.hpp&quot;</span>
+<span class="cp">#include &quot;geometry.hpp&quot;</span>
 
-<span class="n">Matrix3x3</span> <span class="n">BP</span> <span class="o">=</span> <span class="n">B</span> <span class="o">*</span> <span class="n">P</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">renderer</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="n">Matrix</span><span class="o">&lt;</span><span class="n">MxN</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">&gt;&gt;</span> <span class="n">Matrix1x3</span><span class="p">;</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span> <span class="n">argv</span><span class="p">){</span>
+    <span class="n">Matrix3x3</span> <span class="n">P</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mf">20.f</span><span class="p">,</span> <span class="mf">20.f</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P0</span>
+        <span class="mf">770.f</span><span class="p">,</span> <span class="mf">30.f</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P1</span>
+        <span class="mf">400.f</span><span class="p">,</span> <span class="mf">780.f</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P2</span>
+    <span class="p">};</span>
 
-<span class="n">cil</span><span class="o">::</span><span class="n">CImg</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;</span> <span class="n">img</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+    <span class="n">Matrix3x3</span> <span class="n">B</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">};</span>
 
-<span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
-<span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
-<span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+    <span class="n">Matrix3x3</span> <span class="n">BP</span> <span class="o">=</span> <span class="n">B</span> <span class="o">*</span> <span class="n">P</span><span class="p">;</span>
 
-<span class="k">for</span> <span class="p">(</span><span class="kt">float</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">;</span> <span class="n">t</span> <span class="o">+=</span> <span class="mf">0.0001f</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">Matrix1x3</span> <span class="n">T</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">*</span> <span class="n">t</span> <span class="p">};</span>
-    <span class="n">Matrix1x3</span> <span class="n">TBP</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">BP</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">TBP</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-    <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">TBP</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Matrix</span><span class="o">&lt;</span><span class="n">MxN</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">&gt;&gt;</span> <span class="n">Matrix1x3</span><span class="p">;</span>
+
+    <span class="n">cil</span><span class="o">::</span><span class="n">CImg</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;</span> <span class="n">img</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+    <span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+    <span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">float</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">;</span> <span class="n">t</span> <span class="o">+=</span> <span class="mf">0.0001f</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Matrix1x3</span> <span class="n">T</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">*</span> <span class="n">t</span> <span class="p">};</span>
+        <span class="n">Matrix1x3</span> <span class="n">TBP</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">BP</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">TBP</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+        <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">TBP</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">img</span><span class="p">.</span><span class="n">display</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="n">img</span><span class="p">.</span><span class="n">display</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">);</span>
 </code></pre></div>
 <p><img src="../images/2015.12/1.png" alt="1.png"></p>
 
