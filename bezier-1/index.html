@@ -171,6 +171,10 @@
 
 <p>\[ B_{i,n}(t) = C_{n}^{i}t^{i}(1-t)^{n-i} = \frac {n!}{i!(n-i)!}t^{i}(1-t)^{n-i} 【i=0,1,\cdots ,n】 \]</p>
 
+<h2>bezier曲线的特性</h2>
+
+<p>特性1：改变单个控制点会引起整条曲线的改变。</p>
+
 <h2>Bernstein polynomial的特性</h2>
 
 <h4>递归性</h4>
@@ -406,9 +410,39 @@
 
 <p>\[ B =  \left[ \begin{matrix} 1&amp;0&amp;0&amp;0\\ -3&amp;3&amp;0&amp;0\\ 3&amp;-6&amp;3&amp;0\\ -1&amp;3&amp;-3&amp;1\\ \end{matrix} \right] \]</p>
 
-<h2>bezier曲线的特性</h2>
+<h2>测试一下正确性</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">Matrix3x3</span> <span class="n">P</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mf">20.f</span><span class="p">,</span> <span class="mf">20.f</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P0</span>
+    <span class="mf">770.f</span><span class="p">,</span> <span class="mf">30.f</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P1</span>
+    <span class="mf">400.f</span><span class="p">,</span> <span class="mf">780.f</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>  <span class="c1">//P2</span>
+<span class="p">};</span>
 
-<p>特性1：改变单个控制点会引起整条曲线的改变。</p>
+<span class="n">Matrix3x3</span> <span class="n">B</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="n">Matrix3x3</span> <span class="n">BP</span> <span class="o">=</span> <span class="n">B</span> <span class="o">*</span> <span class="n">P</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="n">Matrix</span><span class="o">&lt;</span><span class="n">MxN</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">&gt;&gt;</span> <span class="n">Matrix1x3</span><span class="p">;</span>
+
+<span class="n">cil</span><span class="o">::</span><span class="n">CImg</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;</span> <span class="n">img</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+<span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+<span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+<span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kt">float</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">;</span> <span class="n">t</span> <span class="o">+=</span> <span class="mf">0.0001f</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Matrix1x3</span> <span class="n">T</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">*</span> <span class="n">t</span> <span class="p">};</span>
+    <span class="n">Matrix1x3</span> <span class="n">TBP</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">BP</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">TBP</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">TBP</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="n">img</span><span class="p">.</span><span class="n">atXYZC</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">img</span><span class="p">.</span><span class="n">display</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p><img src="../images/2015.12/1.png" alt="1.png"></p>
 
   </div>
 
