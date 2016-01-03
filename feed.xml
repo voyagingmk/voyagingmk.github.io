@@ -7,6 +7,67 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>曲线数学之B样条曲线B-Spline</title>
+        <description>&lt;p&gt;上一篇文章已经介绍了贝塞尔曲线。本篇文章接着介绍B样条曲线。&lt;/p&gt;
+
+&lt;p&gt;B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什么这样说呢？是因为贝塞尔曲线某些情况下不实用：曲线上每个点受所有控制点影响，这会给调整曲线工作带来麻烦。可以想到的第一个优化是，把整个贝塞尔曲线变成多段贝塞尔子曲线的拼接。然而，这个方案也不好用，因为拼接工作很难做好，因为要拼接曲线显得“光滑”前提是保证相邻曲线之间的连续性。&lt;/p&gt;
+
+&lt;p&gt;于是，老外发明了一个“算法”，贝塞尔曲线的变种：B-Spline(B样条)曲线。为什么叫Spline曲线呢？我猜是因为Spline曲线在4个控制点的情况下，有个典型的形状：&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.12/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;是不是有点像一条脊椎(spine)？(跑题了= =)&lt;/p&gt;
+
+&lt;p&gt;下文开始进入数学部分。&lt;/p&gt;
+
+&lt;h1&gt;B-Spline的定义&lt;/h1&gt;
+
+&lt;p&gt;B-Spline曲线我所知道的第一种估计也是最主要的定义：递归定义，其实是贝塞尔曲线的递归定义的一般化。先搬出贝塞尔的递归定义：&lt;/p&gt;
+
+&lt;p&gt;\[ P_{i}^{k} =\begin {cases} P_{i}  【k=0】 \\  (1-t)P_{i}^{k-1}+tP_{i+1}^{k-1} 【k=1,2,\cdots ,n,i=0,1,\cdots ,n-k】 \end {cases}  \]&lt;/p&gt;
+
+&lt;p&gt;而B-Spline是：&lt;/p&gt;
+
+&lt;p&gt;\[ N_{i}^{n}(x) = \frac {x-u_{i}}{u_{i+n}-u_{i}}N_{i}^{n-1}(x) + \frac {u_{i+n+1} - x}{u_{i+n+1}-u_{i+1}}N_{i+1}^{n-1}(x) \]&lt;/p&gt;
+
+&lt;p&gt;\[ N_{i}^{0}(x) =\begin {cases} 1  【x \in [ u_{i},u_{i+1} ) 】 \\ 0  【otherwise】 \end {cases} \]&lt;/p&gt;
+
+&lt;p&gt;(怎么也能看出一丝相似吧。)&lt;/p&gt;
+
+&lt;p&gt;从公式来看，似乎是变复杂了。然而其实现代码可以很简单，比如github上的这个js实现:&lt;a href=&quot;https://github.com/thibauts/b-spline&quot;&gt;https://github.com/thibauts/b-spline&lt;/a&gt;，它的B-Spline核心代码只有10行不到(OTL)。&lt;/p&gt;
+
+&lt;p&gt;对于这条公式的剖析，我发现有人已经做得机好了：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.csdn.net/tuqu/article/details/4749586&quot;&gt;B-样条曲线教程B-spline Curves Notes目录&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.csdn.net/tuqu/article/details/5177405&quot;&gt;B-样条基函数：定义 B-spline Basis Functions: Definition&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;扒了下原文，原来是密西根理工大学的教学讲义: &lt;a href=&quot;http://www.cs.mtu.edu/%7Eshene/COURSES/cs3621/NOTES/&quot;&gt;http://www.cs.mtu.edu/~shene/COURSES/cs3621/NOTES/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;如果认真看完这些资料，基本该懂的都懂了。&lt;/p&gt;
+
+&lt;p&gt;因为我自己来写B-Spline剖析肯定写不到这个深度，当然也没必要。所以我做了点别的事情：写了一个curve designer：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://voyagingmk.github.io/curvedesigner/&quot;&gt;curve designer&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;(这个东西基于zebra WebUI和上面那个bspline)&lt;/p&gt;
+
+&lt;p&gt;目的是实现一个B样条曲线的可视化编辑器，通过改变参数来理解B样条的实际特性。这可比看公式看论文爽多了。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2015.12/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/thibauts/b-spline&quot;&gt;https://github.com/thibauts/b-spline&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 29 Dec 2015 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/b-spline-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/b-spline-1/</guid>
+      </item>
+    
+      <item>
         <title>曲线数学之贝塞尔曲线Bézier Curves</title>
         <description>&lt;p&gt;本文主要关注的是公式的推导。&lt;/p&gt;
 
@@ -309,25 +370,31 @@
 
 &lt;p&gt;\( P_{i}^{k=0} = P_{i} \) &lt;/p&gt;
 
-&lt;p&gt;\( P_{0}^{k=0} = P_{0} \)
-\( P_{1}^{k=0} = P_{1} \)
-\( P_{2}^{k=0} = P_{2} \)
-\( P_{3}^{k=0} = P_{3} \)&lt;/p&gt;
+&lt;p&gt;\( P_{0}^{k=0} = P_{0} \)&lt;/p&gt;
+
+&lt;p&gt;\( P_{1}^{k=0} = P_{1} \)&lt;/p&gt;
+
+&lt;p&gt;\( P_{2}^{k=0} = P_{2} \)&lt;/p&gt;
+
+&lt;p&gt;\( P_{3}^{k=0} = P_{3} \)&lt;/p&gt;
 
 &lt;p&gt;k = 1时，\(i = 0,1,\cdots ,n-k = 0,1,2 \)，所以有:&lt;/p&gt;
 
 &lt;p&gt;\( P_{i}^{k=1} = (1-t)P_{i}^{1-1}+tP_{i+1}^{1-1}  = (1-t)P_{i}^{0}+tP_{i+1}^{0} \)&lt;/p&gt;
 
-&lt;p&gt;\( P_{0}^{k=1} = (1-t)P_{0}^{0}+tP_{1}^{0} = 0.5P_{0} + 0.5P_{1} = m_{0} \)
-\( P_{1}^{k=1} = (1-t)P_{1}^{0}+tP_{2}^{0} = 0.5P_{1} + 0.5P_{2} = m_{1} \)
-\( P_{2}^{k=1} = (1-t)P_{2}^{0}+tP_{3}^{0} = 0.5P_{2} + 0.5P_{3} = m_{2} \)&lt;/p&gt;
+&lt;p&gt;\( P_{0}^{k=1} = (1-t)P_{0}^{0}+tP_{1}^{0} = 0.5P_{0} + 0.5P_{1} = m_{0} \)&lt;/p&gt;
+
+&lt;p&gt;\( P_{1}^{k=1} = (1-t)P_{1}^{0}+tP_{2}^{0} = 0.5P_{1} + 0.5P_{2} = m_{1} \)&lt;/p&gt;
+
+&lt;p&gt;\( P_{2}^{k=1} = (1-t)P_{2}^{0}+tP_{3}^{0} = 0.5P_{2} + 0.5P_{3} = m_{2} \)&lt;/p&gt;
 
 &lt;p&gt;k = 2时，\(i = 0,1,\cdots ,n-k = 0,1\)，所以有:&lt;/p&gt;
 
 &lt;p&gt;\( P_{i}^{k=2} = (1-t)P_{i}^{1}+tP_{i+1}^{1} \)&lt;/p&gt;
 
-&lt;p&gt;\( P_{0}^{k=2} = (1-t)P_{0}^{1}+tP_{1}^{1} = 0.5m_{0} + 0.5m_{1} = q_{0} \)
-\( P_{1}^{k=2} = (1-t)P_{1}^{1}+tP_{2}^{1} = 0.5m_{1} + 0.5m_{2} = q_{1} \)&lt;/p&gt;
+&lt;p&gt;\( P_{0}^{k=2} = (1-t)P_{0}^{1}+tP_{1}^{1} = 0.5m_{0} + 0.5m_{1} = q_{0} \)&lt;/p&gt;
+
+&lt;p&gt;\( P_{1}^{k=2} = (1-t)P_{1}^{1}+tP_{2}^{1} = 0.5m_{1} + 0.5m_{2} = q_{1} \)&lt;/p&gt;
 
 &lt;p&gt;k = 3时，\(i = 0,1,\cdots ,n-k = 0\)，所以有:&lt;/p&gt;
 
@@ -337,7 +404,7 @@
 
 &lt;h1&gt;Bézier曲线的矩阵形式&lt;/h1&gt;
 
-&lt;p&gt;由上一节推导出来的2条式子：&lt;/p&gt;
+&lt;p&gt;由上上一节推导出来的2条式子：&lt;/p&gt;
 
 &lt;p&gt;\[ b_{k,i} = C_{n}^{k} C_{k}^{i}(-1)^{k - i} \]&lt;/p&gt;
 
@@ -2194,193 +2261,6 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
         <pubDate>Sun, 18 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/shah-function/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/shah-function/</guid>
-      </item>
-    
-      <item>
-        <title>理解卷积 Convolution</title>
-        <description>&lt;h2&gt;数学中的卷积&lt;/h2&gt;
-
-&lt;p&gt;卷积的wiki：&lt;a href=&quot;https://en.wikipedia.org/wiki/Convolution#Derivations&quot;&gt;Convolution&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;卷积和(convolution sum)的公式是:&lt;/p&gt;
-
-&lt;p&gt;\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]&lt;/p&gt;
-
-&lt;p&gt;写成积分形式是:&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;\[ x(t)*h(t) = \int _{-\infty }^{\infty }x(\tau )h(t-\tau )d\tau = \int _{-\infty }^{\infty }x(t-\tau )h(\tau )d\tau \]&lt;/p&gt;
-
-&lt;p&gt;要理解这个东西，比较难，一种是公式推导，不过是从傅里叶变换得到的；一种是用狄拉克δ函数来辅助理解（我自认为的）；最后一种是通过线性时不变系统理论&lt;a href=&quot;https://en.wikipedia.org/wiki/LTI_system_theory#Overview&quot;&gt;LTI system theory&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;先讲第一种吧。&lt;/p&gt;
-
-&lt;h2&gt;第一种思路：傅里叶变换与卷积&lt;/h2&gt;
-
-&lt;p&gt;首先要搬出&lt;a href=&quot;http://www.qiujiawei.com/fourier-equation/&quot;&gt;傅里叶变换&lt;/a&gt;的一个推论：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathcal {F}[\alpha f(t) + \beta g(t)] = \alpha F(s) + \beta G(s) \]&lt;/p&gt;
-
-&lt;p&gt;这个公式意思是，一个时域下的复杂信号函数可以分解成多个简单信号函数的和，然后对各个子信号函数做傅里叶变换并再次求和，就求出了原信号的傅里叶变换。这个事实显然很有用处。&lt;/p&gt;
-
-&lt;p&gt;但除了加法之外，还有乘法。这时候有一个问题：&lt;strong&gt;是否存在某种新的f(t)和g(t)的结合方式，使得f(t)和g(t)结合后的函数的傅里叶变换结果是F(s)G(s)？&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;要求这个问题的解，要用倒推法。&lt;/p&gt;
-
-&lt;p&gt;首先，设有信号函数f(x)和g(t)（注意，x、t都是指横轴变量，只是用来区分开f和g），G(s)、F(s)分别是f(x)和g(t)的傅里叶变换，于是有:&lt;/p&gt;
-
-&lt;p&gt;\[ G(s)F(s) = \int _{-\infty }^{\infty }e^{-2\pi ist}g(t)dt\int _{-\infty }^{\infty }e^{-2\pi isx}f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;接着做一些变换:&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{-\infty }^{\infty }e^{-2\pi ist}g(t)dt\int _{-\infty }^{\infty }e^{-2\pi isx}f(x)dx = \int _{-\infty }^{\infty }\int _{-\infty }^{\infty }e^{-2\pi ist}e^{-2\pi isx}g(t)f(x)dtdx \]
-\[ = \int _{-\infty }^{\infty }\int _{-\infty }^{\infty }e^{-2\pi is(t+x)}g(t)f(x)dtdx \]
-\[ = \int _{-\infty }^{\infty }\left (\int _{-\infty }^{\infty }e^{-2\pi is(t+x)}g(t)dt\right )f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;现在设u = t + x，所以t = u - x，du = dt（这是把x看做常数项了）。则有：&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{-\infty }^{\infty }\left (\int _{-\infty }^{\infty }e^{-2\pi is(t+x)}g(t)dt\right )f(x)dx =  \int _{-\infty }^{\infty }\left (\int _{-\infty }^{\infty }e^{-2\pi isu}g(u - x)du\right )f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;接着调整下积分顺序：
-\[ \int _{-\infty }^{\infty }\left (\int _{-\infty }^{\infty }e^{-2\pi isu}g(u - x)du\right )f(x)dx = \int _{-\infty }^{\infty }\int _{-\infty }^{\infty }e^{-2\pi isu}g(u - x)f(x)dudx \]
-\[ = \int _{-\infty }^{\infty }\int _{-\infty }^{\infty }e^{-2\pi isu}g(u - x)f(x)dxdu \]
-\[ = \int _{-\infty }^{\infty }e^{-2\pi isu}\left (\int _{-\infty }^{\infty }g(u - x)f(x)dx\right )du \]&lt;/p&gt;
-
-&lt;p&gt;括号内那个积分是一个关于u的函数，所以可以设成h(u)：&lt;/p&gt;
-
-&lt;p&gt;\[ h(u) = \int _{-\infty }^{\infty }g(u - x)f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;于是上面的式子就变成:&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{-\infty }^{\infty }e^{-2\pi isu}\left (\int _{-\infty }^{\infty }g(u - x)f(x)dx\right )du = \int _{-\infty }^{\infty }e^{-2\pi isu}h(u)du =  \mathcal {F}[h(s)] = H(s)  \]&lt;/p&gt;
-
-&lt;p&gt;这个结论，可以简化成：&lt;/p&gt;
-
-&lt;p&gt;\[  H(s) = G(s)F(s) \]&lt;/p&gt;
-
-&lt;p&gt;再来看下h(u)。如果把h(u)的u换成t（这是可以的，只是一个符号而已），就有:&lt;/p&gt;
-
-&lt;p&gt;\[ h(t) = \int _{-\infty }^{\infty }g(t - x)f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;2个终极公式都出来了。&lt;/p&gt;
-
-&lt;p&gt;最后，我们还要定义一个特殊的二元运算符号\(*\)来替代h(t)（也叫卷积运算符，注意，这个不是乘法的乘号哦）：&lt;/p&gt;
-
-&lt;p&gt;\[ h(t) = (g*f)(t) = \int _{-\infty }^{\infty }g(t - x)f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;于是有：&lt;/p&gt;
-
-&lt;p&gt;\[ H(s) = G(s)F(s) \]
-\[ \mathcal {F}[h(t)] = \mathcal {F}[g(s)] \mathcal {F}[f(s)] \]
-\[ \mathcal {F}[(g*f)(s)] = \mathcal {F}[g(s)] \mathcal {F}[f(s)] \]&lt;/p&gt;
-
-&lt;p&gt;最后的公式，也被叫做&lt;strong&gt;卷积定理&lt;/strong&gt;(Convolution Theorem)。&lt;/p&gt;
-
-&lt;p&gt;这个定理说明，信号f和信号g的卷积的傅里叶变换，等于f、g各自的傅里叶变换的积。&lt;/p&gt;
-
-&lt;h2&gt;第二种思路：狄拉克δ函数与卷积&lt;/h2&gt;
-
-&lt;p&gt;第二种思路的关键在于&lt;strong&gt;狄拉克δ函数&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h3&gt;狄拉克δ函数 dirac delta function&lt;/h3&gt;
-
-&lt;p&gt;狄拉克δ函数的wiki：&lt;a href=&quot;https://en.wikipedia.org/wiki/Dirac_delta_function&quot;&gt;dirac delta function&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;狄拉克δ函数在坐标系上的长相:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.10/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2015.10/Dirac_function_approximation.gif&quot; alt=&quot;Dirac_function_approximation.gif&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;（图片来自wiki）&lt;/p&gt;
-
-&lt;p&gt;在&lt;strong&gt;信号处理科学&lt;/strong&gt;中狄拉克δ函数被称为单位脉冲信号(unit impulse symbol）。上面这个图也很形象地说明了这一点。&lt;/p&gt;
-
-&lt;p&gt;狄拉克δ函数有这样的性质:&lt;/p&gt;
-
-&lt;p&gt;\[ delta (t) =  \begin {cases} +\infty , t=0 \\  0, t\neq 0 \end {cases} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{-\infty }^{\infty }\delta (t)dt = 1 \]&lt;/p&gt;
-
-&lt;p&gt;狄拉克δ函数在t等于0时值为正无穷，t不等于0时则为0，且在整个定义域的积分等于1。&lt;/p&gt;
-
-&lt;h3&gt;狄拉克δ函数与卷积&lt;/h3&gt;
-
-&lt;p&gt;考虑卷积公式的一个特殊情况：&lt;strong&gt;当h(t)是狄拉克δ函数时&lt;/strong&gt;。现在试一下把h(t)代入卷积公式，得到:&lt;/p&gt;
-
-&lt;p&gt;\[ x(t) * h(t) = x(t) * \delta (t) = \int _{-\infty }^{\infty }x(\tau )\delta (t-\tau )d\tau = x(t) \]&lt;/p&gt;
-
-&lt;p&gt;(最后一步跳跃得比较厉害，后文会有说明）&lt;/p&gt;
-
-&lt;p&gt;这个结果说明，x(t)和狄拉克δ函数卷积的结果还是x(t)，为什么会这样呢？&lt;/p&gt;
-
-&lt;p&gt;再看下前面给出的卷积和标准公式：&lt;/p&gt;
-
-&lt;p&gt;\[ y(t) = x(t)*h(t) = \sum _{\tau =-\infty }^{\infty }x(\tau )h(t-\tau )\]&lt;/p&gt;
-
-&lt;p&gt;把其中的\( h(t - \tau ) \)换成\( \delta (t - \tau ) \)，那么里面的\( t - \tau \)，其实就是让那个脉冲信号在横轴上移动(偏移)\( \tau \)距离。根据狄拉克δ函数的定义，可以知道，当\( t = \tau \)时，\( x(\tau )h(t-\tau ) \)才非0，且等于\( x(\tau ) \)。所以卷积和也就等于\( x(\tau ) \)。（这也算是上面的公式的证明吧）&lt;/p&gt;
-
-&lt;p&gt;将这个特殊情况一般化，即不限制h = δ时，就是所谓的卷积公式了。&lt;/p&gt;
-
-&lt;h2&gt;第三种思路：线性时不变系统·理论 LTI system theory&lt;/h2&gt;
-
-&lt;p&gt;这个还没搞懂，搞懂了再来填坑&lt;/p&gt;
-
-&lt;h2&gt;二维卷积以及图像中的卷积&lt;/h2&gt;
-
-&lt;p&gt;上面讨论的仅仅是一维的卷积。幸运的是，高维卷积可以简单地根据一维卷积得到，比如说二维的卷积：&lt;/p&gt;
-
-&lt;p&gt;\[ f(x,y)*g(x,y) = \sum _{x&amp;#39; }^{}\sum _{y&amp;#39; }^{}f(x&amp;#39;,y&amp;#39;)g(x - x&amp;#39;, y - y&amp;#39;)  \]&lt;/p&gt;
-
-&lt;p&gt;积分形式是：&lt;/p&gt;
-
-&lt;p&gt;\[ (f*g)(x,y) = \int \int f(x&amp;#39;,y&amp;#39;)g(x - x&amp;#39;, y - y&amp;#39;)dx&amp;#39;dy&amp;#39;  \]&lt;/p&gt;
-
-&lt;p&gt;如果给定一个范围r，则有：&lt;/p&gt;
-
-&lt;p&gt;\[ f(x,y)*g(x,y) = \sum _{x&amp;#39; = -r }^{x&amp;#39; = r}\sum _{y&amp;#39; = -r }^{y&amp;#39; = r }f(x&amp;#39;,y&amp;#39;)g(x - x&amp;#39;, y - y&amp;#39;)  \]&lt;/p&gt;
-
-&lt;p&gt;现在想象一下，把一幅图片(位图)当做是一个函数：&lt;/p&gt;
-
-&lt;p&gt;\[ f(x,y) = RGB\ value \]&lt;/p&gt;
-
-&lt;p&gt;先让自己对这个式子有一个几何空间上的想象：带有2个变量的函数，它的几何表示是三维的，三个坐标轴分别是：x、y、f(x,y)，所以f(x,y)表示的是三维空间里的一个连续表面(surface)。&lt;/p&gt;
-
-&lt;p&gt;然后，我们再来回顾下线性代数——矩阵。假设我们有一个128X128的bmp图像，可以用一个矩阵A(应该说是方阵)来表示它，A的每一个元素是一个rgb值。
-有了这个图像-&amp;gt;矩阵的转换关系后，我们就可以用线性代数的知识对这个图像做处理。&lt;/p&gt;
-
-&lt;p&gt;比如说，我们用矩阵乘法吧。假设有另一个和A同阶的方阵S，很显然，下面的等式成立：&lt;/p&gt;
-
-&lt;p&gt;\[ AS = A&amp;#39; \]&lt;/p&gt;
-
-&lt;p&gt;这个式子意味着，图像处理可以抽象成矩阵的线性运算。比如当S是单位矩阵I时，显然有\( AI = A \)，即A保持不变，什么都没做。&lt;/p&gt;
-
-&lt;p&gt;好了，明确了图像可以用线性代数的方法来加工处理后，要理解图像卷积就简单了。&lt;/p&gt;
-
-&lt;p&gt;上面说的‘转换’方阵S，是和A同阶的方阵。这个‘同阶’性质，是不是必要的？其实不是。只要你有办法使得A变成A&amp;#39;，就可以了。中间的S，代表的是一个转换过程。&lt;/p&gt;
-
-&lt;p&gt;卷积转换，是一个特殊的转换，首先，它有一个叫做&lt;strong&gt;窗口&lt;/strong&gt;的东西（或者叫卷积子），一般情况下这个窗口是一个比A的阶数小得多的方阵。&lt;/p&gt;
-
-&lt;p&gt;如果拿这个小方阵R去和A的&lt;strong&gt;局部区域&lt;/strong&gt;做线性变换(更具体地说，是&lt;strong&gt;点积运算&lt;/strong&gt;)，则有：&lt;/p&gt;
-
-&lt;p&gt;\[ A_{x,y,w,h}\cdot R_{w,h} = \sum _{x&amp;#39; = x - w/2}^{x&amp;#39; = x + w/2}\sum _{y&amp;#39; = y - h/2}^{y&amp;#39; = y + h/2}A[x&amp;#39;,y&amp;#39;]R[x&amp;#39; - x, y&amp;#39; - y] = new\ RGB\ value \]&lt;/p&gt;
-
-&lt;p&gt;把得到的这个RGB值赋给A[x,y]，就有：&lt;/p&gt;
-
-&lt;p&gt;\[ A[x,y]R = A&amp;#39;[x,y]  \]&lt;/p&gt;
-
-&lt;p&gt;简单地说就是，A[x,y]的值被R刷新了。如果对整幅图像的每一个像素都和R做一次点积运算，整幅图像就被刷新了。&lt;/p&gt;
-
-&lt;p&gt;这就是图像的卷积变换的本质。&lt;/p&gt;
-
-&lt;h2&gt;找到的相关资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.eecg.toronto.edu/%7Eahouse/mirror/engi7824/course_notes_7824_part6.pdf&quot;&gt;The Convolution Sum for Discrete-Time LTI Systems. Andrew W. H. House&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 18 Oct 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/convolution/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/convolution/</guid>
       </item>
     
   </channel>
