@@ -12,9 +12,9 @@
 
 &lt;p&gt;B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什么这样说呢？是因为贝塞尔曲线某些情况下不实用：曲线上每个点受所有控制点影响，这会给调整曲线工作带来麻烦。可以想到的第一个优化是，把整个贝塞尔曲线变成多段贝塞尔子曲线的拼接。然而，这个方案也不好用，因为拼接工作很难做好，因为要拼接曲线显得“光滑”前提是保证相邻曲线之间的连续性。&lt;/p&gt;
 
-&lt;p&gt;于是，老外发明了一个“算法”，贝塞尔曲线的变种：B-Spline(B样条)曲线。为什么叫Spline曲线呢？我猜是因为Spline曲线在4个控制点的情况下，有个典型的形状：&lt;/p&gt;
+&lt;p&gt;于是，老外发明了一个算法:&lt;a href=&quot;https://en.wikipedia.org/wiki/De_Boor%27s_algorithm&quot;&gt;De Boor&amp;#39;s algorithm&lt;/a&gt;，基于这个算法的曲线也被称为贝塞尔曲线的变种：B-Spline(B样条)曲线。为什么叫Spline曲线呢？我猜是因为Spline曲线在4个控制点的情况下，有个典型的形状：&lt;/p&gt;
 
-&lt;!-- more --&gt;
+&lt;!--more--&gt;
 
 &lt;p&gt;&lt;img src=&quot;../images/2015.12/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
 
@@ -52,15 +52,11 @@
 
 &lt;p&gt;&lt;a href=&quot;http://voyagingmk.github.io/curvedesigner/&quot;&gt;curve designer&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;(这个东西基于zebra WebUI和上面那个bspline)&lt;/p&gt;
+&lt;p&gt;(这个东西基于zebra WebUI和上面那个bspline，顺便吐槽下，zebra没有看起来那么好用)&lt;/p&gt;
 
 &lt;p&gt;目的是实现一个B样条曲线的可视化编辑器，通过改变参数来理解B样条的实际特性。这可比看公式看论文爽多了。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;../images/2015.12/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;h1&gt;参考资料&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/thibauts/b-spline&quot;&gt;https://github.com/thibauts/b-spline&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 29 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/b-spline-1/</link>
