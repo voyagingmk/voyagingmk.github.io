@@ -7,6 +7,80 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>《OpenGL编程指南(第8版)》阅读笔记01</title>
+        <description>&lt;h1&gt;Example源码Bug备忘&lt;/h1&gt;
+
+&lt;h2&gt;第三章&lt;/h2&gt;
+
+&lt;h3&gt;ch03_drawcommands&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;n&quot;&gt;glUniformMatrix4fv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;render_model_matrix_loc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model_matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;应改为：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;n&quot;&gt;glUniformMatrix4fv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;render_model_matrix_loc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model_matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;原因：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);&lt;/p&gt;
+
+&lt;p&gt;Parameters&lt;/p&gt;
+
+&lt;p&gt;location&lt;/p&gt;
+
+&lt;p&gt;Specifies the location of the uniform value to be modified.&lt;/p&gt;
+
+&lt;p&gt;count&lt;/p&gt;
+
+&lt;p&gt;Specifies the number of matrices that are to be modified. This should be 1 if the targeted uniform variable is &amp;gt; not an array of matrices, and 1 or more if it is an array of matrices.&lt;/p&gt;
+
+&lt;p&gt;transpose&lt;/p&gt;
+
+&lt;p&gt;Specifies whether to transpose the matrix as the values are loaded into the uniform variable. Must be GL_FALSE.&lt;/p&gt;
+
+&lt;p&gt;value&lt;/p&gt;
+
+&lt;p&gt;Specifies a pointer to an array of count values that will be used to update the specified uniform variable.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;因为例子使用的是primitive_restart.vs.glsl顶点着色器，model_matrix不是数组，所以参数count应该为1。&lt;/p&gt;
+
+&lt;p&gt;还发现了一句注释： // &amp;quot;model_matrix&amp;quot; is actually an array of 4 matrices&lt;/p&gt;
+
+&lt;p&gt;不明白为什么model_matrix会是一个包含4个矩阵的数组。并且确实改成1后就能运行了。&lt;/p&gt;
+
+&lt;p&gt;(后面发现有一个shader里面的model_matrix确实是一个长度4的数组...估计是混淆了吧)&lt;/p&gt;
+
+&lt;p&gt;真是坑。&lt;/p&gt;
+
+&lt;h3&gt;vmath&lt;/h3&gt;
+
+&lt;p&gt;vmath::rotation 要改为 vmath::rotate
+vmath::translation 要改为 vmath::translate&lt;/p&gt;
+
+&lt;h3&gt;绝对路径....&lt;/h3&gt;
+
+&lt;p&gt;ch03_instancing的Initialize函数里：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;c1&quot;&gt;// Load the object&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LoadFromVBM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;C:/Vermilion-Book/trunk/Code/media/armadillo_low.vbm&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;太坑了。&lt;/p&gt;
+
+&lt;h3&gt;把vs和fs写在cpp文件里&lt;/h3&gt;
+
+&lt;p&gt;如果是为了演示如何手动编译shader，也不用放在多个example里吧。&lt;/p&gt;
+
+&lt;h2&gt;第四章&lt;/h2&gt;
+
+&lt;h3&gt;ch04_shadowmap的vbm.h和vbm.cpp是不对的，运行会出错&lt;/h3&gt;
+
+&lt;p&gt;换成第三章的工程里的就OK了。&lt;/p&gt;
+</description>
+        <pubDate>Sun, 21 Feb 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/openl-01/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/openl-01/</guid>
+      </item>
+    
+      <item>
         <title>我的2015总结</title>
         <description>&lt;!--more--&gt;
 
@@ -44,7 +118,7 @@
 
 &lt;p&gt;2015年除了过年时去了杭州，由于工作上的不顺心(其实是没钱)，之后都没有外出旅行。2015开始，更重视的是积蓄的问题，因为我发现工作2年后，依然存不到多少钱，对建立家庭来说，远远不足。在中国白手起家想要做到安居乐业，有车有房，完全就是一个Hard难度的游戏。当然，游戏虽难，但仍有希望。&lt;/p&gt;
 
-&lt;p&gt;2015年，家庭关系比较和谐，没出啥状况。和GF也还行，有波澜但终归和睦。2014年年底我们一起通宵打Minecraft，那时候她是一名见习医生；2015年年底我们一起通宵打Don&amp;#39;t Starve Together，这时候，她已经走在职业转型的道路上，即将成为一名美术生。也许以后我们会一起做独立游戏。可能这就是destiny吧.&lt;/p&gt;
+&lt;p&gt;2015年，家庭关系比较和谐，没出啥状况。和GF也还行，有波澜但终归和睦。2014年年底我们一起通宵打Minecraft，那时候她是一名见习医生；2015年年底我们一起通宵打Don&amp;#39;t Starve Together，这时候，她已经走在职业转型的道路上，即将成为一名美术生。也许以后我们会一起做独立游戏。可能这就是destiny吧。&lt;/p&gt;
 
 &lt;p&gt;对于物质生活，我是有期待的，但是暂时无法提高，也就不勉强。其它不实际的期待也没有了，只但愿这副身子骨不散架，平平安安，就好。&lt;/p&gt;
 
@@ -2108,101 +2182,6 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
         <pubDate>Fri, 30 Oct 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-3/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/cpp-3/</guid>
-      </item>
-    
-      <item>
-        <title>线性代数之奇异值(SVD)分解</title>
-        <description>&lt;p&gt;在线性代数中，SVD是对实数矩阵(甚至复数矩阵)的一种因式分解。在信号、统计、图像图形学中都有应用。&lt;/p&gt;
-
-&lt;p&gt;SVD非常强大且实用，因为数学界前辈已经证明任意的一个矩阵都可以做SVD分解。这一点特别重要，因为相比SVD分解，和SVD相近的特征值分解只能应用于方阵。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;SVD的定义&lt;/h2&gt;
-
-&lt;p&gt;先给出公式的全貌：&lt;/p&gt;
-
-&lt;p&gt;设有一个m X n的矩阵M，它的SVD分解是：&lt;/p&gt;
-
-&lt;p&gt;\[ M = UΣV^{*} \]&lt;/p&gt;
-
-&lt;p&gt;其中：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;U是一个m X m的单式矩阵(&lt;a href=&quot;https://en.wikipedia.org/wiki/Unitary_matrix&quot;&gt;Unitary Matrix&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;Σ是m X n的矩形对角矩阵(&lt;a href=&quot;https://en.wikipedia.org/wiki/Diagonal_matrix&quot;&gt;Rectangular Diagonal Matrix&lt;/a&gt;)，并且在对角线上的元素都是非负实数\(\sigma _{i}\)，称为M的奇异值&lt;/li&gt;
-&lt;li&gt;V*是一个n X n的单式矩阵，也是V的共轭转置矩阵(&lt;a href=&quot;https://en.wikipedia.org/wiki/Conjugate_transpose&quot;&gt;Conjugate Transpose Matrix&lt;/a&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;一些补充:&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;U矩阵的m个列向量、V的n个列向量分别被称为M的左奇异向量，和M的右奇异向量&lt;/li&gt;
-&lt;li&gt;约定Σ矩阵的对角线上的奇异值\(\sigma _{i}\)用降序排列&lt;/li&gt;
-&lt;li&gt;由第2点可以看出，Σ矩阵完全由M决定，和U、V无关&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;SVD和特征值分解的联系&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;M的左奇异向量 是 \(MM^{*}\)的特征向量&lt;/li&gt;
-&lt;li&gt;M的右奇异向量 是 \(M^{*}M\)的特征向量&lt;/li&gt;
-&lt;li&gt;M的非零奇异值（即Σ的对角线上的元素）分别是\(M^{*}M\)以及\(MM^{*}\)的所有非零特征值的开平方&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;由单式矩阵的定义，知：&lt;/p&gt;
-
-&lt;p&gt;\[ U^{*}U = I = U^{-1}U \]&lt;/p&gt;
-
-&lt;p&gt;\[ V^{*}V = I = V^{-1}V \]&lt;/p&gt;
-
-&lt;p&gt;\[ U^{*} = U^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;\[ V^{*} = V^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;由矩形对角矩阵的定义，知：&lt;/p&gt;
-
-&lt;p&gt;\[ Σ_{m,n}Σ_{m,n}^{*} = Σ_{m,n}Σ&amp;#39;_{n,m} = D_{m,m} \]&lt;/p&gt;
-
-&lt;p&gt;\[ Σ_{m,n}^{*}Σ_{m,n} = Σ&amp;#39;_{n,m}Σ_{m,n} = D_{n,n} \]&lt;/p&gt;
-
-&lt;p&gt;(D = Diagonal Square Matrix)&lt;/p&gt;
-
-&lt;p&gt;即，Σ和Σ的转置相乘，等于一个新的方阵D，D的阶数等于左边的Σ矩阵的行数；D还是一个对角方阵，且对角线上的元素分别是Σ的对角线上的元素的平方。&lt;/p&gt;
-
-&lt;p&gt;再根据SVD公式：&lt;/p&gt;
-
-&lt;p&gt;\[ M = UΣV^{*} \]&lt;/p&gt;
-
-&lt;p&gt;有：&lt;/p&gt;
-
-&lt;p&gt;\[ M^{*}M = V\Sigma ^{*}U^{*}U\Sigma V^{*} = V\Sigma ^{*}(U^{*}U)\Sigma V^{*} = V\Sigma ^{*}\Sigma V^{*} = V(\Sigma  ^{*}\Sigma )V^{-1}  \]&lt;/p&gt;
-
-&lt;p&gt;\[ MM^{*} = U\Sigma V^{*}V\Sigma ^{*}U^{*} = U\Sigma (V^{*}V)\Sigma ^{*}U^{*} = U\Sigma \Sigma ^{*}U^{*} = U(\Sigma \Sigma ^{*})U^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;右边的东西符合特征分解的定义，所以上述两式子都是特征分解。&lt;/p&gt;
-
-&lt;h2&gt;SVD的几何意义以及应用&lt;/h2&gt;
-
-&lt;p&gt;推荐阅读这篇文章:&lt;a href=&quot;http://blog.chinaunix.net/uid-20761674-id-4040274.html&quot;&gt;http://blog.chinaunix.net/uid-20761674-id-4040274.html&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;英文原文:&lt;a href=&quot;http://www.ams.org/samplings/feature-column/fcarc-svd&quot;&gt;http://www.ams.org/samplings/feature-column/fcarc-svd&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;不过这文章只讲了和图像有关的应用，实际上，SVD的应用非常广泛，比如机器学习领域也在用。&lt;/p&gt;
-
-&lt;h2&gt;SVD的求法&lt;/h2&gt;
-
-&lt;p&gt;SVD的解法有很多种而且看起来很复杂，比如这篇文章就列举了很多种:&lt;a href=&quot;http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf&quot;&gt;http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;因为矩阵有稠密和稀疏之分，所以针对不同的矩阵就有不同的解法。学习SVD的解法想必是一件艰苦的事情。因为目前还没有深入学习SVD的需求，所以博主就此罢笔。&lt;/p&gt;
-
-&lt;h2&gt;参考资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Singular_value_decomposition&quot;&gt;https://en.wikipedia.org/wiki/Singular_value_decomposition&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Tue, 27 Oct 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-9/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-9/</guid>
       </item>
     
   </channel>
