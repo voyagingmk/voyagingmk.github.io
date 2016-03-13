@@ -113,7 +113,7 @@
 
 &lt;p&gt;\[ ax = \frac { x } { ar * z * tan(\frac {\alpha } { 2 } ) } \]&lt;/p&gt;
 
-&lt;p&gt;观察等式，可以发现等式右边有个多余的z。OpenGL中对这个问题的处理是，在变换过程中强(偷)制(偷)插入一个步骤：把矩阵相乘的结果值再统一除以z！这么做之后，事情就简单了，上面的等式可以推出：&lt;/p&gt;
+&lt;p&gt;观察等式，可以发现等式右边有个多余的z。OpenGL中对这个问题的处理是，在变换过程中强(偷)制(偷)插入一个步骤：把矩阵相乘的结果值再统一除以z（Divide z技术）！这么做之后，事情就简单了，上面的等式可以推出：&lt;/p&gt;
 
 &lt;p&gt;\[ a = \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }  \]&lt;/p&gt;
 
@@ -126,6 +126,64 @@
 &lt;p&gt;\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;amp;0&amp;amp;0\\ i&amp;amp;j&amp;amp;k&amp;amp;l\\ m&amp;amp;n&amp;amp;o&amp;amp;p\\ \end{matrix} \right] \]&lt;/p&gt;
 
 &lt;p&gt;到了这里，其实透视变换问题已经解决大半了，因为\(x_{p}\)和\(y_{p}\)都可以算了，并且可以规范化到[-1,1]范围。剩下的问题是\(z_{p}\)，即顶点的深度信息。&lt;/p&gt;
+
+&lt;p&gt;前面提到的Divide z技术会导致一个问题：z分量在转换过程中会因为Divide z技术而导致变成1。针对这个问题，OpenGL的解决方案是，把V的z值复制覆盖到w上，从而把原始z值保存起来，同时Divide z仅对x、y、z有效（跳过w）。&lt;/p&gt;
+
+&lt;p&gt;因此，M的后两行也可以得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;1&amp;amp;0\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;然而，事情还没有结束。现在用这个新的M去做透视变换后，得不到规范化的z分量。规范化的，可以使得后续的渲染步骤不需要知道near Z和far Z。为了完成这个事情，需要对M做改进，着手点就是row 3，全为0的第三行。&lt;/p&gt;
+
+&lt;p&gt;再阐述一下问题：我们需要求出row3=(i,j,k,l)，使得row3和V做点积运算能得到规范化的\(z_{p}\)。用公式表示：&lt;/p&gt;
+
+&lt;p&gt;\[z_{p} = Az + B , z_{p}\in [-1,1] \]&lt;/p&gt;
+
+&lt;p&gt;再考虑上divide z技术，上式变成：&lt;/p&gt;
+
+&lt;p&gt;\[z_{p} = A + \frac {B}{z} , z_{p}\in [-1,1] \]&lt;/p&gt;
+
+&lt;p&gt;把公式中的A、B求出来，代入row3，就能解决问题。&lt;/p&gt;
+
+&lt;p&gt;因为当z等于near Z时，\(z_{p}\)必然等于1；当z等于far Z时，\(z_{p}\)必然等于-1 (Note：这里用的是右手坐标系）。因此得到：&lt;/p&gt;
+
+&lt;p&gt;\[ A + \frac {B}{NearZ} = 1 \]&lt;/p&gt;
+
+&lt;p&gt;\[ A = 1 - \frac {B}{NearZ} \]&lt;/p&gt;
+
+&lt;p&gt;接着：&lt;/p&gt;
+
+&lt;p&gt;\[ A + \frac {B}{FarZ} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;\[ \frac {B}{FarZ} + 1 - \frac {B}{NearZ} = -1 \]&lt;/p&gt;
+
+&lt;p&gt;\[ \frac {B*NearZ - B*FarZ}{FarZ*NearZ} = -2 \]&lt;/p&gt;
+
+&lt;p&gt;\[ B = \frac {-2*FarZ*NearZ}{NearZ - FarZ}  \]&lt;/p&gt;
+
+&lt;p&gt;B解决了，求A：&lt;/p&gt;
+
+&lt;p&gt;\[ A = 1 - \frac {B}{NearZ}  = 1 - \frac {-2*FarZ*NearZ}{NearZ*(NearZ - FarZ)} \]&lt;/p&gt;
+
+&lt;p&gt;\[ A = 1 - \frac {-2*FarZ}{NearZ - FarZ}  \]&lt;/p&gt;
+
+&lt;p&gt;\[ A =\frac {NearZ - FarZ +2*FarZ}{NearZ - FarZ}\]&lt;/p&gt;
+
+&lt;p&gt;\[ A = \frac {NearZ + FarZ}{NearZ - FarZ} \]&lt;/p&gt;
+
+&lt;p&gt;有了A、B后，就可以求row3了:&lt;/p&gt;
+
+&lt;p&gt;\[ ix +jy +kz +lw = Az + B \]&lt;/p&gt;
+
+&lt;p&gt;显然，可让i = j = 0，那么上式变成:&lt;/p&gt;
+
+&lt;p&gt;\[ kz + lw = Az + B \]&lt;/p&gt;
+
+&lt;p&gt;因为V的w分量必然是1，所以可以得知：k = A，l = B。&lt;/p&gt;
+
+&lt;p&gt;代入M，得：&lt;/p&gt;
+
+&lt;p&gt;\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;\frac {-NearZ - FarZ}{(NearZ - FarZ)}&amp;amp;\frac {2*FarZ*NearZ}{NearZ - FarZ}\\ 0&amp;amp;0&amp;amp;1&amp;amp;0\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sun, 13 Mar 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-12/</link>
