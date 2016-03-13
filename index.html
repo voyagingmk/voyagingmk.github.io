@@ -259,9 +259,29 @@
 
 <p>因为V的w分量必然是1，所以可以得知：k = A，l = B。</p>
 
-<p>代入M，得：</p>
+<p>代入M，得到最终完善的M：</p>
 
-<p>\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0&amp;0\\ 0&amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0\\ 0&amp;0&amp;\frac {-NearZ - FarZ}{(NearZ - FarZ)}&amp;\frac {2*FarZ*NearZ}{NearZ - FarZ}\\ 0&amp;0&amp;1&amp;0\\ \end{matrix} \right] \]</p>
+<p>\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0&amp;0\\ 0&amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0\\ 0&amp;0&amp;\frac {NearZ + FarZ}{NearZ - FarZ}&amp;\frac {-2*FarZ*NearZ}{NearZ - FarZ}\\ 0&amp;0&amp;1&amp;0\\ \end{matrix} \right] \]</p>
+
+<p>再对比下superbible7中构造透视矩阵的代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kr">inline</span> <span class="n">mat4</span> <span class="nf">perspective</span><span class="p">(</span><span class="kt">float</span> <span class="n">fovy</span><span class="p">,</span> <span class="kt">float</span> <span class="n">aspect</span><span class="p">,</span> <span class="kt">float</span> <span class="n">n</span><span class="p">,</span> <span class="kt">float</span> <span class="n">f</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">float</span> <span class="n">q</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="n">tan</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="mf">0.5f</span> <span class="o">*</span> <span class="n">fovy</span><span class="p">));</span>
+    <span class="kt">float</span> <span class="n">A</span> <span class="o">=</span> <span class="n">q</span> <span class="o">/</span> <span class="n">aspect</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">f</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0f</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="n">f</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">f</span><span class="p">);</span>
+
+    <span class="n">mat4</span> <span class="n">result</span><span class="p">;</span>
+
+    <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">);</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">);</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">);</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>仔细观察，发现有2处不同：一是这个函数构造的矩阵是列主导的矩阵；二是上面的M的row4中的1，在这里变成了-1，同时上文的B在这里被取反了(那个float C)。第二个不同点暂时原因未知。</p>
 
       </div>
 
