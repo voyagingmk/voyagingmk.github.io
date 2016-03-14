@@ -107,7 +107,7 @@
 
 &lt;p&gt;\[ ax + by + cz + dw = x_{p} = \frac { x } { ar * z * tan(\frac {\alpha } { 2 } ) } \]&lt;/p&gt;
 
-&lt;p&gt;这是M矩阵第一行和V的点积等式。求解这个等式的话，会发现可以让b=0、c=0，从而等式简化成:&lt;/p&gt;
+&lt;p&gt;这是M矩阵第一行和V的点积等式。求解这个等式的话，会发现可以让b=0、d=0，从而等式简化成:&lt;/p&gt;
 
 &lt;p&gt;\[ ax + cz = \frac { x } { ar * z * tan(\frac {\alpha } { 2 } ) } \]&lt;/p&gt;
 
