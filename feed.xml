@@ -7,6 +7,87 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之平移、缩放、旋转矩阵</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;平移矩阵 Translate Matrix&lt;/h2&gt;
+
+&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;x\\  0&amp;amp;1&amp;amp;0&amp;amp;y\\  0&amp;amp;0&amp;amp;1&amp;amp;z\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h2&gt;缩放矩阵 Scale Matrix&lt;/h2&gt;
+
+&lt;p&gt;\[ S =  \left[ \begin{matrix} x&amp;amp;0&amp;amp;0&amp;amp;0\\  0&amp;amp;y&amp;amp;0&amp;amp;0\\  0&amp;amp;0&amp;amp;z&amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h2&gt;旋转矩阵 Rotate Matrix&lt;/h2&gt;
+
+&lt;h3&gt;绕(1,0,0)旋转\(\theta \)角度&lt;/h3&gt;
+
+&lt;p&gt;\[ R_{(1,0,0)} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;0\\  0&amp;amp;cos\theta &amp;amp;sin\theta &amp;amp;0\\  0&amp;amp;-sin\theta &amp;amp;cos\theta &amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h3&gt;绕(0,1,0)旋转\(\theta \)角度&lt;/h3&gt;
+
+&lt;p&gt;\[ R_{(0,1,0)} =  \left[ \begin{matrix} cos\theta&amp;amp;0&amp;amp;-sin\theta&amp;amp;0\\    0&amp;amp;1&amp;amp;0&amp;amp;0\\  sin\theta &amp;amp;0&amp;amp;cos\theta &amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h3&gt;绕(0,0,1)旋转\(\theta \)角度&lt;/h3&gt;
+
+&lt;p&gt;\[ R_{(0,0,1)} =  \left[ \begin{matrix} cos\theta&amp;amp;sin\theta&amp;amp;0&amp;amp;0\\  -sin\theta &amp;amp;cos\theta &amp;amp;0&amp;amp;0\\   0&amp;amp;0&amp;amp;1&amp;amp;0\\   0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h3&gt;绕任意轴旋转\(\theta \)角度&lt;/h3&gt;
+
+&lt;p&gt;设旋转轴为\(\vec n\)，这是一个单位化的方向向量。设被旋转的向量为\(\vec v\)，被旋转后是\(\vec v&amp;#39; \)。&lt;/p&gt;
+
+&lt;p&gt;为了求出\(\vec v&amp;#39; \)，需要迂回地处理：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;将\(\vec v\) 分解为 \(\vec v = \vec v_{\perp }+\vec v_{\parallel } \) ，\( \vec v_{\parallel } \)指的是\(\vec v\)与\(\vec n\)平行的部分，\( \vec v_{\perp } \) 指的是\(\vec v\) 与\(\vec n\)垂直的部分。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;分解为两部分后，可以分别对这两个部分做旋转，然后再合并，所以有： \(\vec v&amp;#39; = \vec v&amp;#39;_{\perp }+\vec v&amp;#39;_{\parallel } \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;让 \( \vec v_{\parallel } \) 绕旋转轴\(\vec n\)旋转\(\theta \)角度，它依然保持不变，因为它和\(\vec n\)是同方向的向量，所以有 \( \vec v_{\parallel } = \vec v&amp;#39;_{\parallel } \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;根据上一点，可以得到： \(\vec v&amp;#39; = \vec v&amp;#39;_{\perp }+\vec v_{\parallel } \)。因此，问题简化为求\( \vec v&amp;#39;_{\perp } \)和\( \vec v_{\parallel } \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;分析\( \vec v_{\parallel } \)，可以发现它相当于是\(\vec v\)在\(\vec n\)上的投影，根据向量的点积公式：&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ \vec A\cdot \vec B = |\vec A||\vec B|cos\alpha  \]&lt;/p&gt;
+
+&lt;p&gt;代入\(\vec v\)、\(\vec n\)后，得到：\( \vec v\cdot \vec n = |\vec v||\vec n|cos\alpha = |\vec v|cos\alpha = |\vec v_{\parallel }| \)，即算出了\( \vec v_{\parallel } \)的长度，又因为\vec v_{\parallel } \)和\(\vec n\)方向一致、\(\vec n\)长度为1，所以有:&lt;/p&gt;
+
+&lt;p&gt;\[ \vec v_{\parallel } = (\vec v\cdot \vec n) \vec n \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;上一步已经解决了\( \vec v_{\parallel } \)，剩下的就是求\( \vec v&amp;#39;_{\perp } \)。求\( \vec v&amp;#39;_{\perp } \)之前需要先求出\( \vec v_{\perp } \)，而显然\( \vec v_{\perp } = v - \vec v_{\parallel} \) &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;接着，需要计算一个新的向量\(\vec w \)，\( \vec w = \vec n \times \vec v_{\perp } \) （注意叉乘的顺序不能错），所以\(\vec w \)是一个垂直于\(  \vec n \)、\( \vec v_{\perp } \)所构成平面的向量。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;把\( \vec v_{\perp }\)、\(\vec w \) 分别当做是\(  \vec n \)、\( \vec v_{\perp } \)平面的x、y轴(2D坐标系)，那么\( \vec v&amp;#39;_{\perp } \)的含义就是指\( \vec v_{\perp } \)在这个2D坐标系下旋转\(\theta \)度。从而得到等式：&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ \vec v&amp;#39;_{\perp } =  cos\theta \vec v_{\perp } + sin\theta \vec w \]&lt;/p&gt;
+
+&lt;p&gt;好了，所有变量都得到了，总结下最终的公式：&lt;/p&gt;
+
+&lt;p&gt;\( \vec v_{\parallel } = (\vec v\cdot \vec n) \vec n \)&lt;/p&gt;
+
+&lt;p&gt;\( \vec v_{\perp } = \vec v - \vec v_{\parallel} = \vec v -  (\vec v\cdot \vec n) \vec n \) &lt;/p&gt;
+
+&lt;p&gt;\( \vec w = \vec n \times \vec v_{\perp } \) &lt;/p&gt;
+
+&lt;p&gt;\( = \vec n \times (\vec v - \vec v_{\parallel}) \) &lt;/p&gt;
+
+&lt;p&gt;\( = \vec n \times \vec v - \vec n \times \vec v_{\parallel}) \) &lt;/p&gt;
+
+&lt;p&gt;\( = \vec n \times \vec v \) &lt;/p&gt;
+
+&lt;p&gt;\( \vec v&amp;#39;_{\perp } =  cos\theta \vec v_{\perp } + sin\theta \vec w \)&lt;/p&gt;
+
+&lt;p&gt;\( =  cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v)  \)&lt;/p&gt;
+
+&lt;p&gt;\( \vec v&amp;#39; = \vec v&amp;#39;_{\perp } + \vec v_{\parallel } \)&lt;/p&gt;
+
+&lt;p&gt;\( = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \)&lt;/p&gt;
+</description>
+        <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-14/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-14/</guid>
+      </item>
+    
+      <item>
         <title>线性代数之视角矩阵Lookat Matrix</title>
         <description>&lt;h1&gt;引言&lt;/h1&gt;
 
@@ -1437,67 +1518,6 @@ vmath::translation 要改为 vmath::translate&lt;/p&gt;
         <pubDate>Sun, 08 Nov 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/cpp-6/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/cpp-6/</guid>
-      </item>
-    
-      <item>
-        <title>关于c++11的一些特性(3) auto 和 decltype</title>
-        <description>&lt;p&gt;首先看下这3个不同版本的Get函数：&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;ul&gt;
-&lt;li&gt;版本1(c++11)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Index&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;decltype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;5&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;版本2(c++11)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Index&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;4&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;版本3(c++14)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;decltype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Index&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;4&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;能搞懂这3者的区别吗？如果不能的话，实际编译测试下吧，用下面这段代码即可：&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;lineno&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;2&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;3&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;4&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;decltype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;5&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;6&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;lineno&quot;&gt;7&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;编译结果是：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;第一和第三种写法等价，且可以编译运行，decltype(Get(arr, 0))类型是int&amp;amp;&lt;/li&gt;
-&lt;li&gt;第二种写法编译失败，decltype(Get(arr, 0))类型是int，&lt;strong&gt;Get(arr, 0) = 0;&lt;/strong&gt;非法(不能把右值赋给右值)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;也就是说，第二种写法的auto，把返回值推导成了int；而decltype(auto)会推导成int&amp;amp;。&lt;/p&gt;
-</description>
-        <pubDate>Sat, 07 Nov 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/cpp-5/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/cpp-5/</guid>
       </item>
     
   </channel>
