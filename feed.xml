@@ -81,6 +81,20 @@
 &lt;p&gt;\( \vec v&amp;#39; = \vec v&amp;#39;_{\perp } + \vec v_{\parallel } \)&lt;/p&gt;
 
 &lt;p&gt;\( = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \)&lt;/p&gt;
+
+&lt;p&gt;加粗并居中：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;\[ \vec v&amp;#39; = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \]&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这就是绕任意轴的旋转公式了。&lt;/p&gt;
+
+&lt;p&gt;接下来是把这个公式转换成矩阵的形式。方法是，把\(v_{x} = (1,0,0) \)、\(v_{y} = (0,1,0) \)、\(v_{z} = (0,0,1) \)，分别代入上面的公式，分别得到：&lt;/p&gt;
+
+&lt;p&gt;\[ v_{x}&amp;#39; =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta \\ n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta \\ n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta \\ \\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ v_{y}&amp;#39; =  \left[ \begin{matrix} \\ n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta \\ n_{y}^{2}(1-cos\theta )+cos\theta \\ n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta \\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[ v_{z}&amp;#39; =  \left[ \begin{matrix} n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta \\ n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta \\ n_{z}^{2}(1-cos\theta )+cos\theta \\ \\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-14/</link>
