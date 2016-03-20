@@ -113,6 +113,8 @@
 
 <p>当eye、focal、up三个向量的值确定后，就可以构造Lookat矩阵了。</p>
 
+<p>(额外补充：focal向量一般是通过计算被观察位置center和观察者的位置eye的差值得到的，focal = center - eye)</p>
+
 <p>首先明确2点：一，Lookat矩阵是正交且规范化的；二，我们使用的是右手坐标系。</p>
 
 <p>这个Lookat矩阵，相当于是一个坐标系，那么可以设三个坐标轴的方向向量分别为\(\vec r\)、\(\vec u\)、\(\vec f\)，分别的含义是，观察者坐标系的right、up、forward方向。</p>
