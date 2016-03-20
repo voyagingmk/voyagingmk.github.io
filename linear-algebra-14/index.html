@@ -165,11 +165,15 @@
 
 <p>接下来是把这个公式转换成矩阵的形式。方法是，把\(v_{x} = (1,0,0) \)、\(v_{y} = (0,1,0) \)、\(v_{z} = (0,0,1) \)，分别代入上面的公式，分别得到：</p>
 
-<p>\[ v_{x}&#39; =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta \\ n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta \\ n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta \\ \end{matrix} \right] \]</p>
+<p>\[ v_{x}&#39; =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta \\ n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta \\ n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta \\ \end{matrix} \right] ^{T} \]</p>
 
-<p>\[ v_{y}&#39; =  \left[ \begin{matrix} \\ n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta \\ n_{y}^{2}(1-cos\theta )+cos\theta \\ \end{matrix} \right] \]</p>
+<p>\[ v_{y}&#39; =  \left[ \begin{matrix} n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta \\ n_{y}^{2}(1-cos\theta )+cos\theta \\ n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta \\ \end{matrix} \right] ^{T} \]</p>
 
-<p>\[ v_{z}&#39; =  \left[ \begin{matrix} n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta \\ n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta \\ n_{z}^{2}(1-cos\theta )+cos\theta \\ \end{matrix} \right] \]</p>
+<p>\[ v_{z}&#39; =  \left[ \begin{matrix} n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta \\ n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta \\ n_{z}^{2}(1-cos\theta )+cos\theta \\ \end{matrix} \right] ^{T} \]</p>
+
+<p>最终的旋转矩阵为:</p>
+
+<p>\[ R(\vec n, \theta ) =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta &amp;  n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta &amp;  n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta &amp;0\\      n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta &amp;n_{y}^{2}(1-cos\theta )+cos\theta &amp;n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta &amp;0\\     n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta &amp;n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta &amp;n_{z}^{2}(1-cos\theta )+cos\theta &amp;0\\    0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
 
   </div>
 

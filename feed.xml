@@ -90,11 +90,15 @@
 
 &lt;p&gt;接下来是把这个公式转换成矩阵的形式。方法是，把\(v_{x} = (1,0,0) \)、\(v_{y} = (0,1,0) \)、\(v_{z} = (0,0,1) \)，分别代入上面的公式，分别得到：&lt;/p&gt;
 
-&lt;p&gt;\[ v_{x}&amp;#39; =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta \\ n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta \\ n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta \\ \\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;\[ v_{x}&amp;#39; =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta \\ n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta \\ n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta \\ \end{matrix} \right] ^{T} \]&lt;/p&gt;
 
-&lt;p&gt;\[ v_{y}&amp;#39; =  \left[ \begin{matrix} \\ n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta \\ n_{y}^{2}(1-cos\theta )+cos\theta \\ n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta \\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;\[ v_{y}&amp;#39; =  \left[ \begin{matrix} n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta \\ n_{y}^{2}(1-cos\theta )+cos\theta \\ n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta \\ \end{matrix} \right] ^{T} \]&lt;/p&gt;
 
-&lt;p&gt;\[ v_{z}&amp;#39; =  \left[ \begin{matrix} n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta \\ n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta \\ n_{z}^{2}(1-cos\theta )+cos\theta \\ \\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;\[ v_{z}&amp;#39; =  \left[ \begin{matrix} n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta \\ n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta \\ n_{z}^{2}(1-cos\theta )+cos\theta \\ \end{matrix} \right] ^{T} \]&lt;/p&gt;
+
+&lt;p&gt;最终的旋转矩阵为:&lt;/p&gt;
+
+&lt;p&gt;\[ R(\vec n, \theta ) =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta &amp;amp;  n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta &amp;amp;  n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta &amp;amp;0\\      n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta &amp;amp;n_{y}^{2}(1-cos\theta )+cos\theta &amp;amp;n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta &amp;amp;0\\     n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta &amp;amp;n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta &amp;amp;n_{z}^{2}(1-cos\theta )+cos\theta &amp;amp;0\\    0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-14/</link>
