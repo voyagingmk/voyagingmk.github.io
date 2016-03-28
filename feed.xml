@@ -7,6 +7,160 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>用线性代数知识解决光线和三角形的交点问题</title>
+        <description>&lt;p&gt;本文可认为是《PBRT》3.6节的公式推导笔记。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h3&gt;Step1 抽象化问题&lt;/h3&gt;
+
+&lt;p&gt;首先是问题中的3个对象的抽象：&lt;/p&gt;
+
+&lt;p&gt;三角形：由三角形的定义可知，只要确定空间中三个顶点的坐标，就能确定唯一的一个三角形。设三个顶点分别为\(\vec p_{0}\)，\(\vec p_{1}\)，\(\vec p_{2}\)。&lt;/p&gt;
+
+&lt;p&gt;光线：光线在本问题中，设为有起点、有发射方向的射线，起点设为\(\vec o\)，方向为\(\vec d\)。&lt;/p&gt;
+
+&lt;p&gt;光线和三角形的交点：设该交点为\(\vec g\)。&lt;/p&gt;
+
+&lt;p&gt;这时候还要再用到几何数学的一个东西：质心坐标 Barycentric Coordinates。 &lt;a href=&quot;http://mathworld.wolfram.com/BarycentricCoordinates.html&quot;&gt;http://mathworld.wolfram.com/BarycentricCoordinates.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;\[ p_{BC} = b_{0}\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2}\]&lt;/p&gt;
+
+&lt;p&gt;规范化的质心坐标被称为Homogeneous  Barycentric Coordinates，特性是\( b_{0} +  b_{1} + b_{2} = 1 \)，&lt;/p&gt;
+
+&lt;p&gt;因为光线和三角形的交点必然落在三角形内部，所以这个交点可认为是一个\(p_{BC} \)。所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec g = (1 - b_{1} - b_{2})\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]&lt;/p&gt;
+
+&lt;h3&gt;Step2 问题方程&lt;/h3&gt;
+
+&lt;p&gt;因为光线和三角形的交点要么不存在、要么有且只有一个，所以可列出下面的方程：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec o + t \vec d = \vec g  = (1 - b_{1} - b_{2})\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]&lt;/p&gt;
+
+&lt;p&gt;中间的\(\vec g\)去掉：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec o + t \vec d = (1 - b_{1} - b_{2})\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]&lt;/p&gt;
+
+&lt;p&gt;可以看到，只剩下3个未知量：\(t\)、\(b_{1}\)、\( b_{2}\)。(注意：这3个都是数，不是向量)&lt;/p&gt;
+
+&lt;p&gt;为了应用线性代数的知识来解决问题，我们需要把这个方程写成线性代数里的线性方程组形式：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec o + t \vec d = (1 - b_{1} - b_{2})\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \vec o + t \vec d = \vec p_{0} - b_{1}\vec p_{0} - b_{2}\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \vec o - \vec p_{0} = -t\vec d - b_{1}\vec p_{0} - b_{2}\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ -\vec d t + (\vec p_{1}- \vec p_{0}) b_{1} + (\vec p_{2} - \vec p_{0}) b_{2} = \vec o - \vec p_{0} \]&lt;/p&gt;
+
+&lt;p&gt;为了让后续的推导更简洁，需要设：&lt;/p&gt;
+
+&lt;p&gt;\( \vec e_{1} = \vec p_{1} - \vec p_{0} \)&lt;/p&gt;
+
+&lt;p&gt;\( \vec e_{2} = \vec p_{2} - \vec p_{0} \)&lt;/p&gt;
+
+&lt;p&gt;\( \vec s = \vec o - \vec p_{0} \)&lt;/p&gt;
+
+&lt;p&gt;因此，上面的线性方程(组)简化成：&lt;/p&gt;
+
+&lt;p&gt;\[ -\vec d t + \vec e_{1} b_{1} + \vec e_{2} b_{2} = \vec s \]&lt;/p&gt;
+
+&lt;p&gt;再进一步，把方程左边写成矩阵相乘的形式，参数和系数就更显而易见了：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} -\vec d&amp;amp; \vec e_{1}&amp;amp; \vec e_{2} \\ \end{matrix} \right]  \left[ \begin{matrix} t\\  b_{1}\\  b_{2}\\ \end{matrix} \right] = \vec s \]&lt;/p&gt;
+
+&lt;h3&gt;Step3 解开问题方程&lt;/h3&gt;
+
+&lt;p&gt;接下来使用大招——&lt;strong&gt;克拉默(Cramer)法则&lt;/strong&gt;，来解方程。（在我的&lt;a href=&quot;http://www.qiujiawei.com/linear-algebra/&quot;&gt;&amp;lt;复习向&amp;gt;线性代数之矩阵与行列式(1)&lt;/a&gt; 一文中有介绍）&lt;/p&gt;
+
+&lt;p&gt;克拉默(Cramer)法则：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;若系数行列式 \( D\neq 0 \)，则方程组有唯一解，其解为：
+\[ x_{j} = \dfrac {D_{j}} {D} \]&lt;/p&gt;
+
+&lt;p&gt;\( D_{j} \)是将系数行列式D中第j列的元素\( a_{1j},a_{2j},\cdots a_{nj} \)对应地换成方程组右端的常数项\( b_{1j},b_{2j},\cdots b_{nj} \)，而其余各列保持不变得到的行列式。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;对应到上面的方程，系数行列式D等于：&lt;/p&gt;
+
+&lt;p&gt;\[ D =    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right| \]&lt;/p&gt;
+
+&lt;p&gt;而方程右边的常数项为\(\vec s\)。&lt;/p&gt;
+
+&lt;p&gt;所以上面的方程的各个未知数的值为：&lt;/p&gt;
+
+&lt;p&gt;\( t = \frac {    \left| \begin{matrix} \vec s\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right| } {    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right| } \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{1} = \frac {    \left| \begin{matrix} -\vec d\  \vec s\  \vec e_{2} \\ \end{matrix} \right| } {    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right| } \)&lt;/p&gt;
+
+&lt;p&gt;\( b_{2} = \frac {    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec s \\ \end{matrix} \right| } {    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right| } \)&lt;/p&gt;
+
+&lt;p&gt;将三个式子合并下：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} t\\  b_{1}\\  b_{2}\\ \end{matrix} \right] = \frac { 1 } {    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right| } \left[ \begin{matrix}    \left| \begin{matrix} \vec s\  \vec e_{1}\  \vec e_{2} \\ \end{matrix} \right|  \\    \left| \begin{matrix} -\vec d\  \vec s\  \vec e_{2} \\ \end{matrix} \right|  \\    \left| \begin{matrix} -\vec d\  \vec e_{1}\  \vec s \\ \end{matrix} \right|  \\  \end{matrix} \right]    \]&lt;/p&gt;
+
+&lt;p&gt;然后再使用另一杀招——&lt;strong&gt;向量的混合积&lt;/strong&gt;&lt;a href=&quot;http://mathworld.wolfram.com/ScalarTripleProduct.html&quot;&gt;Scalar Triple Product&lt;/a&gt;，从而再次将上式简化。&lt;/p&gt;
+
+&lt;p&gt;向量的混合积公式：&lt;/p&gt;
+
+&lt;p&gt;\[ [\vec a,\vec b, \vec c] = \vec a\cdot (\vec b \times \vec c) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \vec b\cdot (\vec c \times \vec a) = \vec b\cdot (-\vec a \times \vec c) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \vec c\cdot (\vec a \times \vec b) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = det(\vec a \ \vec b \ \vec c) = |\vec a \ \vec b \ \vec c| \]&lt;/p&gt;
+
+&lt;p&gt;因此有：&lt;/p&gt;
+
+&lt;p&gt;\[ |-\vec d \ \vec e_{1} \ \vec e_{2}| = -(-\vec d) \times \vec e_{2})\cdot \vec e_{1} = (\vec d \times \vec e_{2})\cdot \vec e_{1} \]&lt;/p&gt;
+
+&lt;p&gt;\[ |\vec s \ \vec e_{1} \ \vec e_{2}| = (\vec s \times \vec e_{1})\cdot \vec e_{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ |-\vec d \ \vec s \ \vec e_{2}| = (\vec d \times \vec e_{2})\cdot \vec s \]&lt;/p&gt;
+
+&lt;p&gt;\[ |-\vec d \ \vec e_{1} \ \vec s| = (\vec s \times \vec e_{1})\cdot \vec d \]&lt;/p&gt;
+
+&lt;p&gt;再代入到前面的方程，得到：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} t\\  b_{1}\\  b_{2}\\ \end{matrix} \right] = \frac { 1 } { (\vec d \times \vec e_{2})\cdot \vec e_{1} }  \left[ \begin{matrix} (\vec s \times \vec e_{1})\cdot \vec e_{2}\\  (\vec d \times \vec e_{2})\cdot \vec s\\  (\vec s \times \vec e_{1})\cdot \vec d\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;再设：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec s_{1} = \vec d \times \vec e_{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ \vec s_{2} = \vec s \times \vec e_{1} \]&lt;/p&gt;
+
+&lt;p&gt;就得到最终的等式了：&lt;/p&gt;
+
+&lt;p&gt;\[  \left[ \begin{matrix} t\\  b_{1}\\  b_{2}\\ \end{matrix} \right] = \frac { 1 } { \vec s_{1} \cdot \vec e_{1} }  \left[ \begin{matrix} \vec s_{2}\cdot \vec e_{2}\\  \vec s_{1}\cdot \vec s\\  \vec s_{2}\cdot \vec d\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;推导到了这里就结束了。现在来分析下这个最终等式的特点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;\(\vec d 、\  \vec s 、\  \vec e_{1} 、\  \vec e_{2} \) 是需要先求出来的，不过也是非常容易计算的(向量加减法)。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;接着就是算\( \vec s_{1} 、\   \vec s_{2} \)，无法避免的2次叉积运算。算完后，就得到了等式右边所有变量的值了。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;最后就是4次向量点积运算，1次求倒数运算，3次乘法运算，就分别得到了\( t 、\ b_{1} 、\ b_{2} \)的值。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;在上面的推导过程中，用到了矩阵、行列式、向量叉积、向量混合积等诸多概念，只为了得到相交点的坐标，确实复杂了点。&lt;/p&gt;
+
+&lt;p&gt;其中的&lt;strong&gt;向量的混合积&lt;/strong&gt;，可以参考以下网页来理解：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://mathworld.wolfram.com/CrossProduct.html&quot;&gt;http://mathworld.wolfram.com/CrossProduct.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Triple_product&quot;&gt;https://en.wikipedia.org/wiki/Triple_product&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/triangle-intersect/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/triangle-intersect/</guid>
+      </item>
+    
+      <item>
         <title>线性代数之平移、缩放、旋转矩阵</title>
         <description>&lt;!--more--&gt;
 
@@ -1234,308 +1388,6 @@ vmath::translation 要改为 vmath::translate&lt;/p&gt;
         <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-10/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-10/</guid>
-      </item>
-    
-      <item>
-        <title>《Effective Modern C++》读书笔记</title>
-        <description>&lt;p&gt;Note：为避免各种侵权问题，本文并没有复制原书任意文字(代码除外，作者已经声明代码可以被使用)。需要原书完整中文翻译的读者请等待官方译本的发布。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h1&gt;正文&lt;/h1&gt;
-
-&lt;p&gt;为了让本文更加清晰，依然还是用&lt;strong&gt;条款&lt;/strong&gt;的形式来介绍知识点。(但不能保证我写的&lt;strong&gt;条款&lt;/strong&gt;就是原书的条款)&lt;/p&gt;
-
-&lt;h2&gt;条款7：考虑用新的变量初始化语法{}代替旧的()吧&lt;/h2&gt;
-
-&lt;h3&gt;优点：&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;用{}来初始化变量，可以避免程序员不期望的隐式类型转换(更具体地说应该是narrowing conversions，收缩转换)；&lt;/li&gt;
-&lt;li&gt;用{}替代()，可以避免A a()被编译器解析(parsed)成函数声明的问题；&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;缺点：&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;和auto结合得不友好，auto遇到{}，auto推导成了std::initializer_list，这不是所期望的；&lt;/li&gt;
-&lt;li&gt;当类的多个构造函数里，有一个是用std::initializer_list时，要注意其他构造函数不能用{}语法；&lt;/li&gt;
-&lt;li&gt;当类有类型转换函数时，第二个缺点会变得更严重：复制构造函数可能不会被调用；&lt;/li&gt;
-&lt;li&gt;当存在std::initializer_list构造函数时，即使构造代码不正确，编译器也不会转而使用其他构造函数来构造(即使其他构造函数更加match)，而是报错。(一种例外情况是当{...}里的元素不能被转换成std::initializer_list的T时，编译器才会转而使用其他构造函数)；&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;编写类构造函数的最佳实践&lt;/h3&gt;
-
-&lt;p&gt;当你要给自定义的类加上std::initializer_list构造函数时，要细心考虑这个类被使用时，用{}和()是否一致，是否会有反直觉的结果。也就是说，为了避免上面所说的缺点，为了不坑自己或你的代码的用户，你需要在编写一个class时保持警惕。如无必要，应尽可能不添加td::initializer_list构造函数。&lt;/p&gt;
-
-&lt;h3&gt;c++11创造了2个阵营&lt;/h3&gt;
-
-&lt;p&gt;用()构造亦或用{}构造对象。只使用()的话，是传统派；只使用{}的话，是革新派。革新派追求{}的那2个优点，对{}的缺点保持乐观面对的态度；传统派更重视避免std::initializer_list构造函数带来的问题。选择哪一个阵营，看自己喜好了。&lt;/p&gt;
-
-&lt;h3&gt;对于库的编写者，并不是立场的问题&lt;/h3&gt;
-
-&lt;p&gt;编写template function，可能会需要构造局部变量，当局部变量的类型未知时，怎么知道要用{}还是()？万一T是一个革新派写的class，而你又用了{}来构造对象，那么你的template function的执行情况，可能和T的构造函数重载情况大有关系。也即是说，你的template function是不稳定的。究竟在template function里用{}还是()，是一个复杂的问题。&lt;/p&gt;
-
-&lt;h2&gt;条款8：不用考虑了，就用nullptr代替0和NULL&lt;/h2&gt;
-
-&lt;p&gt;nullptr的好处在哪，请阅读书中的例子。这个条款十分简单：不要再用0和NULL来表示空指针，而是用c++11的nullptr，只有好处，没有坏处。&lt;/p&gt;
-
-&lt;h2&gt;条款9：用using代替typedef&lt;/h2&gt;
-
-&lt;p&gt;同条款8，大部分情况下都可以用using代替typedef。&lt;/p&gt;
-
-&lt;h2&gt;条款10：具有作用域的enum&lt;/h2&gt;
-
-&lt;p&gt;写法如下:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;enum&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Color&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;black&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;red&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// black, white, red&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// are scoped to Color&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;white&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// fine, no othe&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error! no enumerator named&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// &amp;quot;white&amp;quot; is in this scope&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// fine&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// also fine (and in accord&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// with Item 5&amp;#39;s advice)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;我觉得主要好处是避免名空间污染。&lt;/p&gt;
-
-&lt;p&gt;c++11还允许给enum指定underlying type：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;enum&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint32_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// underlying type for&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// Status is std::uint32_t&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// (from &amp;lt;cstdint&amp;gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;意思是，Status的每一个元素都是std::uint32_t类型。缺省类型是int。&lt;/p&gt;
-
-&lt;p&gt;还有就是，c++11 enum支持前置声明(类似class的前置声明)。&lt;/p&gt;
-
-&lt;h2&gt;条款11：新功能：在成员函数声明后面加 = delete&lt;/h2&gt;
-
-&lt;p&gt;这样子写:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;想比c++98的做法(把函数声明为private，并不定义实现)：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;private&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;用 = delete会更好，因为被声明 = delete的函数，编译器保证什么代码都不能调用它们(会编译报错)，如果是c++98，有可能是链接时才报错。&lt;/p&gt;
-
-&lt;p&gt;注意到 = delete声明的函数，是public的，其实是为了让报错内容更准确。想一下，如果 = delete的函数是private，然后这个函数被外部调用，编译器可能只是给出&amp;quot;不能调用private函数&amp;quot;的错误信息。这可能会误导调用者。&lt;/p&gt;
-
-&lt;p&gt;= delete的另一个特性是，它并不是只能用在类成员函数，而是任意函数。看这段代码:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// original function&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// reject chars&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// reject bools&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// reject doubles and floats&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error! call to deleted function&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error!&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isLucky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.5f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// error!&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;把后3个函数重载给delete掉，保证了那3种调用方式不能被编译！也就是说，=delete可以用来阻止隐式转换陷阱。&lt;/p&gt;
-
-&lt;p&gt;用= delete还有一个高端的好处：在class内部的函数模板，它的访问类型只能是public、protected、private其中一种，不能又有public又有private的实例化，所以c++98的&amp;quot;delete&amp;quot;方案对函数模板没辙。还好，C++11解决了这个问题，用= delete即可：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ptr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// still public, but deleted&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;再引用下作者的一段话:&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;the C++98 approach is not as good as the real thing. It doesn’t work outside classes, it doesn’t always work inside classes, and when it does work, it may not work until link-time. So stick to deleted functions.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3&gt;条款12-1：新功能：引用限定符 reference qualifiers&lt;/h3&gt;
-
-&lt;p&gt;这样子玩:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doWork&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this version of doWork applies&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// only when *this is an lvalue&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doWork&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this version of doWork applies&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// only when *this is an rvalue&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;makeA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// factory function (returns rvalue)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// normal object (an lvalue)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doWork&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// calls A::doWork for lvalues&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// (i.e., A::doWork &amp;amp;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;makeA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doWork&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// calls A::doWork for rvalues&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// (i.e., A::doWork &amp;amp;&amp;amp;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;条款12-2：新功能：覆盖限定符 override qualifiers&lt;/h3&gt;
-
-&lt;p&gt;这个限定符是用来防止程序员粗心写错重载的。&lt;/p&gt;
-
-&lt;p&gt;错误例子:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Base&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;mf2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Derived&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Base&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;mf2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Derived的前3个函数一点没有覆盖掉基类的实现。因为派生类函数和基类对应的函数，函数签名不完全一样。&lt;/p&gt;
-
-&lt;p&gt;c++11给出了优雅的解决办法：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Derived&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Base&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mf4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Derived的mf1、mf2、mf3这3个覆盖函数无法编译通过，因为编译器在Base中找不到对应的函数。&lt;/p&gt;
-
-&lt;h3&gt;条款13: 尽可能使用const_iterators&lt;/h3&gt;
-
-&lt;p&gt;c++11/c++14可以这么写:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// it是const_iterators&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cbegin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1983&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;insert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1998&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;注意，cbegin和cend是成员函数。在c++11中，有非成员函数的begin和end，但没有非成员函数的cbegin和cend(c++14才有)。&lt;/p&gt;
-
-&lt;p&gt;所以要写泛型函数时，c++14这么写:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;findAndInsert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;targetVal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;insertVal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cbegin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cbegin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;targetVal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;insert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;insertVal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;c++11则不能，但可以先定义2个函数，使得可以和c++14保持一致:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cbegin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;decltype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;decltype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;条款14: 如果函数保证不会抛出异常，请给它加上 noexcept声明&lt;/h3&gt;
-
-&lt;p&gt;(这个标题怎么有点像《三体》里的安全声明:如果你的文明确定没有攻击性，请给你的星球加个光速黑洞=。=)&lt;/p&gt;
-
-&lt;p&gt;在c++98中，允许声明一个函数会抛出什么样的异常，客户端可以根据异常声明去安排自己的代码。然并卵，因为这产生了耦合性：如果一个函数的异常声明被改动了，客户端代码也得跟着改了。所以最终大家都不用这个特性。&lt;/p&gt;
-
-&lt;p&gt;在modern c++中，把这个东西废掉了，并加入noexcept关键字。从而只需要声明一个函数&lt;strong&gt;是否抛出异常&lt;/strong&gt;即可。&lt;/p&gt;
-
-&lt;p&gt;noexcept的威力在于，它告诉编译器的优化器可以多大程度地优化函数代码生成。当noexcept被声明时，运行时栈不需要保存一个可解状态(可解状态是指，这函数里的局部变量可以按照构造顺序的反序去析构)。即干掉这个函数的不必要信息，让它更轻量。&lt;/p&gt;
-
-&lt;p&gt;noexcept在标准库里部有很重要的应用，具体请阅读原书。&lt;/p&gt;
-
-&lt;p&gt;noexcept还是支持表达式计算的。可以这样子玩:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;swap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;swap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)));&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;T2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;swap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;swap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;
-                                  &lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;swap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)));&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;解释下第二个swap：一个pair对象和另一个pair对象进行swap，当前仅当swap(first, p.first)和swap(second, p.second)都是noexcept时，pair::swap才是noexcept。&lt;/p&gt;
-
-&lt;p&gt;虽然noexcept很强大，但是乱用是不好的。譬如如果你声明一个函数是noexcept，但有一天你反悔了，你可能想去掉noexcept声明，但这对客户端代码的影响不小，或者你不管noexcept声明了，硬是在函数里抛出异常！Oh，那当这个异常抛出来的时候，程序就强制终止了。&lt;/p&gt;
-
-&lt;p&gt;解决上述问题的唯一办法就是&lt;strong&gt;谨慎&lt;/strong&gt;，只对关键的、底层的、频繁调用的函数考虑加上noexcept声明。一来，函数是底层函数，函数内部很可能没有调用其他函数，或者调用的函数也都是noexcept的，于是这个函数可以妥妥地加上noexcept。&lt;/p&gt;
-
-&lt;p&gt;在modern c++中，用户定义的析构函数亦或是编译器生成的析构函数，都隐式声明了noexcept。&lt;/p&gt;
-
-&lt;h3&gt;条款15: 尽可能地使用constexpr&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;所有的constexpr对象都是常量，但不是所有的const对象都是constexpr。如果确定需要一个编译时期的常量，那么得用constexpr。&lt;/li&gt;
-&lt;li&gt;当你着手的代码需要用到编译时期常量时，可以使用constexpr函数，如果你给constexpr函数传递一些编译时期可知的参数(这些参数来源于上下文)，那么这个constexpr函数&lt;strong&gt;很可能&lt;/strong&gt;会在编译时期被执行。然而，如果其中一个参数是编译时期不可知的，这个函数&lt;strong&gt;肯定&lt;/strong&gt;不会在编译时期就执行。这个自动处理是自动的、隐式的，也就是说不要求程序员写2个函数，一个runtime用，一个compiling用。&lt;/li&gt;
-&lt;li&gt;从第二点可以反推，如果一个函数不是constexpr，那么即使你传递给它的参数都是编译时期已知的，这个函数也不一定就会在编译时期执行。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;具体怎么玩？看下面的代码：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span class=&quot;k&quot;&gt;constexpr&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// C++11&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;constexpr&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;noexcept&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// C++14&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;auto&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;constexpr&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1000000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;constexpr&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;%d&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;c++11的递归版本很容易爆栈，而c++14对constexpr做了改进，允许写成迭代的形式。&lt;/p&gt;
-
-&lt;p&gt;注释掉c++11的版本，然后试试c++14的版本吧，执行指令：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;time gcc test.cpp -o test.out -std=gnu++14 -lstdc++&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;指令执行耗时：&lt;/p&gt;
-
-&lt;p&gt;real    0m1.190s&lt;/p&gt;
-
-&lt;p&gt;user    0m1.108s&lt;/p&gt;
-
-&lt;p&gt;sys     0m0.052s&lt;/p&gt;
-
-&lt;p&gt;哇，用了1秒多，这1秒多花在哪了呢？其实就是gcc编译器在编译时期就把constexpr int result = times(a, b);计算了。（然而有些诡异的是，times仅仅循环100W，就花了一秒。）&lt;/p&gt;
-
-&lt;p&gt;不过这也值得高兴了，这个特性可以让程序性能有了进一步提高，譬如可以把复杂的静态class常量变成constexpr，使得在编译器就把变量生成了，而不是等到运行期(即使你说运行期只创建一次)。&lt;/p&gt;
-
-&lt;p&gt;总的来说就是，constexpr使得本来在运行期执行的工作，可以提前到编译期，只要你加上constexpr声明即可。&lt;/p&gt;
-
-&lt;h3&gt;条款16: 关于编译器自动生成的成员函数&lt;/h3&gt;
-
-&lt;p&gt;移动构造函数(move constructor)和移动赋值操作符(move assignment operator)，是modern c++新补充的generated member function。&lt;/p&gt;
-
-&lt;p&gt;对于这2个函数的任意一个，当前仅当满足下面的条件时，编译器才会自动生成它们：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;有地方需要用到它&lt;/li&gt;
-&lt;li&gt;用户没有自定义复制操作函数(copy operations)，即复制构造函数(copy constructor)和赋值操作符(copy assignment operator)&lt;/li&gt;
-&lt;li&gt;用户没有自定义移动操作函数(move operations)&lt;/li&gt;
-&lt;li&gt;用户没有自定义析构函数&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Sun, 08 Nov 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/cpp-6/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/cpp-6/</guid>
       </item>
     
   </channel>
