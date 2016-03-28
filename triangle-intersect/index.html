@@ -101,11 +101,11 @@
 
 <p>这时候还要再用到几何数学的一个东西：质心坐标 Barycentric Coordinates。 <a href="http://mathworld.wolfram.com/BarycentricCoordinates.html">http://mathworld.wolfram.com/BarycentricCoordinates.html</a></p>
 
-<p>\[ p_{BC} = b_{0}\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2}\]</p>
+<p>\[ \vec p_{BC} = b_{0}\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2}\]</p>
 
 <p>规范化的质心坐标被称为Homogeneous  Barycentric Coordinates，特性是\( b_{0} +  b_{1} + b_{2} = 1 \)，</p>
 
-<p>因为光线和三角形的交点必然落在三角形内部，所以这个交点可认为是一个\(p_{BC} \)。所以有：</p>
+<p>因为光线和三角形的交点必然落在三角形内部，所以这个交点可认为是一个\(\vec p_{BC} \)。所以有：</p>
 
 <p>\[ \vec g = (1 - b_{1} - b_{2})\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]</p>
 
@@ -119,7 +119,7 @@
 
 <p>\[ \vec o + t \vec d = (1 - b_{1} - b_{2})\vec p_{0} + b_{1}\vec p_{1} + b_{2}\vec p_{2} \]</p>
 
-<p>可以看到，只剩下3个未知量：\(t\)、\(b_{1}\)、\( b_{2}\)。(注意：这3个都是数，不是向量)</p>
+<p>可以看到，只剩下3个未知量：\(t\)、\(b_{1}\)、\( b_{2}\)，它们就是最终要求出来的东西。(注意：这3个都是数，不是向量)</p>
 
 <p>为了应用线性代数的知识来解决问题，我们需要把这个方程写成线性代数里的线性方程组形式：</p>
 
