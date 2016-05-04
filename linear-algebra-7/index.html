@@ -221,6 +221,33 @@ The adjugate has sometimes been called the &quot;adjoint&quot;, but today the &q
 
 <p>wiki:<a href="https://en.wikipedia.org/wiki/Bidiagonal_matrix">https://en.wikipedia.org/wiki/Bidiagonal_matrix</a></p>
 
+<h2>格拉姆矩阵 Gramian matrix</h2>
+
+<p>设矩阵X：</p>
+
+<p>\[ X =  \left[ \begin{matrix} \vec X_{1}&amp;\vec X_{2}&amp;\cdots &amp;\vec X_{n}\\ \end{matrix} \right]  \]</p>
+
+<p>则Gramian matrix为：</p>
+
+<p>\[ G = X^{T}X \]</p>
+
+<p>性质：</p>
+
+<ul>
+<li><p>G是positive semi-definite matrix正半定矩阵</p></li>
+<li><p>G的行列式非0时，X是线性无关的（充分必要）（可用来判定X是否线性无关，很重要）</p></li>
+</ul>
+
+<h2>协方差矩阵 Covariance matrix （或离差矩阵dispersion matrix）</h2>
+
+<p>先给出协方差(covariance)公式：</p>
+
+<p>\[ cov(X,Y) = \frac { \sum ^{n} _{i=1}(X_{i} - \overline {X})(Y_{i} - \overline {Y}) }{n-1} = E[(X - E[X])(Y - E[Y])] \]</p>
+
+<p>协方差是一个测量2个变量关联性程度的方法。当变量数目多于2时，任意2个变量之间的协方差的集合就构成了协方差矩阵C：</p>
+
+<p>\[ C = \Sigma _{ij} = cov(X_{i},X_{j}) = E[(X_{i} - E[X_{i}])(X_{j}s - E[X_{j}])]  \]</p>
+
   </div>
 
   <div class="date">
