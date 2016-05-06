@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>最小二乘估计(Least Squares Estimator)的公式的推导 – Wyman的技术博客 – 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="" />
+    <meta property="og:description" content="" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="最小二乘估计(Least Squares Estimator)的公式的推导" />
+    <meta property="twitter:title" content="最小二乘估计(Least Squares Estimator)的公式的推导" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 伪技术宅，兴趣点：服务器编程、游戏开发、人工智能" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/linear-algebra-15/',
+		  'title': '最小二乘估计(Least Squares Estimator)的公式的推导'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">伪技术宅，兴趣点：服务器编程、游戏开发、人工智能</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>最小二乘估计(Least Squares Estimator)的公式的推导</h1>
+  <h3>Tags: <a href="/tag/matrix.html" rel="tag">matrix</a>, <a href="/tag/linear-algebra.html" rel="tag">linear algebra</a>, <a href="/tag/least-squares.html" rel="tag">Least Squares</a></h3>
+  <div class="entry">
+    <!--more-->
+
+<p>最近在学习ML(machine learning)，注意到了一个有趣的东西：(最小二乘估计)[<a href="https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)%5D%E3%80%82">https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)]。</a></p>
+
+<p>先从简单说起吧。看下面的式子：</p>
+
+<p>\[ y = ax + e \]</p>
+
+<p>这是一个非常简单的直线方程。如果赋予y、a、x、b具体的意义，这个式子就有意思了：</p>
+
+<ol>
+<li><p>假设x是一个统计变量（预先就知道的），譬如，x代表人的年龄。</p></li>
+<li><p>假设y是关于x的一个label量（预先就知道的），譬如，y代表的是年龄为x时的人的智商。</p></li>
+<li><p>假设y和x存在线性关系，那么可以有 y = ax。这个式子表明年龄为x时，智商为ax。</p></li>
+<li><p>当x、y的取值只有一对时，a = y/x，但当x、y不只一对时，y = ax可能会无解（因为求解的是方程组 \( y_{i} = ax_{i} \) 了）</p></li>
+<li><p>为了使方程组 \( y_{i} = ax_{i} \) 可以求解，需要把方程组扩展成 \( y_{i} = ax_{i} + e_{i} \) 。</p></li>
+<li><p>\( y_{i} = ax_{i} + e_{i} \)使得我们有机会求出a，但同时也产生了很多个\( e_{i} \)。每对<y,x>都有它自己的error系数的话，这个a的意义就减弱了。</p></li>
+<li><p>为了使得a变得更有意义，我们希望每个error系数尽可能地小（无限逼近0最好了），同时又能求出唯一的a。</p></li>
+<li><p>又因为现实生活中，智商肯定不只跟年龄x有关系，还和其他参数有关系，那么可以再把公式扩展成:</p></li>
+</ol>
+
+<p>\[ y_{i} = a_{1}x_{i1} + a_{2}x_{i2} + \cdots + a_{k}x_{ik} + e_{i} , 1\le i\le n, k\ge 1 \]</p>
+
+<p>现在，把上式写成矩阵形式：</p>
+
+<p>\[ \vec y = X\vec a + \vec e \]</p>
+
+<p>\[  \left[ \begin{matrix} y_{1}\\ y_{2}\\ \vdots \\ y_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} x_{11}&amp;x_{12}&amp;\cdots &amp;x_{1k}\\    x_{21}&amp;x_{22}&amp;\cdots &amp;x_{2k}\\    \vdots &amp;\vdots &amp;\ddots &amp;\vdots \\   x_{n1}&amp;x_{n2}&amp;\cdots &amp;x_{nk}\\ \end{matrix} \right] \left[ \begin{matrix} a_{1}\\ a_{2}\\ \vdots \\ a_{k}\\ \end{matrix} \right] +  \left[ \begin{matrix} e_{1}\\ e_{2}\\ \vdots \\ e_{n}\\ \end{matrix} \right] \]</p>
+
+<p>再回到上面的第7点：为了使得\(\vec a\)变得更有意义，我们希望\(\vec e\)的每个分量尽可能地小。明确这一点非常重要。</p>
+
+<p>那么，这个目标完成情况应该如何衡量？其实很简单，既然\(\vec e\)是一个向量（n维空间），那么\(\vec e\)的长度就是我们需要的指标：</p>
+
+<p>\[ |\vec e| = \sqrt { \sum ^{n}_{i=1}e_{i}^{2} } \]</p>
+
+<p>开根号是不必要的，我们可以换成下面这个指标：</p>
+
+<p>\[ |\vec e|^{2} = \sum ^{n}_{i=1}e_{i}^{2} = \vec e\vec e = \vec e^{T}\vec e \]</p>
+
+<p><strong>小结一下：当\( \vec e^{T}\vec e \)取得最小值时，\(\vec a\)能取得最优解。</strong></p>
+
+<p>继续推导。</p>
+
+<p>由上文可知：</p>
+
+<p>\( \vec e = \vec y - X\vec a \)</p>
+
+<p>\( \vec e^{T} = (\vec y - X\vec a)^{T} \)</p>
+
+<p>\( \vec e^{T}\vec e = (\vec y - X\vec a)^{T}(\vec y - X\vec a)  \)</p>
+
+<p>\( = (\vec y^{T} - \vec a^{T}X^{T})(\vec y - X\vec a)  \)</p>
+
+<p>\( = \vec y^{T}\vec y - \vec a^{T}X^{T}\vec y - \vec y^{T}X\vec a + \vec a^{T}X^{T}X\vec a \)</p>
+
+<p>注意，中间的2个子项是可以合并的。首先，仔细观察\( \vec a^{T}X^{T}\vec y \)这个子项，发现它是一个<strong>值</strong>，那么就有：</p>
+
+<p>\( \vec a^{T}X^{T}\vec y  = (\vec a^{T}X^{T}\vec y)^{T} \)</p>
+
+<p>（一个数值可认为是一个1维的方阵，1维方阵的转置矩阵是它本身）</p>
+
+<p>而又有：</p>
+
+<p>\( (\vec a^{T}X^{T}\vec y)^{T} = \vec y^{T}(\vec a^{T}X^{T})^{T} \)</p>
+
+<p>\( = \vec y^{T}(X\vec a) = \vec y^{T}X\vec a  \)</p>
+
+<p>得：</p>
+
+<p>\( \vec a^{T}X^{T}\vec y  = \vec y^{T}X\vec a  \)</p>
+
+<p>所以上面的方程可变为：</p>
+
+<p>\[ \vec e^{T}\vec e = \vec y^{T}\vec y - 2\vec y^{T}X\vec a + \vec a^{T}X^{T}X\vec a \]</p>
+
+<p>如何让\( \vec e^{T}\vec e \)取得最小值？此时需要使用新的招数：矩阵微分。</p>
+
+<h2>矩阵微分</h2>
+
+<p>介绍下矩阵微分公式：</p>
+
+<p>设：</p>
+
+<p>\[ \vec y = A\vec x \]</p>
+
+<p>y是一个\(m \times 1\)的矩阵，A是一个\(m \times n\)的矩阵，x是一个\(n \times 1\)的矩阵。</p>
+
+<p>则有：</p>
+
+<p>\[ \frac {\partial \vec y}{\partial \vec x} = A 【公式1】 \]</p>
+
+<p>这是如何得到的呢？实际上超级简单，上面这个式子指的是，\(\vec y \)的每一个分量对\(\vec x \)的每一个分量的微分，结果显然就是一个\(m \times n\)矩阵。</p>
+
+<p>扩展公式：</p>
+
+<p>设：</p>
+
+<p>\[ \alpha = \vec y^{T}A\vec x \]</p>
+
+<p>则有：</p>
+
+<p>\[ \frac {\partial \alpha }{\partial \vec x} = \vec y^{T}A  【公式2】 \]</p>
+
+<p>\[ \frac {\partial \alpha }{\partial \vec y} = \vec x^{T}A^{T}  【公式3】 \]</p>
+
+<p>设：</p>
+
+<p>\[ \alpha = \vec x^{T}A\vec x \]</p>
+
+<p>且A是对称矩阵，</p>
+
+<p>则有：</p>
+
+<p>\[ \frac {\partial \alpha }{\partial \vec x} = 2\vec x^{T}A  【公式4】 \]</p>
+
+<h2>应用矩阵微分公式</h2>
+
+<p>再来看下刚才的\( \vec e^{T}\vec e  \)方程：</p>
+
+<p>\[ \vec e^{T}\vec e  = \vec y^{T}\vec y - 2\vec y^{T}X\vec a + \vec a^{T}X^{T}X\vec a \]</p>
+
+<p>对等号右边的式子求关于\(\vec a\)的微分，得到：</p>
+
+<p>\( \frac {\partial \vec y^{T}\vec y}{\partial \vec a} - 2\frac {\partial \vec y^{T}X\vec a}{\partial \vec a} + \frac {\partial \vec a^{T}X^{T}X\vec a}{\partial \vec a} \)</p>
+
+<p><strong>当这个式子(导数)等于0时, 就得到了\( \vec e^{T}\vec e \)的最小值。</strong></p>
+
+<p>显然，第一个子项为0，所以可把它去掉，得到：</p>
+
+<p>\( - 2\frac {\partial \vec y^{T}X\vec a}{\partial \vec a} + \frac {\partial \vec a^{T}X^{T}X\vec a}{\partial \vec a}  = 0\)</p>
+
+<p>\(  2\frac {\vec y^{T}X\vec a}{\partial \vec a} = \frac {\vec a^{T}X^{T}X\vec a}{\partial \vec a} \)</p>
+
+<p>观察左边的式子，和上文的【公式2】是一样的，所以有：</p>
+
+<p>\( 2\frac {\vec y^{T}X\vec a}{\partial \vec a} = 2\vec y^{T}X \)</p>
+
+<p>观察右边的式子，符合上文的【公式4】，所以有：</p>
+
+<p>\(  \frac {\vec a^{T}X^{T}X\vec a}{\partial \vec a} = 2\vec a^{T}X^{T}X \)</p>
+
+<p>综上，得：</p>
+
+<p>\(  2\vec y^{T}X = 2\vec a^{T}X^{T}X \)</p>
+
+<p>\(  \vec y^{T}X = \vec a^{T}X^{T}X \)</p>
+
+<p>\(  (\vec y^{T}X)^{T} = (\vec a^{T}X^{T}X)^{T} \)</p>
+
+<p>\(  X^{T}\vec y = X^{T}X\vec a \)</p>
+
+<p>\(  \vec a = (X^{T}X)^{-1}X^{T}\vec y  \)</p>
+
+<p>这个东西就是所谓的<strong>最小二乘估计(Least Squares Estimator)</strong>了。</p>
+
+  </div>
+
+  <div class="date">
+    Written on May  6, 2016
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
