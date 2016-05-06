@@ -9,8 +9,32 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="" />
-    <meta property="og:description" content="" />
+    <meta name="description" content="最近在学习ML(machine learning)，注意到了一个有趣的东西：Least Squares Estimator。
+
+先从简单说起吧。看下面的式子：
+
+\[ y = ax + e \]
+
+这是一个非常简单的直线方程。如果赋予y、a、x、b具体的意义，这个式子就有意思了：
+
+
+假设x是一个统计变量（预先就知道的），譬如，x代表人的年龄。
+假设y是关于x的一个label量（预先就知道的），譬如，y代表的是年龄为x时的人的智商。
+
+" />
+    <meta property="og:description" content="最近在学习ML(machine learning)，注意到了一个有趣的东西：Least Squares Estimator。
+
+先从简单说起吧。看下面的式子：
+
+\[ y = ax + e \]
+
+这是一个非常简单的直线方程。如果赋予y、a、x、b具体的意义，这个式子就有意思了：
+
+
+假设x是一个统计变量（预先就知道的），譬如，x代表人的年龄。
+假设y是关于x的一个label量（预先就知道的），譬如，y代表的是年龄为x时的人的智商。
+
+" />
     
     <meta name="author" content="Wyman的技术博客" />
 
@@ -83,9 +107,7 @@
   <h1>最小二乘估计(Least Squares Estimator)的公式的推导</h1>
   <h3>Tags: <a href="/tag/matrix.html" rel="tag">matrix</a>, <a href="/tag/linear-algebra.html" rel="tag">linear algebra</a>, <a href="/tag/least-squares.html" rel="tag">Least Squares</a></h3>
   <div class="entry">
-    <!--more-->
-
-<p>最近在学习ML(machine learning)，注意到了一个有趣的东西：(最小二乘估计)[<a href="https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)%5D%E3%80%82">https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)]。</a></p>
+    <p>最近在学习ML(machine learning)，注意到了一个有趣的东西：<a href="https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)">Least Squares Estimator</a>。</p>
 
 <p>先从简单说起吧。看下面的式子：</p>
 
@@ -96,6 +118,11 @@
 <ol>
 <li><p>假设x是一个统计变量（预先就知道的），譬如，x代表人的年龄。</p></li>
 <li><p>假设y是关于x的一个label量（预先就知道的），譬如，y代表的是年龄为x时的人的智商。</p></li>
+</ol>
+
+<!--more-->
+
+<ol>
 <li><p>假设y和x存在线性关系，那么可以有 y = ax。这个式子表明年龄为x时，智商为ax。</p></li>
 <li><p>当x、y的取值只有一对时，a = y/x，但当x、y不只一对时，y = ax可能会无解（因为求解的是方程组 \( y_{i} = ax_{i} \) 了）</p></li>
 <li><p>为了使方程组 \( y_{i} = ax_{i} \) 可以求解，需要把方程组扩展成 \( y_{i} = ax_{i} + e_{i} \) 。</p></li>
@@ -158,11 +185,11 @@
 
 <p>\[ \vec e^{T}\vec e = \vec y^{T}\vec y - 2\vec y^{T}X\vec a + \vec a^{T}X^{T}X\vec a \]</p>
 
-<p>如何让\( \vec e^{T}\vec e \)取得最小值？此时需要使用新的招数：矩阵微分。</p>
+<p>如何让\( \vec e^{T}\vec e \)取得最小值？此时需要使用新的招数：<strong>矩阵微分</strong>。</p>
 
 <h2>矩阵微分</h2>
 
-<p>介绍下矩阵微分公式：</p>
+<p>矩阵微分公式：</p>
 
 <p>设：</p>
 
@@ -237,6 +264,12 @@
 <p>\(  \vec a = (X^{T}X)^{-1}X^{T}\vec y  \)</p>
 
 <p>这个东西就是所谓的<strong>最小二乘估计(Least Squares Estimator)</strong>了。</p>
+
+<h2>参考资料</h2>
+
+<p><a href="https://economictheoryblog.com/2015/02/19/ols_estimator/">https://economictheoryblog.com/2015/02/19/ols_estimator/</a></p>
+
+<p><a href="http://www.atmos.washington.edu/%7Edennis/MatrixCalculus.pdf">http://www.atmos.washington.edu/~dennis/MatrixCalculus.pdf</a></p>
 
   </div>
 

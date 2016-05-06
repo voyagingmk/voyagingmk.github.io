@@ -8,9 +8,7 @@
     
       <item>
         <title>最小二乘估计(Least Squares Estimator)的公式的推导</title>
-        <description>&lt;!--more--&gt;
-
-&lt;p&gt;最近在学习ML(machine learning)，注意到了一个有趣的东西：(最小二乘估计)[&lt;a href=&quot;https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)%5D%E3%80%82&quot;&gt;https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)]。&lt;/a&gt;&lt;/p&gt;
+        <description>&lt;p&gt;最近在学习ML(machine learning)，注意到了一个有趣的东西：&lt;a href=&quot;https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)&quot;&gt;Least Squares Estimator&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;先从简单说起吧。看下面的式子：&lt;/p&gt;
 
@@ -21,6 +19,11 @@
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;假设x是一个统计变量（预先就知道的），譬如，x代表人的年龄。&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;假设y是关于x的一个label量（预先就知道的），譬如，y代表的是年龄为x时的人的智商。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;!--more--&gt;
+
+&lt;ol&gt;
 &lt;li&gt;&lt;p&gt;假设y和x存在线性关系，那么可以有 y = ax。这个式子表明年龄为x时，智商为ax。&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;当x、y的取值只有一对时，a = y/x，但当x、y不只一对时，y = ax可能会无解（因为求解的是方程组 \( y_{i} = ax_{i} \) 了）&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;为了使方程组 \( y_{i} = ax_{i} \) 可以求解，需要把方程组扩展成 \( y_{i} = ax_{i} + e_{i} \) 。&lt;/p&gt;&lt;/li&gt;
@@ -83,11 +86,11 @@
 
 &lt;p&gt;\[ \vec e^{T}\vec e = \vec y^{T}\vec y - 2\vec y^{T}X\vec a + \vec a^{T}X^{T}X\vec a \]&lt;/p&gt;
 
-&lt;p&gt;如何让\( \vec e^{T}\vec e \)取得最小值？此时需要使用新的招数：矩阵微分。&lt;/p&gt;
+&lt;p&gt;如何让\( \vec e^{T}\vec e \)取得最小值？此时需要使用新的招数：&lt;strong&gt;矩阵微分&lt;/strong&gt;。&lt;/p&gt;
 
 &lt;h2&gt;矩阵微分&lt;/h2&gt;
 
-&lt;p&gt;介绍下矩阵微分公式：&lt;/p&gt;
+&lt;p&gt;矩阵微分公式：&lt;/p&gt;
 
 &lt;p&gt;设：&lt;/p&gt;
 
@@ -162,6 +165,12 @@
 &lt;p&gt;\(  \vec a = (X^{T}X)^{-1}X^{T}\vec y  \)&lt;/p&gt;
 
 &lt;p&gt;这个东西就是所谓的&lt;strong&gt;最小二乘估计(Least Squares Estimator)&lt;/strong&gt;了。&lt;/p&gt;
+
+&lt;h2&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://economictheoryblog.com/2015/02/19/ols_estimator/&quot;&gt;https://economictheoryblog.com/2015/02/19/ols_estimator/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.atmos.washington.edu/%7Edennis/MatrixCalculus.pdf&quot;&gt;http://www.atmos.washington.edu/~dennis/MatrixCalculus.pdf&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 06 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-15/</link>
