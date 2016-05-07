@@ -162,7 +162,7 @@
 
 &lt;p&gt;\(  X^{T}\vec y = X^{T}X\vec a \)&lt;/p&gt;
 
-&lt;p&gt;\(  \vec a = (X^{T}X)^{-1}X^{T}\vec y  \)&lt;/p&gt;
+&lt;p&gt;\[ \vec a = (X^{T}X)^{-1}X^{T}\vec y  \]&lt;/p&gt;
 
 &lt;p&gt;这个东西就是所谓的&lt;strong&gt;最小二乘估计(Least Squares Estimator)&lt;/strong&gt;了。&lt;/p&gt;
 
