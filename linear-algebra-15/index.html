@@ -126,12 +126,12 @@
 <li><p>假设y和x存在线性关系，那么可以有 y = ax。这个式子表明年龄为x时，智商为ax。</p></li>
 <li><p>当x、y的取值只有一对时，a = y/x，但当x、y不只一对时，y = ax可能会无解（因为求解的是方程组 \( y_{i} = ax_{i} \) 了）</p></li>
 <li><p>为了使方程组 \( y_{i} = ax_{i} \) 可以求解，需要把方程组扩展成 \( y_{i} = ax_{i} + e_{i} \) 。</p></li>
-<li><p>\( y_{i} = ax_{i} + e_{i} \)使得我们有机会求出a，但同时也产生了很多个\( e_{i} \)。每对<y,x>都有它自己的error系数的话，这个a的意义就减弱了。</p></li>
+<li><p>\( y_{i} = ax_{i} + e_{i} \)使得我们有机会求出a，但同时也产生了很多个\( e_{i} \)。每对<y,  x>都有它自己的error系数的话，这个a的意义就减弱了。</p></li>
 <li><p>为了使得a变得更有意义，我们希望每个error系数尽可能地小（无限逼近0最好了），同时又能求出唯一的a。</p></li>
 <li><p>又因为现实生活中，智商肯定不只跟年龄x有关系，还和其他参数有关系，那么可以再把公式扩展成:</p></li>
 </ol>
 
-<p>\[ y_{i} = a_{1}x_{i1} + a_{2}x_{i2} + \cdots + a_{k}x_{ik} + e_{i} , 1\le i\le n, k\ge 1 \]</p>
+<p>\[ y_{i} = a_{1}x_{i1} + a_{2}x_{i2} + \cdots + a_{k}x_{ik} + e_{i} ,   1\le i\le n,   k\ge 1 \]</p>
 
 <p>现在，把上式写成矩阵形式：</p>
 
@@ -235,7 +235,7 @@
 
 <p>\( \frac {\partial \vec y^{T}\vec y}{\partial \vec a} - 2\frac {\partial \vec y^{T}X\vec a}{\partial \vec a} + \frac {\partial \vec a^{T}X^{T}X\vec a}{\partial \vec a} \)</p>
 
-<p><strong>当这个式子(导数)等于0时, 就得到了\( \vec e^{T}\vec e \)的最小值。</strong></p>
+<p><strong>当这个式子(导数)等于0时,   就得到了\( \vec e^{T}\vec e \)的最小值。</strong></p>
 
 <p>显然，第一个子项为0，所以可把它去掉，得到：</p>
 
@@ -264,6 +264,349 @@
 <p>\(  \vec a = (X^{T}X)^{-1}X^{T}\vec y  \)</p>
 
 <p>这个东西就是所谓的<strong>最小二乘估计(Least Squares Estimator)</strong>了。</p>
+
+<h2>实例</h2>
+
+<p>使用非常经典的Iris数据集<a href="http://archive.ics.uci.edu/ml/datasets/Iris">http://archive.ics.uci.edu/ml/datasets/Iris</a>来验证下上面的公式是否可用。</p>
+
+<p>Iris鸢尾花卉数据集，是一类多重变量分析的数据集。通过<strong>花萼长度，花萼宽度，花瓣长度，花瓣宽度4个属性</strong>预测鸢尾花卉属于（Setosa，Versicolour，Virginica）<strong>三个种类</strong>中的哪一类。</p>
+
+<p>整个数据集可在<a href="http://archive.ics.uci.edu/ml/machine-learning-databases/iris/bezdekIris.data">这里</a>浏览。</p>
+
+<p>首先是为3个类别各赋予1个标签值：</p>
+
+<ul>
+<li>Iris-setosa = 1</li>
+<li>Iris-versicolor = 2</li>
+<li>Iris-virginica = 3</li>
+</ul>
+
+<p>然后从整个数据集中挑选训练数据集(Train Dataset)，譬如从3个类别中各取出前10个数据项。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mf">5.1</span><span class="p">,</span>  <span class="mf">3.5</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">4.9</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">4.7</span><span class="p">,</span>  <span class="mf">3.2</span><span class="p">,</span>  <span class="mf">1.3</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">4.6</span><span class="p">,</span>  <span class="mf">3.1</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">5.0</span><span class="p">,</span>  <span class="mf">3.6</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">5.4</span><span class="p">,</span>  <span class="mf">3.9</span><span class="p">,</span>  <span class="mf">1.7</span><span class="p">,</span>  <span class="mf">0.4</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">4.6</span><span class="p">,</span>  <span class="mf">3.4</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.3</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">5.0</span><span class="p">,</span>  <span class="mf">3.4</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">4.4</span><span class="p">,</span>  <span class="mf">2.9</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.2</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">4.9</span><span class="p">,</span>  <span class="mf">3.1</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">,</span>  <span class="mf">0.1</span><span class="p">,</span>  <span class="mi">1</span>
+<span class="mf">7.0</span><span class="p">,</span>  <span class="mf">3.2</span><span class="p">,</span>  <span class="mf">4.7</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">6.4</span><span class="p">,</span>  <span class="mf">3.2</span><span class="p">,</span>  <span class="mf">4.5</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">6.9</span><span class="p">,</span>  <span class="mf">3.1</span><span class="p">,</span>  <span class="mf">4.9</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">5.5</span><span class="p">,</span>  <span class="mf">2.3</span><span class="p">,</span>  <span class="mf">4.0</span><span class="p">,</span>  <span class="mf">1.3</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">6.5</span><span class="p">,</span>  <span class="mf">2.8</span><span class="p">,</span>  <span class="mf">4.6</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">5.7</span><span class="p">,</span>  <span class="mf">2.8</span><span class="p">,</span>  <span class="mf">4.5</span><span class="p">,</span>  <span class="mf">1.3</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">6.3</span><span class="p">,</span>  <span class="mf">3.3</span><span class="p">,</span>  <span class="mf">4.7</span><span class="p">,</span>  <span class="mf">1.6</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">4.9</span><span class="p">,</span>  <span class="mf">2.4</span><span class="p">,</span>  <span class="mf">3.3</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">6.6</span><span class="p">,</span>  <span class="mf">2.9</span><span class="p">,</span>  <span class="mf">4.6</span><span class="p">,</span>  <span class="mf">1.3</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">5.2</span><span class="p">,</span>  <span class="mf">2.7</span><span class="p">,</span>  <span class="mf">3.9</span><span class="p">,</span>  <span class="mf">1.4</span><span class="p">,</span>  <span class="mi">2</span>
+<span class="mf">6.3</span><span class="p">,</span>  <span class="mf">3.3</span><span class="p">,</span>  <span class="mf">6.0</span><span class="p">,</span>  <span class="mf">2.5</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">5.8</span><span class="p">,</span>  <span class="mf">2.7</span><span class="p">,</span>  <span class="mf">5.1</span><span class="p">,</span>  <span class="mf">1.9</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">7.1</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">,</span>  <span class="mf">5.9</span><span class="p">,</span>  <span class="mf">2.1</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">6.3</span><span class="p">,</span>  <span class="mf">2.9</span><span class="p">,</span>  <span class="mf">5.6</span><span class="p">,</span>  <span class="mf">1.8</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">6.5</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">,</span>  <span class="mf">5.8</span><span class="p">,</span>  <span class="mf">2.2</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">7.6</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">,</span>  <span class="mf">6.6</span><span class="p">,</span>  <span class="mf">2.1</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">4.9</span><span class="p">,</span>  <span class="mf">2.5</span><span class="p">,</span>  <span class="mf">4.5</span><span class="p">,</span>  <span class="mf">1.7</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">7.3</span><span class="p">,</span>  <span class="mf">2.9</span><span class="p">,</span>  <span class="mf">6.3</span><span class="p">,</span>  <span class="mf">1.8</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">6.7</span><span class="p">,</span>  <span class="mf">2.5</span><span class="p">,</span>  <span class="mf">5.8</span><span class="p">,</span>  <span class="mf">1.8</span><span class="p">,</span>  <span class="mi">3</span>
+<span class="mf">7.2</span><span class="p">,</span>  <span class="mf">3.6</span><span class="p">,</span>  <span class="mf">6.1</span><span class="p">,</span>  <span class="mf">2.5</span><span class="p">,</span>  <span class="mi">3</span>
+</code></pre></div>
+<p>此时，已经得到了\( X \)、\( \vec y \)的值了，\( X \)是上面这个表格的前4列（30x4的矩阵），\( \vec y \)是第5列（30x1的矩阵）。</p>
+
+<p>我们的目标是求出系数\( \vec a \)，它是一个4x1的矩阵。</p>
+
+<p>根据前文推导出来的公式：</p>
+
+<p>\(  \vec a = (X^{T}X)^{-1}X^{T}\vec y  \)</p>
+
+<p>因为矩阵比较庞大的关系，只能直接给出\( (X^{T}X)^{-1}X^{T} \)的结果了，读者们也可以自己做下计算：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">X</span><span class="err">`</span> <span class="o">=</span> 
+<span class="mf">5.1</span>  <span class="mf">4.9</span>  <span class="mf">4.7</span>  <span class="mf">4.6</span>  <span class="mi">5</span>  <span class="mf">5.4</span>  <span class="mf">4.6</span>  <span class="mi">5</span>  <span class="mf">4.4</span>  <span class="mf">4.9</span>  <span class="mi">7</span>  <span class="mf">6.4</span>  <span class="mf">6.9</span>  <span class="mf">5.5</span>  <span class="mf">6.5</span>  <span class="mf">5.7</span>  <span class="mf">6.3</span>  <span class="mf">4.9</span>  <span class="mf">6.6</span>  <span class="mf">5.2</span>  <span class="mf">6.3</span>  <span class="mf">5.8</span>  <span class="mf">7.1</span>  <span class="mf">6.3</span>  <span class="mf">6.5</span>  <span class="mf">7.6</span>  <span class="mf">4.9</span>  <span class="mf">7.3</span>  <span class="mf">6.7</span>  <span class="mf">7.2</span>
+<span class="mf">3.5</span>  <span class="mi">3</span>  <span class="mf">3.2</span>  <span class="mf">3.1</span>  <span class="mf">3.6</span>  <span class="mf">3.9</span>  <span class="mf">3.4</span>  <span class="mf">3.4</span>  <span class="mf">2.9</span>  <span class="mf">3.1</span>  <span class="mf">3.2</span>  <span class="mf">3.2</span>  <span class="mf">3.1</span>  <span class="mf">2.3</span>  <span class="mf">2.8</span>  <span class="mf">2.8</span>  <span class="mf">3.3</span>  <span class="mf">2.4</span>  <span class="mf">2.9</span>  <span class="mf">2.7</span>  <span class="mf">3.3</span>  <span class="mf">2.7</span>  <span class="mi">3</span>  <span class="mf">2.9</span>  <span class="mi">3</span>  <span class="mi">3</span>  <span class="mf">2.5</span>  <span class="mf">2.9</span>  <span class="mf">2.5</span>  <span class="mf">3.6</span>
+<span class="mf">1.4</span>  <span class="mf">1.4</span>  <span class="mf">1.3</span>  <span class="mf">1.5</span>  <span class="mf">1.4</span>  <span class="mf">1.7</span>  <span class="mf">1.4</span>  <span class="mf">1.5</span>  <span class="mf">1.4</span>  <span class="mf">1.5</span>  <span class="mf">4.7</span>  <span class="mf">4.5</span>  <span class="mf">4.9</span>  <span class="mi">4</span>  <span class="mf">4.6</span>  <span class="mf">4.5</span>  <span class="mf">4.7</span>  <span class="mf">3.3</span>  <span class="mf">4.6</span>  <span class="mf">3.9</span>  <span class="mi">6</span>  <span class="mf">5.1</span>  <span class="mf">5.9</span>  <span class="mf">5.6</span>  <span class="mf">5.8</span>  <span class="mf">6.6</span>  <span class="mf">4.5</span>  <span class="mf">6.3</span>  <span class="mf">5.8</span>  <span class="mf">6.1</span>
+<span class="mf">0.2</span>  <span class="mf">0.2</span>  <span class="mf">0.2</span>  <span class="mf">0.2</span>  <span class="mf">0.2</span>  <span class="mf">0.4</span>  <span class="mf">0.3</span>  <span class="mf">0.2</span>  <span class="mf">0.2</span>  <span class="mf">0.1</span>  <span class="mf">1.4</span>  <span class="mf">1.5</span>  <span class="mf">1.5</span>  <span class="mf">1.3</span>  <span class="mf">1.5</span>  <span class="mf">1.3</span>  <span class="mf">1.6</span>  <span class="mi">1</span>  <span class="mf">1.3</span>  <span class="mf">1.4</span>  <span class="mf">2.5</span>  <span class="mf">1.9</span>  <span class="mf">2.1</span>  <span class="mf">1.8</span>  <span class="mf">2.2</span>  <span class="mf">2.1</span>  <span class="mf">1.7</span>  <span class="mf">1.8</span>  <span class="mf">1.8</span>  <span class="mf">2.5</span>
+
+<span class="n">X</span><span class="err">`</span><span class="n">X</span> <span class="o">=</span> 
+<span class="mf">1051.290</span>    <span class="mf">532.720</span>     <span class="mf">723.350</span>     <span class="mf">230.480</span>   
+<span class="mf">532.720</span>     <span class="mf">281.280</span>     <span class="mf">345.450</span>     <span class="mf">108.190</span>   
+<span class="mf">723.350</span>     <span class="mf">345.450</span>     <span class="mf">550.410</span>     <span class="mf">182.580</span>   
+<span class="mf">230.480</span>     <span class="mf">108.190</span>     <span class="mf">182.580</span>     <span class="mf">62.220</span>
+
+
+<span class="p">(</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span> <span class="o">=</span> 
+<span class="mf">0.541034</span>    <span class="o">-</span><span class="mf">0.573805</span>   <span class="o">-</span><span class="mf">0.641245</span>   <span class="mf">0.875298</span>
+<span class="o">-</span><span class="mf">0.573805</span>   <span class="mf">0.633743</span>    <span class="mf">0.631976</span>    <span class="o">-</span><span class="mf">0.830927</span>
+<span class="o">-</span><span class="mf">0.641245</span>   <span class="mf">0.631976</span>    <span class="mf">0.920228</span>    <span class="o">-</span><span class="mf">1.42389</span>
+<span class="mf">0.875298</span>    <span class="o">-</span><span class="mf">0.830927</span>   <span class="o">-</span><span class="mf">1.42389</span>    <span class="mf">2.396868</span>
+
+
+<span class="p">((</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="p">)</span><span class="n">X</span><span class="err">`</span> <span class="o">=</span> 
+<span class="mf">0.028273</span>    <span class="mf">0.206968</span>    <span class="mf">0.048125</span>    <span class="o">-</span><span class="mf">0.076847</span>   <span class="o">-</span><span class="mf">0.083211</span>   <span class="o">-</span><span class="mf">0.056253</span>   <span class="o">-</span><span class="mf">0.097334</span>   <span class="o">-</span><span class="mf">0.032575</span>   <span class="o">-</span><span class="mf">0.006168</span>   <span class="o">-</span><span class="mf">0.002067</span>   <span class="mf">0.162628</span>    <span class="mf">0.053786</span>    <span class="mf">0.125186</span>    <span class="mf">0.228843</span>    <span class="mf">0.273287</span>    <span class="o">-</span><span class="mf">0.270475</span>   <span class="o">-</span><span class="mf">0.098417</span>   <span class="mf">0.033124</span>    <span class="mf">0.094950</span>    <span class="o">-</span><span class="mf">0.011335</span>   <span class="o">-</span><span class="mf">0.144267</span>   <span class="o">-</span><span class="mf">0.018560</span>   <span class="mf">0.174707</span>    <span class="o">-</span><span class="mf">0.270956</span>   <span class="mf">0.001741</span>    <span class="o">-</span><span class="mf">0.003648</span>   <span class="o">-</span><span class="mf">0.181042</span>   <span class="o">-</span><span class="mf">0.178793</span>   <span class="mf">0.046731</span>    <span class="mf">0.106397</span>
+<span class="mf">0.010276</span>    <span class="o">-</span><span class="mf">0.191835</span>   <span class="o">-</span><span class="mf">0.013523</span>   <span class="mf">0.106879</span>    <span class="mf">0.131031</span>    <span class="mf">0.115039</span>    <span class="mf">0.150711</span>    <span class="mf">0.067480</span>    <span class="mf">0.031694</span>    <span class="mf">0.017830</span>    <span class="o">-</span><span class="mf">0.181668</span>   <span class="o">-</span><span class="mf">0.046873</span>   <span class="o">-</span><span class="mf">0.144359</span>   <span class="o">-</span><span class="mf">0.250620</span>   <span class="o">-</span><span class="mf">0.294553</span>   <span class="mf">0.267479</span>    <span class="mf">0.117184</span>    <span class="o">-</span><span class="mf">0.036068</span>   <span class="o">-</span><span class="mf">0.122374</span>   <span class="mf">0.028729</span>    <span class="mf">0.190919</span>    <span class="mf">0.027353</span>    <span class="o">-</span><span class="mf">0.189075</span>   <span class="mf">0.26628</span> <span class="mf">0.008918</span>    <span class="o">-</span><span class="mf">0.033594</span>   <span class="mf">0.204029</span>    <span class="mf">0.134858</span>    <span class="o">-</span><span class="mf">0.090344</span>   <span class="o">-</span><span class="mf">0.072185</span>
+<span class="o">-</span><span class="mf">0.054892</span>   <span class="o">-</span><span class="mf">0.242631</span>   <span class="o">-</span><span class="mf">0.080010</span>   <span class="mf">0.104963</span>    <span class="mf">0.072430</span>    <span class="o">-</span><span class="mf">0.003185</span>   <span class="mf">0.060144</span>    <span class="mf">0.038057</span>    <span class="mf">0.014794</span>    <span class="mf">0.054978</span>    <span class="o">-</span><span class="mf">0.134766</span>   <span class="o">-</span><span class="mf">0.076454</span>   <span class="o">-</span><span class="mf">0.092183</span>   <span class="o">-</span><span class="mf">0.243448</span>   <span class="o">-</span><span class="mf">0.301346</span>   <span class="mf">0.404405</span>    <span class="mf">0.092525</span>    <span class="o">-</span><span class="mf">0.012496</span>   <span class="o">-</span><span class="mf">0.017495</span>   <span class="o">-</span><span class="mf">0.032696</span>   <span class="mf">0.007320</span>    <span class="o">-</span><span class="mf">0.025114</span>   <span class="o">-</span><span class="mf">0.217735</span>   <span class="mf">0.383162</span>    <span class="o">-</span><span class="mf">0.067400</span>   <span class="mf">0.105802</span>    <span class="mf">0.158253</span>    <span class="mf">0.386076</span>    <span class="mf">0.057919</span>    <span class="o">-</span><span class="mf">0.288185</span>
+<span class="mf">0.041703</span>    <span class="mf">0.282107</span>    <span class="mf">0.083251</span>    <span class="o">-</span><span class="mf">0.205964</span>   <span class="o">-</span><span class="mf">0.12892</span>    <span class="mf">0.024128</span>    <span class="o">-</span><span class="mf">0.073167</span>   <span class="o">-</span><span class="mf">0.105123</span>   <span class="o">-</span><span class="mf">0.072449</span>   <span class="o">-</span><span class="mf">0.183062</span>   <span class="mf">0.131452</span>    <span class="mf">0.130738</span>    <span class="mf">0.081924</span>    <span class="mf">0.323375</span>    <span class="mf">0.408249</span>    <span class="o">-</span><span class="mf">0.628974</span>   <span class="o">-</span><span class="mf">0.084976</span>   <span class="o">-</span><span class="mf">0.007234</span>   <span class="o">-</span><span class="mf">0.066687</span>   <span class="mf">0.110491</span>    <span class="mf">0.221148</span>    <span class="mf">0.125436</span>    <span class="mf">0.354307</span>    <span class="o">-</span><span class="mf">0.554733</span>   <span class="mf">0.211204</span>    <span class="o">-</span><span class="mf">0.204767</span>   <span class="o">-</span><span class="mf">0.121187</span>   <span class="o">-</span><span class="mf">0.676157</span>   <span class="o">-</span><span class="mf">0.157020</span>   <span class="mf">0.617249</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="p">((</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="p">)</span><span class="n">X</span><span class="err">`</span><span class="n">y</span> <span class="o">=</span> 
+<span class="o">-</span><span class="mf">0.291</span>   
+<span class="mf">0.441</span>   
+<span class="mf">0.637</span>   
+<span class="o">-</span><span class="mf">0.094</span>  
+</code></pre></div>
+<p>a的值为：</p>
+
+<p>\[ \vec a =  \left[ \begin{matrix} -0.291\\ 0.441\\ 0.637\\ -0.094\\ \end{matrix} \right] \]</p>
+
+<p>然后就是测试a的可靠度如何。方法就是把a用到剩余的其他数据项里，算出predict值，并和实际的值做比较，看预测正确的有多少个，公式为：</p>
+
+<p>\[ \vec y_{predict} = X_{test}\vec a \]</p>
+
+<p>结果是：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mf">0.997</span>   
+<span class="mf">1.103</span>   
+<span class="mf">0.809</span>   
+<span class="mf">0.763</span>   
+<span class="mf">0.822</span>   
+<span class="mf">1.200</span>   
+<span class="mf">0.939</span>   
+<span class="mf">0.923</span>   
+<span class="mf">1.072</span>   
+<span class="mf">1.119</span>   
+<span class="mf">0.992</span>   
+<span class="mf">1.066</span>   
+<span class="mf">0.867</span>   
+<span class="mf">1.007</span>   
+<span class="mf">1.294</span>   
+<span class="mf">0.868</span>   
+<span class="mf">1.026</span>   
+<span class="mf">0.967</span>   
+<span class="mf">0.859</span>   
+<span class="mf">1.044</span>   
+<span class="mf">0.971</span>   
+<span class="mf">0.846</span>   
+<span class="mf">1.241</span>   
+<span class="mf">1.125</span>   
+<span class="mf">0.887</span>   
+<span class="mf">0.702</span>   
+<span class="mf">0.752</span>   
+<span class="mf">0.887</span>   
+<span class="mf">0.852</span>   
+<span class="mf">0.952</span>   
+<span class="mf">0.888</span>   
+<span class="mf">0.505</span>   
+<span class="mf">0.940</span>   
+<span class="mf">1.051</span>   
+<span class="mf">1.364</span>   
+<span class="mf">0.790</span>   
+<span class="mf">1.192</span>   
+<span class="mf">0.946</span>   
+<span class="mf">1.026</span>   
+<span class="mf">0.873</span>   
+<span class="mf">1.563</span>   
+<span class="mf">2.140</span>   
+<span class="mf">1.678</span>   
+<span class="mf">2.366</span>   
+<span class="mf">1.820</span>   
+<span class="mf">2.089</span>   
+<span class="mf">2.419</span>   
+<span class="mf">2.021</span>   
+<span class="mf">1.892</span>   
+<span class="mf">1.854</span> 
+<span class="mf">2.583</span>   
+<span class="mf">1.886</span>   
+<span class="mf">2.250</span>   
+<span class="mf">2.341</span>   
+<span class="mf">2.033</span>   
+<span class="mf">2.074</span>   
+<span class="mf">2.182</span>   
+<span class="mf">2.398</span>   
+<span class="mf">2.258</span>   
+<span class="mf">1.623</span>   
+<span class="mf">1.775</span>   
+<span class="mf">1.721</span>   
+<span class="mf">1.874</span>   
+<span class="mf">2.543</span>   
+<span class="mf">2.477</span>   
+<span class="mf">2.470</span>   
+<span class="mf">2.270</span>   
+<span class="mf">1.862</span>   
+<span class="mf">2.183</span>   
+<span class="mf">1.928</span>   
+<span class="mf">2.236</span>   
+<span class="mf">2.346</span>   
+<span class="mf">1.894</span>   
+<span class="mf">1.567</span>   
+<span class="mf">2.114</span>   
+<span class="mf">2.227</span>   
+<span class="mf">2.173</span>   
+<span class="mf">2.092</span>   
+<span class="mf">1.426</span>   
+<span class="mf">2.066</span>   
+<span class="mf">2.580</span>   
+<span class="mf">2.526</span>   
+<span class="mf">2.650</span>   
+<span class="mf">2.441</span>   
+<span class="mf">2.570</span>   
+<span class="mf">2.709</span>   
+<span class="mf">2.766</span>   
+<span class="mf">3.496</span>   
+<span class="mf">3.085</span>   
+<span class="mf">2.268</span>   
+<span class="mf">2.818</span>   
+<span class="mf">2.539</span>   
+<span class="mf">3.074</span>   
+<span class="mf">2.310</span>   
+<span class="mf">2.939</span>   
+<span class="mf">2.969</span>   
+<span class="mf">2.319</span>   
+<span class="mf">2.500</span>   
+<span class="mf">2.742</span>  
+<span class="mf">2.772</span>   
+<span class="mf">2.788</span>   
+<span class="mf">3.266</span>   
+<span class="mf">2.733</span>   
+<span class="mf">2.509</span>   
+<span class="mf">2.807</span>   
+<span class="mf">2.752</span>   
+<span class="mf">3.008</span>   
+<span class="mf">2.839</span>   
+<span class="mf">2.465</span>   
+<span class="mf">2.602</span>   
+<span class="mf">2.759</span>   
+<span class="mf">2.392</span>   
+<span class="mf">2.573</span>   
+<span class="mf">2.975</span>   
+<span class="mf">2.902</span>   
+<span class="mf">2.470</span>   
+<span class="mf">2.276</span>   
+<span class="mf">2.556</span>   
+<span class="mf">2.919</span>   
+<span class="mf">2.686</span> 
+</code></pre></div>
+<p>再四舍五入一下，得到：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">1</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">1</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">2</span>
+<span class="mi">2</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+<span class="mi">3</span>
+</code></pre></div>
+<p>此时就可以算准确率了，经过比较，上面的predict值正确的有109个，总共的测试项有120，准确率高达90.83%哦。</p>
 
 <h2>参考资料</h2>
 
