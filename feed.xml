@@ -8,7 +8,7 @@
     
       <item>
         <title>最小二乘估计(Least Squares Estimator)的公式的推导</title>
-        <description>&lt;p&gt;最近在学习ML(machine learning)，注意到了一个有趣的东西：&lt;a href=&quot;https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)&quot;&gt;Least Squares Estimator&lt;/a&gt;。&lt;/p&gt;
+        <description>&lt;p&gt;最近在学习ML(Machine Learning)，注意到了一个有趣的东西：&lt;a href=&quot;https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)&quot;&gt;Least Squares Estimator&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;先从简单说起吧。看下面的式子：&lt;/p&gt;
 
@@ -168,7 +168,7 @@
 
 &lt;h2&gt;实例&lt;/h2&gt;
 
-&lt;p&gt;使用非常经典的Iris数据集&lt;a href=&quot;http://archive.ics.uci.edu/ml/datasets/Iris&quot;&gt;http://archive.ics.uci.edu/ml/datasets/Iris&lt;/a&gt;来验证下上面的公式是否可用。&lt;/p&gt;
+&lt;p&gt;使用ML中常用的Iris数据集&lt;a href=&quot;http://archive.ics.uci.edu/ml/datasets/Iris&quot;&gt;http://archive.ics.uci.edu/ml/datasets/Iris&lt;/a&gt;来验证下上面的公式是否可用。&lt;/p&gt;
 
 &lt;p&gt;Iris鸢尾花卉数据集，是一类多重变量分析的数据集。通过&lt;strong&gt;花萼长度，花萼宽度，花瓣长度，花瓣宽度4个属性&lt;/strong&gt;预测鸢尾花卉属于（Setosa，Versicolour，Virginica）&lt;strong&gt;三个种类&lt;/strong&gt;中的哪一类。&lt;/p&gt;
 
