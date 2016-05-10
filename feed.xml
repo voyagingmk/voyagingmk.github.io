@@ -7,6 +7,222 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>矩阵微分（一）</title>
+        <description>&lt;h1&gt;基本认识&lt;/h1&gt;
+
+&lt;h2&gt;3种标准导数(梯度)公式&lt;/h2&gt;
+
+&lt;p&gt;1) 自变量是一个数值量(Scalar)时：&lt;/p&gt;
+
+&lt;p&gt;\[ Df(x) = \lim _{t\to 0} \frac {f(x+t)-f(t)}{t} \]&lt;/p&gt;
+
+&lt;p&gt;2) 自变量是一个向量(Vector)时：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{\textbf {w}}f(\textbf {x}) = \lim _{t\to 0} \frac {f(\textbf {x} + t\textbf {w}) - f(t)}{t} \]&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;(w的维数和x一致)&lt;/p&gt;
+
+&lt;p&gt;这个导数的含义是，在n维空间中f(x)所定义的(超)平面上的某个坐标点x相对于w的斜率。&lt;/p&gt;
+
+&lt;p&gt;3) 自变量是一个矩阵(Matrix)时：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \]&lt;/p&gt;
+
+&lt;p&gt;含义和2)类似。（已经无法想象了）&lt;/p&gt;
+
+&lt;h2&gt;矩阵迹(trace)的各种性质&lt;/h2&gt;
+
+&lt;h3&gt;性质1&lt;/h3&gt;
+
+&lt;p&gt;\[ tr(A) = tr(A^{T}) \]&lt;/p&gt;
+
+&lt;h3&gt;性质2&lt;/h3&gt;
+
+&lt;p&gt;\[ tr(AB) = tr(BA) \]&lt;/p&gt;
+
+&lt;p&gt;\[ tr(ABC) = tr(CAB) = tr(BCA) \]&lt;/p&gt;
+
+&lt;p&gt;\[ tr(ABCD) = tr(DABC) = tr(CDAB) = tr(BCDA) \]&lt;/p&gt;
+
+&lt;p&gt;(看出规律了吧)&lt;/p&gt;
+
+&lt;h3&gt;性质3&lt;/h3&gt;
+
+&lt;p&gt;\[ tr(A+B) = tr(A) + tr(B) \]&lt;/p&gt;
+
+&lt;h3&gt;性质4&lt;/h3&gt;
+
+&lt;p&gt;\[ tr(\alpha A) = \alpha tr(A) \]&lt;/p&gt;
+
+&lt;h3&gt;性质5&lt;/h3&gt;
+
+&lt;p&gt;设有矩阵H、U，H和U都是n x m的矩阵，则有：&lt;/p&gt;
+
+&lt;p&gt;\[ \sum _{j=1}^{m} \sum _{i=1}^{n}(h_{ij}u_{ij}) = \sum _{j=1}^{m} \sum _{i=1}^{n}((h^{T})_{ji}u_{ij}) = tr(H^{T}U) \]&lt;/p&gt;
+
+&lt;h1&gt;矩阵微分的各种性质&lt;/h1&gt;
+
+&lt;p&gt;设有关于矩阵A的一个函数f，记为\( f(A) \)，\( f(A) \)关于A的导数为：&lt;/p&gt;
+
+&lt;p&gt;\[  \nabla _{A}f(A) = \frac { \partial f(A) }{ \partial A } \]&lt;/p&gt;
+
+&lt;p&gt;\[  =  \left[ \begin{matrix} \frac {\partial f }{\partial A_{11}}&amp;amp;\frac {\partial f }{\partial A_{12}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{1n}}\\ \frac {\partial f }{\partial A_{21}}&amp;amp;\frac {\partial f }{\partial A_{22}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{2n}}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\ \frac {\partial f }{\partial A_{m1}}&amp;amp;\frac {\partial f }{\partial A_{m2}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{mn}}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;h2&gt;性质1&lt;/h2&gt;
+
+&lt;p&gt;\[ \nabla _{ A^{T} }f(A) = (\nabla _{A}f(A))^{T} \]&lt;/p&gt;
+
+&lt;p&gt;证明：&lt;/p&gt;
+
+&lt;p&gt;\[ \nabla _{ A^{T} }f(A) = \]&lt;/p&gt;
+
+&lt;p&gt;\[  =  \left[ \begin{matrix} \frac {\partial f }{\partial A_{11}}&amp;amp;\frac {\partial f }{\partial A_{21}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{m1}}\\ \frac {\partial f }{\partial A_{12}}&amp;amp;\frac {\partial f }{\partial A_{22}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{m2}}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\ \frac {\partial f }{\partial A_{1n}}&amp;amp;\frac {\partial f }{\partial A_{2n}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{mn}}\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;\[  =  \left[ \begin{matrix} \frac {\partial f }{\partial A_{11}}&amp;amp;\frac {\partial f }{\partial A_{12}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{1n}}\\ \frac {\partial f }{\partial A_{21}}&amp;amp;\frac {\partial f }{\partial A_{22}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{2n}}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\ \frac {\partial f }{\partial A_{m1}}&amp;amp;\frac {\partial f }{\partial A_{m2}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{mn}}\\ \end{matrix} \right]^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = (\frac { \partial f(A) }{ \partial A })^{T}  = (\nabla _{A}f(A))^{T} \]&lt;/p&gt;
+
+&lt;h2&gt;性质2&lt;/h2&gt;
+
+&lt;p&gt;假设存在矩阵U，使得下面的等式成立：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} = tr(W^{T}U) \]&lt;/p&gt;
+
+&lt;p&gt;（这里要注意一下：中间的式子的分子包含矩阵，而分母只是一个t，那么这个极限的结果应仍然仍是一个矩阵，然而等式右边却是一个trace，trace是一个数。矩阵等于数？其实是可以的，譬如当f(X)是一个tr运算的时候。）&lt;/p&gt;
+
+&lt;p&gt;那么，对\( \textbf {W} \)中任意一个\(W_{ij} \)求导，则有：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{W_{ij}}f(\textbf {X}) = tr(W_{ij}^{T}U) = \sum _{j=1}^{} \sum _{i=1}^{}(w_{ij}u_{ij}) = u_{ij}  \]&lt;/p&gt;
+
+&lt;p&gt;这个结果可能有点费解。首先要明白\( W_{ij} \)是W矩阵的一个元素，是一个值(Scalar)，那么就可以确定这个导数也是一个值(Scalar)；对W矩阵的局部单个元素求导，其实按偏导数的概念理解即可，既然是偏导数，这就意味着除了存在\( w_{ij} \)的那一项之外的其他元素都被当做常数，而对常数求导必然等于0，所以最后会得到唯一的\( u_{ij}\)。(中间那一步用到了trace的性质5)&lt;/p&gt;
+
+&lt;p&gt;既然已经知道，对局部的\( W_{ij} \)求导会得到\( U_{ij}\)，那么分别对所有\( W_{ij} \)求导，并把各个求导结果再组成一个矩阵，就是U矩阵了。又因为W代表任意矩阵，所以f(X)关于X的导数等于U：&lt;/p&gt;
+
+&lt;p&gt;\[  \frac { \partial f(\textbf {X}) }{ \partial X } = \textbf {U} \]&lt;/p&gt;
+
+&lt;p&gt;这个式子的意义在于，当题目是“给你一个自变量是矩阵X的函数f(X),求它关于X的导数”时，可以把问题立即转变成求U，而U的求解，可以通过上面的标准导数公式来求。小结一下步骤：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;计算\( \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \)，并化简，直到得到一个形如\(tr(W^{T}Q) \)的式子；&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;根据\( \frac { \partial f(\textbf {X}) }{ \partial X } = \textbf {U} \)，可以知道\(tr(W^{T}Q) \) = \(tr(W^{T}U) \)， 于是就得到了\(\frac { \partial f(\textbf {X}) }{ \partial X } = U = Q \) 。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;性质3&lt;/h2&gt;
+
+&lt;p&gt;\[ \frac { \partial tr(AX) }{ \partial X } = A^{T} \]&lt;/p&gt;
+
+&lt;p&gt;证明过程需要用到上面的性质2，刚好作为一个应用举例。&lt;/p&gt;
+
+&lt;p&gt;证明，设：&lt;/p&gt;
+
+&lt;p&gt;\[ f(X) = tr(AX)   \]&lt;/p&gt;
+
+&lt;p&gt;根据上面的结论，只需要把下面这个极限简化，理论上就可以求出 \( \frac { \partial tr(AX) }{ \partial X } \) 了：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(A(X + tW)) -  tr(AX) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AX + AtW) -  tr(AX) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AX) + tr(AtW) -  tr(AX) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AtW) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AW)t }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} tr(AW) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr(AW) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr((AW)^{T}) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr(W^{T}A^{T}) \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{W}f(X) = tr(W^{T}A^{T}) = tr(W^{T}U)  \]&lt;/p&gt;
+
+&lt;p&gt;\[ U = A^{T} \]&lt;/p&gt;
+
+&lt;p&gt;得证：&lt;/p&gt;
+
+&lt;p&gt;\[ \frac { \partial tr(AX) }{ \partial X } = U =  A^{T}  \] &lt;/p&gt;
+
+&lt;h2&gt;性质4&lt;/h2&gt;
+
+&lt;p&gt;\[ \frac { \partial tr(X^{T}A^{T}) }{ \partial X } = A^{T} \]&lt;/p&gt;
+
+&lt;p&gt;有了性质3，就可以推导出这个：&lt;/p&gt;
+
+&lt;p&gt;\[ \frac { \partial tr(AX) }{ \partial X } =  A^{T}  \] &lt;/p&gt;
+
+&lt;p&gt;\[ \frac { \partial tr((AX)^{T}) }{ \partial X } =  A^{T}  \] &lt;/p&gt;
+
+&lt;p&gt;\[ \frac { \partial tr(X^{T}A^{T}) }{ \partial X } =  A^{T}  \] &lt;/p&gt;
+
+&lt;h2&gt;性质5&lt;/h2&gt;
+
+&lt;p&gt;\[ \nabla _{ X}tr(X) = tr(\nabla _{ X}X) \]&lt;/p&gt;
+
+&lt;p&gt;待证。&lt;/p&gt;
+
+&lt;h2&gt;性质6&lt;/h2&gt;
+
+&lt;p&gt;\[ \nabla _{ A}tr(AXBX^{T}C) = A^{T}C^{T}XB^{T} + CAXB \]&lt;/p&gt;
+
+&lt;p&gt;类似性质3的证明过程，只是复杂一些。设:&lt;/p&gt;
+
+&lt;p&gt;\[ f(X) = tr(AXBX^{T}C)  \]&lt;/p&gt;
+
+&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(A(X + tW)B(X + tW)^{T}C) -  tr(AXBX^{T}C) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( A(X + tW)B(X + tW)^{T}C - AXBX^{T}C ) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( (AXB + tAWB)(X^{T}C + tW^{T}C) - AXBX^{T}C ) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( AXBX^{T}C + tAWBX^{T}C + tAXBW^{T}C + t^{2}AWBW^{T}C - AXBX^{T}C ) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( tAWBX^{T}C + tAXBW^{T}C + t^{2}AWBW^{T}C ) }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( AWBX^{T}C + AXBW^{T}C + tAWBW^{T}C )t }{t} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} [tr( AWBX^{T}C + AXBW^{T}C + tAWBW^{T}C )] \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} [tr( AWBX^{T}C + AXBW^{T}C)] + \lim _{t\to 0} [tr( tAWBW^{T}C )] \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{t\to 0} [tr( AWBX^{T}C + AXBW^{T}C)] \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr( AWBX^{T}C ) + tr( AXBW^{T}C ) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr( (AWBX^{T}C)^{T} ) + tr( AXBW^{T}C ) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr( C^{T}XB^{T}W^{T}A^{T} ) + tr( AXBW^{T}C ) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr( W^{T}A^{T}C^{T}XB^{T} ) + tr( W^{T}CAXB ) 【用了trace的性质2】 \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr( W^{T}A^{T}C^{T}XB^{T} + W^{T}CAXB ) \]&lt;/p&gt;
+
+&lt;p&gt;\[  = tr( W^{T}  (A^{T}C^{T}XB^{T} + CAXB) ) \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ D_{W}f(X) = tr( W^{T}  (A^{T}C^{T}XB^{T} + CAXB) ) = tr(W^{T}U)  \]&lt;/p&gt;
+
+&lt;p&gt;得证：&lt;/p&gt;
+
+&lt;p&gt;\[ \frac { \partial tr(AXBX^{T}C) }{ \partial X } = U = A^{T}C^{T}XB^{T} + CAXB \]&lt;/p&gt;
+</description>
+        <pubDate>Sun, 08 May 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/matrix-calculus-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/matrix-calculus-1/</guid>
+      </item>
+    
+      <item>
         <title>最小二乘估计(Least Squares Estimator)的公式的推导</title>
         <description>&lt;p&gt;最近在学习ML(Machine Learning)，注意到了一个有趣的东西：&lt;a href=&quot;https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)&quot;&gt;Least Squares Estimator&lt;/a&gt;。&lt;/p&gt;
 
@@ -38,7 +254,7 @@
 
 &lt;p&gt;\[ \vec y = X\vec a + \vec e \]&lt;/p&gt;
 
-&lt;p&gt;\[  \left[ \begin{matrix} y_{1}\\ y_{2}\\ \vdots \\ y_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} x_{11}&amp;amp;x_{12}&amp;amp;\cdots &amp;amp;x_{1k}\\    x_{21}&amp;amp;x_{22}&amp;amp;\cdots &amp;amp;x_{2k}\\    \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\   x_{n1}&amp;amp;x_{n2}&amp;amp;\cdots &amp;amp;x_{nk}\\ \end{matrix} \right] \left[ \begin{matrix} a_{1}\\ a_{2}\\ \vdots \\ a_{k}\\ \end{matrix} \right] +  \left[ \begin{matrix} e_{1}\\ e_{2}\\ \vdots \\ e_{n}\\ \end{matrix} \right] \]&lt;/p&gt;
+&lt;p&gt;\[  \left[ \begin{matrix} y_{1}\\   y_{2}\\   \vdots \\   y_{n}\\ \end{matrix} \right] =  \left[ \begin{matrix} x_{11}&amp;amp;  x_{12}&amp;amp;  \cdots &amp;amp;  x_{1k}\\      x_{21}&amp;amp;  x_{22}&amp;amp;  \cdots &amp;amp;  x_{2k}\\      \vdots &amp;amp;  \vdots &amp;amp;  \ddots &amp;amp;  \vdots \\     x_{n1}&amp;amp;  x_{n2}&amp;amp;  \cdots &amp;amp;  x_{nk}\\ \end{matrix} \right] \left[ \begin{matrix} a_{1}\\   a_{2}\\   \vdots \\   a_{k}\\ \end{matrix} \right] +  \left[ \begin{matrix} e_{1}\\   e_{2}\\   \vdots \\   e_{n}\\ \end{matrix} \right] \]&lt;/p&gt;
 
 &lt;p&gt;再回到上面的第7点：为了使得\(\vec a\)变得更有意义，我们希望\(\vec e\)的每个分量尽可能地小。明确这一点非常重要。&lt;/p&gt;
 
@@ -1690,101 +1906,6 @@ vmath::translation 要改为 vmath::translate&lt;/p&gt;
         <pubDate>Sat, 26 Dec 2015 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/bezier-1/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/bezier-1/</guid>
-      </item>
-    
-      <item>
-        <title>线性代数之Cholesky分解</title>
-        <description>&lt;p&gt;又到了矩阵分解时间。这次介绍的是&lt;strong&gt;Cholesky分解&lt;/strong&gt;。这个方法只适用于符合厄米特矩阵、正定矩阵定义的矩阵。&lt;/p&gt;
-
-&lt;h2&gt;算法原理&lt;/h2&gt;
-
-&lt;p&gt;设A是一个n阶厄米特正定矩阵(Hermitian positive-definite matrix)。&lt;/p&gt;
-
-&lt;p&gt;Cholesky分解的目标是把A变成:&lt;/p&gt;
-
-&lt;p&gt;\[ A = LL^{T} \]&lt;/p&gt;
-
-&lt;p&gt;L是下三角矩阵。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;推导过程&lt;/h2&gt;
-
-&lt;p&gt;因为A是对称的矩阵，所以设A为：&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} a_{11}&amp;amp;A_{21}^{T}\\ A_{21}&amp;amp;A_{22}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;(注意：细心观察此式子可以发现\(A_{21}\)是一个列向量，\(A_{22}\)是一个n-1阶的方阵)&lt;/p&gt;
-
-&lt;p&gt;设L：&lt;/p&gt;
-
-&lt;p&gt;\[ L =  \left[ \begin{matrix} l_{11}&amp;amp;0\\ L_{21}&amp;amp;L_{22}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;则有:&lt;/p&gt;
-
-&lt;p&gt;\[ L^{T} =  \left[ \begin{matrix} l_{11}&amp;amp;L_{21}^{T}\\ 0&amp;amp;L_{22}^{T}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;设\( A = LL^{T} \)，得到：&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} a_{11}&amp;amp;A_{21}^{T}\\ A_{21}&amp;amp;A_{22}\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{11}&amp;amp;0\\ L_{21}&amp;amp;L_{22}\\ \end{matrix} \right] \left[ \begin{matrix} l_{11}&amp;amp;L_{21}^{T}\\ 0&amp;amp;L_{22}^{T}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ =  \left[ \begin{matrix} l_{11}^{2}&amp;amp;l_{11}L_{21}^{T}\\ l_{11}L_{21}&amp;amp;L_{21}L_{21}^{T}+L_{22}L_{22}^{T}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;其中，未知量是\( l_{11},L_{21},L_{22} \)，这3个未知量的求解公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ l_{11} = \sqrt {a_{11}} \]&lt;/p&gt;
-
-&lt;p&gt;\[ L_{21} = \frac {1}{l_{11}}A_{21} \]&lt;/p&gt;
-
-&lt;p&gt;\[ L_{22}L_{22}^{T} =  A_{22} - L_{21}L_{21}^{T} \]&lt;/p&gt;
-
-&lt;p&gt;显然，\( l_{11},L_{21} \)是易求的，而\( L_{22} \)的求解救有意思了。&lt;/p&gt;
-
-&lt;p&gt;观察可以发现，\( A_{22} - L_{21}L_{21}^{T} \)也很好求，\( A_{22} \)已知，\( L_{21}L_{21}^{T} \)是一个对角线矩阵，对角线上的元素只是一个平方，好求。&lt;/p&gt;
-
-&lt;p&gt;那么设\(A_{22}&amp;#39; = A_{22} - L_{21}L_{21}^{T} \)，则剩下的问题就是求:&lt;/p&gt;
-
-&lt;p&gt;\[ A_{22}&amp;#39; = L_{22}L_{22}^{T} \]&lt;/p&gt;
-
-&lt;p&gt;啊，这不也是Cholesky分解！被分解的矩阵是A的右下角的n-1阶子方阵！&lt;/p&gt;
-
-&lt;p&gt;所以这个算法具有递归性质。&lt;/p&gt;
-
-&lt;p&gt;附上一个实例：&lt;/p&gt;
-
-&lt;p&gt;设:&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{11}&amp;amp;0&amp;amp;0\\ l_{21}&amp;amp;l_{22}&amp;amp;0\\ l_{31}&amp;amp;l_{32}&amp;amp;l_{33}\\ \end{matrix} \right] \left[ \begin{matrix} l_{11}&amp;amp;l_{21}&amp;amp;l_{31}\\ 0&amp;amp;l_{22}&amp;amp;l_{32}\\ 0&amp;amp;0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;根据上文的公式，有：&lt;/p&gt;
-
-&lt;p&gt;\[ l_{11} = \sqrt { a_{11} } = 5 \]
-\[ L_{21} = \frac {1}{l_{11}}A_{21} = \frac {1}{5} \left[ \begin{matrix} 15\\ -5\\ \end{matrix} \right] =  \left[ \begin{matrix} 3\\ -1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ A_{22} - L_{21}L_{21}^{T}  =  L_{22}L_{22}^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[ A_{22} - L_{21}L_{21}^{T}  =  L_{22}L_{22}^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} 18&amp;amp;0\\ 0&amp;amp;11\\ \end{matrix} \right] -  \left[ \begin{matrix} 3\\ -1\\ \end{matrix} \right] \left[ \begin{matrix} 3&amp;amp;-1\\ \end{matrix} \right] =   \left[ \begin{matrix} l_{22}&amp;amp;0\\ l_{32}&amp;amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;amp;l_{32}\\ 0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[  \left[ \begin{matrix} 9&amp;amp;3\\ 3&amp;amp;10\\ \end{matrix} \right] =  \left[ \begin{matrix} l_{22}&amp;amp;0\\ l_{32}&amp;amp;l_{33}\\ \end{matrix} \right]   \left[ \begin{matrix} l_{22}&amp;amp;l_{32}\\ 0&amp;amp;l_{33}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;(注意，这里已经是n-1阶的Cholesky分解)&lt;/p&gt;
-
-&lt;p&gt;\[ l_{22} = \sqrt { 9 } = 3 \]
-\[ l_{32} = \frac {1}{3}3 = 1 \]
-\[ 10 = l_{32}^{2} + l_{33}^{2} = 1 + l_{33}^{2} \]
-\[ l_{33} = \sqrt {10 - 1} = 3 \]&lt;/p&gt;
-
-&lt;p&gt;综上：&lt;/p&gt;
-
-&lt;p&gt;\[ A =  \left[ \begin{matrix} 25&amp;amp;15&amp;amp;-5\\ 15&amp;amp;18&amp;amp;0\\ -5&amp;amp;0&amp;amp;11\\ \end{matrix} \right] =  \left[ \begin{matrix} 5&amp;amp;0&amp;amp;0\\ 3&amp;amp;3&amp;amp;0\\ -1&amp;amp;1&amp;amp;3\\ \end{matrix} \right] \left[ \begin{matrix} 5&amp;amp;3&amp;amp;-1\\ 0&amp;amp;3&amp;amp;1\\ 0&amp;amp;0&amp;amp;3\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h2&gt;参考资料&lt;/h2&gt;
-</description>
-        <pubDate>Sat, 19 Dec 2015 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-11/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-11/</guid>
       </item>
     
   </channel>
