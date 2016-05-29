@@ -701,13 +701,32 @@ vmath::translation 要改为 vmath::translate</p>
       <div class="entry">
         <h2>定义</h2>
 
-<p>设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\alpha \)，使得：
-\[ A\alpha = \lambda \alpha \]
-则称\(\lambda \)为A的一个<strong>特征值(根)</strong>(eigenvalue)，称\(\alpha \)为A的属于特征值\(\lambda \)的<strong>特征向量</strong>(eigenvector)。</p>
+<p>设A是数域F上的n阶矩阵，如果存在数域F中的一个数\(\lambda \)与数域上F的非零向量\(\vec \alpha \)，使得：
+\[ A\vec \alpha = \lambda \vec \alpha \]
+则称\(\lambda \)为A的一个<strong>特征值(根)</strong>(eigenvalue)，称\(\vec \alpha \)为A的属于特征值\(\lambda \)的<strong>特征向量</strong>(eigenvector)。</p>
 
-<p>\( A\alpha \)和\(\alpha \)平行（即在同一个直线上。</p>
+<p>显然从上式可以看出，\( A\vec \alpha \)和\(\vec \alpha \)平行。</p>
 
-<p>\(\lambda E - A\)为A的<strong>特征矩阵</strong>，行列式\(f(\lambda ) = |\lambda E - A|\)为A的<strong>特征多项式</strong>，\(|\lambda E - A| = 0\)为A的<strong>特征方程</strong>,\((\lambda E - A)X=0\)是A关于该\(\lambda \)的<strong>齐次线性方程组</strong>。</p>
+<p>将上式做一下变换：</p>
+
+<p>\[ A\vec \alpha = \lambda \vec \alpha \]</p>
+
+<p>\[ A\vec \alpha - \lambda \vec \alpha = \vec 0 \]</p>
+
+<p>\[ A\vec \alpha - \lambda E\vec \alpha = \vec 0 \]</p>
+
+<p>\[ (A - \lambda E)\vec \alpha = \vec 0 \]</p>
+
+<p>\[ (\lambda E - A)\vec \alpha = \vec 0 \]</p>
+
+<p>称：</p>
+
+<ul>
+<li><p>\(\lambda E - A\)为A的<strong>特征矩阵</strong></p></li>
+<li><p>行列式\(f(\lambda ) = |\lambda E - A|\)为A的<strong>特征多项式</strong></p></li>
+<li><p>\(|\lambda E - A| = 0\)为A的<strong>特征方程</strong></p></li>
+<li><p>\((\lambda E - A)\vec x = \vec 0\)是A关于该\(\lambda \)的<strong>齐次线性方程组</strong></p></li>
+</ul>
 
 <p>A的主对角线上元素之和称为A的<strong>迹</strong>(trace)，记为tr(A)，即</p>
 
@@ -717,7 +736,7 @@ vmath::translation 要改为 vmath::translate</p>
 
 <p>\[ tr(A) = \lambda _{1} + \lambda _{2} + \cdots + \lambda _{n} \]</p>
 
-<p>迹还和A的行列式有关系：</p>
+<p>特征值还和A的行列式有关系：</p>
 
 <p>\[ |A| = \lambda _{1}\lambda _{2}\cdots \lambda _{n} \]</p>
 
