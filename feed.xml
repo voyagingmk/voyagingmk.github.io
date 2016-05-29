@@ -43,7 +43,7 @@
 
 &lt;p&gt;\[ A^{+} = VΣ^{+}U^{*} \]&lt;/p&gt;
 
-&lt;p&gt;这个公式要注意的是中间的\(Σ^{+}\)的求法。因为\(Σ_{m\mul n}\)是一个对角线矩阵，但又不一定是方阵，所以计算它的伪逆矩阵的步骤是特殊又简单的：&lt;/p&gt;
+&lt;p&gt;这个公式要注意的是中间的\(Σ^{+}\)的求法。因为\(Σ_{m\times n}\)是一个对角线矩阵，但又不一定是方阵，所以计算它的伪逆矩阵的步骤是特殊又简单的：&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;将对角线上的元素取倒数&lt;/p&gt;&lt;/li&gt;
@@ -61,6 +61,38 @@
 &lt;li&gt;&lt;p&gt;\( (A^{*})^{+}  = (A^{+})^{*} \)&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;\( (\alpha A)^{+}  = \alpha ^{-1}A^{+} \)，\(\alpha \)不等于0&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h1&gt;应用：最小二乘估计&lt;/h1&gt;
+
+&lt;p&gt;在我的&lt;a href=&quot;http://www.qiujiawei.com/linear-algebra-15/&quot;&gt;最小二乘估计(Least Squares Estimator)的公式的推导&lt;/a&gt;一文中，提到了一个小问题，&lt;strong&gt;当矩阵X不是方阵时，最小二乘估计公式必须为&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec a = (X^{T}X)^{-1}X^{T}\vec y  \]&lt;/p&gt;
+
+&lt;p&gt;不能进一步简化，除非X是有逆矩阵的方阵。&lt;/p&gt;
+
+&lt;p&gt;这个事情也可以用伪逆矩阵来讨论一遍。&lt;/p&gt;
+
+&lt;p&gt;先回到问题本源——最小二乘估计的本质是解决下面的方程：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec y = X\vec a + \vec e \]&lt;/p&gt;
+
+&lt;p&gt;其中\(\vec y\)和\(X\)是已知量，\(\vec a\)和\(\vec e\)是要求的量，这可能有0到n个解，而我们的目标是想找使得\( ||\vec e||_{2}\)最小的\(\vec a\)。&lt;/p&gt;
+
+&lt;p&gt;当我们求得理想的\(\vec a\)、\(\vec e\)后，可以让\(\vec e = \vec 0\)，并把\(\vec a\)、\(\vec e\)代入原方程，从而得到下面的等式：&lt;/p&gt;
+
+&lt;p&gt;\[ \widehat {\vec y} = X\vec a \]&lt;/p&gt;
+
+&lt;p&gt;求得的\( \widehat {\vec y} \)就是\( \vec y  \)的最佳近似。&lt;/p&gt;
+
+&lt;p&gt;再换个角度想——如果我们一开始就默认方程\( \vec y = X\vec a  \)有解，那么这个解就是：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec a = X^{-1}\vec y \]&lt;/p&gt;
+
+&lt;p&gt;慢着！\(  X^{-1} \)可不一定存在的，因为X不一定是方阵，所以上面这个等式是错误的。怎么办？这时候伪逆矩阵就派上用场了：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec a = X^{+}\vec y \]&lt;/p&gt;
+
+&lt;p&gt;这个等式才是合理的。&lt;/p&gt;
 </description>
         <pubDate>Sun, 29 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-16/</link>
@@ -466,6 +498,20 @@
 &lt;p&gt;\[ \vec a = (X^{T}X)^{-1}X^{T}\vec y  \]&lt;/p&gt;
 
 &lt;p&gt;这个东西就是所谓的&lt;strong&gt;最小二乘估计(Least Squares Estimator)&lt;/strong&gt;了。&lt;/p&gt;
+
+&lt;h2&gt;特殊情况下的最小二乘估计&lt;/h2&gt;
+
+&lt;p&gt;上文的讨论中没有考虑到一种特殊情况：X是一个方阵。当X是方阵时，上面的公式可进一步简化：&lt;/p&gt;
+
+&lt;p&gt;\[ \vec a = (X^{T}X)^{-1}X^{T}\vec y  \]&lt;/p&gt;
+
+&lt;p&gt;\[ \vec a = X^{-1}(X^{T})^{-1}X^{T}\vec y  \]&lt;/p&gt;
+
+&lt;p&gt;\[ \vec a = X^{-1}\vec y  \]&lt;/p&gt;
+
+&lt;p&gt;还是搞不明白X不是方阵时，公式为什么要那么复杂？答案就在于，X不是方阵时，\( X^{-1} \)和\( (X^{T})^{-1} \)都不成立，导致最小二乘估计公式不能简化。&lt;/p&gt;
+
+&lt;p&gt;关于这个问题的进一步讨论，请阅读我的另一篇文章&lt;a href=&quot;http://www.qiujiawei.com/linear-algebra-16/&quot;&gt;线性代数之伪逆矩阵&lt;/a&gt;。&lt;/p&gt;
 
 &lt;h2&gt;实例&lt;/h2&gt;
 
