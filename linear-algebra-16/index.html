@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>线性代数之伪逆矩阵(pseudoinverse matrix) – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -9,11 +9,16 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="" />
-    <meta property="og:description" content="" />
+    <meta name="description" content="众所周知只有方阵才有逆矩阵，非方阵没有逆矩阵。这个不和谐的问题已在20世纪初被数学家E. H. Moore等人解决掉了，因为他们发明了一般化的逆矩阵(generalized inverse)，也称为伪逆矩阵(Moore–Penrose pseudoinverse)。
+" />
+    <meta property="og:description" content="众所周知只有方阵才有逆矩阵，非方阵没有逆矩阵。这个不和谐的问题已在20世纪初被数学家E. H. Moore等人解决掉了，因为他们发明了一般化的逆矩阵(generalized inverse)，也称为伪逆矩阵(Moore–Penrose pseudoinverse)。
+" />
     
     <meta name="author" content="Wyman的技术博客" />
 
+    
+    <meta property="og:title" content="线性代数之伪逆矩阵(pseudoinverse matrix)" />
+    <meta property="twitter:title" content="线性代数之伪逆矩阵(pseudoinverse matrix)" />
     
 
     <!--[if lt IE 9]>
@@ -33,8 +38,8 @@
 
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
-		  'page': '/matrix/',
-		  'title': ''
+		  'page': '/linear-algebra-16/',
+		  'title': '线性代数之伪逆矩阵(pseudoinverse matrix)'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -77,15 +82,67 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1></h1>
+  <h1>线性代数之伪逆矩阵(pseudoinverse matrix)</h1>
   <h3>Tags: <a href="/tag/matrix.html" rel="tag">matrix</a></h3>
   <div class="entry">
-    <!--more-->
+    <p>众所周知只有方阵才有逆矩阵，非方阵没有逆矩阵。这个不和谐的问题已在20世纪初被数学家<a href="https://en.wikipedia.org/wiki/E._H._Moore">E. H. Moore</a>等人解决掉了，因为他们发明了<strong>一般化的逆矩阵(generalized inverse)</strong>，也称为<strong>伪逆矩阵(Moore–Penrose pseudoinverse)</strong>。</p>
+
+<!--more-->
+
+<h1>定义</h1>
+
+<p>对于任意一个矩阵A，A的伪逆矩阵\(A ^{+} \)必然存在，且\(A ^{+} \)必然满足以下四个条件：</p>
+
+<ol>
+<li><p>\( AA ^{+}A = A \)</p></li>
+<li><p>\( A ^{+}AA ^{+} = A ^{+} \)</p></li>
+<li><p>\( (AA ^{+})^{*} = AA ^{+} \)</p></li>
+<li><p>\( (A ^{+}A)^{*} = A ^{+}A \)</p></li>
+</ol>
+
+<p>伪逆矩阵\( A ^{+} \)的极限形式定义：</p>
+
+<p>\[ A^{+} = \lim _{\delta \searrow 0} ( A^{*}A + \delta I ) ^{-1}A^{*} \]</p>
+
+<p>\[  = \lim _{\delta \searrow 0}A^{*} ( A^{*}A + \delta I ) ^{-1} \]</p>
+
+<p>伪逆矩阵更加常用的定义（基于SVD奇异值分解）：</p>
+
+<ul>
+<li>SVD公式：</li>
+</ul>
+
+<p>\[ A = UΣV^{*} \]</p>
+
+<ul>
+<li>伪逆矩阵公式：</li>
+</ul>
+
+<p>\[ A^{+} = VΣ^{+}U^{*} \]</p>
+
+<p>这个公式要注意的是中间的\(Σ^{+}\)的求法。因为\(Σ_{m\mul n}\)是一个对角线矩阵，但又不一定是方阵，所以计算它的伪逆矩阵的步骤是特殊又简单的：</p>
+
+<ol>
+<li><p>将对角线上的元素取倒数</p></li>
+<li><p>再将整个矩阵转置一次</p></li>
+</ol>
+
+<h1>性质</h1>
+
+<ul>
+<li><p>当A可逆时，A的伪逆矩阵等于A的逆矩阵</p></li>
+<li><p>零矩阵的伪逆矩阵是它的转置矩阵</p></li>
+<li><p>\( (A^{+})^{+} = A \)</p></li>
+<li><p>\( (A^{+})^{T} = (A^{T})^{+} \)</p></li>
+<li><p>\( ( \overline {A} )^{+} =  \overline { A^{+} } \)</p></li>
+<li><p>\( (A^{*})^{+}  = (A^{+})^{*} \)</p></li>
+<li><p>\( (\alpha A)^{+}  = \alpha ^{-1}A^{+} \)，\(\alpha \)不等于0</p></li>
+</ul>
 
   </div>
 
   <div class="date">
-    Written on May  8, 2016
+    Written on May 29, 2016
   </div>
 
   

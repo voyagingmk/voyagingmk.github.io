@@ -7,6 +7,67 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>线性代数之伪逆矩阵(pseudoinverse matrix)</title>
+        <description>&lt;p&gt;众所周知只有方阵才有逆矩阵，非方阵没有逆矩阵。这个不和谐的问题已在20世纪初被数学家&lt;a href=&quot;https://en.wikipedia.org/wiki/E._H._Moore&quot;&gt;E. H. Moore&lt;/a&gt;等人解决掉了，因为他们发明了&lt;strong&gt;一般化的逆矩阵(generalized inverse)&lt;/strong&gt;，也称为&lt;strong&gt;伪逆矩阵(Moore–Penrose pseudoinverse)&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1&gt;定义&lt;/h1&gt;
+
+&lt;p&gt;对于任意一个矩阵A，A的伪逆矩阵\(A ^{+} \)必然存在，且\(A ^{+} \)必然满足以下四个条件：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;\( AA ^{+}A = A \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( A ^{+}AA ^{+} = A ^{+} \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( (AA ^{+})^{*} = AA ^{+} \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( (A ^{+}A)^{*} = A ^{+}A \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;伪逆矩阵\( A ^{+} \)的极限形式定义：&lt;/p&gt;
+
+&lt;p&gt;\[ A^{+} = \lim _{\delta \searrow 0} ( A^{*}A + \delta I ) ^{-1}A^{*} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \lim _{\delta \searrow 0}A^{*} ( A^{*}A + \delta I ) ^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;伪逆矩阵更加常用的定义（基于SVD奇异值分解）：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;SVD公式：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ A = UΣV^{*} \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;伪逆矩阵公式：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ A^{+} = VΣ^{+}U^{*} \]&lt;/p&gt;
+
+&lt;p&gt;这个公式要注意的是中间的\(Σ^{+}\)的求法。因为\(Σ_{m\mul n}\)是一个对角线矩阵，但又不一定是方阵，所以计算它的伪逆矩阵的步骤是特殊又简单的：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;将对角线上的元素取倒数&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;再将整个矩阵转置一次&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;性质&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;当A可逆时，A的伪逆矩阵等于A的逆矩阵&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;零矩阵的伪逆矩阵是它的转置矩阵&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( (A^{+})^{+} = A \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( (A^{+})^{T} = (A^{T})^{+} \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( ( \overline {A} )^{+} =  \overline { A^{+} } \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( (A^{*})^{+}  = (A^{+})^{*} \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( (\alpha A)^{+}  = \alpha ^{-1}A^{+} \)，\(\alpha \)不等于0&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 29 May 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/linear-algebra-16/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-16/</guid>
+      </item>
+    
+      <item>
         <title>矩阵微分（一）</title>
         <description>&lt;h1&gt;基本认识&lt;/h1&gt;
 
@@ -244,15 +305,6 @@
         <pubDate>Sun, 08 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/matrix-calculus-1/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/matrix-calculus-1/</guid>
-      </item>
-    
-      <item>
-        <title></title>
-        <description>&lt;!--more--&gt;
-</description>
-        <pubDate>Sun, 08 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/matrix/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/matrix/</guid>
       </item>
     
       <item>
