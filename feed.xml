@@ -36,9 +36,27 @@
 
 &lt;p&gt;\[  E[\vec x] =  \overline {x} \]&lt;/p&gt;
 
-&lt;h3&gt;方差&lt;/h3&gt;
+&lt;p&gt;有时候也用\( \mu \)来指代Mean。&lt;/p&gt;
 
-&lt;p&gt;\ Var(\vec x) = E[()]&lt;/p&gt;
+&lt;h3&gt;方差和协方差&lt;/h3&gt;
+
+&lt;p&gt;方差:&lt;/p&gt;
+
+&lt;p&gt;\[ Var(\vec x) = E[ (\vec x - E[\vec x])^{2 } ] = E[ (\vec x - E[\vec x])(\vec x -  E[\vec x]) ]  \]&lt;/p&gt;
+
+&lt;p&gt;协方差:&lt;/p&gt;
+
+&lt;p&gt;\[ Cov(\vec x, \vec y) = E[ (\vec x -  E[\vec x])(\vec y -  E[\vec y]) ] \]&lt;/p&gt;
+
+&lt;p&gt;可以发现方差是协方差的特殊情况:&lt;/p&gt;
+
+&lt;p&gt;\[ Var(\vec x) = Cov(\vec x, \vec x) \]&lt;/p&gt;
+
+&lt;h3&gt;协方差矩阵&lt;/h3&gt;
+
+&lt;p&gt;在&lt;a href=&quot;http://daobiao.win:4000/linear-algebra-7/&quot;&gt;线性代数之各种各样的矩阵&lt;/a&gt;最后面已经提到了协方差矩阵(Covariance matrix):&lt;/p&gt;
+
+&lt;p&gt;\[ C =  \left[ \begin{matrix} E[(\vec x_{1} - \mu_{1})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{1} - \mu_{1})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{1} - \mu_{1})(\vec x_{n} - \mu_{n})]\\            E[(\vec x_{2} - \mu_{2})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{2} - \mu_{2})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{2} - \mu_{2})(\vec x_{n} - \mu_{n})]\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\         E[(\vec x_{n} - \mu_{n})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{n} - \mu_{n})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{n} - \mu_{n})(\vec x_{n} - \mu_{n})]\\ \end{matrix} \right]  \]&lt;/p&gt;
 </description>
         <pubDate>Mon, 30 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-17/</link>
