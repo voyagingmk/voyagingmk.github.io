@@ -70,7 +70,23 @@
 
 &lt;p&gt;代入上式，得到：&lt;/p&gt;
 
-&lt;p&gt;\[ C = \frac {1}{n} \left[ \begin{matrix} \sum _{i=1}^{n} \vec x_{1}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{1}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{1}\vec x_{n}\\            \sum _{i=1}^{n} \vec x_{2}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{2}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{2}\vec x_{n}\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\        \sum _{i=1}^{n} \vec x_{m1}\vec x_{1}&amp;amp;  E[\vec x_{m}\vec x_{2}]&amp;amp;  \cdots &amp;amp; E[\vec x_{m}\vec x_{m}]\\ \end{matrix} \right]  \]&lt;/p&gt;
+&lt;p&gt;\[ C = \frac {1}{n} \left[ \begin{matrix} \sum _{i=1}^{n} \vec x_{1}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{1}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{1}\vec x_{m}\\            \sum _{i=1}^{n} \vec x_{2}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{2}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{2}\vec x_{m}\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\        \sum _{i=1}^{n} \vec x_{m}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{m}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{m}\vec x_{m}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;再设一个矩阵X：&lt;/p&gt;
+
+&lt;p&gt;\[ X =  \left[ \begin{matrix} \vec x_{1}\\  \vec x_{2}\\  \vdots \\  \vec x_{m}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ X^{T} =  \left[ \begin{matrix} \vec x_{1}&amp;amp; \vec x_{2}&amp;amp; \cdots &amp;amp; \vec x_{m}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;于是有：&lt;/p&gt;
+
+&lt;p&gt;\[ C = \frac {1}{n}XX^{T} \]&lt;/p&gt;
+
+&lt;p&gt;总结下，对符合均匀分布的、且均值等于0的(\vec x_{i}, 1\leq i \leq n\)，可用下面的X指代，C是X的协方差矩阵：&lt;/p&gt;
+
+&lt;p&gt;\[ X^{T} =  \left[ \begin{matrix} \vec x_{1}&amp;amp; \vec x_{2}&amp;amp; \cdots &amp;amp; \vec x_{m}\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;\[ C = \frac {1}{n}XX^{T} \]&lt;/p&gt;
 </description>
         <pubDate>Mon, 30 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-17/</link>

@@ -151,7 +151,23 @@
 
 <p>代入上式，得到：</p>
 
-<p>\[ C = \frac {1}{n} \left[ \begin{matrix} \sum _{i=1}^{n} \vec x_{1}\vec x_{1}&amp;  \sum _{i=1}^{n} \vec x_{1}\vec x_{2}&amp;  \cdots &amp; \sum _{i=1}^{n} \vec x_{1}\vec x_{n}\\            \sum _{i=1}^{n} \vec x_{2}\vec x_{1}&amp;  \sum _{i=1}^{n} \vec x_{2}\vec x_{2}&amp;  \cdots &amp; \sum _{i=1}^{n} \vec x_{2}\vec x_{n}\\   \vdots &amp; \vdots &amp;  \ddots &amp; \vdots \\        \sum _{i=1}^{n} \vec x_{m1}\vec x_{1}&amp;  E[\vec x_{m}\vec x_{2}]&amp;  \cdots &amp; E[\vec x_{m}\vec x_{m}]\\ \end{matrix} \right]  \]</p>
+<p>\[ C = \frac {1}{n} \left[ \begin{matrix} \sum _{i=1}^{n} \vec x_{1}\vec x_{1}&amp;  \sum _{i=1}^{n} \vec x_{1}\vec x_{2}&amp;  \cdots &amp; \sum _{i=1}^{n} \vec x_{1}\vec x_{m}\\            \sum _{i=1}^{n} \vec x_{2}\vec x_{1}&amp;  \sum _{i=1}^{n} \vec x_{2}\vec x_{2}&amp;  \cdots &amp; \sum _{i=1}^{n} \vec x_{2}\vec x_{m}\\   \vdots &amp; \vdots &amp;  \ddots &amp; \vdots \\        \sum _{i=1}^{n} \vec x_{m}\vec x_{1}&amp;  \sum _{i=1}^{n} \vec x_{m}\vec x_{2}&amp;  \cdots &amp; \sum _{i=1}^{n} \vec x_{m}\vec x_{m}\\ \end{matrix} \right]  \]</p>
+
+<p>再设一个矩阵X：</p>
+
+<p>\[ X =  \left[ \begin{matrix} \vec x_{1}\\  \vec x_{2}\\  \vdots \\  \vec x_{m}\\ \end{matrix} \right]  \]</p>
+
+<p>\[ X^{T} =  \left[ \begin{matrix} \vec x_{1}&amp; \vec x_{2}&amp; \cdots &amp; \vec x_{m}\\ \end{matrix} \right]  \]</p>
+
+<p>于是有：</p>
+
+<p>\[ C = \frac {1}{n}XX^{T} \]</p>
+
+<p>总结下，对符合均匀分布的、且均值等于0的(\vec x_{i}, 1\leq i \leq n\)，可用下面的X指代，C是X的协方差矩阵：</p>
+
+<p>\[ X^{T} =  \left[ \begin{matrix} \vec x_{1}&amp; \vec x_{2}&amp; \cdots &amp; \vec x_{m}\\ \end{matrix} \right]  \]</p>
+
+<p>\[ C = \frac {1}{n}XX^{T} \]</p>
 
   </div>
 
