@@ -56,7 +56,21 @@
 
 &lt;p&gt;在&lt;a href=&quot;http://daobiao.win:4000/linear-algebra-7/&quot;&gt;线性代数之各种各样的矩阵&lt;/a&gt;最后面已经提到了协方差矩阵(Covariance matrix):&lt;/p&gt;
 
-&lt;p&gt;\[ C =  \left[ \begin{matrix} E[(\vec x_{1} - \mu_{1})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{1} - \mu_{1})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{1} - \mu_{1})(\vec x_{n} - \mu_{n})]\\            E[(\vec x_{2} - \mu_{2})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{2} - \mu_{2})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{2} - \mu_{2})(\vec x_{n} - \mu_{n})]\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\         E[(\vec x_{n} - \mu_{n})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{n} - \mu_{n})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{n} - \mu_{n})(\vec x_{n} - \mu_{n})]\\ \end{matrix} \right]  \]&lt;/p&gt;
+&lt;p&gt;\[ C =  \left[ \begin{matrix} E[(\vec x_{1} - \mu_{1})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{1} - \mu_{1})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{1} - \mu_{1})(\vec x_{m} - \mu_{m})]\\            E[(\vec x_{2} - \mu_{2})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{2} - \mu_{2})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{2} - \mu_{2})(\vec x_{m} - \mu_{m})]\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\         E[(\vec x_{m} - \mu_{m})(\vec x_{1} - \mu_{1})]&amp;amp;  E[(\vec x_{m} - \mu_{m})(\vec x_{2} - \mu_{2})]&amp;amp;  \cdots &amp;amp; E[(\vec x_{m} - \mu_{m})(\vec x_{m} - \mu_{m})]\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;h3&gt;当Mean等于0时的情况&lt;/h3&gt;
+
+&lt;p&gt;当Mean等于0时，上面的协方差矩阵变成：&lt;/p&gt;
+
+&lt;p&gt;\[ C =  \left[ \begin{matrix} E[\vec x_{1}\vec x_{1}]&amp;amp;  E[\vec x_{1} \vec x_{2}]&amp;amp;  \cdots &amp;amp; E[\vec x_{1}\vec x_{m}]\\            E[\vec x_{2}\vec x_{1}]&amp;amp;  E[\vec x_{2}\vec x_{2}]&amp;amp;  \cdots &amp;amp; E[\vec x_{2}\vec x_{m}]\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\         E[\vec x_{m}\vec x_{1}]&amp;amp;  E[\vec x_{m}\vec x_{2}]&amp;amp;  \cdots &amp;amp; E[\vec x_{m}\vec x_{m}]\\ \end{matrix} \right]  \]&lt;/p&gt;
+
+&lt;p&gt;再假设\( \vec x \)每个分量的取值是均匀分布的，那么根据上面的定义，有：&lt;/p&gt;
+
+&lt;p&gt;\[E[\vec x_{a}\vec x_{b}] = \frac {1}{n}\sum _{i=1}^{n} \vec x_{ai}\vec x_{bi} , 1 \leq a\leq m, 1 \leq b\leq m  \]&lt;/p&gt;
+
+&lt;p&gt;代入上式，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ C = \frac {1}{n} \left[ \begin{matrix} \sum _{i=1}^{n} \vec x_{1}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{1}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{1}\vec x_{n}\\            \sum _{i=1}^{n} \vec x_{2}\vec x_{1}&amp;amp;  \sum _{i=1}^{n} \vec x_{2}\vec x_{2}&amp;amp;  \cdots &amp;amp; \sum _{i=1}^{n} \vec x_{2}\vec x_{n}\\   \vdots &amp;amp; \vdots &amp;amp;  \ddots &amp;amp; \vdots \\        \sum _{i=1}^{n} \vec x_{m1}\vec x_{1}&amp;amp;  E[\vec x_{m}\vec x_{2}]&amp;amp;  \cdots &amp;amp; E[\vec x_{m}\vec x_{m}]\\ \end{matrix} \right]  \]&lt;/p&gt;
 </description>
         <pubDate>Mon, 30 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-17/</link>
