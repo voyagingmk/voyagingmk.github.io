@@ -91,8 +91,8 @@
 &lt;p&gt;嘿嘿嘿&lt;/p&gt;
 </description>
         <pubDate>Mon, 30 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-17/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-17/</guid>
+        <link>http://www.qiujiawei.com/2016/05/30/linear-algebra-17/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/05/30/linear-algebra-17/</guid>
       </item>
     
       <item>
@@ -190,8 +190,8 @@
 &lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_pseudoinverse#Singular_value_decomposition_.28SVD.29&quot;&gt;Moore–Penrose pseudoinverse&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 29 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-16/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-16/</guid>
+        <link>http://www.qiujiawei.com/2016/05/29/linear-algebra-16/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/05/29/linear-algebra-16/</guid>
       </item>
     
       <item>
@@ -430,8 +430,8 @@
 &lt;p&gt;&lt;a href=&quot;http://www.tc.umn.edu/%7Enydic001/docs/unpubs/Schonemann_Trace_Derivatives_Presentation.pdf&quot;&gt;http://www.tc.umn.edu/~nydic001/docs/unpubs/Schonemann_Trace_Derivatives_Presentation.pdf&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 08 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/matrix-calculus-1/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/matrix-calculus-1/</guid>
+        <link>http://www.qiujiawei.com/2016/05/08/matrix-calculus-1/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/05/08/matrix-calculus-1/</guid>
       </item>
     
       <item>
@@ -958,8 +958,8 @@
 &lt;p&gt;&lt;a href=&quot;http://www.atmos.washington.edu/%7Edennis/MatrixCalculus.pdf&quot;&gt;http://www.atmos.washington.edu/~dennis/MatrixCalculus.pdf&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 06 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-15/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-15/</guid>
+        <link>http://www.qiujiawei.com/2016/05/06/linear-algebra-15/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/05/06/linear-algebra-15/</guid>
       </item>
     
       <item>
@@ -1112,8 +1112,8 @@
 &lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Triple_product&quot;&gt;https://en.wikipedia.org/wiki/Triple_product&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/triangle-intersect/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/triangle-intersect/</guid>
+        <link>http://www.qiujiawei.com/2016/03/28/triangle-intersect/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/03/28/triangle-intersect/</guid>
       </item>
     
       <item>
@@ -1211,8 +1211,8 @@
 &lt;p&gt;\[ R(\vec n, \theta ) =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta &amp;amp;  n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta &amp;amp;  n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta &amp;amp;0\\      n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta &amp;amp;n_{y}^{2}(1-cos\theta )+cos\theta &amp;amp;n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta &amp;amp;0\\     n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta &amp;amp;n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta &amp;amp;n_{z}^{2}(1-cos\theta )+cos\theta &amp;amp;0\\    0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-14/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-14/</guid>
+        <link>http://www.qiujiawei.com/2016/03/20/linear-algebra-14/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/03/20/linear-algebra-14/</guid>
       </item>
     
       <item>
@@ -1296,8 +1296,8 @@
 &lt;p&gt;\[ Lookat =  \left[ \begin{matrix} r_{x}&amp;amp;r_{y}&amp;amp;r_{z}&amp;amp;-(\vec r\cdot \overrightarrow {eye})\\  u_{x}&amp;amp;u_{y}&amp;amp;u_{z}&amp;amp;-(\vec u\cdot \overrightarrow {eye})\\  f_{x}&amp;amp;f_{y}&amp;amp;f_{z}&amp;amp;-(\vec f\cdot \overrightarrow {eye})\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
 </description>
         <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-13/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-13/</guid>
+        <link>http://www.qiujiawei.com/2016/03/20/linear-algebra-13/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/03/20/linear-algebra-13/</guid>
       </item>
     
       <item>
@@ -1506,8 +1506,8 @@
 &lt;p&gt;仔细观察，发现有1处不同：这个函数构造的矩阵是列主导的矩阵。其中元素的取值和本文的推导完全一致！&lt;/p&gt;
 </description>
         <pubDate>Sun, 13 Mar 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-12/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-12/</guid>
+        <link>http://www.qiujiawei.com/2016/03/13/linear-algebra-12/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/03/13/linear-algebra-12/</guid>
       </item>
     
       <item>
@@ -1580,8 +1580,8 @@ vmath::translation 要改为 vmath::translate&lt;/p&gt;
 &lt;p&gt;换成第三章的工程里的就OK了。&lt;/p&gt;
 </description>
         <pubDate>Sun, 21 Feb 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/openl-01/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/openl-01/</guid>
+        <link>http://www.qiujiawei.com/2016/02/21/openl-01/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/02/21/openl-01/</guid>
       </item>
     
       <item>
@@ -1641,8 +1641,8 @@ vmath::translation 要改为 vmath::translate&lt;/p&gt;
 &lt;p&gt;Goodbye 2015。&lt;/p&gt;
 </description>
         <pubDate>Wed, 06 Jan 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/summarize/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/summarize/</guid>
+        <link>http://www.qiujiawei.com/2016/01/06/summarize/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/2016/01/06/summarize/</guid>
       </item>
     
   </channel>
