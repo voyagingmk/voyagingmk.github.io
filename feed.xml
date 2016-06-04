@@ -82,7 +82,7 @@
 
 &lt;p&gt;\[ C = \frac {1}{n}XX^{T} \]&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;总结下&lt;/strong&gt;，对符合均匀分布的、且均值等于0的\(\vec x_{i, 1\leq i \leq n}\)，它的协方差矩阵如下：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;总结下&lt;/strong&gt;，对符合均匀分布的、且均值等于0的\(\vec x_{i, 1\leq i \leq m}\)，它的协方差矩阵如下：&lt;/p&gt;
 
 &lt;p&gt;\[ X^{T} =  \left[ \begin{matrix} \vec x_{1}&amp;amp; \vec x_{2}&amp;amp; \cdots &amp;amp; \vec x_{m}\\ \end{matrix} \right]  \]&lt;/p&gt;
 
