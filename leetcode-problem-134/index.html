@@ -173,7 +173,7 @@ The solution is guaranteed to be unique.</p>
     当sum &lt; 0时，说明start的gas已经少到不能走到end了，但又因为start必然是路径的起点，于是start还可以尝试往左挪，start减一，并执行 sum += gas(start) - cost(start)。（也就是把start的左边的加油站合并到start）</p></li>
 </ol>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">int</span> <span class="nf">canCompleteCircuit</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">gas</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">cost</span><span class="p">)</span> <span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="kt">int</span> <span class="nf">canCompleteCircuit</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">gas</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">cost</span><span class="p">)</span> <span class="p">{</span>
 <span class="lineno"> 2</span>      <span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="n">gas</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
 <span class="lineno"> 3</span>      <span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="lineno"> 4</span>      <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
@@ -190,7 +190,7 @@ The solution is guaranteed to be unique.</p>
 <span class="lineno">15</span>      <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
 <span class="lineno">16</span>          <span class="k">return</span> <span class="n">start</span><span class="p">;</span>
 <span class="lineno">17</span>      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="lineno">18</span>  <span class="p">}</span></code></pre></div>
+<span class="lineno">18</span>  <span class="p">}</span></code></pre></figure>
 
   </div>
 

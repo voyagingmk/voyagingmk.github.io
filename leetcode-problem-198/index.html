@@ -98,11 +98,11 @@ Given a list of non-negative integers representing the amount of money of each h
 
 <!--more-->
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
 <span class="lineno">2</span> <span class="k">public</span><span class="o">:</span>
 <span class="lineno">3</span>     <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
 <span class="lineno">4</span>     <span class="p">}</span>
-<span class="lineno">5</span> <span class="p">};</span></code></pre></div>
+<span class="lineno">5</span> <span class="p">};</span></code></pre></figure>
 
 <h3>题意：</h3>
 
@@ -141,7 +141,7 @@ Given a list of non-negative integers representing the amount of money of each h
 
 <p>代码如下(leetcode RunTime 0ms)：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
 <span class="lineno"> 2</span> <span class="k">public</span><span class="o">:</span>
 <span class="lineno"> 3</span>  <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
 <span class="lineno"> 4</span>      <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
@@ -156,13 +156,13 @@ Given a list of non-negative integers representing the amount of money of each h
 <span class="lineno">13</span>      <span class="p">}</span>
 <span class="lineno">14</span>      <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()];</span>
 <span class="lineno">15</span>  <span class="p">}</span>
-<span class="lineno">16</span> <span class="p">};</span></code></pre></div>
+<span class="lineno">16</span> <span class="p">};</span></code></pre></figure>
 
 <p>又因为，我们只需要求f[n]，并不需要输出整个F数组，那么可以改下代码，降低空间复杂度。</p>
 
 <p>代码如下(leetcode RunTime 0ms)：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
 <span class="lineno"> 2</span> <span class="k">public</span><span class="o">:</span>
 <span class="lineno"> 3</span>  <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
 <span class="lineno"> 4</span>      <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
@@ -177,7 +177,7 @@ Given a list of non-negative integers representing the amount of money of each h
 <span class="lineno">13</span>      <span class="p">}</span>
 <span class="lineno">14</span>      <span class="k">return</span> <span class="n">cur</span><span class="p">;</span>
 <span class="lineno">15</span>  <span class="p">}</span>
-<span class="lineno">16</span> <span class="p">};</span></code></pre></div>
+<span class="lineno">16</span> <span class="p">};</span></code></pre></figure>
 
   </div>
 

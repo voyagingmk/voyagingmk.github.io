@@ -120,7 +120,7 @@
 
 <p>A1、A2、B1、B2的含义是什么呢？举例说明一下：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="n">great</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="n">great</span>
 <span class="lineno"> 2</span> <span class="n">rgtae</span>
 <span class="lineno"> 3</span> 
 <span class="lineno"> 4</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="err">时：</span>
@@ -147,7 +147,7 @@
 <span class="lineno">25</span>    <span class="o">***|</span><span class="n">ae</span>                          <span class="n">rgt</span><span class="o">|**</span>
 <span class="lineno">26</span>    <span class="n">B1</span> <span class="o">=</span> <span class="n">F</span>                          <span class="n">B2</span> <span class="o">=</span> <span class="n">F</span>
 <span class="lineno">27</span> 
-<span class="lineno">28</span> <span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">&amp;&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">T</span></code></pre></div>
+<span class="lineno">28</span> <span class="err">显然</span> <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">||</span> <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">&amp;&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">F</span> <span class="o">&amp;&amp;</span> <span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">T</span></code></pre></figure>
 
 <ol>
 <li><p><strong>当(A1 &amp;&amp; A2) = T时， s1-left和s2-left互为Scramble， s1-right和s2-right互为Scramble；</strong> </p></li>
@@ -160,7 +160,7 @@
 
 <p>代码如下:</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">bool</span> <span class="nf">isScramble</span><span class="p">(</span><span class="n">string</span> <span class="n">s1</span><span class="p">,</span> <span class="n">string</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="kt">bool</span> <span class="nf">isScramble</span><span class="p">(</span><span class="n">string</span> <span class="n">s1</span><span class="p">,</span> <span class="n">string</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
 <span class="lineno"> 2</span>      <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">s1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
 <span class="lineno"> 3</span>      <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">!=</span> <span class="n">s2</span><span class="p">.</span><span class="n">length</span><span class="p">()){</span>
 <span class="lineno"> 4</span>          <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
@@ -192,7 +192,7 @@
 <span class="lineno">30</span>          <span class="p">}</span>
 <span class="lineno">31</span>      <span class="p">}</span>
 <span class="lineno">32</span>      <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
-<span class="lineno">33</span>  <span class="p">}</span></code></pre></div>
+<span class="lineno">33</span>  <span class="p">}</span></code></pre></figure>
 
 <p>rumtime 196ms...别人最快有4ms的。应该是4重循环的自底而上的DP计算导致这么慢的，必须全部状态都算出来才可以返回最终结果。</p>
 

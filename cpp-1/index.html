@@ -130,7 +130,7 @@
 
 <h3>条款3：绝对不要以多态(polymorphically)方式处理数组</h3>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">printBSTArray</span><span class="p">(</span><span class="n">ostream</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">BST</span> <span class="n">array</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">numElements</span><span class="p">)</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="kt">void</span> <span class="nf">printBSTArray</span><span class="p">(</span><span class="n">ostream</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">BST</span> <span class="n">array</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">numElements</span><span class="p">)</span>
 <span class="lineno"> 2</span> <span class="p">{</span>
 <span class="lineno"> 3</span>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numElements</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
 <span class="lineno"> 4</span>      <span class="n">s</span><span class="o">&lt;&lt;</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
@@ -139,7 +139,7 @@
 <span class="lineno"> 7</span> <span class="n">BST</span> <span class="n">BSTArray</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
 <span class="lineno"> 8</span> <span class="n">BalanceBST</span> <span class="n">bBSTArray</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
 <span class="lineno"> 9</span> <span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">BSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//OK</span>
-<span class="lineno">10</span> <span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">bBSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//Not OK</span></code></pre></div>
+<span class="lineno">10</span> <span class="n">printBSTArray</span><span class="p">(</span><span class="n">cout</span><span class="p">,</span> <span class="n">bBSTArray</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="c1">//Not OK</span></code></pre></figure>
 
 <p>array[i]其实是一个“指针算术表达式”的简写；它代表的其实是* (array+i)。array所指内存和array+i所指内存的距离是i*sizeof(数组中的单个元素)。而因为printBSTArray中，声明了array的元素的类型为BST，所以距离是i*sizeof(BST)。但当传入的是BalanceBST的数组时，就会出错了。</p>
 
@@ -162,11 +162,11 @@
 <li>用一个普通函数来替代类型转换操作符。因为这种操作符重载是&quot;隐式(implicit)&quot;的：</li>
 </ul>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Rational</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Rational</span><span class="p">{</span>
 <span class="lineno">2</span> <span class="k">public</span><span class="o">:</span>
 <span class="lineno">3</span> <span class="k">operator</span> <span class="kt">double</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">//not good</span>
 <span class="lineno">4</span> <span class="kt">double</span> <span class="n">asDouble</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">//good</span>
-<span class="lineno">5</span> <span class="p">}</span></code></pre></div>
+<span class="lineno">5</span> <span class="p">}</span></code></pre></figure>
 
 <ul>
 <li>单自变量构造函数，前面要加一个explicit声明。</li>
@@ -182,7 +182,7 @@
 <li>虽然禁止obj+++++，但是++++obj是允许的。</li>
 </ul>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">UPInt</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">UPInt</span><span class="p">{</span>
 <span class="lineno"> 2</span>  <span class="kt">int</span> <span class="n">m_num</span><span class="p">;</span>
 <span class="lineno"> 3</span> <span class="k">public</span><span class="o">:</span>
 <span class="lineno"> 4</span>  <span class="n">UPInt</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">)</span><span class="o">:</span><span class="n">m_num</span><span class="p">(</span><span class="n">num</span><span class="p">){};</span>
@@ -198,13 +198,13 @@
 <span class="lineno">14</span>  <span class="kt">int</span> <span class="nf">get</span><span class="p">(){</span>
 <span class="lineno">15</span>      <span class="k">return</span> <span class="n">m_num</span><span class="p">;</span>
 <span class="lineno">16</span>  <span class="p">}</span>    
-<span class="lineno">17</span> <span class="p">};</span></code></pre></div>
+<span class="lineno">17</span> <span class="p">};</span></code></pre></figure>
 
 <h3>条款7：千万不要重载&amp;&amp;、||和, 操作符</h3>
 
 <p>直接贴上我写的一个代码片段：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;iostream&gt;</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;iostream&gt;</span>
 <span class="lineno"> 2</span> <span class="cp">#include &lt;string&gt;</span>
 <span class="lineno"> 3</span> <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 <span class="lineno"> 4</span>  
@@ -231,13 +231,13 @@
 <span class="lineno">25</span>  <span class="kt">bool</span> <span class="n">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="p">;</span>
 <span class="lineno">26</span>  <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;a &amp;&amp; b = &quot;</span><span class="o">&lt;&lt;</span><span class="n">result</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
 <span class="lineno">27</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno">28</span> <span class="p">}</span></code></pre></div>
+<span class="lineno">28</span> <span class="p">}</span></code></pre></figure>
 
 <p>运行结果为:</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="nl">get</span><span class="p">:</span><span class="n">b</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="nl">get</span><span class="p">:</span><span class="n">b</span>
 <span class="lineno">2</span> <span class="nl">get</span><span class="p">:</span><span class="n">a</span>
-<span class="lineno">3</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span></code></pre></div>
+<span class="lineno">3</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span></code></pre></figure>
 
 <p>a &amp;&amp; b这个表达式，b先求值了，这不反人类么。</p>
 
@@ -255,7 +255,7 @@
 <li>new operator是指：</li>
 </ul>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">string</span> <span class="o">*</span> <span class="n">ps</span> <span class="o">=</span> <span class="k">new</span> <span class="n">string</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">);</span></code></pre></div>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">string</span> <span class="o">*</span> <span class="n">ps</span> <span class="o">=</span> <span class="k">new</span> <span class="n">string</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">);</span></code></pre></figure>
 
 <p>这样子的代码里的new。这个操作符是由语言内建的，就像sizeof一样，不能被改变意义，总是做相同的事情。它的动作分为2个方面，第一，它分配足够的内存，用来放置某类型的对象；第二，它调用一个constructor，为刚才分配的内存中的那个对象设定初值。new operator总是做这两件事，你无法改变其行为。</p>
 
@@ -263,7 +263,7 @@
 <li>operator new的一般用法，用来分配且仅分配内存（不调用构造函数）：</li>
 </ul>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;iostream&gt;</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;iostream&gt;</span>
 <span class="lineno"> 2</span> <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 <span class="lineno"> 3</span> <span class="k">class</span> <span class="nc">Widget</span><span class="p">{</span>
 <span class="lineno"> 4</span>  <span class="kt">char</span> <span class="n">member</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span>
@@ -280,18 +280,18 @@
 <span class="lineno">15</span>  <span class="n">Widget</span> <span class="o">*</span> <span class="n">widget</span> <span class="o">=</span> <span class="p">(</span><span class="n">Widget</span><span class="o">*</span><span class="p">)</span> <span class="n">rawMemory</span><span class="p">;</span>
 <span class="lineno">16</span>  <span class="n">widget</span><span class="o">-&gt;</span><span class="n">print</span><span class="p">();</span>
 <span class="lineno">17</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno">18</span> <span class="p">}</span></code></pre></div>
+<span class="lineno">18</span> <span class="p">}</span></code></pre></figure>
 
 <p>输出：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="mi">8</span><span class="p">,</span><span class="mh">0x306850</span>
-<span class="lineno">2</span> <span class="n">member</span><span class="o">=</span><span class="n">Pm0</span></code></pre></div>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="mi">8</span><span class="p">,</span><span class="mh">0x306850</span>
+<span class="lineno">2</span> <span class="n">member</span><span class="o">=</span><span class="n">Pm0</span></code></pre></figure>
 
 <ul>
 <li>placement new 用法：</li>
 </ul>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;iostream&gt;</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="cp">#include &lt;iostream&gt;</span>
 <span class="lineno"> 2</span> <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 <span class="lineno"> 3</span> <span class="k">class</span> <span class="nc">Widget</span><span class="p">{</span>
 <span class="lineno"> 4</span>  <span class="kt">char</span> <span class="n">member</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span>
@@ -308,12 +308,12 @@
 <span class="lineno">15</span>  <span class="n">Widget</span> <span class="o">*</span> <span class="n">w</span> <span class="o">=</span> <span class="n">constructWidgetInBuf</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
 <span class="lineno">16</span>  <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="s">&quot;,&quot;</span><span class="o">&lt;&lt;</span><span class="n">buf</span><span class="p">;</span>
 <span class="lineno">17</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno">18</span> <span class="p">}</span></code></pre></div>
+<span class="lineno">18</span> <span class="p">}</span></code></pre></figure>
  
 
 <p>输出：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="mi">2</span><span class="p">,</span><span class="n">a</span></code></pre></div>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="mi">2</span><span class="p">,</span><span class="n">a</span></code></pre></figure>
 
 <ul>
 <li>使用策略：如果你希望将对象产生于heap内存，请使用new operator。它不但分配内存而且为该对象调用一个constructor。如果你只是打算分配内存，请调用operator new，那就没有任何constructor会被调用。如果你打算在heap objects产生时自己决定内存分配方式，请写一个自己的operator new（重载），并使用new operator，它将会自动调用你所写的operator new。如果你打算在已分配的内存中构造对象，请使用placement new。</li>
@@ -332,7 +332,7 @@
 <li>array new指的是：</li>
 </ul>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">string</span> <span class="o">*</span><span class="n">ps</span> <span class="o">=</span> <span class="k">new</span> <span class="n">string</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span></code></pre></div>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">string</span> <span class="o">*</span><span class="n">ps</span> <span class="o">=</span> <span class="k">new</span> <span class="n">string</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span></code></pre></figure>
 
 <p>这样子的代码里的new operator，由于诞生的是数组，所以内存是由一个兄弟函数：operator new[]负责分配。</p>
 
@@ -433,15 +433,15 @@
 <p>Lazy Evaluation的反义词是Eager Evaluation（急式评估）。
 贴书中的例子：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">Matrix</span> <span class="nf">m1</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">Matrix</span> <span class="nf">m1</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
 <span class="lineno">2</span> <span class="n">Matrix</span> <span class="nf">m2</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
-<span class="lineno">3</span> <span class="n">Matrix</span> <span class="n">m3</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m2</span><span class="p">;</span></code></pre></div>
+<span class="lineno">3</span> <span class="n">Matrix</span> <span class="n">m3</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m2</span><span class="p">;</span></code></pre></figure>
 
 <p>m3是m1和m2的合，这是一个百万级的加法操作。如果m3的值实际上是不会被程序用到，那么这个计算就应该被忽略。</p>
 
 <p>一般来说，定义了m3，应该下文就会用到m3。那么m3的计算就在所难免了，但如果是这样的情况：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">m3</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span></code></pre></div>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">m3</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span></code></pre></figure>
 
 <p>显然，按照这一个条款的指示，应该使得，m3.at(2,2)执行时，只计算(2,2)处的值，而不计算其他的值。</p>
 
@@ -539,7 +539,7 @@
 
 <p>如果要使得一个雷有且只有1个对象，要用到一些‘技巧’，比如说用static:</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
 <span class="lineno"> 2</span> <span class="k">friend</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">();</span>
 <span class="lineno"> 3</span> <span class="k">private</span><span class="o">:</span>
 <span class="lineno"> 4</span>  <span class="n">A</span><span class="p">();</span>
@@ -548,13 +548,13 @@
 <span class="lineno"> 7</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">(){</span>
 <span class="lineno"> 8</span>  <span class="k">static</span> <span class="n">A</span> <span class="n">a</span><span class="p">;</span>
 <span class="lineno"> 9</span>  <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
-<span class="lineno">10</span> <span class="p">}</span></code></pre></div>
+<span class="lineno">10</span> <span class="p">}</span></code></pre></figure>
 
 <p>三个要点：1)构造函数private；2)全局函数被声明为friend，使得theA不受A的private的约束；3)theA里的static。</p>
 
 <p>或者把theA写成静态成员函数(static member function)：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
 <span class="lineno"> 2</span> <span class="k">static</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">();</span>
 <span class="lineno"> 3</span> <span class="k">private</span><span class="o">:</span>
 <span class="lineno"> 4</span>  <span class="n">A</span><span class="p">();</span>
@@ -563,13 +563,13 @@
 <span class="lineno"> 7</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">A</span><span class="o">::</span><span class="n">theA</span><span class="p">(){</span>
 <span class="lineno"> 8</span>  <span class="k">static</span> <span class="n">A</span> <span class="n">a</span><span class="p">;</span>
 <span class="lineno"> 9</span>  <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
-<span class="lineno">10</span> <span class="p">}</span></code></pre></div>
+<span class="lineno">10</span> <span class="p">}</span></code></pre></figure>
 
 <p>改写成这样的好处是，去掉了全局函数；坏处是，调用theA变麻烦了，要A::theA()。(其实也没多麻烦吧)</p>
 
 <p>还可以把A和theA放进一个namespace：</p>
 
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">namespace</span> <span class="n">Test</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span> <span class="k">namespace</span> <span class="n">Test</span><span class="p">{</span>
 <span class="lineno"> 2</span> 
 <span class="lineno"> 3</span> <span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
 <span class="lineno"> 4</span> <span class="k">friend</span> <span class="n">A</span><span class="o">&amp;</span> <span class="n">theA</span><span class="p">();</span>
@@ -581,7 +581,7 @@
 <span class="lineno">10</span>  <span class="k">static</span> <span class="n">A</span> <span class="n">a</span><span class="p">;</span>
 <span class="lineno">11</span>  <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
 <span class="lineno">12</span> <span class="p">}</span>
-<span class="lineno">13</span> <span class="p">};</span></code></pre></div>
+<span class="lineno">13</span> <span class="p">};</span></code></pre></figure>
 
 <p>然后调用方法就是: Test::theA()。</p>
 

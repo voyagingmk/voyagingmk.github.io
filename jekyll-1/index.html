@@ -96,6 +96,29 @@
 
 <p>最后的最后，吐槽下坚果云。坚果云的linux版只支持桌面版，没有terminal的版本，导致我在vps上无法用坚果云。Dropbox虽然被墙了，但是Dropbox支持linux terminal，而且安装超级简单，按照官方说明，一下子就搞定了。</p>
 
+<h2>更新</h2>
+
+<p>决定还是在本机搭建jekyll服务了。</p>
+
+<h3>Windows</h3>
+
+<p>按照:<a href="https://jekyllrb.com/docs/windows/#installation%EF%BC%8C%E5%AE%89%E8%A3%85ruby%E3%80%81gem%E3%80%81jekyll%E3%80%82">https://jekyllrb.com/docs/windows/#installation，安装ruby、gem、jekyll。</a></p>
+
+<p>其中，可能会遇到https的问题，要根据<a href="https://gist.github.com/fnichol/867550%E5%A4%84%E7%90%86%E3%80%82%E7%AE%80%E5%8D%95%E6%9D%A5%E8%AF%B4%E4%B8%8B%E8%BD%BDhttp://curl.haxx.se/ca/cacert.pem%E5%88%B0%E6%9C%AC%E6%9C%BA%EF%BC%8C%E5%B9%B6%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E6%8C%87%E5%90%91cacert.pem%E3%80%82">https://gist.github.com/fnichol/867550处理。简单来说下载http://curl.haxx.se/ca/cacert.pem到本机，并添加一个环境变量指向cacert.pem。</a></p>
+
+<p>然后是安装需要的插件：</p>
+
+<p>gem install jekyll-tagging
+gem install jekyll-sitemap</p>
+
+<p>安装DevKit，教程： <a href="https://github.com/oneclick/rubyinstaller/wiki/Development-Kit">https://github.com/oneclick/rubyinstaller/wiki/Development-Kit</a></p>
+
+<p>然后安装：</p>
+
+<p>gem install pygments.rb</p>
+
+<p>然后就可以在Blog目录执行：jekyll serve 了。</p>
+
   </div>
 
   <div class="date">
