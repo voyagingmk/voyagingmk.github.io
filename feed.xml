@@ -90,15 +90,74 @@
 
 &lt;p&gt;\[ C = \frac {1}{n}XX^{T} \]&lt;/p&gt;
 
+&lt;p&gt;为了下文能继续推导，需要把C记为\( C_{x} \)。&lt;/p&gt;
+
 &lt;h1&gt;PART II&lt;/h1&gt;
 
 &lt;p&gt;根据上面得到的协方差矩阵的公式，可以知道：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;C是一个对称方阵&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;C的对角线上的元素分别代表了对某个特征的n次测量的方差&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;C的非对角线上的元素代表了任意2个特征之间的协方差&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( C_{x} \)是一个对称方阵&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( C_{x} \)的对角线上的元素分别代表了对某个特征的n次测量的方差&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( C_{x} \)的非对角线上的元素代表了任意2个特征之间的协方差&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;开始进入到PCA的环节。PCA的目标是提炼出\( C_{x} \)的关键信息并剔除冗余信息，这个过程用线性代数表示就是：&lt;/p&gt;
+
+&lt;p&gt;\[ Y  = PX  \]&lt;/p&gt;
+
+&lt;p&gt;这里面P就是我们需要的目标矩阵。而关于矩阵Y的协方差矩阵\( C_{y} \)的特性是：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;\( C_{y} \)的对角线上的元素(方差)尽可能大（增大信号）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( C_{y} \)的非对角线上的元素(协方差)应该等于零，因此\( C_{y} \)还是一个对角线矩阵&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\( C_{x} \)、\( C_{y} \)、P的关系是：&lt;/p&gt;
+
+&lt;p&gt;\[  C_{y} =  \frac {1}{n}YY^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \frac {1}{n}(PX)(PX)^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = \frac {1}{n}PXX^{T}P^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = P(\frac {1}{n}XX^{T})P^{T} \]&lt;/p&gt;
+
+&lt;p&gt;\[  = PC_{x}P^{T} \]&lt;/p&gt;
+
+&lt;p&gt;即：&lt;/p&gt;
+
+&lt;p&gt;\[   C_{y} = PC_{x}P^{T} \]&lt;/p&gt;
+
+&lt;p&gt;PCA的求解方法多种多样，下面展示最经典的解法——特征值分解。&lt;/p&gt;
+
+&lt;h2&gt;基于特征值分解的PCA&lt;/h2&gt;
+
+&lt;p&gt;在&lt;a href=&quot;http://127.0.0.1:4000/linear-algebra-6/&quot;&gt;矩阵的特征值、特征向量、特征矩阵、迹、特征值分解&lt;/a&gt;一文中提到了对称方阵的特征值分解公式：&lt;/p&gt;
+
+&lt;p&gt;\[ A =  S\Lambda S^{-1} = S\Lambda S^{T} \]&lt;/p&gt;
+
+&lt;p&gt;矩阵\Lambda 是对角矩阵，对角线上的元素为特征值；矩阵S是一个行向量为特征向量的矩阵，\( S^{-1} = S^{T} \)。&lt;/p&gt;
+
+&lt;p&gt;有了这个公式后，立即可以知道对称矩阵\( C_{x} \)的特征值分解(对角化)为：&lt;/p&gt;
+
+&lt;p&gt;\[ C_{x} =  S\Lambda S^{T} \]&lt;/p&gt;
+
+&lt;p&gt;将其代入上面的公式，有:&lt;/p&gt;
+
+&lt;p&gt;\[C_{y} = PS\Lambda S^{T}P^{T}   \]&lt;/p&gt;
+
+&lt;p&gt;这里可以大胆做个假设：令\( P =  S^{T} \)。又因为 \( S^{-1} = S^{T} \)， 则有:&lt;/p&gt;
+
+&lt;p&gt;\[ P^{-1} =  (S^{T})^{-1} = (S^{-1})^{-1} = S = P^{T} \]&lt;/p&gt;
+
+&lt;p&gt;所以：&lt;/p&gt;
+
+&lt;p&gt;\[ C_{y} = PS\Lambda S^{T}P^{T} = PP^{T} \Lambda PP^{T} = PP^{-1} \Lambda PP^{-1} = \Lambda   \]&lt;/p&gt;
+
+&lt;p&gt;总结：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;当\( P \)是\( C_{x} \)的特征向量矩阵\( S \)时，\( C_{y} \)是特征值矩阵\( \Lambda\)&lt;/strong&gt;。&lt;/p&gt;
 </description>
         <pubDate>Mon, 30 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-17/</link>
