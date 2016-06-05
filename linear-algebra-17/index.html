@@ -97,15 +97,17 @@
 
 <h1>Part I</h1>
 
-<p>设向量\( \vec x \)的每个分量分别记录了某一个特征的信息，且共有n个分量(特征)；那么m个不同的\( \vec x \)就组成了一个\(m\times n \)的矩阵\( X \)：</p>
+<p>设向量\( \vec x \)表示对某个特征的n次采样(测量), 那么如果有m个不同的特征，就组成了一个\(m\times n \)的矩阵\( X \)：</p>
 
 <p>\[ X =  \left[ \begin{matrix} \vec x_{1}\\   \vec x_{2}\\   \vdots \\  \vec x_{m}\\ \end{matrix} \right]  \]</p>
 
-<p>然后问题来了：\( \vec x \)的每个分量之间是否是<strong>相互独立(independant)</strong>的？如果是，那么说明这n个特征是良好的，可以直接拿去应用到任务中(譬如基于这些特征做一个分类器)；如果不是，那么就说明有特征是多余的，譬如\( x^{(k)} \)、\( x^{(k+1)} \)分别用米和英尺记录了同一个特征，虽然数值不一样，然而并没有什么卵用。</p>
+<p>然后问题来了：每个特征之间是否是<strong>相互独立(independant)</strong>的？如果是，那么说明这m个特征是良好的，可以直接拿去应用到任务中(譬如基于这些特征做一个分类器)；如果不是，那么就说明有特征是多余的，譬如\(  \vec x_{a} \)、\(  \vec x_{b} \)分别用米和英尺记录了同一个特征，虽然数值不一样，然而并没有什么卵用。</p>
 
 <p>量化特征与特征之间的关系的最好办法是用<strong>方差</strong>(<a href="https://en.wikipedia.org/wiki/Variance">Variance</a>)和<strong>协方差</strong>(<a href="https://en.wikipedia.org/wiki/Covariance">Covariance</a>)，这2者又共同涉及到了更基础的概念<strong>数学期望</strong>(<a href="https://en.wikipedia.org/wiki/Expected_value">Expected Value</a>)和<strong>均值</strong>(<a href="https://en.wikipedia.org/wiki/Mean">Mean</a>)。先简单过一遍这4个东西的公式。</p>
 
 <h3>数学期望和均值</h3>
+
+<p>数学期望公式：</p>
 
 <p>\[ E[\vec x] = \sum _{i=1}^{n}x_{i}p_{i} \]</p>
 
@@ -169,7 +171,15 @@
 
 <p>\[ C = \frac {1}{n}XX^{T} \]</p>
 
-<p>嘿嘿嘿</p>
+<h1>PART II</h1>
+
+<p>根据上面得到的协方差矩阵的公式，可以知道：</p>
+
+<ul>
+<li><p>C是一个对称方阵</p></li>
+<li><p>C的对角线上的元素分别代表了对某个特征的n次测量的方差</p></li>
+<li><p>C的非对角线上的元素代表了任意2个特征之间的协方差</p></li>
+</ul>
 
   </div>
 
