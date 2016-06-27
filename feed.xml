@@ -7,6 +7,51 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Global Gamejam 2016 和 IndieAce Gamejam 2016 作品</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h1&gt;Global Gamejam&lt;/h1&gt;
+
+&lt;p&gt;本次主题，一个词：&lt;/p&gt;
+
+&lt;h2&gt;&lt;strong&gt;Ritual&lt;/strong&gt;&lt;/h2&gt;
+
+&lt;p&gt;我们根据题目做出来的游戏：《阴阳合》&lt;/p&gt;
+
+&lt;p&gt;游戏截图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.6/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;试玩地址：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://yinyang.qiujiawei.com/&quot;&gt;http://yinyang.qiujiawei.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;IndieACE Gamejam&lt;/h1&gt;
+
+&lt;p&gt;本次主题，一幅画：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.6/1.jpg&quot; alt=&quot;1.jpg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;我们根据题目做出来的游戏：《人，造人》&lt;/p&gt;
+
+&lt;p&gt;游戏截图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.6/3.jpg&quot; alt=&quot;3.jpg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;试玩地址：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://voyagingmk.github.io/IndieACEGamejam2016/&quot;&gt;https://voyagingmk.github.io/IndieACEGamejam2016/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;后记&lt;/h1&gt;
+
+&lt;p&gt;GGJ一般是年初的时候举办，IndieACE的GJ一般是年中的时候举办。目前国内搞得好的、一般人能接触到的只有这2个GJ吧。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 27 Jun 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/gamejam/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/gamejam/</guid>
+      </item>
+    
+      <item>
         <title>学习增强学习</title>
         <description>&lt;!--more--&gt;
 
@@ -1720,80 +1765,6 @@
         <pubDate>Sun, 13 Mar 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-12/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-12/</guid>
-      </item>
-    
-      <item>
-        <title>《OpenGL编程指南(第8版)》阅读笔记01</title>
-        <description>&lt;h1&gt;Example源码Bug备忘&lt;/h1&gt;
-
-&lt;h2&gt;第三章&lt;/h2&gt;
-
-&lt;h3&gt;ch03_drawcommands&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;n&quot;&gt;glUniformMatrix4fv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;render_model_matrix_loc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model_matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;应改为：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;n&quot;&gt;glUniformMatrix4fv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;render_model_matrix_loc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model_matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;原因：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);&lt;/p&gt;
-
-&lt;p&gt;Parameters&lt;/p&gt;
-
-&lt;p&gt;location&lt;/p&gt;
-
-&lt;p&gt;Specifies the location of the uniform value to be modified.&lt;/p&gt;
-
-&lt;p&gt;count&lt;/p&gt;
-
-&lt;p&gt;Specifies the number of matrices that are to be modified. This should be 1 if the targeted uniform variable is &amp;gt; not an array of matrices, and 1 or more if it is an array of matrices.&lt;/p&gt;
-
-&lt;p&gt;transpose&lt;/p&gt;
-
-&lt;p&gt;Specifies whether to transpose the matrix as the values are loaded into the uniform variable. Must be GL_FALSE.&lt;/p&gt;
-
-&lt;p&gt;value&lt;/p&gt;
-
-&lt;p&gt;Specifies a pointer to an array of count values that will be used to update the specified uniform variable.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;因为例子使用的是primitive_restart.vs.glsl顶点着色器，model_matrix不是数组，所以参数count应该为1。&lt;/p&gt;
-
-&lt;p&gt;还发现了一句注释： // &amp;quot;model_matrix&amp;quot; is actually an array of 4 matrices&lt;/p&gt;
-
-&lt;p&gt;不明白为什么model_matrix会是一个包含4个矩阵的数组。并且确实改成1后就能运行了。&lt;/p&gt;
-
-&lt;p&gt;(后面发现有一个shader里面的model_matrix确实是一个长度4的数组...估计是混淆了吧)&lt;/p&gt;
-
-&lt;p&gt;真是坑。&lt;/p&gt;
-
-&lt;h3&gt;vmath&lt;/h3&gt;
-
-&lt;p&gt;vmath::rotation 要改为 vmath::rotate
-vmath::translation 要改为 vmath::translate&lt;/p&gt;
-
-&lt;h3&gt;绝对路径....&lt;/h3&gt;
-
-&lt;p&gt;ch03_instancing的Initialize函数里：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;    &lt;span class=&quot;c1&quot;&gt;// Load the object&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LoadFromVBM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;C:/Vermilion-Book/trunk/Code/media/armadillo_low.vbm&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;太坑了。&lt;/p&gt;
-
-&lt;h3&gt;把vs和fs写在cpp文件里&lt;/h3&gt;
-
-&lt;p&gt;如果是为了演示如何手动编译shader，也不用放在多个example里吧。&lt;/p&gt;
-
-&lt;h2&gt;第四章&lt;/h2&gt;
-
-&lt;h3&gt;ch04_shadowmap的vbm.h和vbm.cpp是不对的，运行会出错&lt;/h3&gt;
-
-&lt;p&gt;换成第三章的工程里的就OK了。&lt;/p&gt;
-</description>
-        <pubDate>Sun, 21 Feb 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/openl-01/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/openl-01/</guid>
       </item>
     
   </channel>
