@@ -102,23 +102,67 @@
 
 <h3>Windows</h3>
 
-<p>按照:<a href="https://jekyllrb.com/docs/windows/#installation%EF%BC%8C%E5%AE%89%E8%A3%85ruby%E3%80%81gem%E3%80%81jekyll%E3%80%82">https://jekyllrb.com/docs/windows/#installation，安装ruby、gem、jekyll。</a></p>
+<p>以下所有指令需要在cmd命令行下执行（不需要管理员权限）。</p>
 
-<p>其中，可能会遇到https的问题，要根据<a href="https://gist.github.com/fnichol/867550%E5%A4%84%E7%90%86%E3%80%82%E7%AE%80%E5%8D%95%E6%9D%A5%E8%AF%B4%E4%B8%8B%E8%BD%BDhttp://curl.haxx.se/ca/cacert.pem%E5%88%B0%E6%9C%AC%E6%9C%BA%EF%BC%8C%E5%B9%B6%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E6%8C%87%E5%90%91cacert.pem%E3%80%82">https://gist.github.com/fnichol/867550处理。简单来说下载http://curl.haxx.se/ca/cacert.pem到本机，并添加一个环境变量指向cacert.pem。</a></p>
+<p>按照:<a href="https://jekyllrb.com/docs/windows/#installation">https://jekyllrb.com/docs/windows/#installation</a>，安装choco、ruby、gem、jekyll。</p>
+
+<p>choco安装命令(最好用官网的命令，因为可能会更新):</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="err">@</span><span class="n">powershell</span> <span class="o">-</span><span class="n">NoProfile</span> <span class="o">-</span><span class="n">ExecutionPolicy</span> <span class="n">Bypass</span> <span class="o">-</span><span class="n">Command</span> <span class="s">&quot;iex ((new-object net.webclient).DownloadString(&#39;https://chocolatey.org/install.ps1&#39;))&quot;</span> <span class="o">&amp;&amp;</span> <span class="n">SET</span> <span class="n">PATH</span><span class="o">=%</span><span class="n">PATH</span><span class="o">%</span><span class="p">;</span><span class="o">%</span><span class="n">ALLUSERSPROFILE</span><span class="o">%</span><span class="err">\</span><span class="n">chocolatey</span><span class="err">\</span><span class="n">bin</span>
+</code></pre></div>
+<p>安装ruby和gem：</p>
+
+<p>choco install ruby -y</p>
+
+<p>用gem安装jekyll：</p>
+
+<p>gem install jekyll</p>
+
+<p>其中，可能会遇到https的问题，要根据<a href="https://gist.github.com/fnichol/867550">https://gist.github.com/fnichol/867550</a>处理。简单来说下载<a href="http://curl.haxx.se/ca/cacert.pem">http://curl.haxx.se/ca/cacert.pem</a>到本机，并添加一个环境变量指向cacert.pem。</p>
 
 <p>然后是安装需要的插件：</p>
 
-<p>gem install jekyll-tagging
-gem install jekyll-sitemap</p>
+<p>gem install jekyll-tagging</p>
+
+<p>gem install jekyll-sitemap</p>
 
 <p>安装DevKit，教程： <a href="https://github.com/oneclick/rubyinstaller/wiki/Development-Kit">https://github.com/oneclick/rubyinstaller/wiki/Development-Kit</a></p>
 
-<p>然后安装：</p>
+<p>即下载DevKit的安装包，然后解压到一个目录里，在该目录执行：</p>
+
+<p>ruby dk.rb init</p>
+
+<p>然后执行ruby dk.rb review，检查是否能够正确安装，如果提示 ** Invalid configuration. Please fix &#39;config.yml.&#39;**，就需要编辑 config.yml文件，譬如我是改成了：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">---</span>
+<span class="o">-</span> <span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">tools</span><span class="err">\</span><span class="n">ruby23</span>
+</code></pre></div>
+<p>然后再执行ruby dk.rb review，没报错就可以安装了：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">devkit</span><span class="o">&gt;</span><span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="n">rb</span> <span class="n">install</span>
+<span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Updating</span> <span class="n">convenience</span> <span class="n">notice</span> <span class="n">gem</span> <span class="n">override</span> <span class="k">for</span> <span class="err">&#39;</span><span class="nl">C</span><span class="p">:</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">ruby23</span><span class="err">&#39;</span>
+<span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Installing</span> <span class="err">&#39;</span><span class="nl">C</span><span class="p">:</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">ruby23</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="n">site_ruby</span><span class="o">/</span><span class="n">devkit</span><span class="p">.</span><span class="n">rb</span><span class="err">&#39;</span>
+</code></pre></div>
+<p>如果只打印了上面这2行提示，就是正确安装了。</p>
+
+<p>最后安装pygments和redcarpet：</p>
 
 <p>gem install pygments.rb</p>
 
-<p>然后就可以在Blog目录执行：jekyll serve 了。</p>
+<p>gem install redcarpet</p>
 
+<p>然后就可以在Blog目录执行：jekyll serve 了：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">wyman_blog</span><span class="o">&gt;</span><span class="n">jekyll</span> <span class="n">serve</span>
+<span class="n">Configuration</span> <span class="nl">file</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">_config</span><span class="p">.</span><span class="n">yml</span>
+            <span class="nl">Source</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span>
+       <span class="nl">Destination</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">_site</span>
+ <span class="n">Incremental</span> <span class="nl">build</span><span class="p">:</span> <span class="n">disabled</span><span class="p">.</span> <span class="n">Enable</span> <span class="n">with</span> <span class="o">--</span><span class="n">incremental</span>
+      <span class="n">Generating</span><span class="p">...</span>
+                    <span class="n">done</span> <span class="n">in</span> <span class="mf">2.048</span> <span class="n">seconds</span><span class="p">.</span>
+  <span class="n">Please</span> <span class="n">add</span> <span class="n">the</span> <span class="n">following</span> <span class="n">to</span> <span class="n">your</span> <span class="n">Gemfile</span> <span class="n">to</span> <span class="n">avoid</span> <span class="n">polling</span> <span class="k">for</span> <span class="nl">changes</span><span class="p">:</span>
+    <span class="n">gem</span> <span class="err">&#39;</span><span class="n">wdm</span><span class="err">&#39;</span><span class="p">,</span> <span class="err">&#39;</span><span class="o">&gt;=</span> <span class="mf">0.1.0</span><span class="err">&#39;</span> <span class="k">if</span> <span class="n">Gem</span><span class="p">.</span><span class="n">win_platform</span><span class="o">?</span>
+ <span class="n">Auto</span><span class="o">-</span><span class="nl">regeneration</span><span class="p">:</span> <span class="n">enabled</span> <span class="k">for</span> <span class="err">&#39;</span><span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span><span class="err">&#39;</span>
+<span class="n">Configuration</span> <span class="nl">file</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">_config</span><span class="p">.</span><span class="n">yml</span>
+    <span class="n">Server</span> <span class="nl">address</span><span class="p">:</span> <span class="nl">http</span><span class="p">:</span><span class="c1">//127.0.0.1:4000/</span>
+  <span class="n">Server</span> <span class="n">running</span><span class="p">...</span> <span class="n">press</span> <span class="n">ctrl</span><span class="o">-</span><span class="n">c</span> <span class="n">to</span> <span class="n">stop</span><span class="p">.</span>
+</code></pre></div>
   </div>
 
   <div class="date">
