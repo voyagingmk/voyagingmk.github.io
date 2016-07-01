@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>直线与平面相交算法 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="" />
+    <meta property="og:description" content="" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="直线与平面相交算法" />
+    <meta property="twitter:title" content="直线与平面相交算法" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/line-plane-intersection/',
+		  'title': '直线与平面相交算法'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>直线与平面相交算法</h1>
+  <h3>Tags: <a href="/tag/math/" rel="tag">math</a></h3>
+  <div class="entry">
+    <!--more-->
+
+<h1>平面的方程</h1>
+
+<p>设位于平面P上的某个点为\( \vec p_{0} \)(已知量)，平面P的法向量为\( \vec n \)(已知量)，该平面P的任意一点设为\( \vec p \)，则平面P的方程为：</p>
+
+<p>\[ (\vec p -  \vec p_{0} )\cdot \vec n = 0 \]</p>
+
+<p>使得这个方程成立的原理是，位于平面P上的任意一个向量\( (\vec p -  \vec p_{0} ) \)，必然和平面P的法向量垂直，互相垂直的向量的点积必然为0。</p>
+
+<h1>直线的方程</h1>
+
+<p>设位于直线上的某个点为\( \vec o \)(已知量)，直线的方向向量为\( \vec d \)(已知量)，直线上的任意一点为\( \vec p \)，则直线的方程为:</p>
+
+<p>\[ \vec p = \vec o + t\vec d, t\in R \]</p>
+
+<p>注意，式子右边的t是一个Scalar（一个实数），这个t决定了\(\vec p\)的位置。</p>
+
+<h1>直线与平面的相交</h1>
+
+<p>直线与平面的相交，必然是一个点。将上面的直线方程代入平面方程，得到：</p>
+
+<p>\[ ( \vec o + t\vec d -  \vec p_{0} )\cdot \vec n = 0  \]</p>
+
+<p>其中，\( \vec o 、\vec d 、\vec p_{0} 、\vec n \)都是已知量，只有t是未知量，所以求直线与平面的相交点等同于求t的值。</p>
+
+<p>化简这个式子，得到：</p>
+
+<p>\[ t\vec d \cdot \vec n + (\vec o -  \vec p_{0} )\cdot \vec n = 0  \]</p>
+
+<p>\[ t\vec d \cdot \vec n = ( \vec p_{0} - \vec o )\cdot \vec n  \]</p>
+
+<p>\[ t = \frac { ( \vec p_{0} - \vec o )\cdot \vec n }{ \vec d \cdot \vec n }  \]</p>
+
+<h1>实例 (基于三维坐标系)</h1>
+
+<p>本小节的实例是结合实际需求设计的。在3D图形学中，直线与平面相交算法一般是应用到了光线与包围盒的相交判定问题中。</p>
+
+<p>那么下面就设直线为任意直线(光线都是任意方向的)，而平面设为某几种特定的特殊平面，来展示上面的算法的流程。</p>
+
+<h2>1. 法向量为\( (1,0,0) \)并且经过点\( (x_{0},0,0) \)的平面</h2>
+
+<p>根据上面的定义，可以知道：</p>
+
+<p>\[ \vec n =  (1,0,0)  \]</p>
+
+<p>\[ \vec p_{0} =  (x_{0},0,0)  \]</p>
+
+<p>代入上面的方程，得到：</p>
+
+<p>\[ t = \frac { ( (x_{0},0,0) - \vec o )\cdot (1,0,0) }{ \vec d \cdot (1,0,0) }  \]</p>
+
+<p>化简得到：</p>
+
+<p>\[ t = \frac { x_{0} -  o_{x} }{ d_{x} }  \]</p>
+
+  </div>
+
+  <div class="date">
+    Written on July  1, 2016
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
