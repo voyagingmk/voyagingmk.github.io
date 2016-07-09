@@ -7,6 +7,73 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>渲染基础理论的介绍</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h1&gt;基础概念&lt;/h1&gt;
+
+&lt;h2&gt;辐射通量(Flux)&lt;/h2&gt;
+
+&lt;p&gt;辐射通量(Radiant Flux)，指的是单位时间到达一块平面(或一个局部空间区域)的能量总和。单位是焦耳每秒(joules/second,，J/s)，或瓦特(watts，W)。符号是\(\Phi \)。&lt;/p&gt;
+
+&lt;p&gt;一个点光源发射出去的能量大小可以用Flux来描述。其中要注意的是，Flux描述的是单位时间的能量，那么对于点光源来说，Flux只和光源的强弱有关，所以下图的2个圆圈的Flux值是一样的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.7/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;h2&gt;辐射密度(Irradiance) 和 辐射照度(Radiant Exitence)&lt;/h2&gt;
+
+&lt;p&gt;辐射密度也叫辐射度。定义了辐射通量后，就可以定义辐射度了，辐射度指的是单位面积&lt;strong&gt;进入&lt;/strong&gt;的辐射通量，单位是\(W\/m^{2}\)。根据这个定义用符号E表示。&lt;/p&gt;
+
+&lt;p&gt;辐射照度和辐射密度是近似的东西，辐射照度指的是单位面积&lt;strong&gt;离开&lt;/strong&gt;的辐射通量，单位也是\(W/m^{2}\)。用符号M表示。&lt;/p&gt;
+
+&lt;p&gt;以上面的点光源来分析，可以知道上图中内圆圈的辐射度比外圆圈的辐射度大，这是因为内圆圈的面积更小而点光源的Flux值恒定，所以内圆圈的E值就大。&lt;/p&gt;
+
+&lt;p&gt;用公式表示：&lt;/p&gt;
+
+&lt;p&gt;\[ E = \frac { 点光源辐射通量 }{ 球的表面积 } =  \frac {\Phi}{4\pi r^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;可见，W恒定，半径r越小，那么辐射度E越大。&lt;/p&gt;
+
+&lt;p&gt;当假设光源在无限远处时，可把光源认为是一块平面（这种光源叫方向光）。此时，光源平面与被照射平面存在2种情形：光源平面与被照射平面平行（下图中的A）、光源平面与被照射平面不平行（下图中的B）：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.7/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;当光源平面与被照射平面平行时，有：&lt;/p&gt;
+
+&lt;p&gt;\[ E_{1} = \frac {\Phi}{ L } \]&lt;/p&gt;
+
+&lt;p&gt;当光源平面与被照射平面不平行时，需要根据平面的法向量和光线方向的夹角θ，先求出\( L^{&amp;#39;} \)：&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta = \frac { L }{ L^{&amp;#39;} }  \]&lt;/p&gt;
+
+&lt;p&gt;\[ L^{&amp;#39;}= \frac { L }{ cos\theta }  \]&lt;/p&gt;
+
+&lt;p&gt;于是得到：&lt;/p&gt;
+
+&lt;p&gt;\[ E_{2} = \frac {\Phi}{ L^{&amp;#39;} } =  \frac {\Phi}{ \frac { L }{ cos\theta }  } =  \frac {  \Phi  cos\theta  }{ L } \]&lt;/p&gt;
+
+&lt;p&gt;根据这个式子，可以想到，当θ逼近0度时，cosθ等于1，法向量和光线方向平行（上图中的A）；当θ逼近90度时，cosθ等于0，辐射度E为0（光线垂直于法向量了）。&lt;/p&gt;
+
+&lt;h2&gt;立体角(Solid Angle)&lt;/h2&gt;
+
+&lt;p&gt;理解立体角之前要先理解圆心角。在二维平面上，一个圆的圆弧的微分记为ds(也叫弧微分)，半径为r，则圆心角指的是弧微分与半径的比值:&lt;/p&gt;
+
+&lt;p&gt;\[ d\theta = \frac {ds}{r} \]&lt;/p&gt;
+
+&lt;p&gt;对这个式子做0到2π的积分的话，显然右边的分子变成了圆周长2πr，圆心角为\( \frac { 2πr }{r} = 2π \)。&lt;/p&gt;
+
+&lt;p&gt;立体角与圆心角非常类似。立体角的ds的含义是球面上的面积微分，而分母需要变成半径r的平方（1&lt;a href=&quot;https://en.wikipedia.org/wiki/Steradian&quot;&gt;球面度&lt;/a&gt;所对应的立体角所对应的球面表面积为\(r^{2}\) ）：&lt;/p&gt;
+
+&lt;p&gt;\[ d\Omega = \frac {ds}{r^{2}} \]&lt;/p&gt;
+
+&lt;p&gt;因为球体表面积等于\( 4πr^{2} \)，所以上面的式子积分到整个球体的话，立体角等于4π。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 09 Jul 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/rendering-equation/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/rendering-equation/</guid>
+      </item>
+    
+      <item>
         <title>直线与平面相交算法</title>
         <description>&lt;!--more--&gt;
 
@@ -1634,91 +1701,6 @@
         <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-14/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-14/</guid>
-      </item>
-    
-      <item>
-        <title>线性代数之视角矩阵Lookat Matrix</title>
-        <description>&lt;h1&gt;引言&lt;/h1&gt;
-
-&lt;p&gt;我对视角矩阵的理解是这样子的，假设3维空间有一个观察者（摄像机），这个观察者必然有它的坐标位置、视角、焦点，根据这3个参数，可以建立一个正交化、规范化的坐标系（一个正交化、单位化的3x3矩阵），这个坐标系对应的矩阵就是Lookat矩阵。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;根据上面这个我自己创造的定义，可以知道，Lookat矩阵只和观察者的坐标、焦点、视角有关，和被观察的东西完全无关，也就是说，Lookat矩阵是independent的，这个性质的好处是，这个观察者的Lookat矩阵，可以应用到任意目标上。&lt;/p&gt;
-
-&lt;p&gt;观察者的坐标、焦点、视角，可以进一步抽象。观察者坐标位置设为eye向量，焦点位置设为focal向量，视角呢，比较特殊，是设为一个up向量，含义是这个观察者的头顶朝向。&lt;/p&gt;
-
-&lt;p&gt;可以想象成，观察者就是你自己，你站在地面上，盯着远处一个美女，可以是盯着她的腿、她的腰，都无妨。&lt;/p&gt;
-
-&lt;p&gt;看的过程中，你可以往左侧着头看，也可以倒立着看，不会影响focal向量，因为你的眼睛还是能看见美女。&lt;/p&gt;
-
-&lt;p&gt;但是当你低头时，情况就有些变化了。第一种情况：你对着美女弯腰90度，focal向量变成指向了地面上的某个点，up向量虽然还是沿着你头部的方向，不过因为弯腰90度的关系，已经不是朝着上方了(大约是指向了美女的方向)；第二种情况是，你只是微微低头(大于15度这样子)，眼睛还是能看到美女（低头15度的视野和完全直立时一致），不过，up向量被改变了，因为你的头转了15度。&lt;/p&gt;
-
-&lt;p&gt;通过这个例子，可以知道，focal向量和up向量之间是存在联系的，而eye向量则和focal、up向量没有关系，eye向量决定的是你所在的位置。&lt;/p&gt;
-
-&lt;p&gt;唠嗑到这里，下面进入数学环节。&lt;/p&gt;
-
-&lt;h1&gt;推导&lt;/h1&gt;
-
-&lt;p&gt;当eye、focal、up三个向量的值确定后，就可以构造Lookat矩阵了。&lt;/p&gt;
-
-&lt;p&gt;(额外补充：focal向量一般是通过计算被观察位置center和观察者的位置eye的差值得到的，focal = center - eye)&lt;/p&gt;
-
-&lt;p&gt;首先明确2点：一，Lookat矩阵是正交且规范化的；二，我们使用的是右手坐标系。&lt;/p&gt;
-
-&lt;p&gt;这个Lookat矩阵，相当于是一个坐标系，那么可以设三个坐标轴的方向向量分别为\(\vec r\)、\(\vec u\)、\(\vec f\)，分别的含义是，观察者坐标系的right、up、forward方向。&lt;/p&gt;
-
-&lt;p&gt;\(\vec f\)可以轻松得到：它的朝向是focal的反方向。为什么呢？很简单，focal是指从观察者位置到焦点位置的方向向量，又因为我们用的是右手坐标系，那么观察者坐标系的f轴朝向当然是focal的反方向了。&lt;/p&gt;
-
-&lt;p&gt;\[\vec f = - \frac {\overrightarrow {focal} }{|\overrightarrow {focal}|} \]&lt;/p&gt;
-
-&lt;p&gt;接着是\(\vec r\)。显然，\(\vec r\)指的方向是，focal和up所构成的平面的垂线的正方向，即focal和up的叉积。&lt;/p&gt;
-
-&lt;p&gt;\[\vec r = \frac {\overrightarrow {focal} \times \overrightarrow {up}}{|\overrightarrow {focal} \times \overrightarrow {up}|} \]&lt;/p&gt;
-
-&lt;p&gt;\(\vec r\)、\(\vec f\)都得到后，\(\vec u\)就简单了，因为\(\vec r\)、\(\vec f\)已经规范化、正交化了的，那么\(\vec u\)就是他们的叉积：&lt;/p&gt;
-
-&lt;p&gt;\[\vec u = \vec f \times \vec r \]&lt;/p&gt;
-
-&lt;p&gt;设Lookat矩阵为M，则M等于：&lt;/p&gt;
-
-&lt;p&gt;\[ M =  \left[ \begin{matrix} r_{x}&amp;amp;r_{y}&amp;amp;r_{z}&amp;amp;0\\  u_{x}&amp;amp;u_{y}&amp;amp;u_{z}&amp;amp;0\\  f_{x}&amp;amp;f_{y}&amp;amp;f_{z}&amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;拿这个M和单位矩阵I对比下：&lt;/p&gt;
-
-&lt;p&gt;\[ I =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;0\\ 0&amp;amp;1&amp;amp;0&amp;amp;0\\ 0&amp;amp;0&amp;amp;1&amp;amp;0\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;可以发现，单位矩阵I相当于是把观察者放在世界空间的原点。因为I的\(\vec r\)、\(\vec u\)、\(\vec f\)已经是规范化、正交化的，且和世界坐标系一致。&lt;/p&gt;
-
-&lt;p&gt;所以上面的M可以理解为：M等于M乘以I。含义是，把世界坐标系变换到观察者坐标系。也即相当于调整了对world的观察角度。&lt;/p&gt;
-
-&lt;p&gt;到了这里，事情还没完，因为这个M并不能体现出观察者的&lt;strong&gt;位置&lt;/strong&gt;，为什么呢？因为\(\vec r\)、\(\vec u\)、\(\vec f\)是规范化的向量，长度都为1，并不包含位置信息。&lt;/p&gt;
-
-&lt;p&gt;和单位矩阵I对比的话就清楚了，单位矩阵I之所以不需要位置信息，是因为单位矩阵I已经隐含了一个信息：观察位置就在(0,0,0)。&lt;/p&gt;
-
-&lt;p&gt;观察位置，上面已经定义过了，它就是eye向量。&lt;/p&gt;
-
-&lt;p&gt;把观察者放到eye位置，反过来想，相当于是把被观察的东西偏移-eye的距离。实际上，我们正在构造的Lookat矩阵，不是要作用到观察者身上，而是要作用到被观察者（world）身上的。&lt;/p&gt;
-
-&lt;p&gt;因此，现在可以根据eye向量构造一个移动矩阵T(Translate)了：&lt;/p&gt;
-
-&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;-eye_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;-eye_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;-eye_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;然后把M和T合并，即得到了Lookat矩阵：&lt;/p&gt;
-
-&lt;p&gt;\[ Lookat = MT \]&lt;/p&gt;
-
-&lt;p&gt;\[ =  \left[ \begin{matrix} r_{x}&amp;amp;r_{y}&amp;amp;r_{z}&amp;amp;0\\  u_{x}&amp;amp;u_{y}&amp;amp;u_{z}&amp;amp;0\\  f_{x}&amp;amp;f_{y}&amp;amp;f_{z}&amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;-eye_{x}\\ 0&amp;amp;1&amp;amp;0&amp;amp;-eye_{y}\\ 0&amp;amp;0&amp;amp;1&amp;amp;-eye_{z}\\ 0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[ =  \left[ \begin{matrix} r_{x}&amp;amp;r_{y}&amp;amp;r_{z}&amp;amp;-r_{x}eye_{x}-r_{y}eye_{y}-r_{z}eye_{z}\\  u_{x}&amp;amp;u_{y}&amp;amp;u_{z}&amp;amp;-u_{x}eye_{x}-u_{y}eye_{y}-u_{z}eye_{z}\\  f_{x}&amp;amp;f_{y}&amp;amp;f_{z}&amp;amp;-f_{x}eye_{x}-f_{y}eye_{y}-f_{z}eye_{z}\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;简化下：&lt;/p&gt;
-
-&lt;p&gt;\[ Lookat =  \left[ \begin{matrix} r_{x}&amp;amp;r_{y}&amp;amp;r_{z}&amp;amp;-(\vec r\cdot \overrightarrow {eye})\\  u_{x}&amp;amp;u_{y}&amp;amp;u_{z}&amp;amp;-(\vec u\cdot \overrightarrow {eye})\\  f_{x}&amp;amp;f_{y}&amp;amp;f_{z}&amp;amp;-(\vec f\cdot \overrightarrow {eye})\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-</description>
-        <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-13/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-13/</guid>
       </item>
     
   </channel>
