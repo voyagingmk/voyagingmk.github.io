@@ -97,7 +97,7 @@
 
 <h2>辐射密度(Irradiance) 和 辐射照度(Radiant Exitence)</h2>
 
-<p>辐射密度也叫辐射照度。定义了辐射通量后，就可以定义辐射照度了，辐射照度指的是单位面积<strong>进入</strong>的辐射通量，单位是\(W\/m^{2}\)。根据这个定义用符号E表示。</p>
+<p>辐射密度也叫辐射照度。定义了辐射通量后，就可以定义辐射照度了，辐射照度指的是单位面积<strong>进入</strong>的辐射通量，单位是\(W/m^{2}\)。根据这个定义用符号E表示。</p>
 
 <p>辐射照度和辐射密度是近似的东西，辐射照度指的是单位面积<strong>离开</strong>的辐射通量，单位也是\(W/m^{2}\)。用符号M表示。</p>
 
@@ -129,6 +129,16 @@
 
 <p>\[ E_{2} = \frac {\Phi}{ A^{&#39;} } =  \frac {\Phi}{ \frac { A }{ cos\theta }  } =  \frac {  \Phi  cos\theta  }{ A } \]</p>
 
+<p>也可以记为</p>
+
+<p>\[ E = \frac { \Phi  cos\theta  }{ A^{\perp } }  \]</p>
+
+<p>( \(  A^{\perp } \) 指A&#39;在光线的方向的正交平面上的投影)</p>
+
+<p>微分形式：</p>
+
+<p>\[ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  } \]</p>
+
 <p>根据这个式子，可以想到，当θ逼近0度时，cosθ等于1，法向量和光线方向平行（上图中的A）；当θ逼近90度时，cosθ等于0，辐射照度E为0（光线垂直于法向量了）。</p>
 
 <h2>立体角(Solid Angle)</h2>
@@ -141,15 +151,15 @@
 
 <p>立体角与圆心角非常类似。立体角的ds的含义是球面上的面积微分，而分母需要变成半径r的平方（1<a href="https://en.wikipedia.org/wiki/Steradian">球面度</a>所对应的立体角所对应的球面表面积为\(r^{2}\) ）：</p>
 
-<p>\[ d\Omega = \frac {ds}{r^{2}} \]</p>
+<p>\[ d\omega = \frac {ds}{r^{2}} \]</p>
 
 <p>因为球体表面积等于\( 4πr^{2} \)，所以上面的式子积分到整个球体的话，立体角等于4π。</p>
 
 <h2>辐射强度(Intensity)</h2>
 
-<p>辐射强度指<strong>辐射通量和立体角</strong>的比值，符号是I。注意，这里的立体角是有朝向性。</p>
+<p>辐射强度指<strong>辐射通量和立体角</strong>的比值，符号是I。注意，这里的立体角有朝向性，用新的符号\(\omega \)区分。</p>
 
-<p>\[ I = \frac { \Phi }{d\Omega } \]</p>
+<p>\[ I = \frac { \Phi }{d\omega } \]</p>
 
 <p>因为定义中用到了立体角，立体角只存在在点光源中，所以辐射强度是对点光源才有意义的。</p>
 
@@ -157,15 +167,62 @@
 
 <p>辐射亮度是指辐射通量与单位面积单位立体角的比值。符号为L。定义式如下：</p>
 
-<p>\[ L = \frac { d\Phi }{ d\Omega dA^{\perp } } \]</p>
+<p>\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } \]</p>
 
 <p>或：</p>
 
 <p>\[ L = \frac { I }{  dA^{\perp } }  \]</p>
 
-<p>物体含义如下图所示：</p>
+<p>物理含义如下图所示：</p>
 
 <p><img src="../images/2016.7/7.png" alt="7.png"></p>
+
+<p>注意：在计算机图形学中，辐射亮度比起上面其他物理量，都重要地得多。</p>
+
+<p>如果要求平面上某点p的某方向\(\omega \)的辐射亮度L(Radiance)，可用下面的符号表示：</p>
+
+<p>\[ L(p,\omega ) \]</p>
+
+<p>其中，\(\omega \)的方向需要注意，因为它是一个立体角，立体角的圆心是p，\(\omega \)的朝向必然是从圆心p往外（向量起点是p）。</p>
+
+<p>实际上，需要区分成入射(input)和出射(output)2种辐射亮度L，用下面2个符号表示：</p>
+
+<p>\[ L_{i}(p,\omega ) \]</p>
+
+<p>\[ L_{o}(p,\omega ) \]</p>
+
+<p>且在现实世界中有：</p>
+
+<p>\[ L_{i}(p,\omega ) \neq L_{o}(p,\omega ) \]</p>
+
+<p>还有，上面的这个p不能简单认为真的是一个无体积的点，它也可能是一个无限小的平面块，即它是一个有面积A、有法向量n的“点”。对于这样一个“点”，我们可以求出它的上半球(沿着n的方向)的辐射密度值\( E(p, n) \)：</p>
+
+<p>\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |d\omega \]</p>
+
+<p>分析下这个式子的由来。首先搬出上文给出的L和E的公式：</p>
+
+<p>\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } \]</p>
+
+<p>\[ E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  } \]</p>
+
+<p>所以有：</p>
+
+<p>\[ d\Phi = L d\omega dA^{\perp } \]</p>
+
+<p>\[ 
+E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
+= \frac {  L d\omega dA^{\perp }  cos\theta  }{ dA^{\perp }  }<br>
+= L d\omega cos\theta \]</p>
+
+<p>对上式做整个半球的积分，就得到了：</p>
+
+<p>\[ E = \int _{\Omega }L|cos\theta |d\omega \]</p>
+
+<p>也就是：</p>
+
+<p>\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |d\omega \]</p>
+
+<p>其中的\( cos\theta \)加绝对值是因为我们求的是半球的积分，立体角\(\omega \)和法向量的夹角必然是锐角，锐角的余弦值必然大于等于0。</p>
 
   </div>
 
