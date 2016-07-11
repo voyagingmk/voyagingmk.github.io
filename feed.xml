@@ -22,7 +22,7 @@
 
 &lt;h2&gt;辐射密度(Irradiance) 和 辐射照度(Radiant Exitence)&lt;/h2&gt;
 
-&lt;p&gt;辐射密度也叫辐射照度。定义了辐射通量后，就可以定义辐射照度了，辐射照度指的是单位面积&lt;strong&gt;进入&lt;/strong&gt;的辐射通量，单位是\(W\/m^{2}\)。根据这个定义用符号E表示。&lt;/p&gt;
+&lt;p&gt;辐射密度也叫辐射照度。定义了辐射通量后，就可以定义辐射照度了，辐射照度指的是单位面积&lt;strong&gt;进入&lt;/strong&gt;的辐射通量，单位是\(W/m^{2}\)。根据这个定义用符号E表示。&lt;/p&gt;
 
 &lt;p&gt;辐射照度和辐射密度是近似的东西，辐射照度指的是单位面积&lt;strong&gt;离开&lt;/strong&gt;的辐射通量，单位也是\(W/m^{2}\)。用符号M表示。&lt;/p&gt;
 
@@ -54,47 +54,217 @@
 
 &lt;p&gt;\[ E_{2} = \frac {\Phi}{ A^{&amp;#39;} } =  \frac {\Phi}{ \frac { A }{ cos\theta }  } =  \frac {  \Phi  cos\theta  }{ A } \]&lt;/p&gt;
 
+&lt;p&gt;也可以记为&lt;/p&gt;
+
+&lt;p&gt;\[ E = \frac { \Phi  cos\theta  }{ A^{\perp } }  \]&lt;/p&gt;
+
+&lt;p&gt;( \(  A^{\perp } \) 指A&amp;#39;在光线的方向的正交平面上的投影)&lt;/p&gt;
+
+&lt;p&gt;微分形式：&lt;/p&gt;
+
+&lt;p&gt;\[ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  } \]&lt;/p&gt;
+
 &lt;p&gt;根据这个式子，可以想到，当θ逼近0度时，cosθ等于1，法向量和光线方向平行（上图中的A）；当θ逼近90度时，cosθ等于0，辐射照度E为0（光线垂直于法向量了）。&lt;/p&gt;
 
 &lt;h2&gt;立体角(Solid Angle)&lt;/h2&gt;
 
-&lt;p&gt;理解立体角之前要先理解圆心角。在二维平面上，一个圆的圆弧的微分记为ds(也叫弧微分)，半径为r，则圆心角指的是弧微分与半径的比值:&lt;/p&gt;
-
-&lt;p&gt;\[ d\theta = \frac {ds}{r} \]&lt;/p&gt;
-
-&lt;p&gt;对这个式子做0到2π的积分的话，显然右边的分子变成了圆周长2πr，圆心角为\( \frac { 2πr }{r} = 2π \)。&lt;/p&gt;
-
-&lt;p&gt;立体角与圆心角非常类似。立体角的ds的含义是球面上的面积微分，而分母需要变成半径r的平方（1&lt;a href=&quot;https://en.wikipedia.org/wiki/Steradian&quot;&gt;球面度&lt;/a&gt;所对应的立体角所对应的球面表面积为\(r^{2}\) ）：&lt;/p&gt;
-
-&lt;p&gt;\[ d\Omega = \frac {ds}{r^{2}} \]&lt;/p&gt;
-
-&lt;p&gt;因为球体表面积等于\( 4πr^{2} \)，所以上面的式子积分到整个球体的话，立体角等于4π。&lt;/p&gt;
-
-&lt;h2&gt;辐射强度(Intensity)&lt;/h2&gt;
-
-&lt;p&gt;辐射强度指&lt;strong&gt;辐射通量和立体角&lt;/strong&gt;的比值，符号是I。注意，这里的立体角是有朝向性。&lt;/p&gt;
-
-&lt;p&gt;\[ I = \frac { \Phi }{d\Omega } \]&lt;/p&gt;
-
-&lt;p&gt;因为定义中用到了立体角，立体角只存在在点光源中，所以辐射强度是对点光源才有意义的。&lt;/p&gt;
+&lt;p&gt;立体角的介绍请访问：&lt;a href=&quot;http://www.qiujiawei.com/solid-angle/&quot;&gt;立体角(Solid Angle)详解&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2&gt;辐射亮度(Radiance)&lt;/h2&gt;
 
-&lt;p&gt;辐射亮度是指辐射通量与单位面积单位立体角的比值。符号为L。定义式如下：&lt;/p&gt;
+&lt;p&gt;辐射亮度是指辐射通量与单位面积(注意，是与光线方向正交的那块)单位立体角的比值。符号为L。定义式如下：&lt;/p&gt;
 
-&lt;p&gt;\[ L = \frac { d\Phi }{ d\Omega dA^{\perp } } \]&lt;/p&gt;
+&lt;p&gt;\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } \]&lt;/p&gt;
 
 &lt;p&gt;或：&lt;/p&gt;
 
 &lt;p&gt;\[ L = \frac { I }{  dA^{\perp } }  \]&lt;/p&gt;
 
-&lt;p&gt;物体含义如下图所示：&lt;/p&gt;
+&lt;p&gt;物理含义如下图所示：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;../images/2016.7/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;注意：在计算机图形学中，辐射亮度比起上面其他物理量，都重要地得多。&lt;/p&gt;
+
+&lt;p&gt;如果要求平面上某点p的某方向\(\omega \)的辐射亮度L(Radiance)，可用下面的符号表示：&lt;/p&gt;
+
+&lt;p&gt;\[ L(p,\omega ) \]&lt;/p&gt;
+
+&lt;p&gt;其中，\(\omega \)的方向需要注意，因为它是一个立体角，立体角的圆心是p，\(\omega \)的朝向必然是从圆心p往外（向量起点是p）。&lt;/p&gt;
+
+&lt;p&gt;实际上，需要区分成入射(input)和出射(output)2种辐射亮度L，用下面2个符号表示：&lt;/p&gt;
+
+&lt;p&gt;\[ L_{i}(p,\omega ) \]&lt;/p&gt;
+
+&lt;p&gt;\[ L_{o}(p,\omega ) \]&lt;/p&gt;
+
+&lt;p&gt;且在现实世界中有：&lt;/p&gt;
+
+&lt;p&gt;\[ L_{i}(p,\omega ) \neq L_{o}(p,\omega ) \]&lt;/p&gt;
+
+&lt;p&gt;还有，上面的这个p不能简单认为真的是一个无体积的点，它也可能是一个无限小的平面块，即它是一个有面积A、有法向量n的“点”。对于这样一个“点”，我们可以求出它的上半球(沿着n的方向)的辐射密度值\( E(p, n) \)：&lt;/p&gt;
+
+&lt;p&gt;\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |d\omega \]&lt;/p&gt;
+
+&lt;p&gt;分析下这个式子的由来。首先搬出上文给出的L和E的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } \]&lt;/p&gt;
+
+&lt;p&gt;\[ E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  } \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ d\Phi = L d\omega dA^{\perp } \]&lt;/p&gt;
+
+&lt;p&gt;\[ 
+E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
+= \frac {  L d\omega dA^{\perp }  cos\theta  }{ dA^{\perp }  }&lt;br&gt;
+= L d\omega cos\theta \]&lt;/p&gt;
+
+&lt;p&gt;对上式做整个半球的积分，就得到了：&lt;/p&gt;
+
+&lt;p&gt;\[ E = \int _{\Omega }L|cos\theta |d\omega \]&lt;/p&gt;
+
+&lt;p&gt;也就是：&lt;/p&gt;
+
+&lt;p&gt;\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |d\omega \]&lt;/p&gt;
+
+&lt;p&gt;其中的\( cos\theta \)加绝对值是因为我们求的是半球的积分，立体角\(\omega \)和法向量的夹角必然是锐角，锐角的余弦值必然大于等于0。&lt;/p&gt;
+
+&lt;p&gt;如果把式子中的\(d\omega \)替换成球形角(Sphere Angle)，则得到：&lt;/p&gt;
+
+&lt;p&gt;\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |sin\theta d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;这个式子是不对的，因为积分那里用了立体角，需要将其转换成对\(\theta 和 \phi \)的积分。因为这里积分的是半球，那么\(\theta \)的取值范围是\( [0,\frac {π}{2}] \)、\(\phi \)的取值范围是\( [0,2π] \)：&lt;/p&gt;
+
+&lt;p&gt;\[ E(p, n) = \int _{0 }^{ 2π } \int _{0 }^{ \frac {π}{2} }  L_{i} (p,\theta ,\phi ) cos\theta sin\theta d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;（因为已经明确限定了\(\theta \)的取值范围，所以\( cos\theta \)必然大于等于0，可去掉绝对值符号）&lt;/p&gt;
+
+&lt;p&gt;如果\(L_{i} (p,\theta ,\phi ) \)是一个常量值，那么就意味着任意方向的Radiance都是相等的，于是上式可以求出积分：&lt;/p&gt;
+
+&lt;p&gt;\[ E(p, n) = L_{i} (p,\theta ,\phi ) \int _{0 }^{ 2π } \int _{0 }^{ \frac {π}{2} }  cos\theta sin\theta d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[ = L_{i} (p,\theta ,\phi ) \int _{0 }^{ 2π } (\frac {1}{2}sin^{2}\theta )\rvert ^{\frac {π}{2}}_{0} d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[ = L_{i} (p,\theta ,\phi ) \int _{0 }^{ 2π } (\frac {1}{2}sin^{2}\frac {π}{2} - \frac {1}{2}sin^{2}0  ) d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[ = L_{i} (p,\theta ,\phi ) \int _{0 }^{ 2π } \frac {1}{2} d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[ = L_{i} (p,\theta ,\phi ) \frac {1}{2}( 2π - 0) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = L_{i} (p,\theta ,\phi ) π  \]&lt;/p&gt;
 </description>
-        <pubDate>Sat, 09 Jul 2016 00:00:00 +0800</pubDate>
+        <pubDate>Sun, 10 Jul 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/rendering-equation/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/rendering-equation/</guid>
+      </item>
+    
+      <item>
+        <title>立体角(Solid Angle)详解</title>
+        <description>&lt;p&gt;理解立体角之前要先理解圆心角。在二维平面上，一个圆的圆弧的微分记为ds(也叫弧微分)，半径为r，则圆心角指的是弧微分与半径的比值:&lt;/p&gt;
+
+&lt;p&gt;\[ d\theta = \frac {ds}{r} \]&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;对这个式子做0到2π的积分的话，显然右边的分子变成了圆周长2πr，圆心角为\( \frac { 2πr }{r} = 2π \)。&lt;/p&gt;
+
+&lt;p&gt;立体角与圆心角非常类似。立体角的ds的含义是球面上的面积微分(下文用dA表示)，而分母需要变成半径r的平方（1&lt;a href=&quot;https://en.wikipedia.org/wiki/Steradian&quot;&gt;球面度&lt;/a&gt;所对应的立体角所对应的球面表面积为\(r^{2}\) ）：&lt;/p&gt;
+
+&lt;p&gt;\[ d\omega = \frac {dA}{r^{2}} \]&lt;/p&gt;
+
+&lt;p&gt;因为球体表面积等于\( 4πr^{2} \)，所以上面的式子积分到整个球体的话，立体角等于4π。&lt;/p&gt;
+
+&lt;p&gt;再换个角度分析。在宏观上看，立体角的定义是：&lt;/p&gt;
+
+&lt;p&gt;\[ \Omega = \frac {A}{r^{2} } sr \]&lt;/p&gt;
+
+&lt;p&gt;其中，sr是单位，叫做球面度；A是这个立体角所对应的球表面积，A被叫做&lt;strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Spherical_cap&quot;&gt;spherical cap&lt;/a&gt;&lt;/strong&gt;(球帽?)。&lt;/p&gt;
+
+&lt;p&gt;spherical cap的几何表示如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.7/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(from wiki)&lt;/p&gt;
+
+&lt;p&gt;spherical cap面积等于\(2\pi rh \)，所以上式可变成：&lt;/p&gt;
+
+&lt;p&gt;\[ \Omega = \frac {2\pi rh}{r^{2} } sr \]&lt;/p&gt;
+
+&lt;p&gt;当h等于r时，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \Omega = \frac {2\pi rr}{r^{2} } sr = 2\pi \ sr \]&lt;/p&gt;
+
+&lt;p&gt;此时得到的是半球的立体角，那么就可以知道整个球的立体角为\(4\pi  \)，和上述结论一致。&lt;/p&gt;
+
+&lt;h2&gt;立体角(Solid Angle)转换到球形角(Sphere Angle)&lt;/h2&gt;
+
+&lt;p&gt;Spherical Coordinates坐标系下的单位球，可用2个&lt;strong&gt;弧度变量&lt;/strong&gt;来定位球面上一个点：\(\theta 和 \phi \)。和三维坐标系的对应关系如下：&lt;/p&gt;
+
+&lt;p&gt;\[ x = sin\theta cos\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[ y = sin\theta sin\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[ x = cos\theta \]&lt;/p&gt;
+
+&lt;p&gt;简单验证下。把上面3个式子代入单位球公式:\(x^{2}+y^{2}+z^{2} = 1\)，可得：&lt;/p&gt;
+
+&lt;p&gt;\[ (sin\theta cos\phi)^{2} + (sin\theta sin\phi )^{2} + cos^{2}\theta = 1 \]&lt;/p&gt;
+
+&lt;p&gt;\[ sin^{2}\theta (cos^{2}\phi  + sin^{2}\phi ) + cos^{2}\theta = 1 \]&lt;/p&gt;
+
+&lt;p&gt;\[ sin^{2}\theta  + cos^{2}\theta = 1 \]&lt;/p&gt;
+
+&lt;p&gt;那么，立体角\(\omega \)和\(\theta 、 \phi \)是什么关系呢？先给出答案：&lt;/p&gt;
+
+&lt;p&gt;\[ d\omega = sin\theta d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;似乎有点莫名其妙，这里我详细解释吧。首先先搞懂\(  d\theta 和  d\phi \)的几何意义。&lt;/p&gt;
+
+&lt;p&gt;弧度变量的单位是&lt;strong&gt;弧度&lt;/strong&gt;，1弧度的定义是：弧长s等于半径r的弧对应的圆心角为1弧度。因此可以知道整个圆的弧度为周长\(2\pi r\)除以半径\(r\)等于\(2\pi \)。&lt;/p&gt;
+
+&lt;p&gt;因此，如果已知弧度和半径，就可以求出弧长s，那么上面的\(\theta 、 \phi \)对应的弧长就是：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{ \theta } = r_{ \theta }\theta  \]&lt;/p&gt;
+
+&lt;p&gt;\[ s_{ \phi } = r_{ \phi }\phi  \]&lt;/p&gt;
+
+&lt;p&gt;微分形式：&lt;/p&gt;
+
+&lt;p&gt;\[ ds_{ \theta } = r_{ \theta } d\theta  \]&lt;/p&gt;
+
+&lt;p&gt;\[ ds_{ \phi } = r_{ \phi } d\phi  \]&lt;/p&gt;
+
+&lt;p&gt;\( r_{ \theta }、r_{ \phi }\)的值并不是相等的，需要接着分析。&lt;/p&gt;
+
+&lt;p&gt;在球坐标系下，\(\theta 、 \phi \)指的是这2个角：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.7/9.png&quot; alt=&quot;9.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;\(\theta\)是目标点p与z轴的夹角；而\(\phi\)是目标点p在xy平面上的投影与y轴的夹角。&lt;/p&gt;
+
+&lt;p&gt;从图可知，\( r_{ \theta } \)与圆的半径r相等；而\( r_{ \phi } \)是小于等于r的(注意看上面的小圆)，且有：&lt;/p&gt;
+
+&lt;p&gt;\[ sin\theta = \frac { r_{ \phi } } {r_{ \theta } }\]&lt;/p&gt;
+
+&lt;p&gt;当球是单位球时，球的半径为1，所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ r_{ \theta } = 1\]&lt;/p&gt;
+
+&lt;p&gt;\[ r_{ \phi } = sin\theta  r_{ \theta } = sin\theta \]&lt;/p&gt;
+
+&lt;p&gt;又因为在微观下，立体角对应的曲面(或者叫球帽)面积可以当做一个小矩形看，这个小矩形dA的面积等于2个弧长\( ds_{ \theta } \)和\( ds_{ \phi } \)的积：&lt;/p&gt;
+
+&lt;p&gt;\[ dA = ds_{ \theta }ds_{ \phi } = r_{ \theta } r_{ \phi }d\theta d\phi = sin\theta d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;再因为立体角的微分其实也就是这个小矩形的面积，那么就有：&lt;/p&gt;
+
+&lt;p&gt;\[ d\omega = dA = sin\theta d\theta d\phi \]&lt;/p&gt;
+</description>
+        <pubDate>Sat, 09 Jul 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/solid-angle/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/solid-angle/</guid>
       </item>
     
       <item>
@@ -1626,105 +1796,6 @@
         <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/triangle-intersect/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/triangle-intersect/</guid>
-      </item>
-    
-      <item>
-        <title>线性代数之平移、缩放、旋转矩阵</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;平移矩阵 Translate Matrix&lt;/h2&gt;
-
-&lt;p&gt;\[ T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;x\\  0&amp;amp;1&amp;amp;0&amp;amp;y\\  0&amp;amp;0&amp;amp;1&amp;amp;z\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h2&gt;缩放矩阵 Scale Matrix&lt;/h2&gt;
-
-&lt;p&gt;\[ S =  \left[ \begin{matrix} x&amp;amp;0&amp;amp;0&amp;amp;0\\  0&amp;amp;y&amp;amp;0&amp;amp;0\\  0&amp;amp;0&amp;amp;z&amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h2&gt;旋转矩阵 Rotate Matrix&lt;/h2&gt;
-
-&lt;h3&gt;绕(1,0,0)旋转\(\theta \)角度&lt;/h3&gt;
-
-&lt;p&gt;\[ R_{(1,0,0)} =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;0&amp;amp;0\\  0&amp;amp;cos\theta &amp;amp;sin\theta &amp;amp;0\\  0&amp;amp;-sin\theta &amp;amp;cos\theta &amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h3&gt;绕(0,1,0)旋转\(\theta \)角度&lt;/h3&gt;
-
-&lt;p&gt;\[ R_{(0,1,0)} =  \left[ \begin{matrix} cos\theta&amp;amp;0&amp;amp;-sin\theta&amp;amp;0\\    0&amp;amp;1&amp;amp;0&amp;amp;0\\  sin\theta &amp;amp;0&amp;amp;cos\theta &amp;amp;0\\  0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h3&gt;绕(0,0,1)旋转\(\theta \)角度&lt;/h3&gt;
-
-&lt;p&gt;\[ R_{(0,0,1)} =  \left[ \begin{matrix} cos\theta&amp;amp;sin\theta&amp;amp;0&amp;amp;0\\  -sin\theta &amp;amp;cos\theta &amp;amp;0&amp;amp;0\\   0&amp;amp;0&amp;amp;1&amp;amp;0\\   0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h3&gt;绕任意轴旋转\(\theta \)角度&lt;/h3&gt;
-
-&lt;p&gt;设旋转轴为\(\vec n\)，这是一个单位化的方向向量。设被旋转的向量为\(\vec v\)，被旋转后是\(\vec v&amp;#39; \)。&lt;/p&gt;
-
-&lt;p&gt;为了求出\(\vec v&amp;#39; \)，需要迂回地处理：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;将\(\vec v\) 分解为 \(\vec v = \vec v_{\perp }+\vec v_{\parallel } \) ，\( \vec v_{\parallel } \)指的是\(\vec v\)与\(\vec n\)平行的部分，\( \vec v_{\perp } \) 指的是\(\vec v\) 与\(\vec n\)垂直的部分。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;分解为两部分后，可以分别对这两个部分做旋转，然后再合并，所以有： \(\vec v&amp;#39; = \vec v&amp;#39;_{\perp }+\vec v&amp;#39;_{\parallel } \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;让 \( \vec v_{\parallel } \) 绕旋转轴\(\vec n\)旋转\(\theta \)角度，它依然保持不变，因为它和\(\vec n\)是同方向的向量，所以有 \( \vec v_{\parallel } = \vec v&amp;#39;_{\parallel } \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;根据上一点，可以得到： \(\vec v&amp;#39; = \vec v&amp;#39;_{\perp }+\vec v_{\parallel } \)。因此，问题简化为求\( \vec v&amp;#39;_{\perp } \)和\( \vec v_{\parallel } \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;分析\( \vec v_{\parallel } \)，可以发现它相当于是\(\vec v\)在\(\vec n\)上的投影，根据向量的点积公式：&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ \vec A\cdot \vec B = |\vec A||\vec B|cos\alpha  \]&lt;/p&gt;
-
-&lt;p&gt;代入\(\vec v\)、\(\vec n\)后，得到：\( \vec v\cdot \vec n = |\vec v||\vec n|cos\alpha = |\vec v|cos\alpha = |\vec v_{\parallel }| \)，即算出了\( \vec v_{\parallel } \)的长度，又因为\vec v_{\parallel } \)和\(\vec n\)方向一致、\(\vec n\)长度为1，所以有:&lt;/p&gt;
-
-&lt;p&gt;\[ \vec v_{\parallel } = (\vec v\cdot \vec n) \vec n \]&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;上一步已经解决了\( \vec v_{\parallel } \)，剩下的就是求\( \vec v&amp;#39;_{\perp } \)。求\( \vec v&amp;#39;_{\perp } \)之前需要先求出\( \vec v_{\perp } \)，而显然\( \vec v_{\perp } = v - \vec v_{\parallel} \) &lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;接着，需要计算一个新的向量\(\vec w \)，\( \vec w = \vec n \times \vec v_{\perp } \) （注意叉乘的顺序不能错），所以\(\vec w \)是一个垂直于\(  \vec n \)、\( \vec v_{\perp } \)所构成平面的向量。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;把\( \vec v_{\perp }\)、\(\vec w \) 分别当做是\(  \vec n \)、\( \vec v_{\perp } \)平面的x、y轴(2D坐标系)，那么\( \vec v&amp;#39;_{\perp } \)的含义就是指\( \vec v_{\perp } \)在这个2D坐标系下旋转\(\theta \)度。从而得到等式：&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ \vec v&amp;#39;_{\perp } =  cos\theta \vec v_{\perp } + sin\theta \vec w \]&lt;/p&gt;
-
-&lt;p&gt;好了，所有变量都得到了，总结下最终的公式：&lt;/p&gt;
-
-&lt;p&gt;\( \vec v_{\parallel } = (\vec v\cdot \vec n) \vec n \)&lt;/p&gt;
-
-&lt;p&gt;\( \vec v_{\perp } = \vec v - \vec v_{\parallel} = \vec v -  (\vec v\cdot \vec n) \vec n \) &lt;/p&gt;
-
-&lt;p&gt;\( \vec w = \vec n \times \vec v_{\perp } \) &lt;/p&gt;
-
-&lt;p&gt;\( = \vec n \times (\vec v - \vec v_{\parallel}) \) &lt;/p&gt;
-
-&lt;p&gt;\( = \vec n \times \vec v - \vec n \times \vec v_{\parallel}) \) &lt;/p&gt;
-
-&lt;p&gt;\( = \vec n \times \vec v \) &lt;/p&gt;
-
-&lt;p&gt;\( \vec v&amp;#39;_{\perp } =  cos\theta \vec v_{\perp } + sin\theta \vec w \)&lt;/p&gt;
-
-&lt;p&gt;\( =  cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v)  \)&lt;/p&gt;
-
-&lt;p&gt;\( \vec v&amp;#39; = \vec v&amp;#39;_{\perp } + \vec v_{\parallel } \)&lt;/p&gt;
-
-&lt;p&gt;\( = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \)&lt;/p&gt;
-
-&lt;p&gt;加粗并居中：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;\[ \vec v&amp;#39; = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \]&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;这就是绕任意轴的旋转公式了。&lt;/p&gt;
-
-&lt;p&gt;接下来是把这个公式转换成矩阵的形式。方法是，把\(v_{x} = (1,0,0) \)、\(v_{y} = (0,1,0) \)、\(v_{z} = (0,0,1) \)，分别代入上面的公式，分别得到：&lt;/p&gt;
-
-&lt;p&gt;\[ v_{x}&amp;#39; =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta \\ n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta \\ n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta \\ \end{matrix} \right] ^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[ v_{y}&amp;#39; =  \left[ \begin{matrix} n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta \\ n_{y}^{2}(1-cos\theta )+cos\theta \\ n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta \\ \end{matrix} \right] ^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[ v_{z}&amp;#39; =  \left[ \begin{matrix} n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta \\ n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta \\ n_{z}^{2}(1-cos\theta )+cos\theta \\ \end{matrix} \right] ^{T} \]&lt;/p&gt;
-
-&lt;p&gt;最终的旋转矩阵为:&lt;/p&gt;
-
-&lt;p&gt;\[ R(\vec n, \theta ) =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta &amp;amp;  n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta &amp;amp;  n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta &amp;amp;0\\      n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta &amp;amp;n_{y}^{2}(1-cos\theta )+cos\theta &amp;amp;n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta &amp;amp;0\\     n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta &amp;amp;n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta &amp;amp;n_{z}^{2}(1-cos\theta )+cos\theta &amp;amp;0\\    0&amp;amp;0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
-</description>
-        <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-14/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-14/</guid>
       </item>
     
   </channel>
