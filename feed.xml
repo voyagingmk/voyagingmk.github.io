@@ -221,6 +221,24 @@ E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 &lt;p&gt;注意上面两个图中，横轴是指波长，纵轴是指每单位纳米(10纳米一个单位)的波长的功率（能量）。&lt;/p&gt;
 
 &lt;p&gt;SPD曲线都是用&lt;a href=&quot;https://en.wikipedia.org/wiki/Spectroradiometer&quot;&gt;Spectroradiometers&lt;/a&gt; 这种专门仪器测量的。&lt;/p&gt;
+
+&lt;p&gt;SPD一般用符号P(λ)表示。&lt;/p&gt;
+
+&lt;h2&gt;XYZ 三色刺激值(tristimulus vlaues)&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.7/14.png&quot; alt=&quot;14.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;关于各种CIE颜色表示之间的转换，请访问：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.brucelindbloom.com/index.html?Equations.html&quot;&gt;Useful Color Equations&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;通过SPD计算XYZ：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.brucelindbloom.com/index.html?Eqn_Spect_to_XYZ.html&quot;&gt;Computing XYZ From Spectral Data&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;XYZ转换到RGB：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html&quot;&gt;XYZ to RGB&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 10 Jul 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/rendering-equation/</link>
