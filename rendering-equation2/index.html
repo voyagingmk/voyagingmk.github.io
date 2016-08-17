@@ -191,8 +191,35 @@
     <span class="n">rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.055648f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.204043f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.057311f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>注意，这里得到的RGB是线性空间的RGB，并没有做gamma校正。</p>
+<p>注意，这里得到的RGB是线性空间的RGB，并没有做gamma校正。gamma校正的公式如下:</p>
 
+<p><img src="../images/2016.7/21.png" alt="21.png"></p>
+
+<p>gamma校正应放在【线性空间】到【非线性空间】的转换时做，也就是最后输出时。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">//gamma校正</span>
+<span class="kr">inline</span> <span class="n">Float</span> <span class="nf">GammaCorrect</span><span class="p">(</span><span class="n">Float</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">0.0031308f</span><span class="p">)</span> <span class="k">return</span> <span class="mf">12.92f</span> <span class="o">*</span> <span class="n">value</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mf">1.055f</span> <span class="o">*</span> <span class="n">std</span><span class="o">::</span><span class="n">pow</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Float</span><span class="p">)(</span><span class="mf">1.f</span> <span class="o">/</span> <span class="mf">2.4f</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055f</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="c1">//Clamp函数</span>
+<span class="n">template</span> <span class="o">&lt;</span><span class="kr">typename</span> <span class="n">T</span><span class="p">,</span> <span class="kr">typename</span> <span class="n">U</span><span class="p">,</span> <span class="kr">typename</span> <span class="n">V</span><span class="o">&gt;</span>
+<span class="kr">inline</span> <span class="n">T</span> <span class="n">Clamp</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">,</span> <span class="n">U</span> <span class="n">low</span><span class="p">,</span> <span class="n">V</span> <span class="n">high</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">low</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">high</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="n">val</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="c1">//RGB_linear转成sRGB</span>
+<span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mf">255.f</span> <span class="o">*</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="p">,</span> <span class="mf">0.f</span><span class="p">,</span> <span class="mf">255.f</span><span class="p">);</span>
+<span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mf">255.f</span> <span class="o">*</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="p">,</span> <span class="mf">0.f</span><span class="p">,</span> <span class="mf">255.f</span><span class="p">);</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mf">255.f</span> <span class="o">*</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="p">,</span> <span class="mf">0.f</span><span class="p">,</span> <span class="mf">255.f</span><span class="p">);</span>
+</code></pre></div>
 <h2>参考资料</h2>
 
 <p>pbrt源码</p>
