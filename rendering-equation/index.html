@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>渲染基础理论的介绍 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>渲染基础理论的介绍(1) – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="渲染基础理论的介绍" />
-    <meta property="twitter:title" content="渲染基础理论的介绍" />
+    <meta property="og:title" content="渲染基础理论的介绍(1)" />
+    <meta property="twitter:title" content="渲染基础理论的介绍(1)" />
     
 
     <!--[if lt IE 9]>
@@ -37,7 +37,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/rendering-equation/',
-		  'title': '渲染基础理论的介绍'
+		  'title': '渲染基础理论的介绍(1)'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -80,7 +80,7 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1>渲染基础理论的介绍</h1>
+  <h1>渲染基础理论的介绍(1)</h1>
   <h3>Tags: <a href="/tag/math/" rel="tag">math</a>, <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
   <div class="entry">
     <!--more-->
@@ -153,19 +153,33 @@
 
 <h2>XYZ和RGB之间的互相转换</h2>
 
+<h3>XYZ到RGB</h3>
+
 <p>公式是：</p>
 
 <p><img src="../images/2016.7/17.png" alt="17.png"></p>
 
-<p>看公式可以知道，XYZ和RGB之间可以线性转换得到，这就很实用了。</p>
+<p>(此矩阵只适用于 <a href="https://en.wikipedia.org/wiki/SRGB">sRGB</a> 定义中的RGB)</p>
 
-<p>另外，此图的转换矩阵M是测量获得的，不用去纠结是怎么来的。</p>
+<p>(对于右边的输入值XYZ，也是有要求的，这是因为左边的\(RGB_{linear} \)的取值范围是[0,1]，所以右边的XYZ也需要做规范化。在我的下一篇文章中会介绍这部分。)</p>
 
-<p><a href="http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html">XYZ to RGB</a></p>
+<p>得到的\(RGB_{linear} \)是线性空间的，在渲染器中可以直接使用。\(RGB_{linear} \)各个分量的取值范围都是[0.0, 1.0]，写入位图时需要乘以255并取整。</p>
 
-<p>关于各种CIE颜色表示之间的转换，请访问：</p>
+<p>顺带一提的是，这个得到的\(RGB_{linear} \)需要做一个gamma校正才能变成sRGB。公式如下：</p>
 
-<p><a href="http://www.brucelindbloom.com/index.html?Equations.html">Useful Color Equations</a></p>
+<p><img src="../images/2016.7/21.png" alt="21.png"></p>
+
+<p>对于渲染器来说并不需要做gamma校正，所以可跳过这个步骤。</p>
+
+<h3>RGB到XYZ</h3>
+
+<p>当输入的RGB是sRGB时，需要做逆gamma校正，公式如下：</p>
+
+<p><img src="../images/2016.7/22.png" alt="22.png"></p>
+
+<p>得到线性空间的RGB值后，就可以用下面的公式转换到XYZ空间：</p>
+
+<p><img src="../images/2016.7/23.png" alt="23.png"></p>
 
 <h2>辐射通量(Flux)</h2>
 
@@ -229,15 +243,27 @@
 
 <p>辐射亮度是指辐射通量与单位面积(注意，是与光线方向正交的那块)单位立体角的比值。符号为L。定义式如下：</p>
 
-<p>\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } \]</p>
+<p>\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } = \frac { d\Phi }{ d\omega dA cos\theta  } \]</p>
 
 <p>或：</p>
 
-<p>\[ L = \frac { I }{  dA^{\perp } }  \]</p>
+<p>\[ L = \frac { \Phi }{ \omega A^{\perp } } \]</p>
 
 <p>物理含义如下图所示：</p>
 
 <p><img src="../images/2016.7/7.png" alt="7.png"></p>
+
+<p>辐射密度E和辐射亮度L的关系是&quot;总体&quot;和&quot;个体&quot;的区别，可以对比下两者的公式来理解：</p>
+
+<p>\[ E = \frac { \Phi }{ A }  \]</p>
+
+<p>\[ L = \frac { \Phi }{ \omega A^{\perp } } \]</p>
+
+<p>E是指进入目标区域的总辐射通量与目标区域总面积的比值；而L是指进入目标区域的总辐射通量与目标区域总面积、<strong>总的入射立体角</strong>的比值，也就是说L是比E多除了立体角。直观图示如下：</p>
+
+<p><img src="../images/2016.7/19.png" alt="19.png"></p>
+
+<p><strong>也就是说其实E和L可以认为是同一个东西，只是L描述的是E的局部。用一句话记住两者的区别：有特定方向时是L，无特定方向时是E。这个区别相当重要，因为它体现在了渲染方程中。</strong></p>
 
 <p>注意：在计算机图形学中，辐射亮度比起上面其他物理量，都重要地得多。</p>
 
@@ -265,14 +291,14 @@
 
 <p>\[ L = \frac { d\Phi }{ d\omega dA^{\perp } } \]</p>
 
-<p>\[ E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  } \]</p>
+<p>\[ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  } \]</p>
 
 <p>所以有：</p>
 
 <p>\[ d\Phi = L d\omega dA^{\perp } \]</p>
 
 <p>\[ 
-E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
+dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 = \frac {  L d\omega dA^{\perp }  cos\theta  }{ dA^{\perp }  }<br>
 = L d\omega cos\theta \]</p>
 
@@ -287,6 +313,8 @@ E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 <p>其中的\( cos\theta \)加绝对值是因为我们求的是半球的积分，立体角\(\omega \)和法向量的夹角必然是锐角，锐角的余弦值必然大于等于0。</p>
 
 <p>如果把式子中的\(d\omega \)替换成球形角(Sphere Angle)，则得到：</p>
+
+<p>\[ d\omega = sin\theta d\theta d\phi \]</p>
 
 <p>\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |sin\theta d\theta d\phi \]</p>
 
@@ -342,7 +370,21 @@ E = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 
 <p>能简化成这个式子的原因是，在做渲染器的时候，本来就是把t值固定的，即做动画渲染的话，也是把动画离散成一帧帧来渲染，对每一帧来说t值是常量值；而另外的λ值蕴含在颜色空间(XYZ RGB)中。</p>
 
-<p>到了这里，其实就可以总结一下了：渲染的目标就是得到一幅图上的每个像素点的辐射亮度值(L)，L值相当于RGB值。基于光线追踪的离线渲染中，是可以直接基于上面的渲染方程去做工程实现的。相比而言，实时渲染更多的是用各种trick技术来近似渲染方程。</p>
+<p>还有一个要说清楚的，就是这个方程3个部分的含义：</p>
+
+<p><img src="../images/2016.7/20.png" alt="20.png"></p>
+
+<p>为什么右边那坨是E？上文已经说过了:&quot;有特定方向时是L，无特定方向时是E&quot;,因为它是对L做整个半球的积分（注意，积分的是入射角度），也就是无特定方向，所以它是E。而另外2个分部都是指定了朝向了\(\omega _{o} \)（出射方向）的，所以是L。</p>
+
+<p>整个渲染方程可以说就是在求出射方向到底有多少辐射通量（为什么不是L？因为被渲染区域的面积一般都限定为单位面积，即等于1，所以L相当于\(\Phi \) )，辐射通量一旦确定就可以知道这个被渲染区域的颜色。</p>
+
+<p>基于光线追踪的离线渲染中，是可以直接基于上面的渲染方程去做工程实现的。（相比而言，实时渲染更多的是用各种trick技术来近似渲染方程。）</p>
+
+<h1>备注</h1>
+
+<p><a href="http://www.brucelindbloom.com/index.html?Equations.html">Useful Color Equations</a></p>
+
+<p><a href="http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html">RGB/XYZ Matrices</a></p>
 
   </div>
 
