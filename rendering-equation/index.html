@@ -163,13 +163,11 @@
 
 <p>(对于右边的输入值XYZ，也是有要求的，这是因为左边的\(RGB_{linear} \)的取值范围是[0,1]，所以右边的XYZ也需要做规范化。在我的下一篇文章中会介绍这部分。)</p>
 
-<p>得到的\(RGB_{linear} \)是线性空间的，在渲染器中可以直接使用。\(RGB_{linear} \)各个分量的取值范围都是[0.0, 1.0]，写入位图时需要乘以255并取整。</p>
-
-<p>顺带一提的是，这个得到的\(RGB_{linear} \)需要做一个gamma校正才能变成sRGB。公式如下：</p>
+<p>得到的\(RGB_{linear} \)是线性空间的，有什么意义呢？因为一般渲染器都是在线性空间下进行光照计算的，所以这个\(RGB_{linear} \)可直接用到光照等计算中。但是当要把最终的渲染结果输出时，例如写入到位图文件或显示到屏幕上，就需要对每个像素的\(RGB_{linear} \)做gamma校正，校正成sRGB，公式如下：</p>
 
 <p><img src="../images/2016.7/21.png" alt="21.png"></p>
 
-<p>对于渲染器来说并不需要做gamma校正，所以可跳过这个步骤。</p>
+<p>校正后的sRGB是单位化的，各个分量的取值范围是[0.0, 1.0]，输出时需要乘以255并取整。</p>
 
 <h3>RGB到XYZ</h3>
 
@@ -381,6 +379,10 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 <p>基于光线追踪的离线渲染中，是可以直接基于上面的渲染方程去做工程实现的。（相比而言，实时渲染更多的是用各种trick技术来近似渲染方程。）</p>
 
 <h1>参考资料</h1>
+
+<p><a href="http://blog.csdn.net/candycat1992/article/details/46228771">http://blog.csdn.net/candycat1992/article/details/46228771</a></p>
+
+<p><a href="http://www.poynton.com/GammaFAQ.html">http://www.poynton.com/GammaFAQ.html</a></p>
 
 <p><a href="http://www.poynton.com/PDFs/GammaFAQ.pdf">http://www.poynton.com/PDFs/GammaFAQ.pdf</a></p>
 
