@@ -7,6 +7,142 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;蒙特·卡罗积分公式&lt;/h2&gt;
+
+&lt;p&gt;对于一个连续函数f，它的积分公式为：&lt;/p&gt;
+
+&lt;p&gt;\[ F = \int _{a}^{b}f(x)dx \]&lt;/p&gt;
+
+&lt;p&gt;对应的，f的&lt;a href=&quot;https://en.wikipedia.org/wiki/Monte_Carlo_integration&quot;&gt;蒙特·卡罗积分公式&lt;/a&gt;如下：&lt;/p&gt;
+
+&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
+
+&lt;p&gt;蒙特卡罗最关键的就是理解这条公式了。其他延伸探讨都可以暂时忽略。那么这条公式如何理解呢？首先第一点是，虽然这条公式没有积分符号\(\int  \)，但是它认被称为&lt;strong&gt;积分&lt;/strong&gt;，这是因为这公式的作用相当于在对f(x)做积分，只不过不那么“精确”，即蒙特·卡罗积分是&lt;strong&gt;对理想积分的近似&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;那么这个近似是如何完成的？很简单，核心就是两个字：&lt;strong&gt;采样(Sampling)&lt;/strong&gt;。对一个连续函数的采样方法是在该函数的定义域中随机挑N个值，并求出对应的N个\( f(X_{i}) \)，就得到了样本集合。再对这些样本集合做一些换算，就可以得到一个近似的积分了。对于蒙特·卡罗积分，&lt;strong&gt;采样样本越多，就越逼近真实的积分结果&lt;/strong&gt;，这是蒙特·卡罗积分的最核心特性。&lt;/p&gt;
+
+&lt;p&gt;继续观察上面的公式，里面还有一个极其重要的参数：pdf(probability distribution function，概率分布函数)。pdf还有个近亲pmf，下面小节详解pdf、pmf的由来。&lt;/p&gt;
+
+&lt;h2&gt;pdf和pmf&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;pmf(probability mass function)，指的是&lt;strong&gt;离散的&lt;/strong&gt;随机变量的概率分布函数&lt;/li&gt;
+&lt;li&gt;pdf(probability distribution function)， 指的是&lt;strong&gt;连续的&lt;/strong&gt;随机变量的概率分布函数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;离散的随机变量X的数学期望为：&lt;/p&gt;
+
+&lt;p&gt;\[E[X] = \sum _{ x_{i} }pmf(x_{i})x_{i} \]&lt;/p&gt;
+
+&lt;p&gt;连续的随机变量X的数学期望为：&lt;/p&gt;
+
+&lt;p&gt;\[E[X] = \int ^{\infty }_{-\infty }pdf(x)xdx \]&lt;/p&gt;
+
+&lt;p&gt;pdf和pmf名字接近，含义也是接近。pdf、pmf函数的参数都是样本值x，返回值是概率，即表示一个样本出现的概率，所有样本的出现概率之和(概率的积分)应等于1。要注意的是，pdf、pmf的存在说明有可能每个样本的出现概率都是各不相同的。&lt;/p&gt;
+
+&lt;h3&gt;pmf&lt;/h3&gt;
+
+&lt;p&gt;pmf的简单例子就是&lt;strong&gt;基于均匀分布的离散的随机变量X&lt;/strong&gt;，此时\( pmf(X_{i}) \)恒等于\( \frac{1}{N} \)，含义是每个随机样本的出现概率等于\( \frac{1}{样本总数} \)。&lt;/p&gt;
+
+&lt;p&gt;通过这个例子也印证了pmf的性质：&lt;strong&gt;pmf函数的所有结果值之和等于1&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3&gt;pdf&lt;/h3&gt;
+
+&lt;p&gt;借用&lt;a href=&quot;http://www.scratchapixel.com/&quot;&gt;http://www.scratchapixel.com/&lt;/a&gt;的一个很好的例子来说明：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.8/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;这个例子中，目标问题是求出该函数[a,b]段曲线下方的面积(最后一幅图的黑色区域)，也就是要求该函数[a,b]段的积分。基于蒙特·卡罗积分的解法，就要用上面给出的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
+
+&lt;p&gt;在此图中，做了四次随机采样，得到了四个随机样本\( x_{i} \)：\( x_{1}、x_{2}、x_{3}、x_{4} \)，并且进而得到了这四个样本的\( f(x_{i}) \)值：\( f(x_{1})、f(x_{2})、f(x_{3})、f(x_{4}) \)。（原文没有提及如何得到\( f(x_{i}) \)。函数f是奇形怪状的，不太可能有表达式存在，难道是用尺子量的？暂且忽略这个事吧。）&lt;/p&gt;
+
+&lt;p&gt;有了这4个样本后，可以针对每一个样本求一个&lt;strong&gt;近似面积值&lt;/strong&gt;，这个面积值等于\( f(x_{i})  (b - a) \)。为什么可以这样做呢？是因为每一个单独的样本是对原函数f的近似，即在每个样本中，认为\( f(x) \)恒等于\( f(x_{i}) \)，从而让原函数曲线简化成一个矩形区域，而矩形的面积显然就是长(b-a)乘以宽\( f(x_{i}) \)。&lt;/p&gt;
+
+&lt;p&gt;得到4个&lt;strong&gt;近似面积值&lt;/strong&gt;后，再求出它们的均值(数学期望)，就完成了蒙特·卡罗积分。把上述流程汇总得到：&lt;/p&gt;
+
+&lt;p&gt;\[ Area = \frac {1}{4}(f(x_{1})(b - a) + f(x_{2})(b - a) + f(x_{3})(b - a) + f(x_{4})(b - a)) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \frac {1}{4}(b - a)( f(x_{1}) + f(x_{2}) + f(x_{3}) + f(x_{4}) ) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = \frac {1}{4}(b - a)\sum _{i=1}^{4}f(x_{i}) \]&lt;/p&gt;
+
+&lt;p&gt;此时，对比下蒙特·卡罗积分公式：&lt;/p&gt;
+
+&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
+
+&lt;p&gt;发现两个式子非常相似，对式子做下转换得到：&lt;/p&gt;
+
+&lt;p&gt;\[ Area =  \frac {1}{4}\sum _{i=1}^{4}\frac {f(x_{i})}{\frac {1}{b - a} } \]&lt;/p&gt;
+
+&lt;p&gt;于是可以知道\( pdf(x_{i}) \)等于：&lt;/p&gt;
+
+&lt;p&gt;\[ pdf(x_{i}) = \frac {1}{b - a } \]&lt;/p&gt;
+
+&lt;p&gt;这意味着，对于连续函数f，f的每个可能取值x的出现概率等于x的取值范围[a,b]的倒数\(\frac{1}{b-a}\)。&lt;/p&gt;
+
+&lt;p&gt;在实际应用场合，随机变量X要写成F(X)，即可能需要对X做一个转换再使用。这时候要注意F(X)的pdf不等于X的pdf。&lt;/p&gt;
+
+&lt;h2&gt;蒙特·卡罗积分的数学期望等于理想积分？&lt;/h2&gt;
+
+&lt;p&gt;对于下面的\(F\)和\(F^{N}\)：&lt;/p&gt;
+
+&lt;p&gt;\[ F = \int _{a}^{b}f(x)dx \]&lt;/p&gt;
+
+&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
+
+&lt;p&gt;是否随着N变大，\(F^{N}\)会逼近\(F\)？即\(F^{N}\)的数学期望是否等于\(F\)?&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&quot;&gt;Monte Carlo Methods in Practice&lt;/a&gt;文章中给出了推导过程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.8/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;第二行到第三行是最不好理解的。因为这里其实用到了新的知识点：&lt;a href=&quot;https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician&quot;&gt;Law of the unconscious statistician&lt;/a&gt;(简称：LOTUS)。LOTUS的应用情景是，已知随机变量X的概率分布，但不知道f(x)的分布，此时用LOTUS公式能计算出函数f(x)的数学期望。LOTUS的公式如下：&lt;/p&gt;
+
+&lt;p&gt;f(x)是离散函数时:&lt;/p&gt;
+
+&lt;p&gt;\[ E[f(X)] = \sum _{x_{i}}f(x_{i})pmf(x_{i}) \]&lt;/p&gt;
+
+&lt;p&gt;f(x)是连续函数时:&lt;/p&gt;
+
+&lt;p&gt;\[ E[f(X)] = \int _{-\infty }^{\infty}f(x)pdf(x)dx \]&lt;/p&gt;
+
+&lt;p&gt;(建议对比第二小节开头的两条公式来理解)&lt;/p&gt;
+
+&lt;p&gt;有了LOTUS公式，再来看第二行到第三行的转换，就好理解了：&lt;/p&gt;
+
+&lt;p&gt;\[ E[ \frac {f(X_{i})}{pdf(X_{i})} ] = E[ \frac {f(x)}{pdf(x)} ] =\int _{-\infty }^{\infty}\frac {f(x)}{pdf(x)}pdf(x)dx \]&lt;/p&gt;
+
+&lt;p&gt;\[ =\int _{-\infty }^{\infty}f(x)dx \]&lt;/p&gt;
+
+&lt;h2&gt;蒙特·卡罗积分在图形学中的应用&lt;/h2&gt;
+
+&lt;p&gt;经过上一小节对pmf、pdf的介绍和举例后，可以知道蒙特·卡罗积分公式是确实有用的，但在图形学中有什么地方会用到呢？&lt;/p&gt;
+
+&lt;p&gt;第一个用到的地方是&lt;strong&gt;计算着色点的间接光照&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;\( p(θ,ϕ)\) 被称为联合概率分布(joint probability distribution)。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Marginal_distribution&quot;&gt;边缘分布(marginal distribution)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Cumulative_distribution_function&quot;&gt;累积分布函数CDF(Cumulative distribution function)&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&quot;&gt;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&quot;&gt;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/expected-value-of-the-function-of-a-random-variable&quot;&gt;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/expected-value-of-the-function-of-a-random-variable&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 22 Aug 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/monte-carlo/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/monte-carlo/</guid>
+      </item>
+    
+      <item>
         <title>渲染基础理论的介绍(2)——工程实现</title>
         <description>&lt;!--more--&gt;
 
@@ -115,8 +251,35 @@
     &lt;span class=&quot;n&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.969256f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.875991f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.041556f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.055648f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.204043f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.057311f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;注意，这里得到的RGB是线性空间的RGB，并没有做gamma校正。gamma校正的公式如下:&lt;/p&gt;
 
-&lt;span class=&quot;err&quot;&gt;注意，这里得到的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RGB&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;是线性空间的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RGB&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;，并没有做&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;校正。&lt;/span&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2016.7/21.png&quot; alt=&quot;21.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;gamma校正应放在【线性空间】到【非线性空间】的转换时做，也就是最后输出时。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;c1&quot;&gt;//gamma校正&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GammaCorrect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0031308f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;12.92f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.055f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.4f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.055f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+
+&lt;span class=&quot;c1&quot;&gt;//Clamp函数&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Clamp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;low&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;high&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;low&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;low&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;high&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;high&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+
+&lt;span class=&quot;c1&quot;&gt;//RGB_linear转成sRGB&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Clamp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;255.f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GammaCorrect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;255.f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Clamp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;255.f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GammaCorrect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;255.f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Clamp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;255.f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GammaCorrect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;255.f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2&gt;参考资料&lt;/h2&gt;
 
@@ -238,13 +401,11 @@
 
 &lt;p&gt;(对于右边的输入值XYZ，也是有要求的，这是因为左边的\(RGB_{linear} \)的取值范围是[0,1]，所以右边的XYZ也需要做规范化。在我的下一篇文章中会介绍这部分。)&lt;/p&gt;
 
-&lt;p&gt;得到的\(RGB_{linear} \)是线性空间的，在渲染器中可以直接使用。\(RGB_{linear} \)各个分量的取值范围都是[0.0, 1.0]，写入位图时需要乘以255并取整。&lt;/p&gt;
-
-&lt;p&gt;顺带一提的是，这个得到的\(RGB_{linear} \)需要做一个gamma校正才能变成sRGB。公式如下：&lt;/p&gt;
+&lt;p&gt;得到的\(RGB_{linear} \)是线性空间的，有什么意义呢？因为一般渲染器都是在线性空间下进行光照计算的，所以这个\(RGB_{linear} \)可直接用到光照等计算中。但是当要把最终的渲染结果输出时，例如写入到位图文件或显示到屏幕上，就需要对每个像素的\(RGB_{linear} \)做gamma校正，校正成sRGB，公式如下：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;../images/2016.7/21.png&quot; alt=&quot;21.png&quot;&gt;&lt;/p&gt;
 
-&lt;p&gt;对于渲染器来说并不需要做gamma校正，所以可跳过这个步骤。&lt;/p&gt;
+&lt;p&gt;校正后的sRGB是单位化的，各个分量的取值范围是[0.0, 1.0]，输出时需要乘以255并取整。&lt;/p&gt;
 
 &lt;h3&gt;RGB到XYZ&lt;/h3&gt;
 
@@ -413,6 +574,8 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 
 &lt;p&gt;\[ = L_{i} (p,\theta ,\phi ) π  \]&lt;/p&gt;
 
+&lt;p&gt;注意，这个简化公式在渲染中很重要。因为当计算一个点到摄像机的Radiance，第一步就是先求这个点的入射E（求E的过程可以很复杂），当求出E之后，就可以认为这个点对任意方向的出射Radiance是均等的，也就是\( L = \frac {E}{\pi } \)。&lt;/p&gt;
+
 &lt;h1&gt;渲染方程 Rendering Equation&lt;/h1&gt;
 
 &lt;p&gt;把wiki的渲染方程贴进来：&lt;/p&gt;
@@ -455,7 +618,13 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 
 &lt;p&gt;基于光线追踪的离线渲染中，是可以直接基于上面的渲染方程去做工程实现的。（相比而言，实时渲染更多的是用各种trick技术来近似渲染方程。）&lt;/p&gt;
 
-&lt;h1&gt;备注&lt;/h1&gt;
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.csdn.net/candycat1992/article/details/46228771&quot;&gt;http://blog.csdn.net/candycat1992/article/details/46228771&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.poynton.com/GammaFAQ.html&quot;&gt;http://www.poynton.com/GammaFAQ.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.poynton.com/PDFs/GammaFAQ.pdf&quot;&gt;http://www.poynton.com/PDFs/GammaFAQ.pdf&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.brucelindbloom.com/index.html?Equations.html&quot;&gt;Useful Color Equations&lt;/a&gt;&lt;/p&gt;
 
@@ -1180,246 +1349,6 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
         <pubDate>Sun, 29 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-16/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-16/</guid>
-      </item>
-    
-      <item>
-        <title>矩阵微分（一）</title>
-        <description>&lt;h1&gt;基本认识&lt;/h1&gt;
-
-&lt;h2&gt;3种标准导数(梯度)公式&lt;/h2&gt;
-
-&lt;p&gt;1) 自变量是一个数值量(Scalar)时：&lt;/p&gt;
-
-&lt;p&gt;\[ Df(x) = \lim _{t\to 0} \frac {f(x+t)-f(t)}{t} \]&lt;/p&gt;
-
-&lt;p&gt;2) 自变量是一个向量(Vector)时：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{\textbf {w}}f(\textbf {x}) = \lim _{t\to 0} \frac {f(\textbf {x} + t\textbf {w}) - f(t)}{t} \]&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;(w的维数和x一致)&lt;/p&gt;
-
-&lt;p&gt;这个导数的含义是，在n维空间中f(x)所定义的(超)平面上的某个坐标点x相对于w的斜率。&lt;/p&gt;
-
-&lt;p&gt;3) 自变量是一个矩阵(Matrix)时：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \]&lt;/p&gt;
-
-&lt;p&gt;含义和2)类似。（已经无法想象了）&lt;/p&gt;
-
-&lt;h2&gt;矩阵迹(trace)的各种性质&lt;/h2&gt;
-
-&lt;h3&gt;性质1&lt;/h3&gt;
-
-&lt;p&gt;\[ tr(A) = tr(A^{T}) \]&lt;/p&gt;
-
-&lt;h3&gt;性质2&lt;/h3&gt;
-
-&lt;p&gt;\[ tr(AB) = tr(BA) \]&lt;/p&gt;
-
-&lt;p&gt;\[ tr(ABC) = tr(CAB) = tr(BCA) \]&lt;/p&gt;
-
-&lt;p&gt;\[ tr(ABCD) = tr(DABC) = tr(CDAB) = tr(BCDA) \]&lt;/p&gt;
-
-&lt;p&gt;(看出规律了吧)&lt;/p&gt;
-
-&lt;h3&gt;性质3&lt;/h3&gt;
-
-&lt;p&gt;\[ tr(A+B) = tr(A) + tr(B) \]&lt;/p&gt;
-
-&lt;h3&gt;性质4&lt;/h3&gt;
-
-&lt;p&gt;\[ tr(\alpha A) = \alpha tr(A) \]&lt;/p&gt;
-
-&lt;h3&gt;性质5&lt;/h3&gt;
-
-&lt;p&gt;设有矩阵H、U，H和U都是n x m的矩阵，则有：&lt;/p&gt;
-
-&lt;p&gt;\[ \sum _{j=1}^{m} \sum _{i=1}^{n}(h_{ij}u_{ij}) = \sum _{j=1}^{m} \sum _{i=1}^{n}((h^{T})_{ji}u_{ij}) = tr(H^{T}U) \]&lt;/p&gt;
-
-&lt;h1&gt;矩阵微分的各种性质&lt;/h1&gt;
-
-&lt;p&gt;设有关于矩阵A的一个函数f，记为\( f(A) \)，\( f(A) \)关于A的导数为：&lt;/p&gt;
-
-&lt;p&gt;\[  \nabla _{A}f(A) = \frac { \partial f(A) }{ \partial A } \]&lt;/p&gt;
-
-&lt;p&gt;\[  =  \left[ \begin{matrix} \frac {\partial f }{\partial A_{11}}&amp;amp;\frac {\partial f }{\partial A_{12}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{1n}}\\ \frac {\partial f }{\partial A_{21}}&amp;amp;\frac {\partial f }{\partial A_{22}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{2n}}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\ \frac {\partial f }{\partial A_{m1}}&amp;amp;\frac {\partial f }{\partial A_{m2}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{mn}}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;h2&gt;性质1&lt;/h2&gt;
-
-&lt;p&gt;\[ \nabla _{ A^{T} }f(A) = (\nabla _{A}f(A))^{T} \]&lt;/p&gt;
-
-&lt;p&gt;证明：&lt;/p&gt;
-
-&lt;p&gt;\[ \nabla _{ A^{T} }f(A) = \]&lt;/p&gt;
-
-&lt;p&gt;\[  =  \left[ \begin{matrix} \frac {\partial f }{\partial A_{11}}&amp;amp;\frac {\partial f }{\partial A_{21}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{m1}}\\ \frac {\partial f }{\partial A_{12}}&amp;amp;\frac {\partial f }{\partial A_{22}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{m2}}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\ \frac {\partial f }{\partial A_{1n}}&amp;amp;\frac {\partial f }{\partial A_{2n}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{mn}}\\ \end{matrix} \right] \]&lt;/p&gt;
-
-&lt;p&gt;\[  =  \left[ \begin{matrix} \frac {\partial f }{\partial A_{11}}&amp;amp;\frac {\partial f }{\partial A_{12}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{1n}}\\ \frac {\partial f }{\partial A_{21}}&amp;amp;\frac {\partial f }{\partial A_{22}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{2n}}\\ \vdots &amp;amp;\vdots &amp;amp;\ddots &amp;amp;\vdots \\ \frac {\partial f }{\partial A_{m1}}&amp;amp;\frac {\partial f }{\partial A_{m2}}&amp;amp;\cdots &amp;amp;\frac {\partial f }{\partial A_{mn}}\\ \end{matrix} \right]^{T} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = (\frac { \partial f(A) }{ \partial A })^{T}  = (\nabla _{A}f(A))^{T} \]&lt;/p&gt;
-
-&lt;h2&gt;性质2&lt;/h2&gt;
-
-&lt;p&gt;假设存在矩阵U，使得下面的等式成立：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} = tr(W^{T}U) \]&lt;/p&gt;
-
-&lt;p&gt;（这里要注意一下：中间的式子的分子包含矩阵，而分母只是一个t，那么这个极限的结果应仍然仍是一个矩阵，然而等式右边却是一个trace，trace是一个数。矩阵等于数？其实是可以的，譬如当f(X)是一个tr运算的时候。）&lt;/p&gt;
-
-&lt;p&gt;那么，对\( \textbf {W} \)中任意一个\(W_{ij} \)求导，则有：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{W_{ij}}f(\textbf {X}) = tr(W_{ij}^{T}U) = \sum _{j=1}^{} \sum _{i=1}^{}(w_{ij}u_{ij}) = u_{ij}  \]&lt;/p&gt;
-
-&lt;p&gt;这个结果可能有点费解。首先要明白\( W_{ij} \)是W矩阵的一个元素，是一个值(Scalar)，那么就可以确定这个导数也是一个值(Scalar)；对W矩阵的局部单个元素求导，其实按偏导数的概念理解即可，既然是偏导数，这就意味着除了存在\( w_{ij} \)的那一项之外的其他元素都被当做常数，而对常数求导必然等于0，所以最后会得到唯一的\( u_{ij}\)。(中间那一步用到了trace的性质5)&lt;/p&gt;
-
-&lt;p&gt;既然已经知道，对局部的\( W_{ij} \)求导会得到\( U_{ij}\)，那么分别对所有\( W_{ij} \)求导，并把各个求导结果再组成一个矩阵，就是U矩阵了。又因为W代表任意矩阵，所以f(X)关于X的导数等于U：&lt;/p&gt;
-
-&lt;p&gt;\[  \frac { \partial f(\textbf {X}) }{ \partial X } = \textbf {U} \]&lt;/p&gt;
-
-&lt;p&gt;这个式子的意义在于，当题目是“给你一个自变量是矩阵X的函数f(X),求它关于X的导数”时，可以把问题立即转变成求U，而U的求解，可以通过上面的标准导数公式来求。小结一下步骤：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;计算\( \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \)，并化简，直到得到一个形如\(tr(W^{T}Q) \)的式子；&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;根据\( \frac { \partial f(\textbf {X}) }{ \partial X } = \textbf {U} \)，可以知道\(tr(W^{T}Q) \) = \(tr(W^{T}U) \)， 于是就得到了\(\frac { \partial f(\textbf {X}) }{ \partial X } = U = Q \) 。&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;性质3&lt;/h2&gt;
-
-&lt;p&gt;\[ \frac { \partial tr(AX) }{ \partial X } = A^{T} \]&lt;/p&gt;
-
-&lt;p&gt;证明过程需要用到上面的性质2，刚好作为一个应用举例。&lt;/p&gt;
-
-&lt;p&gt;证明，设：&lt;/p&gt;
-
-&lt;p&gt;\[ f(X) = tr(AX)   \]&lt;/p&gt;
-
-&lt;p&gt;根据上面的结论，只需要把下面这个极限简化，理论上就可以求出 \( \frac { \partial tr(AX) }{ \partial X } \) 了：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(A(X + tW)) -  tr(AX) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AX + AtW) -  tr(AX) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AX) + tr(AtW) -  tr(AX) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AtW) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(AW)t }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} tr(AW) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr(AW) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr((AW)^{T}) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr(W^{T}A^{T}) \]&lt;/p&gt;
-
-&lt;p&gt;所以有：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{W}f(X) = tr(W^{T}A^{T}) = tr(W^{T}U)  \]&lt;/p&gt;
-
-&lt;p&gt;\[ U = A^{T} \]&lt;/p&gt;
-
-&lt;p&gt;得证：&lt;/p&gt;
-
-&lt;p&gt;\[ \frac { \partial tr(AX) }{ \partial X } = U =  A^{T}  \] &lt;/p&gt;
-
-&lt;h2&gt;性质4&lt;/h2&gt;
-
-&lt;p&gt;\[ \frac { \partial tr(X^{T}A^{T}) }{ \partial X } = A^{T} \]&lt;/p&gt;
-
-&lt;p&gt;有了性质3，就可以推导出这个：&lt;/p&gt;
-
-&lt;p&gt;\[ \frac { \partial tr(AX) }{ \partial X } =  A^{T}  \] &lt;/p&gt;
-
-&lt;p&gt;\[ \frac { \partial tr((AX)^{T}) }{ \partial X } =  A^{T}  \] &lt;/p&gt;
-
-&lt;p&gt;\[ \frac { \partial tr(X^{T}A^{T}) }{ \partial X } =  A^{T}  \] &lt;/p&gt;
-
-&lt;h2&gt;性质5&lt;/h2&gt;
-
-&lt;p&gt;\[ \nabla _{ X}tr(X) = tr(\nabla _{ X}X) \]&lt;/p&gt;
-
-&lt;p&gt;待证。&lt;/p&gt;
-
-&lt;h2&gt;性质6&lt;/h2&gt;
-
-&lt;p&gt;\[ \nabla _{ X}tr(AXBX^{T}C) = A^{T}C^{T}XB^{T} + CAXB \]&lt;/p&gt;
-
-&lt;p&gt;类似性质3的证明过程，只是复杂一些。设:&lt;/p&gt;
-
-&lt;p&gt;\[ f(X) = tr(AXBX^{T}C)  \]&lt;/p&gt;
-
-&lt;p&gt;\[ D_{\textbf {W}}f(\textbf {X}) = \lim _{t\to 0} \frac {f(\textbf {X}+t\textbf {W})-f(\textbf {X})}{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr(A(X + tW)B(X + tW)^{T}C) -  tr(AXBX^{T}C) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( A(X + tW)B(X + tW)^{T}C - AXBX^{T}C ) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( (AXB + tAWB)(X^{T}C + tW^{T}C) - AXBX^{T}C ) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( AXBX^{T}C + tAWBX^{T}C + tAXBW^{T}C + t^{2}AWBW^{T}C - AXBX^{T}C ) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( tAWBX^{T}C + tAXBW^{T}C + t^{2}AWBW^{T}C ) }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} \frac {  tr( AWBX^{T}C + AXBW^{T}C + tAWBW^{T}C )t }{t} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} [tr( AWBX^{T}C + AXBW^{T}C + tAWBW^{T}C )] \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} [tr( AWBX^{T}C + AXBW^{T}C)] + \lim _{t\to 0} [tr( tAWBW^{T}C )] \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{t\to 0} [tr( AWBX^{T}C + AXBW^{T}C)] \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr( AWBX^{T}C ) + tr( AXBW^{T}C ) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr( (AWBX^{T}C)^{T} ) + tr( AXBW^{T}C ) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr( C^{T}XB^{T}W^{T}A^{T} ) + tr( AXBW^{T}C ) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr( W^{T}A^{T}C^{T}XB^{T} ) + tr( W^{T}CAXB ) 【用了trace的性质2】 \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr( W^{T}A^{T}C^{T}XB^{T} + W^{T}CAXB ) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = tr( W^{T}  (A^{T}C^{T}XB^{T} + CAXB) ) \]&lt;/p&gt;
-
-&lt;p&gt;所以有：&lt;/p&gt;
-
-&lt;p&gt;\[ D_{W}f(X) = tr( W^{T}  (A^{T}C^{T}XB^{T} + CAXB) ) = tr(W^{T}U)  \]&lt;/p&gt;
-
-&lt;p&gt;得证：&lt;/p&gt;
-
-&lt;p&gt;\[ \frac { \partial tr(AXBX^{T}C) }{ \partial X } = U = A^{T}C^{T}XB^{T} + CAXB \]&lt;/p&gt;
-
-&lt;p&gt;在wiki&lt;a href=&quot;https://en.wikipedia.org/wiki/Matrix_calculus&quot;&gt;Matrix Calculus&lt;/a&gt;还给出了用性质5公式：\( \nabla _{ X}tr(X) = tr(\nabla _{ X}X) \)推导性质6。为了方便，把图也贴进来吧：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://upload.wikimedia.org/math/c/6/1/c61612bff41e8572a97d977871ce2be2.png&quot; alt=&quot;https://upload.wikimedia.org/math/c/6/1/c61612bff41e8572a97d977871ce2be2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://upload.wikimedia.org/math/1/e/7/1e761891d19891ff75670424341b8425.png&quot; alt=&quot;https://upload.wikimedia.org/math/1/e/7/1e761891d19891ff75670424341b8425.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;它最后得到的式子和我的推导似乎不一样，但其实是一样的，用trace的性质1\( tr(A) = tr(A^{T}) \)可以转换得到。&lt;/p&gt;
-
-&lt;h2&gt;性质7&lt;/h2&gt;
-
-&lt;p&gt;\[ \nabla _{ X}tr(XBX^{T}C) = C^{T}XB^{T} + CXB \]&lt;/p&gt;
-
-&lt;p&gt;证明：把性质6的A设为单位矩阵E，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ \nabla _{ X}tr(EXBX^{T}C) = E^{T}C^{T}XB^{T} + CEXB \]&lt;/p&gt;
-
-&lt;p&gt;化简得到：&lt;/p&gt;
-
-&lt;p&gt;\[ \nabla _{ X}tr(XBX^{T}C) = C^{T}XB^{T} + CXB \]&lt;/p&gt;
-
-&lt;h2&gt;参考资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.tc.umn.edu/%7Enydic001/docs/unpubs/Schonemann_Trace_Derivatives_Presentation.pdf&quot;&gt;http://www.tc.umn.edu/~nydic001/docs/unpubs/Schonemann_Trace_Derivatives_Presentation.pdf&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 08 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/matrix-calculus-1/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/matrix-calculus-1/</guid>
       </item>
     
   </channel>
