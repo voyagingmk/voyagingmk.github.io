@@ -7,7 +7,7 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用</title>
+        <title>蒙特·卡罗(Monte Carlo)积分详解</title>
         <description>&lt;!--more--&gt;
 
 &lt;h2&gt;蒙特·卡罗积分公式&lt;/h2&gt;
@@ -117,21 +117,7 @@
 
 &lt;p&gt;\[ =\int _{-\infty }^{\infty}f(x)dx \]&lt;/p&gt;
 
-&lt;h2&gt;蒙特·卡罗积分在图形学中的应用&lt;/h2&gt;
-
-&lt;p&gt;经过上一小节对pmf、pdf的介绍和举例后，可以知道蒙特·卡罗积分公式是确实有用的，但在图形学中有什么地方会用到呢？&lt;/p&gt;
-
-&lt;p&gt;第一个用到的地方是&lt;strong&gt;计算着色点的间接光照&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;\( p(θ,ϕ)\) 被称为联合概率分布(joint probability distribution)。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Marginal_distribution&quot;&gt;边缘分布(marginal distribution)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Cumulative_distribution_function&quot;&gt;累积分布函数CDF(Cumulative distribution function)&lt;/a&gt;&lt;/p&gt;
-
 &lt;h1&gt;参考资料&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&quot;&gt;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&quot;&gt;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&lt;/a&gt;&lt;/p&gt;
 

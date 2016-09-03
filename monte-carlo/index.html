@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>蒙特·卡罗(Monte Carlo)积分详解 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用" />
-    <meta property="twitter:title" content="蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用" />
+    <meta property="og:title" content="蒙特·卡罗(Monte Carlo)积分详解" />
+    <meta property="twitter:title" content="蒙特·卡罗(Monte Carlo)积分详解" />
     
 
     <!--[if lt IE 9]>
@@ -37,7 +37,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/monte-carlo/',
-		  'title': '蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用'
+		  'title': '蒙特·卡罗(Monte Carlo)积分详解'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -80,7 +80,7 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1>蒙特·卡罗(Monte Carlo)积分和其在图形学中的应用</h1>
+  <h1>蒙特·卡罗(Monte Carlo)积分详解</h1>
   <h3>Tags: <a href="/tag/math/" rel="tag">math</a></h3>
   <div class="entry">
     <!--more-->
@@ -192,21 +192,7 @@
 
 <p>\[ =\int _{-\infty }^{\infty}f(x)dx \]</p>
 
-<h2>蒙特·卡罗积分在图形学中的应用</h2>
-
-<p>经过上一小节对pmf、pdf的介绍和举例后，可以知道蒙特·卡罗积分公式是确实有用的，但在图形学中有什么地方会用到呢？</p>
-
-<p>第一个用到的地方是<strong>计算着色点的间接光照</strong>。</p>
-
-<p>\( p(θ,ϕ)\) 被称为联合概率分布(joint probability distribution)。</p>
-
-<p><a href="https://en.wikipedia.org/wiki/Marginal_distribution">边缘分布(marginal distribution)</a></p>
-
-<p><a href="https://en.wikipedia.org/wiki/Cumulative_distribution_function">累积分布函数CDF(Cumulative distribution function)</a></p>
-
 <h1>参考资料</h1>
-
-<p><a href="http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation">http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation</a></p>
 
 <p><a href="http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration">http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration</a></p>
 
