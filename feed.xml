@@ -7,6 +7,199 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>蒙特·卡罗(Monte Carlo)积分在图形学中的应用</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h1&gt;计算着色点的间接光照&lt;/h1&gt;
+
+&lt;p&gt;在计算一个着色点的间接光照时，理论上可以通过从着色点往上半球各个方向发射无数条光线，并计算这些光线返回的Rdiance值，就可以得到这个着色点的间接光照。但因为计算机的计算速度问题，不可能给一个着色点生成“无数”条光线，在工程实现上必然是得做成有限数量的光线，且很悲哀的，这个数量值不会很大。&lt;/p&gt;
+
+&lt;p&gt;那么如何用有限的光线，得到最真实的间接光照值呢？答案是用蒙特·卡罗积分。蒙特·卡罗积分的特性是，采样数越多就越接近真实积分值，而这正是做间接光照计算所需要的。譬如我们可以根据实际需求，设置采样数量，数量大就出图慢、精度高，数量小就出图快但粗糙。&lt;/p&gt;
+
+&lt;p&gt;下面开始数学环节。&lt;/p&gt;
+
+&lt;h2&gt;计算间接光照的蒙特·卡罗方法&lt;/h2&gt;
+
+&lt;p&gt;生成间接光照的各个光线时，需要有一个随机变量\(\omega \)，这个随机变量就是光线的“出射角度”，更严格地说应该是“&lt;a href=&quot;http://www.qiujiawei.com/solid-angle/&quot;&gt;立体角&lt;/a&gt;”。&lt;/p&gt;
+
+&lt;p&gt;对于一个半球，它的总立体角是2π，那么关于\(\omega \)的pdf函数记为\(p(\omega ) \)，而在上一篇文章中我们知道pdf的积分等于1，所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ \int _{\omega = 0 }^{2π}p(\omega )d\omega = 1 \]&lt;/p&gt;
+
+&lt;p&gt;又因为我们希望\(\omega \)是符合均匀分布的，从而使得间接光照采样是概率无偏的，那么\(p(\omega ) \)是一个常数：&lt;/p&gt;
+
+&lt;p&gt;\[ p(\omega ) = C \]&lt;/p&gt;
+
+&lt;p&gt;\[ C\int _{\omega = 0 }^{2π}d\omega = 1 \]&lt;/p&gt;
+
+&lt;p&gt;这个方程是可以解出来的:&lt;/p&gt;
+
+&lt;p&gt;\[ C\int _{\omega = 0 }^{2π}d\omega = C(2π - 0 ) =  1 \]&lt;/p&gt;
+
+&lt;p&gt;\[  p(\omega ) = C = \frac {1}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;成功解决了第一个事情：&lt;strong&gt;随机变量\(\omega \)的pdf函数&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;下一个问题是：&lt;strong&gt;把立体角\(\omega \)转换成球形角\(\phi 、\theta  \)，从而方便实际计算&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;p&gt;\[  p(\omega ) d\omega =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;其中，\(d\omega \)的转换方法在&lt;a href=&quot;http://www.qiujiawei.com/solid-angle/&quot;&gt;立体角(Solid Angle)详解&lt;/a&gt;中已经阐述过了，公式为：&lt;/p&gt;
+
+&lt;p&gt;\[ d\omega = sin\theta d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[  p(\omega ) d\omega =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[  p(\omega ) sin\theta d\theta d\phi =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[  \frac {1}{2π} sin\theta d\theta d\phi =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
+
+&lt;p&gt;\[  \frac {1}{2π} sin\theta  =  p(\theta , \phi)  \]&lt;/p&gt;
+
+&lt;p&gt;\[  p(\theta , \phi) = \frac {sin\theta}{2π}  \]&lt;/p&gt;
+
+&lt;p&gt;\( p(θ,ϕ)\) 被称为联合概率分布(joint probability distribution)。此时，我们需要实现对θ,ϕ各自的独立采样，所以需要把\( p(θ,ϕ)\)拆分开，求出\( p(θ)\) 和 \( p(ϕ) \)。幸运地是，有简单的方法可以实现同样的效果，那就是用&lt;a href=&quot;https://en.wikipedia.org/wiki/Marginal_distribution&quot;&gt;边缘分布(marginal distribution)&lt;/a&gt;。计算过程如下：&lt;/p&gt;
+
+&lt;p&gt;\[ p(θ) = \int _{\phi = 0}^{2π}p(θ,ϕ)d\phi = \int _{\phi = 0}^{2π}\frac {sin\theta}{2π}d\phi = 2π \frac {sin\theta}{2π} =sin\theta \]&lt;/p&gt;
+
+&lt;p&gt;\[ p(ϕ) = \int _{θ = 0}^{ \frac {π}{2} }p(θ,ϕ)dθ = \int _{ θ = 0}^{ \frac {π}{2} }\frac {sin\theta}{2π}dθ = \frac {-cos\theta}{2π} | _{0}^{\frac {π}{2}}= \frac {-cos \frac {π}{2} }{2π} - \frac {-cos0 }{2π} = \frac {1}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;\(p(ϕ)\)也可以用联合概率公式来求解：&lt;/p&gt;
+
+&lt;p&gt;\[ p(ϕ) =\frac {p(θ,ϕ)}{p(θ)} =  \frac { \frac {sin\theta}{2π}  }{ sin\theta }  = \frac {1}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;到了这里，事情还没完，还有2个东西要学习：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Cumulative_distribution_function&quot;&gt;CDF, Cumulative distribution function&lt;/a&gt; 和 &lt;a href=&quot;https://en.wikipedia.org/wiki/Inverse_transform_sampling&quot;&gt;Inverse transform sampling&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h2&gt;CDF 累积分布函数&lt;/h2&gt;
+
+&lt;p&gt;公式如下：&lt;/p&gt;
+
+&lt;p&gt;\[ CDF(x) = P( -\infty &amp;lt; X \leq x ) \]&lt;/p&gt;
+
+&lt;p&gt;大写X是指随机变量，小写x指的是参数，P是概率函数，因此CDF(x)的含义是，&lt;strong&gt;随机变量X的值小于等于x的概率&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;对于连续随机变量X，CDF可以用积分形式表示：&lt;/p&gt;
+
+&lt;p&gt;\[ CDF(s) = \int _{-\infty }^{s}pdf(x)dx \]&lt;/p&gt;
+
+&lt;p&gt;从基本定义延伸出来的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ P(a &amp;lt; x \leq b) = CDF(b) - CDF(a) = \int _{ a }^{b}pdf(x)dx  \]&lt;/p&gt;
+
+&lt;p&gt;CDF的性质：&lt;/p&gt;
+
+&lt;p&gt;\[ \lim _{x\to -\infty }CDF(x) = 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ \lim _{x\to +\infty }CDF(x) = 1 \]&lt;/p&gt;
+
+&lt;p&gt;实例，取值范围是[0,1]的随机变量X的CDF：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.8/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;CDF一般也可以用\(F_{X}\)表示。&lt;/p&gt;
+
+&lt;h2&gt;Inverse transform sampling 逆采样方法&lt;/h2&gt;
+
+&lt;p&gt;步骤一：获得一个均布分布的随机变量u，这个u必须落在[0,1]范围内，并把这个u解释为“概率值”（概率的范围也是[0,1])。&lt;/p&gt;
+
+&lt;p&gt;步骤二：获得一个CDF(x)函数&lt;/p&gt;
+
+&lt;p&gt;步骤三：计算使得下面的不等式成立的x的最大值：&lt;/p&gt;
+
+&lt;p&gt;\[ CDF(x) = P( -\infty &amp;lt; X \leq x ) = F_{X}(x) &amp;lt; u \]&lt;/p&gt;
+
+&lt;p&gt;因为&lt;strong&gt;逆采样&lt;/strong&gt;本质上是一个函数，变量是u，解是x，所以用这个不等式来表达逆采样方法是不方便的，更常见的做法是用\(F_{X}^{-1}(u) \)来表示&lt;strong&gt;逆采样&lt;/strong&gt;。\(F_{X}^{-1}(u) \)的完整表达式一般用&lt;a href=&quot;https://en.wikipedia.org/wiki/Infimum_and_supremum&quot;&gt;下确界或上确界&lt;/a&gt;等式表示：&lt;/p&gt;
+
+&lt;p&gt;上确界形式：&lt;/p&gt;
+
+&lt;p&gt;\[ F_{X}^{-1}(u) = \sup \lbrace F_{X}(x) &amp;lt; u \rbrace \]&lt;/p&gt;
+
+&lt;p&gt;下确界形式：&lt;/p&gt;
+
+&lt;p&gt;\[ F_{X}^{-1}(u) = \inf \lbrace F_{X}(x) \geq u \rbrace \]&lt;/p&gt;
+
+&lt;p&gt;\(F_{X}^{-1}(u) \)的重要性质：u的每一个取值都有唯一的x与之对应。使得这个性质的原因是CDF是一个递增的函数。&lt;/p&gt;
+
+&lt;p&gt;因此，在实际应用中，可以先随机一个u，再通过CDF函数计算出对应的x，又因为u是均匀采样(uniform sample)的，于是x也是均匀采样的。&lt;/p&gt;
+
+&lt;h2&gt;再回到间接光照的问题&lt;/h2&gt;
+
+&lt;p&gt;前面已经得到了\( p(θ)\) 和 \( p(ϕ) \):&lt;/p&gt;
+
+&lt;p&gt;\[ p(θ) = sin\theta \]&lt;/p&gt;
+
+&lt;p&gt;\[ p(ϕ) = \frac {1}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;现在可以推导它们的CDF函数了：&lt;/p&gt;
+
+&lt;p&gt;\[ CDF(θ) = \int _{0 }^{θ}p(θ)dθ = \int _{0 }^{θ}sin\theta dθ = (-cos\theta) |_{0}^{θ}  = -cos\theta - (-cos0) = 1 - cos\theta \]&lt;/p&gt;
+
+&lt;p&gt;\[ CDF(ϕ) = \int _{0 }^{ϕ}p(ϕ)dϕ = \int _{0 }^{ϕ}\frac {1}{2π}dϕ = \frac {1}{2π}\int _{0 }^{ϕ}dϕ = \frac {ϕ}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;即：&lt;/p&gt;
+
+&lt;p&gt;\[ F_{θ}(θ) = 1 - cos\theta  \]&lt;/p&gt;
+
+&lt;p&gt;\[ F_{ϕ}(ϕ) = \frac {ϕ}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;然后就是推导这两个CDF的逆采样公式，设：&lt;/p&gt;
+
+&lt;p&gt;\[ u_{1} = 1 - cos\theta \]&lt;/p&gt;
+
+&lt;p&gt;\[ cos\theta = 1 - u_{1}  \]&lt;/p&gt;
+
+&lt;p&gt;\[ \theta = cos^{-1}(1 - u_{1})  \]&lt;/p&gt;
+
+&lt;p&gt;即：&lt;/p&gt;
+
+&lt;p&gt;\[ F_{θ}^{-1}(u_{1}) = cos^{-1}(1 - u_{1}) \]&lt;/p&gt;
+
+&lt;p&gt;再设：&lt;/p&gt;
+
+&lt;p&gt;\[ u_{2} = \frac {ϕ}{2π} \]&lt;/p&gt;
+
+&lt;p&gt;\[ ϕ = u_{2}2π  \]&lt;/p&gt;
+
+&lt;p&gt;即：&lt;/p&gt;
+
+&lt;p&gt;\[ F_{ϕ}^{-1}(u_{2}) =  u_{2}2π   \]&lt;/p&gt;
+
+&lt;p&gt;汇总一下：&lt;/p&gt;
+
+&lt;p&gt;\[ F_{θ}^{-1}(u_{1}) = cos^{-1}(1 - u_{1}) \]&lt;/p&gt;
+
+&lt;p&gt;\[ F_{ϕ}^{-1}(u_{2}) =  u_{2}2π   \]&lt;/p&gt;
+
+&lt;p&gt;总结一下：只要生成2个在[0,1]范围的符合均匀分布的随机数\( u_{1}、u_{2}\)，就可以得到均匀分布的\(θ、ϕ\)了，就是这么简单。&lt;/p&gt;
+
+&lt;p&gt;有了\(θ、ϕ\)后，就可以代入3维的极坐标公式，得到3维的笛卡尔坐标：&lt;/p&gt;
+
+&lt;p&gt;\[ x= sinθ cosϕ \]&lt;/p&gt;
+
+&lt;p&gt;\[ y= cosθ \]&lt;/p&gt;
+
+&lt;p&gt;\[ z= sinθ sinϕ \]&lt;/p&gt;
+
+&lt;p&gt;坐标(x,y,z)必然落在圆心在原点、半径为1、法向量为(0,1,0)的半球的球面。&lt;/p&gt;
+
+&lt;p&gt;有了(x,y,z)坐标，就可以生成沿着半球面的均匀的出射光线了。之后的就是光线追踪的问题了。本文不表。&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&quot;&gt;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Infimum_and_supremum&quot;&gt;https://en.wikipedia.org/wiki/Infimum_and_supremum&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 03 Sep 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/monte-carlo2/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/monte-carlo2/</guid>
+      </item>
+    
+      <item>
         <title>蒙特·卡罗(Monte Carlo)积分详解</title>
         <description>&lt;!--more--&gt;
 
@@ -1236,105 +1429,6 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
         <pubDate>Mon, 30 May 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/linear-algebra-17/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-17/</guid>
-      </item>
-    
-      <item>
-        <title>线性代数之伪逆矩阵(pseudoinverse matrix)</title>
-        <description>&lt;p&gt;众所周知只有方阵才有逆矩阵，非方阵没有逆矩阵。这个不和谐的问题已在20世纪初被数学家&lt;a href=&quot;https://en.wikipedia.org/wiki/E._H._Moore&quot;&gt;E. H. Moore&lt;/a&gt;等人解决掉了，因为他们发明了&lt;strong&gt;一般化的逆矩阵(generalized inverse)&lt;/strong&gt;，也称为&lt;strong&gt;伪逆矩阵(Moore–Penrose pseudoinverse)&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h1&gt;定义&lt;/h1&gt;
-
-&lt;p&gt;对于任意一个矩阵A，A的伪逆矩阵\(A ^{+} \)必然存在，且\(A ^{+} \)必然满足以下四个条件：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;\( AA ^{+}A = A \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( A ^{+}AA ^{+} = A ^{+} \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( (AA ^{+})^{*} = AA ^{+} \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( (A ^{+}A)^{*} = A ^{+}A \)&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;这四个条件(性质)蕴含了一个事情：\(AA ^{+} \)必然是一个效果等同单位矩阵I、但又不是单位矩阵I的矩阵。&lt;/p&gt;
-
-&lt;p&gt;伪逆矩阵\( A ^{+} \)的极限形式定义：&lt;/p&gt;
-
-&lt;p&gt;\[ A^{+} = \lim _{\delta \searrow 0} ( A^{*}A + \delta I ) ^{-1}A^{*} \]&lt;/p&gt;
-
-&lt;p&gt;\[  = \lim _{\delta \searrow 0}A^{*} ( A^{*}A + \delta I ) ^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;伪逆矩阵更加常用的定义（基于SVD奇异值分解）：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;SVD公式：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ A = UΣV^{*} \]&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;伪逆矩阵公式：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\[ A^{+} = VΣ^{+}U^{*} \]&lt;/p&gt;
-
-&lt;p&gt;这个公式要注意的是中间的\(Σ^{+}\)的求法。因为\(Σ_{m\times n}\)是一个对角线矩阵，但又不一定是方阵，所以计算它的伪逆矩阵的步骤是特殊又简单的：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;将对角线上的元素取倒数&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;再将整个矩阵转置一次&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h1&gt;性质&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;当A可逆时，A的伪逆矩阵等于A的逆矩阵&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;零矩阵的伪逆矩阵是它的转置矩阵&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( (A^{+})^{+} = A \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( (A^{+})^{T} = (A^{T})^{+} \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( ( \overline {A} )^{+} =  \overline { A^{+} } \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( (A^{*})^{+}  = (A^{+})^{*} \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( (\alpha A)^{+}  = \alpha ^{-1}A^{+} \)，\(\alpha \)不等于0&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;应用：最小二乘估计&lt;/h1&gt;
-
-&lt;p&gt;在我的&lt;a href=&quot;http://www.qiujiawei.com/linear-algebra-15/&quot;&gt;最小二乘估计(Least Squares Estimator)的公式的推导&lt;/a&gt;一文中，提到了一个小问题，&lt;strong&gt;当矩阵X不是方阵时，最小二乘估计公式必须为&lt;/strong&gt;：&lt;/p&gt;
-
-&lt;p&gt;\[ \vec a = (X^{T}X)^{-1}X^{T}\vec y  \]&lt;/p&gt;
-
-&lt;p&gt;不能进一步简化，除非X是有逆矩阵的方阵。&lt;/p&gt;
-
-&lt;p&gt;这个事情也可以用伪逆矩阵来讨论一遍。&lt;/p&gt;
-
-&lt;p&gt;先回到问题本源——最小二乘估计的本质是解决下面的方程：&lt;/p&gt;
-
-&lt;p&gt;\[ \vec y = X\vec a + \vec e \]&lt;/p&gt;
-
-&lt;p&gt;其中\(\vec y\)和\(X\)是已知量，\(\vec a\)和\(\vec e\)是要求的量，这可能有0到n个解，而我们的目标是想找使得\( ||\vec e||_{2}\)最小的\(\vec a\)。&lt;/p&gt;
-
-&lt;p&gt;当我们求得理想的\(\vec a\)、\(\vec e\)后，可以让\(\vec e = \vec 0\)，并把\(\vec a\)、\(\vec e\)代入原方程，从而得到下面的等式：&lt;/p&gt;
-
-&lt;p&gt;\[ \widehat {\vec y} = X\vec a \]&lt;/p&gt;
-
-&lt;p&gt;求得的\( \widehat {\vec y} \)就是\( \vec y  \)的最佳近似。&lt;/p&gt;
-
-&lt;p&gt;再换个角度想——如果我们一开始就默认方程\( \vec y = X\vec a  \)有解，那么这个解就是：&lt;/p&gt;
-
-&lt;p&gt;\[ \vec a = X^{-1}\vec y \]&lt;/p&gt;
-
-&lt;p&gt;慢着！\(  X^{-1} \)可不一定存在的，因为X不一定是方阵，所以上面这个等式是错误的。怎么办？这时候伪逆矩阵就派上用场了：&lt;/p&gt;
-
-&lt;p&gt;\[ \vec a = X^{+}\vec y \]&lt;/p&gt;
-
-&lt;p&gt;因为伪逆矩阵对任意矩阵都存在，所以这个等式才是合理的。&lt;/p&gt;
-
-&lt;h1&gt;参考资料&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_pseudoinverse#Singular_value_decomposition_.28SVD.29&quot;&gt;Moore–Penrose pseudoinverse&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 29 May 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/linear-algebra-16/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/linear-algebra-16/</guid>
       </item>
     
   </channel>
