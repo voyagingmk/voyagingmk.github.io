@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://www.qiujiawei.com/redblacktree-2/</loc>
+<lastmod>2016-10-07T00:00:00+08:00</lastmod>
+</url>
+<url>
+<loc>http://www.qiujiawei.com/redblacktree-1/</loc>
+<lastmod>2016-10-07T00:00:00+08:00</lastmod>
+</url>
+<url>
+<loc>http://www.qiujiawei.com/monte-carlo2/</loc>
+<lastmod>2016-09-03T00:00:00+08:00</lastmod>
+</url>
+<url>
+<loc>http://www.qiujiawei.com/monte-carlo/</loc>
+<lastmod>2016-08-22T00:00:00+08:00</lastmod>
+</url>
+<url>
 <loc>http://www.qiujiawei.com/rendering-equation2/</loc>
 <lastmod>2016-08-16T00:00:00+08:00</lastmod>
 </url>
@@ -318,8 +334,11 @@
 <loc>http://www.qiujiawei.com/tag/computer-graphics/</loc>
 </url>
 <url>
+<loc>http://www.qiujiawei.com/tag/data-structure/</loc>
+</url>
+<url>
 <loc>http://www.qiujiawei.com/baidu_verify_3Zt6QmbPGO.html</loc>
-<lastmod>2016-07-03T12:51:25+08:00</lastmod>
+<lastmod>2016-06-13T13:36:03+08:00</lastmod>
 </url>
 <url>
 <loc>http://www.qiujiawei.com/google65d92e3c601ae492.html</loc>
