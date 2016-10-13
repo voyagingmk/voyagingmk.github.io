@@ -7,10 +7,32 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>细说红黑树(2)-基本操作</title>
+        <title>细说红黑树(3)-基本操作之Delete</title>
         <description>&lt;!--more--&gt;
 
-&lt;p&gt;本文争取用精简的文字描述清楚红黑树的各种基本操作：插入、删除、查询。&lt;/p&gt;
+&lt;p&gt;本文争取用精简的文字描述清楚红黑树的各种基本操作：插入、&lt;strong&gt;删除&lt;/strong&gt;、查询。&lt;/p&gt;
+
+&lt;p&gt;在开始下文之前，再次祭出红黑树的四大性质：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;根节点是黑色&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;叶子节点（NULL）视为黑色节点&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如果一个节点是红色，那么它的2个孩子节点都是黑色&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;对于每条从根节点出发、并到达叶子节点的路径，路径上黑色节点的数量一致（叶子节点也计算在内）&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Delete&lt;/h1&gt;
+</description>
+        <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/redblacktree-3/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/redblacktree-3/</guid>
+      </item>
+    
+      <item>
+        <title>细说红黑树(2)-基本操作之Insert</title>
+        <description>&lt;!--more--&gt;
+
+&lt;p&gt;本文争取用精简的文字描述清楚红黑树的各种基本操作：&lt;strong&gt;插入&lt;/strong&gt;、删除、查询。&lt;/p&gt;
 
 &lt;p&gt;在开始下文之前，再次祭出红黑树的四大性质：&lt;/p&gt;
 
@@ -35,7 +57,7 @@
 
 &lt;p&gt;2.插入的节点的父节点是&lt;strong&gt;黑&lt;/strong&gt;色&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;img src=&quot;../images/2016.10/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;img src=&quot;../images/2016.10/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;插入红节点，并不影响性质4。无需调整红黑树。&lt;/strong&gt;&lt;/p&gt;
 
@@ -49,12 +71,7 @@
 
 &lt;p&gt;这个步骤被称为&lt;strong&gt;Recoloring&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/6.png&quot; alt=&quot;6.png&quot;&gt;
-&lt;img src=&quot;../images/2016.10/arrow.png&quot; alt=&quot;arrow.png&quot;&gt;
-&lt;img src=&quot;../images/2016.10/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/arrow.png&quot; alt=&quot;arrow.png&quot;&gt;
-&lt;img src=&quot;../images/2016.10/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;3b.叔节点是&lt;strong&gt;黑&lt;/strong&gt;色&lt;/li&gt;
@@ -64,15 +81,45 @@
 
 &lt;p&gt;i) Left-Left&lt;/p&gt;
 
-&lt;p&gt;ii) Left-Right&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
 
-&lt;p&gt;iii) Right-Left&lt;/p&gt;
+&lt;p&gt;步骤：&lt;/p&gt;
 
-&lt;p&gt;iiii) Right-Right&lt;/p&gt;
+&lt;p&gt;1）&lt;strong&gt;右&lt;/strong&gt;旋转g&lt;/p&gt;
+
+&lt;p&gt;2）交换g和p的颜色&lt;/p&gt;
+
+&lt;p&gt;ii) Right-Right&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/6.png&quot; alt=&quot;6.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;步骤：&lt;/p&gt;
+
+&lt;p&gt;1）&lt;strong&gt;左&lt;/strong&gt;旋转g&lt;/p&gt;
+
+&lt;p&gt;2）交换g和p的颜色&lt;/p&gt;
+
+&lt;p&gt;可以注意到，整个步骤和Left-Left非常相似，其实就是Left-Left的水平镜像。&lt;/p&gt;
+
+&lt;p&gt;iii) Left-Right&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;可以用一个旋转操作把这个case转换成Left-Left的case，步骤如下：&lt;/p&gt;
+
+&lt;p&gt;1）&lt;strong&gt;左&lt;/strong&gt;旋转p&lt;/p&gt;
+
+&lt;p&gt;iiii) Right-Left&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;可以用一个旋转操作把这个case转换成Right-Right的case，步骤如下：&lt;/p&gt;
+
+&lt;p&gt;1）&lt;strong&gt;右&lt;/strong&gt;旋转p&lt;/p&gt;
 
 &lt;h2&gt;资料&lt;/h2&gt;
 
-&lt;p&gt;本文配图来自：&lt;a href=&quot;https://www.cs.usfca.edu/%7Egalles/visualization/RedBlack.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/RedBlack.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;本文配图使用yEd编辑：&lt;a href=&quot;http://www.yworks.com/products/yed/download&quot;&gt;http://www.yworks.com/products/yed/download&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.geeksforgeeks.org/red-black-tree-set-2-insert/&quot;&gt;http://www.geeksforgeeks.org/red-black-tree-set-2-insert/&lt;/a&gt;&lt;/p&gt;
 </description>
@@ -1279,51 +1326,6 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
         <pubDate>Fri, 01 Jul 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/line-plane-intersection/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/line-plane-intersection/</guid>
-      </item>
-    
-      <item>
-        <title>Global Gamejam 2016 和 IndieAce Gamejam 2016 作品</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h1&gt;Global Gamejam&lt;/h1&gt;
-
-&lt;p&gt;本次主题，一个词：&lt;/p&gt;
-
-&lt;h2&gt;&lt;strong&gt;Ritual&lt;/strong&gt;&lt;/h2&gt;
-
-&lt;p&gt;我们根据题目做出来的游戏：《阴阳合》&lt;/p&gt;
-
-&lt;p&gt;游戏截图：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.6/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;试玩地址：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://yinyang.qiujiawei.com/&quot;&gt;http://yinyang.qiujiawei.com/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1&gt;IndieACE Gamejam&lt;/h1&gt;
-
-&lt;p&gt;本次主题，一幅画：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.6/1.jpg&quot; alt=&quot;1.jpg&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;我们根据题目做出来的游戏：《人，造人》&lt;/p&gt;
-
-&lt;p&gt;游戏截图：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.6/3.jpg&quot; alt=&quot;3.jpg&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;试玩地址：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://voyagingmk.github.io/IndieACEGamejam2016/&quot;&gt;https://voyagingmk.github.io/IndieACEGamejam2016/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1&gt;后记&lt;/h1&gt;
-
-&lt;p&gt;GGJ一般是年初的时候举办，IndieACE的GJ一般是年中的时候举办。目前国内搞得好的、一般人能接触到的只有这2个GJ吧。&lt;/p&gt;
-</description>
-        <pubDate>Mon, 27 Jun 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/gamejam/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/gamejam/</guid>
       </item>
     
   </channel>

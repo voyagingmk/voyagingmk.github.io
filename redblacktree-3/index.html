@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>细说红黑树(2)-基本操作之Insert – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>细说红黑树(3)-基本操作之Delete – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="细说红黑树(2)-基本操作之Insert" />
-    <meta property="twitter:title" content="细说红黑树(2)-基本操作之Insert" />
+    <meta property="og:title" content="细说红黑树(3)-基本操作之Delete" />
+    <meta property="twitter:title" content="细说红黑树(3)-基本操作之Delete" />
     
 
     <!--[if lt IE 9]>
@@ -36,8 +36,8 @@
 
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
-		  'page': '/redblacktree-2/',
-		  'title': '细说红黑树(2)-基本操作之Insert'
+		  'page': '/redblacktree-3/',
+		  'title': '细说红黑树(3)-基本操作之Delete'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -80,12 +80,12 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1>细说红黑树(2)-基本操作之Insert</h1>
+  <h1>细说红黑树(3)-基本操作之Delete</h1>
   <h3>Tags: <a href="/tag/data-structure/" rel="tag">data structure</a></h3>
   <div class="entry">
     <!--more-->
 
-<p>本文争取用精简的文字描述清楚红黑树的各种基本操作：<strong>插入</strong>、删除、查询。</p>
+<p>本文争取用精简的文字描述清楚红黑树的各种基本操作：插入、<strong>删除</strong>、查询。</p>
 
 <p>在开始下文之前，再次祭出红黑树的四大性质：</p>
 
@@ -96,85 +96,7 @@
 <li><p>对于每条从根节点出发、并到达叶子节点的路径，路径上黑色节点的数量一致（叶子节点也计算在内）</p></li>
 </ol>
 
-<h1>Insert</h1>
-
-<p>插入操作的第一个准则是，<strong>插入的节点先设置为红色</strong>，插入后根据插入的节点在树中的<strong>位置</strong>以及树的<strong>着色状态</strong>，可以划分出多种情况，这些情况总结如下：</p>
-
-<p>（注意，在以下所有情况中，在节点插入前红黑树是平衡的，即使从图片上看并不能看出平衡性）</p>
-
-<p>1.插入的节点是根节点</p>
-
-<p><img src="../images/2016.10/2.png" alt="2.png"></p>
-
-<p><strong>显然无需调整红黑树。</strong></p>
-
-<p>2.插入的节点的父节点是<strong>黑</strong>色</p>
-
-<p><img src="../images/2016.10/3.png" alt="3.png"></p>
-
-<p><strong>插入红节点，并不影响性质4。无需调整红黑树。</strong></p>
-
-<p>3.插入的节点的父节点是<strong>红</strong>色</p>
-
-<ul>
-<li>3a.叔节点（即父节点的兄弟节点）也是<strong>红</strong>色</li>
-</ul>
-
-<p>这种情况下，需要把<strong>父、叔节点变为黑色，并把祖父节点变为红色</strong>，这样就保证了当前局部范围内红黑树性质能够被满足，但因为祖父节点被改变了颜色，所以事情还没完，需要<strong>递归</strong>本步骤（即把祖父节点当做是插入的节点），直到到达根节点。</p>
-
-<p>这个步骤被称为<strong>Recoloring</strong>。</p>
-
-<p><img src="../images/2016.10/4.png" alt="4.png"></p>
-
-<ul>
-<li>3b.叔节点是<strong>黑</strong>色</li>
-</ul>
-
-<p>当处于这个情况下，根据<strong>父节点相对祖父节点的位置（Left or Right）和  插入节点相对父节点的位置（Left or Right）</strong>，总共有四种细分状态：</p>
-
-<p>i) Left-Left</p>
-
-<p><img src="../images/2016.10/5.png" alt="5.png"></p>
-
-<p>步骤：</p>
-
-<p>1）<strong>右</strong>旋转g</p>
-
-<p>2）交换g和p的颜色</p>
-
-<p>ii) Right-Right</p>
-
-<p><img src="../images/2016.10/6.png" alt="6.png"></p>
-
-<p>步骤：</p>
-
-<p>1）<strong>左</strong>旋转g</p>
-
-<p>2）交换g和p的颜色</p>
-
-<p>可以注意到，整个步骤和Left-Left非常相似，其实就是Left-Left的水平镜像。</p>
-
-<p>iii) Left-Right</p>
-
-<p><img src="../images/2016.10/7.png" alt="7.png"></p>
-
-<p>可以用一个旋转操作把这个case转换成Left-Left的case，步骤如下：</p>
-
-<p>1）<strong>左</strong>旋转p</p>
-
-<p>iiii) Right-Left</p>
-
-<p><img src="../images/2016.10/8.png" alt="8.png"></p>
-
-<p>可以用一个旋转操作把这个case转换成Right-Right的case，步骤如下：</p>
-
-<p>1）<strong>右</strong>旋转p</p>
-
-<h2>资料</h2>
-
-<p>本文配图使用yEd编辑：<a href="http://www.yworks.com/products/yed/download">http://www.yworks.com/products/yed/download</a></p>
-
-<p><a href="http://www.geeksforgeeks.org/red-black-tree-set-2-insert/">http://www.geeksforgeeks.org/red-black-tree-set-2-insert/</a></p>
+<h1>Delete</h1>
 
   </div>
 
