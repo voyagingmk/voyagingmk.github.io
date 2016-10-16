@@ -7,6 +7,123 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>forwarder开发备忘</title>
+        <description>&lt;h1&gt;cmake&lt;/h1&gt;
+
+&lt;h3&gt;1.windows下安装cmake&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://cmake.org/files/v3.7/cmake-3.7.0-rc1-win64-x64.msi&quot;&gt;https://cmake.org/files/v3.7/cmake-3.7.0-rc1-win64-x64.msi&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;顺便可以下载cmake源码，源码里面有一个tests目录，有很多cmake工程可以参考，譬如官网的tutorials教程的代码都在tests里面了。&lt;/p&gt;
+
+&lt;h3&gt;2.手写CMakeLists.txt&lt;/h3&gt;
+
+&lt;p&gt;本文不谈cmake-gui的使用，原因是这东西界面有点怪，其次是cmake作为跨平台的构建系统，理应学习使用cmake的命令行模式，命令都是一致的，而cmake-gui是windows独有的。&lt;/p&gt;
+
+&lt;p&gt;那么，在执行cmake构建指令前，需要在forwarder项目根目录下手写一个CMakeLists.txt文件。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;cmake_minimum_required&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VERSION&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;project&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forwarder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;# The version number.&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FORWARDER_VERSION_MAJOR&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FORWARDER_VERSION_MINOR&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;include_directories&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${PROJECT_SOURCE_DIR}/include&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;include_directories&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${PROJECT_SOURCE_DIR}/enet&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;add_subdirectory&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;enet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EXTRA_LIBS&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EXTRA_LIBS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;libenet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;# add the executable&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;add_executable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forwarder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cpp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;target_link_libraries&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forwarder&lt;/span&gt;  &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EXTRA_LIBS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;（这里推荐用vscode来编辑CMakeLists.txt，vscode有编辑CMakeLists.txt文件的插件，支持语法高亮和智能提示，很爽）&lt;/p&gt;
+
+&lt;h3&gt;3.构建&lt;/h3&gt;
+
+&lt;p&gt;forwarder项目目前用到了2个第三方库，一个是enet，一个是spdlog。&lt;/p&gt;
+
+&lt;p&gt;spdlog的源码都在头文件里，直接把源码包含进来就可以了。&lt;/p&gt;
+
+&lt;p&gt;enet则用静态链接的方式引入。需要把enet的源码都放在子目录&lt;strong&gt;enet&lt;/strong&gt;里，然后在enet目录再手写一个CMakeLists.txt：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;cmake_minimum_required&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VERSION&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;project&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;libenet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;# The version number.&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ENET_VERSION_MAJOR&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ENET_VERSION_MINOR&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;include_directories&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${PROJECT_SOURCE_DIR}/include&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;include_directories&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${PROJECT_SOURCE_DIR}/src&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GLOB&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;libenet_SRC&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;src/*.c&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;add_library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;libenet&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;STATIC&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;libenet_SRC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;target_link_libraries&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;libenet&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;winmm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ws2_32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;（这个CMakeLists.txt是作为根目录CMakeLists.txt的孩子存在的，由根目录的CMakeLists.txt来调用。）&lt;/p&gt;
+
+&lt;p&gt;有了这2个个CMakeLists.txt后，在根目录新建一个文件夹叫build，然后cmd进入这个目录，并执行：&lt;/p&gt;
+
+&lt;p&gt;cmake ..&lt;/p&gt;
+
+&lt;p&gt;就会自动在build目录生成visual studio项目，启动forwarder.sln，点生成解决方案，如果没报错，就说明构建成功了。&lt;/p&gt;
+
+&lt;h1&gt;docker&lt;/h1&gt;
+
+&lt;p&gt;用docker来测试forwarder在linux系统下的运行情况，非常方便。&lt;/p&gt;
+
+&lt;h3&gt;1.首先windows安装docker：&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.docker.com/products/overview&quot;&gt;https://www.docker.com/products/overview&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;2.然后设置share目录：&lt;/h3&gt;
+
+&lt;p&gt;docker安装完毕后在任务栏会有一个图标，右键然后点setting：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/11.png&quot; alt=&quot;11.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2016.10/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;注意红圈的内容，提示了我们开启share目录后，怎么在docker中用（其实就是-v指令）。&lt;/p&gt;
+
+&lt;h3&gt;3.然后在cmd中执行：&lt;/h3&gt;
+
+&lt;p&gt;docker run --rm -it -v D:/workplace/forwarder:/data ubuntu:latest&lt;/p&gt;
+
+&lt;p&gt;run代表启动一个container；&lt;/p&gt;
+
+&lt;p&gt;最后的参数ubuntu:latest代表使用ubuntu的最新版本镜像(image)&lt;/p&gt;
+
+&lt;p&gt;其中的-rm作用是exit时会自动删除这个container；&lt;/p&gt;
+
+&lt;p&gt;-it作用是设置成交互模式(interactive)；&lt;/p&gt;
+
+&lt;p&gt;-v D:/workplace/forwarder:/data，是把windows的共享目录D:/workplace/forwarder 映射到container中的/data目录。&lt;/p&gt;
+
+&lt;p&gt;第一次执行时，会从docker官方服务器下载ubuntu:latest镜像到本地，所以会比较慢。&lt;/p&gt;
+
+&lt;p&gt;执行成功后，就进入这个临时生成的ubuntu的控制台啦！&lt;/p&gt;
+
+&lt;h3&gt;4.在ubuntu中安装cmake并构建forward&lt;/h3&gt;
+
+&lt;p&gt;需要先执行:&lt;/p&gt;
+
+&lt;p&gt;apt-get update&lt;/p&gt;
+
+&lt;p&gt;然后安装cmake&lt;/p&gt;
+
+&lt;p&gt;apt-get install -y cmake=3.5&lt;/p&gt;
+</description>
+        <pubDate>Sun, 16 Oct 2016 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/forwarder-buildsystem/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/forwarder-buildsystem/</guid>
+      </item>
+    
+      <item>
         <title>细说红黑树(3)-基本操作之Delete</title>
         <description>&lt;!--more--&gt;
 
@@ -22,6 +139,14 @@
 &lt;/ol&gt;
 
 &lt;h1&gt;Delete&lt;/h1&gt;
+
+&lt;p&gt;首先，我感到不开心的一件事是，我发现红黑树的删除逻辑之复杂（比Insert还要复杂！），让红黑树变得不那么完美了。不过下文还是会慢慢介绍整个删除算法。&lt;/p&gt;
+
+&lt;p&gt;红黑树的Delete，需要用到一个新的概念：Double-Black，即删除目标节点后，把另一个节点标记为&lt;strong&gt;双黑&lt;/strong&gt;，然后通过把它调整成&lt;strong&gt;单黑&lt;/strong&gt;，从而不破坏红黑树的性质。&lt;/p&gt;
+
+&lt;h1&gt;资料&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/&quot;&gt;http://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/redblacktree-3/</link>
@@ -122,6 +247,8 @@
 &lt;p&gt;本文配图使用yEd编辑：&lt;a href=&quot;http://www.yworks.com/products/yed/download&quot;&gt;http://www.yworks.com/products/yed/download&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.geeksforgeeks.org/red-black-tree-set-2-insert/&quot;&gt;http://www.geeksforgeeks.org/red-black-tree-set-2-insert/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;红黑树测试程序：&lt;a href=&quot;https://www.cs.usfca.edu/%7Egalles/visualization/RedBlack.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/RedBlack.html&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/redblacktree-2/</link>
@@ -1162,170 +1289,6 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
         <pubDate>Sat, 09 Jul 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/solid-angle/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/solid-angle/</guid>
-      </item>
-    
-      <item>
-        <title>直线与平面相交算法</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h1&gt;平面的方程&lt;/h1&gt;
-
-&lt;p&gt;设位于平面P上的某个点为\( \vec p_{0} \)(已知量)，平面P的法向量为\( \vec n \)(已知量)，该平面P的任意一点设为\( \vec p \)，则平面P的方程为：&lt;/p&gt;
-
-&lt;p&gt;\[ (\vec p -  \vec p_{0} )\cdot \vec n = 0 \]&lt;/p&gt;
-
-&lt;p&gt;使得这个方程成立的原理是，位于平面P上的任意一个向量\( (\vec p -  \vec p_{0} ) \)，必然和平面P的法向量垂直，互相垂直的向量的点积必然为0。&lt;/p&gt;
-
-&lt;h1&gt;直线的方程&lt;/h1&gt;
-
-&lt;p&gt;设位于直线上的某个点为\( \vec o \)(已知量)，直线的方向向量为\( \vec d \)(已知量)，直线上的任意一点为\( \vec p \)，则直线的方程为:&lt;/p&gt;
-
-&lt;p&gt;\[ \vec p = \vec o + t\vec d, t\in R \]&lt;/p&gt;
-
-&lt;p&gt;注意，式子右边的t是一个Scalar（一个实数），这个t决定了\(\vec p\)的位置。&lt;/p&gt;
-
-&lt;h1&gt;直线与平面的相交&lt;/h1&gt;
-
-&lt;p&gt;直线与平面的相交，必然是一个点。将上面的直线方程代入平面方程，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ ( \vec o + t\vec d -  \vec p_{0} )\cdot \vec n = 0  \]&lt;/p&gt;
-
-&lt;p&gt;其中，\( \vec o 、\vec d 、\vec p_{0} 、\vec n \)都是已知量，只有t是未知量，&lt;strong&gt;所以求直线与平面的相交点等同于求t的值&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;化简这个式子，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ t\vec d \cdot \vec n + (\vec o -  \vec p_{0} )\cdot \vec n = 0  \]&lt;/p&gt;
-
-&lt;p&gt;\[ t\vec d \cdot \vec n = ( \vec p_{0} - \vec o )\cdot \vec n  \]&lt;/p&gt;
-
-&lt;p&gt;\[ t = \frac { ( \vec p_{0} - \vec o )\cdot \vec n }{ \vec d \cdot \vec n }  \]&lt;/p&gt;
-
-&lt;h1&gt;实例 (基于三维坐标系)&lt;/h1&gt;
-
-&lt;p&gt;本小节的实例是结合实际需求设计的。在3D图形学中，直线与平面相交算法一般是应用到了光线与包围盒的相交判定问题中。&lt;/p&gt;
-
-&lt;p&gt;那么下面就设直线为任意直线(光线都是任意方向的)，而平面设为某几种特定的特殊平面，来展示上面的算法的流程。&lt;/p&gt;
-
-&lt;h2&gt;1. 法向量为\( (1,0,0) \)并且经过点\( (x_{0},0,0) \)的平面&lt;/h2&gt;
-
-&lt;p&gt;根据上面的定义，可以知道：&lt;/p&gt;
-
-&lt;p&gt;\[ \vec n =  (1,0,0)  \]&lt;/p&gt;
-
-&lt;p&gt;\[ \vec p_{0} =  (x_{0},0,0)  \]&lt;/p&gt;
-
-&lt;p&gt;代入上面的方程，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ t = \frac { ( (x_{0},0,0) - \vec o )\cdot (1,0,0) }{ \vec d \cdot (1,0,0) }  \]&lt;/p&gt;
-
-&lt;p&gt;化简得到：&lt;/p&gt;
-
-&lt;p&gt;\[ t = \frac { x_{0} -  o_{x} }{ d_{x} }  \]&lt;/p&gt;
-
-&lt;h2&gt;2. 法向量为\( (0,1,0) \)并且经过点\( (0,y_{0},0) \)的平面&lt;/h2&gt;
-
-&lt;p&gt;同上，可以得到：&lt;/p&gt;
-
-&lt;p&gt;\[ t = \frac { y_{0} -  o_{y} }{ d_{y} }  \]&lt;/p&gt;
-
-&lt;h2&gt;3. 法向量为\( (0,0,1) \)并且经过点\( (0,0,z_{0}) \)的平面&lt;/h2&gt;
-
-&lt;p&gt;同上，可以得到：&lt;/p&gt;
-
-&lt;p&gt;\[ t = \frac { z_{0} -  o_{z} }{ d_{z} }  \]&lt;/p&gt;
-
-&lt;h1&gt;应用，判定直线与BBox是否相交&lt;/h1&gt;
-
-&lt;p&gt;BBox是一个分别和x、y、z轴平行的长方体。在判定直线与BBox是否相交的问题中，要把BBox想象成6个无限大的平面，每个平面称为一个slab。然后就可以应用上面的公式，计算直线与6个slab的相交点(即，算出t值)，根据t值，就可以知道直线是不是和BBox相交了。&lt;/p&gt;
-
-&lt;h2&gt;2维的情况&lt;/h2&gt;
-
-&lt;p&gt;以此图为例：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.7/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;图中的红色区域是一个BBox，一般定义一个BBox只需要记录它的2个对角顶点的坐标值即可。图中BBox的左下顶点坐标为(3,1)，右上顶点坐标为(6,3)；&lt;/p&gt;
-
-&lt;p&gt;图中绿色直线的方程为 y = x - 1。&lt;/p&gt;
-
-&lt;p&gt;BBox的4个slab分别为:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;法向量为\( (1,0) \)并且经过点\( (3,0) \)的直线a&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;法向量为\( (1,0) \)并且经过点\( (6,0) \)的直线b&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;法向量为\( (0,1) \)并且经过点\( (0,1) \)的直线c&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;法向量为\( (0,1) \)并且经过点\( (0,3) \)的直线d&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;绿色直线的o和d分别为：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;o = (1,0)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;d = (1,1)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;根据上面的交点公式，可以知道绿色直线与4个slab的相交点A、B、C、D，它们的t值分别为：&lt;/p&gt;
-
-&lt;p&gt;\[ t_{A} = \frac { x_{0} -  o_{x} }{ d_{x} }  = \frac { 3 - 1 }{ 1 } = 2  \]&lt;/p&gt;
-
-&lt;p&gt;\[ t_{B} = \frac { x_{1} -  o_{x} }{ d_{x} }  = \frac { 6 - 1 }{ 1 } = 5  \]&lt;/p&gt;
-
-&lt;p&gt;\[ t_{C} = \frac { y_{0} -  o_{y} }{ d_{y} }  = \frac { 1 - 0 }{ 1 } = 1  \]&lt;/p&gt;
-
-&lt;p&gt;\[ t_{D} = \frac { y_{1} -  o_{y} }{ d_{y} }  = \frac { 3 - 0 }{ 1 } = 3  \]&lt;/p&gt;
-
-&lt;p&gt;得到这4个t值之后，怎么知道相交还是不相交呢？这需要分析一下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;\( t_{A} \)、\( t_{B} \)的意义是：对于在BBox内的任意一个点P，它的分量x关于直线的t值，必然在\( [ t_{A} ,  t_{B} ] \)之间；&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( t_{C} \)、\( t_{D} \)的意义是：对于在BBox内的任意一个点P，它的分量y关于直线的t值，必然在\( [ t_{C} ,  t_{D} ] \)之间；&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;结合例子来说就是：若BBox内存在一个点P，它的x、y分量的t值分别满足\( 2 \leq t_{x} \leq 5 \)、\( 1 \leq t_{y} \leq 3 \)时，这个BBox就必然与直线y = x - 1相交。&lt;/p&gt;
-
-&lt;p&gt;但是这个方案并不是最佳方案。&lt;/p&gt;
-
-&lt;p&gt;接着分析下。&lt;/p&gt;
-
-&lt;p&gt;因为我们给直线定义了o和d，所以直线的另一个表达式是 \(\vec o + t\vec d\)。根据这个表达式，\( t_{A} \)、\( t_{B} \) 和  \( t_{C} \)、\( t_{D} \)有了新的意义：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;\( t_{A} \)、\( t_{B} \)限定了一条在直线上的有限长度线段\( \overline {AB} \)，起点是\(\vec o + t_{A}\vec d \)，终点是\(\vec o + t_{B}\vec d \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( t_{C} \)、\( t_{D} \)限定了一条在直线上的有限长度线段\( \overline {CD} \)，起点是\(\vec o + t_{C}\vec d \)，终点是\(\vec o + t_{D}\vec d \)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;于是，判定直线与BBox是否相交的充分必要条件呼之欲出：&lt;strong&gt;s1和s2两个线段存在重叠&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.7/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;图中的黑色线段即为\( \overline {AB} \)、\( \overline {CD} \)的重叠部分。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.7/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;对于直线y = x + 1来说，就不存在重叠部分了。&lt;/p&gt;
-
-&lt;h2&gt;3维的情况&lt;/h2&gt;
-
-&lt;p&gt;理解了2维的情况，3维（甚至更高维）的情况类推就可以了。完整的算法流程是：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BBox&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IsIntersectWithRay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Ray&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//x y z&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;invRayDir&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tNear&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pMin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;invRayDir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tFar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pMax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;invRayDir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tNear&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tFar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;swap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tNear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tFar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;t0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tNear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tFar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
-            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-        <pubDate>Fri, 01 Jul 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/line-plane-intersection/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/line-plane-intersection/</guid>
       </item>
     
   </channel>

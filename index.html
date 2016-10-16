@@ -74,10 +74,132 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/least-squares/" class="set-1">Least Squares</a> <a href="/tag/c%2B%2B/" class="set-3">c++</a> <a href="/tag/calculus/" class="set-1">calculus</a> <a href="/tag/computer-graphics/" class="set-1">computer graphics</a> <a href="/tag/curve/" class="set-1">curve</a> <a href="/tag/data-structure/" class="set-1">data structure</a> <a href="/tag/fourier/" class="set-1">fourier</a> <a href="/tag/gamejam/" class="set-1">gamejam</a> <a href="/tag/jekyll/" class="set-1">jekyll</a> <a href="/tag/leetcode/" class="set-4">leetcode</a> <a href="/tag/life/" class="set-1">life</a> <a href="/tag/linear-algebra/" class="set-5">linear algebra</a> <a href="/tag/math/" class="set-4">math</a> <a href="/tag/matrix/" class="set-5">matrix</a> <a href="/tag/ml/" class="set-1">ml</a> <a href="/tag/nopoll/" class="set-1">nopoll</a> <a href="/tag/opengl/" class="set-1">opengl</a> <a href="/tag/pbrt/" class="set-1">pbrt</a> <a href="/tag/quaternion/" class="set-1">quaternion</a> <a href="/tag/raytrace/" class="set-1">raytrace</a> <a href="/tag/shader/" class="set-1">shader</a>
+  <a href="/tag/c%2B%2B/" class="set-1">C++</a> <a href="/tag/c%2B%2B/" class="set-3">c++</a> <a href="/tag/calculus/" class="set-1">calculus</a> <a href="/tag/computer-graphics/" class="set-1">computer graphics</a> <a href="/tag/curve/" class="set-1">curve</a> <a href="/tag/data-structure/" class="set-1">data structure</a> <a href="/tag/fourier/" class="set-1">fourier</a> <a href="/tag/gamejam/" class="set-1">gamejam</a> <a href="/tag/jekyll/" class="set-1">jekyll</a> <a href="/tag/leetcode/" class="set-4">leetcode</a> <a href="/tag/life/" class="set-1">life</a> <a href="/tag/linear-algebra/" class="set-5">linear algebra</a> <a href="/tag/math/" class="set-4">math</a> <a href="/tag/matrix/" class="set-5">matrix</a> <a href="/tag/ml/" class="set-1">ml</a> <a href="/tag/nopoll/" class="set-1">nopoll</a> <a href="/tag/opengl/" class="set-1">opengl</a> <a href="/tag/pbrt/" class="set-1">pbrt</a> <a href="/tag/quaternion/" class="set-1">quaternion</a> <a href="/tag/raytrace/" class="set-1">raytrace</a> <a href="/tag/shader/" class="set-1">shader</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/forwarder-buildsystem/">forwarder开发备忘</a></h1>
+      <div class="date">
+        Written on October 16, 2016
+      </div>
+      <div class="entry">
+        <h1>cmake</h1>
+
+<h3>1.windows下安装cmake</h3>
+
+<p><a href="https://cmake.org/files/v3.7/cmake-3.7.0-rc1-win64-x64.msi">https://cmake.org/files/v3.7/cmake-3.7.0-rc1-win64-x64.msi</a></p>
+
+<p>顺便可以下载cmake源码，源码里面有一个tests目录，有很多cmake工程可以参考，譬如官网的tutorials教程的代码都在tests里面了。</p>
+
+<h3>2.手写CMakeLists.txt</h3>
+
+<p>本文不谈cmake-gui的使用，原因是这东西界面有点怪，其次是cmake作为跨平台的构建系统，理应学习使用cmake的命令行模式，命令都是一致的，而cmake-gui是windows独有的。</p>
+
+<p>那么，在执行cmake构建指令前，需要在forwarder项目根目录下手写一个CMakeLists.txt文件。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">cmake_minimum_required</span> <span class="p">(</span><span class="n">VERSION</span> <span class="mf">2.6</span><span class="p">)</span>
+<span class="n">project</span> <span class="p">(</span><span class="n">forwarder</span><span class="p">)</span>
+
+<span class="cp"># The version number.</span>
+<span class="n">set</span> <span class="p">(</span><span class="n">FORWARDER_VERSION_MAJOR</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">set</span> <span class="p">(</span><span class="n">FORWARDER_VERSION_MINOR</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">include_directories</span><span class="p">(</span><span class="s">&quot;${PROJECT_SOURCE_DIR}/include&quot;</span><span class="p">)</span>
+
+<span class="n">include_directories</span><span class="p">(</span><span class="s">&quot;${PROJECT_SOURCE_DIR}/enet&quot;</span><span class="p">)</span>
+<span class="n">add_subdirectory</span> <span class="p">(</span><span class="n">enet</span><span class="p">)</span>
+<span class="n">set</span> <span class="p">(</span><span class="n">EXTRA_LIBS</span> <span class="err">$</span><span class="p">{</span><span class="n">EXTRA_LIBS</span><span class="p">}</span> <span class="n">libenet</span><span class="p">)</span>
+
+<span class="cp"># add the executable</span>
+<span class="n">add_executable</span><span class="p">(</span><span class="n">forwarder</span> <span class="n">main</span><span class="p">.</span><span class="n">cpp</span><span class="p">)</span>
+<span class="n">target_link_libraries</span> <span class="p">(</span><span class="n">forwarder</span>  <span class="err">$</span><span class="p">{</span><span class="n">EXTRA_LIBS</span><span class="p">})</span>
+</code></pre></div>
+<p>（这里推荐用vscode来编辑CMakeLists.txt，vscode有编辑CMakeLists.txt文件的插件，支持语法高亮和智能提示，很爽）</p>
+
+<h3>3.构建</h3>
+
+<p>forwarder项目目前用到了2个第三方库，一个是enet，一个是spdlog。</p>
+
+<p>spdlog的源码都在头文件里，直接把源码包含进来就可以了。</p>
+
+<p>enet则用静态链接的方式引入。需要把enet的源码都放在子目录<strong>enet</strong>里，然后在enet目录再手写一个CMakeLists.txt：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">cmake_minimum_required</span> <span class="p">(</span><span class="n">VERSION</span> <span class="mf">2.6</span><span class="p">)</span>
+<span class="n">project</span> <span class="p">(</span><span class="n">libenet</span><span class="p">)</span>
+
+<span class="cp"># The version number.</span>
+<span class="n">set</span> <span class="p">(</span><span class="n">ENET_VERSION_MAJOR</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">set</span> <span class="p">(</span><span class="n">ENET_VERSION_MINOR</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">include_directories</span><span class="p">(</span><span class="s">&quot;${PROJECT_SOURCE_DIR}/include&quot;</span><span class="p">)</span>
+<span class="n">include_directories</span><span class="p">(</span><span class="s">&quot;${PROJECT_SOURCE_DIR}/src&quot;</span><span class="p">)</span>
+
+
+<span class="n">file</span><span class="p">(</span><span class="n">GLOB</span> <span class="n">libenet_SRC</span> <span class="s">&quot;src/*.c&quot;</span><span class="p">)</span>
+<span class="n">add_library</span><span class="p">(</span><span class="n">libenet</span> <span class="n">STATIC</span> <span class="err">$</span><span class="p">{</span><span class="n">libenet_SRC</span><span class="p">})</span>
+
+
+<span class="n">target_link_libraries</span> <span class="p">(</span><span class="n">libenet</span> <span class="n">winmm</span><span class="p">.</span><span class="n">lib</span> <span class="n">ws2_32</span><span class="p">.</span><span class="n">lib</span><span class="p">)</span>
+</code></pre></div>
+<p>（这个CMakeLists.txt是作为根目录CMakeLists.txt的孩子存在的，由根目录的CMakeLists.txt来调用。）</p>
+
+<p>有了这2个个CMakeLists.txt后，在根目录新建一个文件夹叫build，然后cmd进入这个目录，并执行：</p>
+
+<p>cmake ..</p>
+
+<p>就会自动在build目录生成visual studio项目，启动forwarder.sln，点生成解决方案，如果没报错，就说明构建成功了。</p>
+
+<h1>docker</h1>
+
+<p>用docker来测试forwarder在linux系统下的运行情况，非常方便。</p>
+
+<h3>1.首先windows安装docker：</h3>
+
+<p><a href="https://www.docker.com/products/overview">https://www.docker.com/products/overview</a></p>
+
+<h3>2.然后设置share目录：</h3>
+
+<p>docker安装完毕后在任务栏会有一个图标，右键然后点setting：</p>
+
+<p><img src="../images/2016.10/11.png" alt="11.png"></p>
+
+<p><img src="../images/2016.10/10.png" alt="10.png"></p>
+
+<p>注意红圈的内容，提示了我们开启share目录后，怎么在docker中用（其实就是-v指令）。</p>
+
+<h3>3.然后在cmd中执行：</h3>
+
+<p>docker run --rm -it -v D:/workplace/forwarder:/data ubuntu:latest</p>
+
+<p>run代表启动一个container；</p>
+
+<p>最后的参数ubuntu:latest代表使用ubuntu的最新版本镜像(image)</p>
+
+<p>其中的-rm作用是exit时会自动删除这个container；</p>
+
+<p>-it作用是设置成交互模式(interactive)；</p>
+
+<p>-v D:/workplace/forwarder:/data，是把windows的共享目录D:/workplace/forwarder 映射到container中的/data目录。</p>
+
+<p>第一次执行时，会从docker官方服务器下载ubuntu:latest镜像到本地，所以会比较慢。</p>
+
+<p>执行成功后，就进入这个临时生成的ubuntu的控制台啦！</p>
+
+<h3>4.在ubuntu中安装cmake并构建forward</h3>
+
+<p>需要先执行:</p>
+
+<p>apt-get update</p>
+
+<p>然后安装cmake</p>
+
+<p>apt-get install -y cmake=3.5</p>
+
+      </div>
+
+      <a href="/forwarder-buildsystem/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 

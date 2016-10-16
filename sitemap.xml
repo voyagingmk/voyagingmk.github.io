@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://www.qiujiawei.com/forwarder-buildsystem/</loc>
+<lastmod>2016-10-16T00:00:00+08:00</lastmod>
+</url>
+<url>
 <loc>http://www.qiujiawei.com/redblacktree-3/</loc>
 <lastmod>2016-10-07T00:00:00+08:00</lastmod>
 </url>
@@ -326,9 +330,6 @@
 <loc>http://www.qiujiawei.com/tag/shader/</loc>
 </url>
 <url>
-<loc>http://www.qiujiawei.com/tag/least-squares/</loc>
-</url>
-<url>
 <loc>http://www.qiujiawei.com/tag/calculus/</loc>
 </url>
 <url>
@@ -339,6 +340,9 @@
 </url>
 <url>
 <loc>http://www.qiujiawei.com/tag/data-structure/</loc>
+</url>
+<url>
+<loc>http://www.qiujiawei.com/tag/c++/</loc>
 </url>
 <url>
 <loc>http://www.qiujiawei.com/baidu_verify_3Zt6QmbPGO.html</loc>
