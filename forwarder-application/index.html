@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>forwarder的应用 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="" />
+    <meta property="og:description" content="" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="forwarder的应用" />
+    <meta property="twitter:title" content="forwarder的应用" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/forwarder-application/',
+		  'title': 'forwarder的应用'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>forwarder的应用</h1>
+  <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
+  <div class="entry">
+    <!--more-->
+
+<p><img src="../images/2017.4/2.jpg" alt="2.jpg"></p>
+
+<p>这是我在开发的游戏的通信架构图。</p>
+
+<p>这里面除开GS和数据库后端的连接，其他连接都基于forwarder。</p>
+
+<p>下面的客户端C连接，涵盖了三大平台：web、ios、android客户端。都可以通过forwarder和服务器通讯。</p>
+
+<p>这套系统已经熬过了压力测试。之前写了robot程序，几千机器人并发登录和战斗。刚开始压力测试时，确实forwarder崩了，经过几轮测试、调试、修bug，现在已经能完美运行。有信心可以做到超长时间不停机。</p>
+
+<p>解决了通信问题后，这套架构剩下的问题就是用户规模问题。越高的用户规模，就越需要仔细思考架构的每个地方是否会出现负载瓶颈。</p>
+
+<p>其实，我们的架构目标是<strong>分布式</strong>，分布式就是说，后端是一个服务器集群，服务器数量可随意增加减少，就像cpu的核心数，核心越多，并发性能越好。总之，我们的后端服务器可以横向扩展，用户增多-&gt;增加服务器。这样子是比较省事的。但实际上要做到这点很难。预期的最高同时在线用户数、预期的总注册用户总数，是做架构设计的2个指标。</p>
+
+<p>另外，我们做的是<strong>世界服</strong>。玩家不需要选择服务器登录。对于玩家来说，只有一个服。不过对于后端来说，当然还是要分服的。这也是使得我们可以做分布式架构的原因。世界服若要做分服，就是分服务器集群。例如可以ios用户一个集群，android用户一个集群，两个集群完全隔离。</p>
+
+<p>其实游戏服务器架构很看游戏设计，但不管怎么变，都是要做网络通信的，基于forwarder去做跨进程、跨机器、跨机房通信，非常简单。只需要设置host和port即可。</p>
+
+<p>因为是公司项目，这里就不过多描述细节了。架构图仅供参考。</p>
+
+  </div>
+
+  <div class="date">
+    Written on April  2, 2017
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
