@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://www.qiujiawei.com/game-synchronize2/</loc>
+<lastmod>2017-04-02T00:00:00+08:00</lastmod>
+</url>
+<url>
+<loc>http://www.qiujiawei.com/game-synchronize/</loc>
+<lastmod>2017-03-31T00:00:00+08:00</lastmod>
+</url>
+<url>
 <loc>http://www.qiujiawei.com/partial-derivatives/</loc>
 <lastmod>2017-03-18T00:00:00+08:00</lastmod>
 </url>
@@ -11,10 +19,6 @@
 <url>
 <loc>http://www.qiujiawei.com/forwarder-buildsystem/</loc>
 <lastmod>2016-10-16T00:00:00+08:00</lastmod>
-</url>
-<url>
-<loc>http://www.qiujiawei.com/redblacktree-3/</loc>
-<lastmod>2016-10-07T00:00:00+08:00</lastmod>
 </url>
 <url>
 <loc>http://www.qiujiawei.com/redblacktree-2/</loc>
@@ -95,10 +99,6 @@
 <url>
 <loc>http://www.qiujiawei.com/openl-01/</loc>
 <lastmod>2016-02-21T00:00:00+08:00</lastmod>
-</url>
-<url>
-<loc>http://www.qiujiawei.com/summarize/</loc>
-<lastmod>2016-01-06T00:00:00+08:00</lastmod>
 </url>
 <url>
 <loc>http://www.qiujiawei.com/b-spline-1/</loc>
@@ -329,9 +329,6 @@
 <loc>http://www.qiujiawei.com/tag/curve/</loc>
 </url>
 <url>
-<loc>http://www.qiujiawei.com/tag/life/</loc>
-</url>
-<url>
 <loc>http://www.qiujiawei.com/tag/opengl/</loc>
 </url>
 <url>
@@ -348,6 +345,9 @@
 </url>
 <url>
 <loc>http://www.qiujiawei.com/tag/data-structure/</loc>
+</url>
+<url>
+<loc>http://www.qiujiawei.com/tag/game/</loc>
 </url>
 <url>
 <loc>http://www.qiujiawei.com/baidu_verify_0OpfO1OtHA.html</loc>

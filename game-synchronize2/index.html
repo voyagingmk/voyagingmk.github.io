@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>实时战斗游戏的同步——demo实战 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="" />
+    <meta property="og:description" content="" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="实时战斗游戏的同步——demo实战" />
+    <meta property="twitter:title" content="实时战斗游戏的同步——demo实战" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/game-synchronize2/',
+		  'title': '实时战斗游戏的同步——demo实战'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>实时战斗游戏的同步——demo实战</h1>
+  <h3>Tags: <a href="/tag/game/" rel="tag">game</a></h3>
+  <div class="entry">
+    <!--more-->
+
+<p>在GGJ2017上，我做一个<strong>局域网联机</strong>对战小游戏：</p>
+
+<p><img src="../images/2017.4/1.png" alt="1.png"></p>
+
+<p>本文将记录这个游戏的技术演化过程。</p>
+
+<h3>技术阶段1——局域网暴力帧同步</h3>
+
+<p>因为开发时间只有不到48小时，为了实现强一致性的复杂战斗（复杂之处主要在攻击方块上），我因此开发了一个暴力的帧同步系统。为什么说暴力呢？这是因为数据传输上相当不计开销：我每一个关键帧都要把整场战斗的数据打包广播给客户端。</p>
+
+<p>实际上，要实现这么暴力的同步方案也是有前提的。前提就是要实现<strong>数据驱动</strong>的战斗，即战斗的每一逻辑帧的状态信息，可以简单提取成json之类的数据格式。也就是说，战斗需要实现save和load函数，save()返回战斗当前的状态数据data，load(data)则可以把任意战斗状态数据载入，使得战斗立即变成data的状态。</p>
+
+<p>当时已经实现了这一技术点。使得这游戏的同步问题很简单：我只需要保证单个服务端、多个客户端的战斗的data都是一样的就行了。</p>
+
+<p>也正因为暴力，我后来试了下把服务端放在阿里云上运行，非局域网联机的话，卡到飞起。</p>
+
+<h3>技术阶段2——只同步玩家操作输入</h3>
+
+<p>最近把代码翻了一遍，并换成使用我开发的forwarder库（之前用了npm上的websocket库），虽然对游戏表现没有什么实质的影响。另外，我把上一阶段里面的暴力同步代码干掉了，现在只需要同步玩家操作输入数据就可以了。</p>
+
+<p>流程大概是：A客户端点击移动-&gt;A客户端向服务端发向前移动的操作包-&gt;服务端验证A的操作包-&gt;将操作包放到下一关键帧的玩家输入列表-&gt;服务端的帧逻辑系统更新到下一关键帧，处理该帧的玩家操作输入，并把操作输入广播到各个客户端-&gt;各个客户端收到广播包时，先缓存起来，当客户端自己的帧逻辑系统更新到这一关键帧时，也同样处理该帧的玩家操作输入。</p>
+
+<p>这个流程其实和旧版区别不大。除了逻辑层，表现层没有改动，也就是所在画面表现上和旧版一致。唯一区别就是，现在这个版本在<strong>非局域网</strong>也能勉强运行了。因为服务端发包减少了不少，客户端处理数据包压力也小了，性能大大改善。</p>
+
+<p>但仍然有2个问题：</p>
+
+<ol>
+<li><p>关键帧卡顿。这是因为服务端、客户端在按同个频率(目前LogicFPS=50)更新战斗时，客户端在到达关键帧后就会暂停并等待服务端的关键帧包，而因为非局域网网络有20-50ms的延迟，即使服务端更新游戏逻辑没有cpu计算上的延迟，也要受到这个网络延迟的制约，所以就会有卡顿感。</p></li>
+<li><p>操作响应有延迟。这是因为客户端的操作包要先发送到服务端，然后服务端在下一个关键帧再发回来，客户端才能处理到这个操作包。</p></li>
+</ol>
+
+<h3>技术阶段3——改善玩家体验的细节技术(开发ing)</h3>
+
+<p>技术阶段2的实现是正确的，当前阶段的目标是怎么优化那2个问题：</p>
+
+<ol>
+<li><p>关键帧如何不卡顿？我想象中的解决方案是，画面更新和逻辑更新要做一些分离。例如，在客户端等待服务端关键帧包的时间内，游戏画面不能静止不动，而是要做<strong>预测</strong>。所有具有速度矢量的游戏实体都可以按照速度方向在关键帧包到达前继续自行运动，当关键包收后时，逻辑层驱动表现层，校验并矫正下位置即可。</p></li>
+<li><p>操作响应必须无延迟！和解决卡顿感的方法类似，玩家点击前进键，表现层的player就开始按照<strong>预测的</strong>运动速度开始移动，并且需要应用我在上一篇文章里提到的技术：服务端需要尽可能相信客户端的位置。不然，即使客户端能够在操作发出时立即开始移动，但最终还是要以逻辑层的位置为主，而逻辑层的位置必然是有延迟的，也就是说，player虽然提前移动了，但最后又拉扯回去。</p></li>
+</ol>
+
+  </div>
+
+  <div class="date">
+    Written on April  2, 2017
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
