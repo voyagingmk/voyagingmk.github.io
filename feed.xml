@@ -7,6 +7,93 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>四元数公式的补充</title>
+        <description>&lt;!--more--&gt;
+
+&lt;p&gt;继上一篇四元数的文章&lt;a href=&quot;http://www.qiujiawei.com/understanding-quaternions/&quot;&gt;Understanding Quaternions 中文翻译《理解四元数》&lt;/a&gt;，已经过去一两年了。我发现那篇文章有一些细节没有讲得特别清楚，遂现在写一篇关于四元数公式的文章补缺下。&lt;/p&gt;
+
+&lt;h2&gt;四元数的指数函数&lt;/h2&gt;
+
+&lt;p&gt;先给出最终公式。设有任意四元数q：&lt;/p&gt;
+
+&lt;p&gt;\[q = s + x\mathbf i + y\mathbf j + z\mathbf k = s + \mathbf {v} = [s,\mathbf {v}] = [s,\mathbf 0] + [0,\mathbf {v}] \]&lt;/p&gt;
+
+&lt;p&gt;则有：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{q} = e^{ s +\mathbf {v}} = e^{s}e^{\mathbf v} =e^{s}( cos|\mathbf v| + \mathbf v \frac {sin |\mathbf v| } { |\mathbf v| } ) \]&lt;/p&gt;
+
+&lt;h3&gt;推导过程&lt;/h3&gt;
+
+&lt;p&gt;首先搬出四元数的&lt;strong&gt;乘积&lt;/strong&gt;公式：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [s_{a},\mathbf {a}] \]&lt;/p&gt;
+
+&lt;p&gt;\[ q_{b} = [s_{b},\mathbf {b}] \]&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]&lt;/p&gt;
+
+&lt;p&gt;代入上面的\( \mathbf v = 0 + x\mathbf i + y\mathbf j + z\mathbf k \)，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf v ^{2} = [ 0 - \mathbf v\cdot \mathbf v, 0 * \mathbf v + 0 * \mathbf v + \mathbf v\times \mathbf v] \]&lt;/p&gt;
+
+&lt;p&gt;\[ = [ - \mathbf v\cdot \mathbf v, 0 + 0 + 0] \]&lt;/p&gt;
+
+&lt;p&gt;\[ = - \mathbf v\cdot \mathbf v \]&lt;/p&gt;
+
+&lt;p&gt;\[ = - (x^{2} + y^{2} + z^{2}) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = -|\mathbf v|^{2} \]&lt;/p&gt;
+
+&lt;p&gt;这时候设\( |\mathbf v| = θ  \) （注意，这个θ没有实际意义，只是一个临时符号），那么就有：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf v ^{2} =  -θ^{2} \ \ ，\ \ \mathbf v ^{3} =  -θ^{2}\mathbf v \ \ ，\ \ \mathbf v ^{4} = θ^{4}  \ \ ，\ \ \mathbf v ^{5} = θ^{4}\mathbf v \ \ ，\ \ \mathbf v ^{6} = -θ^{6} \ \ ，\cdots \]&lt;/p&gt;
+
+&lt;p&gt;下一步，拿出指数函数使用极限形式的定义(证明见[2])：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{x} = \sum _{k=0}^{\infty } \frac {x^{k} }{k!} \ \ \ \ x是实数 \]&lt;/p&gt;
+
+&lt;p&gt;把实数x替换成上面的四元数\(\mathbf v\)，并利用上面的数列，则得到：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{\mathbf v} = \sum _{k=0}^{\infty } \frac {\mathbf v^{k} }{k!} \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 1 + \frac {\mathbf v}{1!} - \frac {θ^{2}}{2!} - \frac {θ^{2}\mathbf v}{3!} + \frac {θ^{4}}{4!} + \frac {θ^{4}\mathbf v}{5!}  - \frac {θ^{6}}{6!} + \cdots = \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 1 + \frac {θ\mathbf v}{1!θ} - \frac {θ^{2}}{2!} - \frac {θ^{3}\mathbf v}{3!θ} + \frac {θ^{4}}{4!} + \frac {θ^{5}\mathbf v}{5!θ}  - \frac {θ^{6}}{6!} + \cdots = \]&lt;/p&gt;
+
+&lt;p&gt;\[ = ( 1 - \frac {θ^{2}}{2!} + \frac {θ^{4}}{4!} - \frac {θ^{6}}{6!}  \cdots ) +  \frac { \mathbf v }{θ} ( \frac {θ}{1!} - \frac {θ^{3}}{3!} + \frac {θ^{5}}{5!} \cdots )  = \]&lt;/p&gt;
+
+&lt;p&gt;\[ = cosθ + \frac { \mathbf v }{θ} sinθ  \]&lt;/p&gt;
+
+&lt;p&gt;最后一步里，2个无穷数列变成三角函数，是用了泰勒公式[3]。&lt;/p&gt;
+
+&lt;p&gt;然后，把假设出来的θ去掉，得到： &lt;/p&gt;
+
+&lt;p&gt;\[ e^{\mathbf v}  = cos|\mathbf v| + \frac { \mathbf v }{|\mathbf v|} sin|\mathbf v|  \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{q} = e^{ s +\mathbf {v}} = e^{s}e^{\mathbf v} =e^{s}( cos|\mathbf v| + \mathbf v \frac {sin |\mathbf v| } { |\mathbf v| } ) \]&lt;/p&gt;
+
+&lt;p&gt;得证。&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;[1] &lt;a href=&quot;http://math.stackexchange.com/questions/1030737/exponential-function-of-quaternion-derivation&quot;&gt;Exponential Function of Quaternion - Derivation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[2]指数函数的泰勒展开公式的证明：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.songho.ca/math/taylor/taylor_exp.html&quot;&gt;MacLaurin series of Exponential function&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[3] cos sin三角函数的泰勒展开公式的证明：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.songho.ca/math/taylor/taylor_tri.html&quot;&gt;MacLaurin series of Trigonometric function&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 04 Apr 2017 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/quaternion2/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/quaternion2/</guid>
+      </item>
+    
+      <item>
         <title>forwarder的应用</title>
         <description>&lt;!--more--&gt;
 
@@ -875,128 +962,6 @@
         <pubDate>Sat, 03 Sep 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/monte-carlo2/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/monte-carlo2/</guid>
-      </item>
-    
-      <item>
-        <title>蒙特·卡罗(Monte Carlo)积分详解</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;蒙特·卡罗积分公式&lt;/h2&gt;
-
-&lt;p&gt;对于一个连续函数f，它的积分公式为：&lt;/p&gt;
-
-&lt;p&gt;\[ F = \int _{a}^{b}f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;对应的，f的&lt;a href=&quot;https://en.wikipedia.org/wiki/Monte_Carlo_integration&quot;&gt;蒙特·卡罗积分公式&lt;/a&gt;如下：&lt;/p&gt;
-
-&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
-
-&lt;p&gt;蒙特卡罗最关键的就是理解这条公式了。其他延伸探讨都可以暂时忽略。那么这条公式如何理解呢？首先第一点是，虽然这条公式没有积分符号\(\int  \)，但是它认被称为&lt;strong&gt;积分&lt;/strong&gt;，这是因为这公式的作用相当于在对f(x)做积分，只不过不那么“精确”，即蒙特·卡罗积分是&lt;strong&gt;对理想积分的近似&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;那么这个近似是如何完成的？很简单，核心就是两个字：&lt;strong&gt;采样(Sampling)&lt;/strong&gt;。对一个连续函数的采样方法是在该函数的定义域中随机挑N个值，并求出对应的N个\( f(X_{i}) \)，就得到了样本集合。再对这些样本集合做一些换算，就可以得到一个近似的积分了。对于蒙特·卡罗积分，&lt;strong&gt;采样样本越多，就越逼近真实的积分结果&lt;/strong&gt;，这是蒙特·卡罗积分的最核心特性。&lt;/p&gt;
-
-&lt;p&gt;继续观察上面的公式，里面还有一个极其重要的参数：pdf(probability distribution function，概率分布函数)。pdf还有个近亲pmf，下面小节详解pdf、pmf的由来。&lt;/p&gt;
-
-&lt;h2&gt;pdf和pmf&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;pmf(probability mass function)，指的是&lt;strong&gt;离散的&lt;/strong&gt;随机变量的概率分布函数&lt;/li&gt;
-&lt;li&gt;pdf(probability distribution function)， 指的是&lt;strong&gt;连续的&lt;/strong&gt;随机变量的概率分布函数&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;离散的随机变量X的数学期望为：&lt;/p&gt;
-
-&lt;p&gt;\[E[X] = \sum _{ x_{i} }pmf(x_{i})x_{i} \]&lt;/p&gt;
-
-&lt;p&gt;连续的随机变量X的数学期望为：&lt;/p&gt;
-
-&lt;p&gt;\[E[X] = \int ^{\infty }_{-\infty }pdf(x)xdx \]&lt;/p&gt;
-
-&lt;p&gt;pdf和pmf名字接近，含义也是接近。pdf、pmf函数的参数都是样本值x，返回值是概率，即表示一个样本出现的概率，所有样本的出现概率之和(概率的积分)应等于1。要注意的是，pdf、pmf的存在说明有可能每个样本的出现概率都是各不相同的。&lt;/p&gt;
-
-&lt;h3&gt;pmf&lt;/h3&gt;
-
-&lt;p&gt;pmf的简单例子就是&lt;strong&gt;基于均匀分布的离散的随机变量X&lt;/strong&gt;，此时\( pmf(X_{i}) \)恒等于\( \frac{1}{N} \)，含义是每个随机样本的出现概率等于\( \frac{1}{样本总数} \)。&lt;/p&gt;
-
-&lt;p&gt;通过这个例子也印证了pmf的性质：&lt;strong&gt;pmf函数的所有结果值之和等于1&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h3&gt;pdf&lt;/h3&gt;
-
-&lt;p&gt;借用&lt;a href=&quot;http://www.scratchapixel.com/&quot;&gt;http://www.scratchapixel.com/&lt;/a&gt;的一个很好的例子来说明：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.8/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这个例子中，目标问题是求出该函数[a,b]段曲线下方的面积(最后一幅图的黑色区域)，也就是要求该函数[a,b]段的积分。基于蒙特·卡罗积分的解法，就要用上面给出的公式：&lt;/p&gt;
-
-&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
-
-&lt;p&gt;在此图中，做了四次随机采样，得到了四个随机样本\( x_{i} \)：\( x_{1}、x_{2}、x_{3}、x_{4} \)，并且进而得到了这四个样本的\( f(x_{i}) \)值：\( f(x_{1})、f(x_{2})、f(x_{3})、f(x_{4}) \)。（原文没有提及如何得到\( f(x_{i}) \)。函数f是奇形怪状的，不太可能有表达式存在，难道是用尺子量的？暂且忽略这个事吧。）&lt;/p&gt;
-
-&lt;p&gt;有了这4个样本后，可以针对每一个样本求一个&lt;strong&gt;近似面积值&lt;/strong&gt;，这个面积值等于\( f(x_{i})  (b - a) \)。为什么可以这样做呢？是因为每一个单独的样本是对原函数f的近似，即在每个样本中，认为\( f(x) \)恒等于\( f(x_{i}) \)，从而让原函数曲线简化成一个矩形区域，而矩形的面积显然就是长(b-a)乘以宽\( f(x_{i}) \)。&lt;/p&gt;
-
-&lt;p&gt;得到4个&lt;strong&gt;近似面积值&lt;/strong&gt;后，再求出它们的均值(数学期望)，就完成了蒙特·卡罗积分。把上述流程汇总得到：&lt;/p&gt;
-
-&lt;p&gt;\[ Area = \frac {1}{4}(f(x_{1})(b - a) + f(x_{2})(b - a) + f(x_{3})(b - a) + f(x_{4})(b - a)) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = \frac {1}{4}(b - a)( f(x_{1}) + f(x_{2}) + f(x_{3}) + f(x_{4}) ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = \frac {1}{4}(b - a)\sum _{i=1}^{4}f(x_{i}) \]&lt;/p&gt;
-
-&lt;p&gt;此时，对比下蒙特·卡罗积分公式：&lt;/p&gt;
-
-&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
-
-&lt;p&gt;发现两个式子非常相似，对式子做下转换得到：&lt;/p&gt;
-
-&lt;p&gt;\[ Area =  \frac {1}{4}\sum _{i=1}^{4}\frac {f(x_{i})}{\frac {1}{b - a} } \]&lt;/p&gt;
-
-&lt;p&gt;于是可以知道\( pdf(x_{i}) \)等于：&lt;/p&gt;
-
-&lt;p&gt;\[ pdf(x_{i}) = \frac {1}{b - a } \]&lt;/p&gt;
-
-&lt;p&gt;这意味着，对于连续函数f，f的每个可能取值x的出现概率等于x的取值范围[a,b]的倒数\(\frac{1}{b-a}\)。&lt;/p&gt;
-
-&lt;p&gt;在实际应用场合，随机变量X要写成F(X)，即可能需要对X做一个转换再使用。这时候要注意F(X)的pdf不等于X的pdf。&lt;/p&gt;
-
-&lt;h2&gt;蒙特·卡罗积分的数学期望等于理想积分？&lt;/h2&gt;
-
-&lt;p&gt;对于下面的\(F\)和\(F^{N}\)：&lt;/p&gt;
-
-&lt;p&gt;\[ F = \int _{a}^{b}f(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;\[ F^{N} = \frac {1}{N}\sum _{i=1}^{N}\frac {f(X_{i})}{ pdf(X_{i}) } \]&lt;/p&gt;
-
-&lt;p&gt;是否随着N变大，\(F^{N}\)会逼近\(F\)？即\(F^{N}\)的数学期望是否等于\(F\)?&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&quot;&gt;Monte Carlo Methods in Practice&lt;/a&gt;文章中给出了推导过程：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.8/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;第二行到第三行是最不好理解的。因为这里其实用到了新的知识点：&lt;a href=&quot;https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician&quot;&gt;Law of the unconscious statistician&lt;/a&gt;(简称：LOTUS)。LOTUS的应用情景是，已知随机变量X的概率分布，但不知道f(x)的分布，此时用LOTUS公式能计算出函数f(x)的数学期望。LOTUS的公式如下：&lt;/p&gt;
-
-&lt;p&gt;f(x)是离散函数时:&lt;/p&gt;
-
-&lt;p&gt;\[ E[f(X)] = \sum _{x_{i}}f(x_{i})pmf(x_{i}) \]&lt;/p&gt;
-
-&lt;p&gt;f(x)是连续函数时:&lt;/p&gt;
-
-&lt;p&gt;\[ E[f(X)] = \int _{-\infty }^{\infty}f(x)pdf(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;(建议对比第二小节开头的两条公式来理解)&lt;/p&gt;
-
-&lt;p&gt;有了LOTUS公式，再来看第二行到第三行的转换，就好理解了：&lt;/p&gt;
-
-&lt;p&gt;\[ E[ \frac {f(X_{i})}{pdf(X_{i})} ] = E[ \frac {f(x)}{pdf(x)} ] =\int _{-\infty }^{\infty}\frac {f(x)}{pdf(x)}pdf(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;\[ =\int _{-\infty }^{\infty}f(x)dx \]&lt;/p&gt;
-
-&lt;h1&gt;参考资料&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&quot;&gt;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-in-practice/monte-carlo-integration&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/expected-value-of-the-function-of-a-random-variable&quot;&gt;http://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/expected-value-of-the-function-of-a-random-variable&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Mon, 22 Aug 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/monte-carlo/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/monte-carlo/</guid>
       </item>
     
   </channel>
