@@ -285,7 +285,7 @@ SQUARD
 
 <p>四元数的概念是由爱尔兰数学家Sir William Rowan Hamilton发明的（1843年，都柏林）。Hamilton当时正和他的妻子前往爱尔兰皇家研究院，当他从Brougham桥通过皇家运河时，他领悟到了一个激动人心的东西，并立刻把它刻在桥的一个石头上：</p>
 
-<p>\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]</p>
+<p>\[ \mathbf i^{2} = \mathbf j^{2} = \mathbf k^{2} =  \mathbf i \mathbf j \mathbf k = -1 \]</p>
 
 <p><img src="../images/2015.9/2.jpg" alt="2.jpg"></p>
 
@@ -303,7 +303,7 @@ SQUARD
 
 <p>虚数有这样的形式：</p>
 
-<p>\[ i^{2} = -1 \]</p>
+<p>\[ \mathbf i^{2} = -1 \]</p>
 
 <p>不要为这个术语较真，因为逻辑上这个数是不存在的。只要知道i是一个平方等于-1的东西即可。</p>
 
@@ -311,7 +311,7 @@ SQUARD
 
 <p>复数的集合\( \mathbb{C} \)是一个实数和一个虚数的和，形式如下：</p>
 
-<p>\[ z = a + bi \ a,b\in R,\ i^{2} = -1 \]</p>
+<p>\[ z = a + b\mathbf i \ a,b\in R,\ \mathbf i^{2} = -1 \]</p>
 
 <p>可以认为所有实数都是b=0的复数、所有虚数都是a=0的复数。</p>
 
@@ -319,82 +319,82 @@ SQUARD
 
 <p>加法：</p>
 
-<p>\[ (a_{1} + b_{1}i) + (a_{2} + b_{2}i) = (a_{1} + a_{2}) + (b_{1} + b_{2})i \]</p>
+<p>\[ (a_{1} + b_{1}\mathbf i) + (a_{2} + b_{2}\mathbf i) = (a_{1} + a_{2}) + (b_{1} + b_{2})\mathbf i \]</p>
 
 <p>减法：</p>
 
-<p>\[ (a_{1} + b_{1}i) - (a_{2} + b_{2}i) = (a_{1} - a_{2}) + (b_{1} - b_{2})i \]</p>
+<p>\[ (a_{1} + b_{1}\mathbf i) - (a_{2} + b_{2}\mathbf i) = (a_{1} - a_{2}) + (b_{1} - b_{2})\mathbf i \]</p>
 
 <h3>复数的系数缩放</h3>
 
-<p>\[ \lambda (a_{1} + b_{1}i) = \lambda  a_{1} + \lambda b_{1}i \]</p>
+<p>\[ \lambda (a_{1} + b_{1}\mathbf i) = \lambda  a_{1} + \lambda b_{1}\mathbf i \]</p>
 
 <h3>复数的积</h3>
 
-<p>\[  z_{1} = (a_{1} + b_{1}i) \]
-\[  z_{2} = (a_{2} + b_{2}i) \]
-\[  z_{1}z_{2} = (a_{1} + b_{1}i)(a_{2} + b_{2}i) = a_{1}a_{2} + a_{1}b_{2}i + b_{1}a_{2}i+b_{1}b_{2}i^{2} \]
-\[ z_{1}z_{2} = (a_{1}a_{2} - b_{1}b_{2}) + (a_{1}b_{2} + b_{1}a_{2})i \]</p>
+<p>\[  z_{1} = (a_{1} + b_{1}\mathbf i) \]
+\[  z_{2} = (a_{2} + b_{2}\mathbf i) \]
+\[  z_{1}z_{2} = (a_{1} + b_{1}\mathbf i)(a_{2} + b_{2}\mathbf i) = a_{1}a_{2} + a_{1}b_{2}\mathbf i + b_{1}a_{2}\mathbf i + b_{1}b_{2}\mathbf i^{2} \]
+\[ z_{1}z_{2} = (a_{1}a_{2} - b_{1}b_{2}) + (a_{1}b_{2} + b_{1}a_{2})\mathbf i \]</p>
 
 <h3>复数的平方</h3>
 
-<p>\[ z = (a + bi) \]
-\[ z^{2} = (a + bi)(a + bi) \]
-\[ z^{2} = (a^{2} - b^{2}) + 2abi \]</p>
+<p>\[ z = (a + b\mathbf i) \]
+\[ z^{2} = (a + b\mathbf i)(a + b\mathbf i) \]
+\[ z^{2} = (a^{2} - b^{2}) + 2ab\mathbf i \]</p>
 
 <h3>共轭复数</h3>
 
 <p>复数的共轭就是指把复数的虚数部分变成负的。共轭复数的符号是\(\bar z\)或\(z^{*}\)。</p>
 
-<p>\[ z = (a + bi) \]</p>
+<p>\[ z = (a + b\mathbf i) \]</p>
 
-<p>\[ z^{*} = (a - bi) \]</p>
+<p>\[ z^{*} = (a - b\mathbf i) \]</p>
 
 <p>复数和它的共轭复数的乘积是：</p>
 
-<p>\[ zz^{*} = (a + bi)(a - bi) = a^{2}-abi+abi+b^{2} = a^{2}+b^{2} \]</p>
+<p>\[ zz^{*} = (a + b\mathbf i)(a - b\mathbf i) = a^{2}-ab\mathbf i + ab\mathbf i + b^{2} = a^{2}+b^{2} \]</p>
 
 <h3>复数的绝对值</h3>
 
 <p>我们使用共轭复数来计算复数的绝对值：</p>
 
-<p>\[ z = (a + bi) \]</p>
+<p>\[ z = (a + b\mathbf i) \]</p>
 
-<p>\[ |z| = \sqrt {zz^{*}} = \sqrt {(a + bi)(a - bi)} = \sqrt {a^{2} + b^{2} } \]</p>
+<p>\[ |z| = \sqrt {zz^{*}} = \sqrt {(a + b\mathbf i)(a - b\mathbf i)} = \sqrt {a^{2} + b^{2} } \]</p>
 
 <h3>两复数的商</h3>
 
-<p>\[  z_{1} = (a_{1} + b_{1}i) \]
-\[  z_{2} = (a_{2} + b_{2}i) \]
-\[ \frac {z_{1}}{z_{2}} = \frac {a_{1} + b_{1}i}{a_{2} + b_{2}i} = \frac {(a_{1} + b_{1}i)(a_{2} - b_{2}i)}{(a_{2} + b_{2}i)(a_{2} - b_{2}i)} \]
-\[  = \frac {a_{1}a_{2}-a_{1}b_{2}i+b_{1}a_{2}i-b_{1}b_{2}i^{2} }{a_{2}^{2} + b_{2}^{2}} \]</p>
+<p>\[  z_{1} = (a_{1} + b_{1}\mathbf i) \]
+\[  z_{2} = (a_{2} + b_{2}\mathbf i) \]
+\[ \frac {z_{1}}{z_{2}} = \frac {a_{1} + b_{1}\mathbf i}{a_{2} + b_{2}\mathbf i} = \frac {(a_{1} + b_{1}\mathbf i)(a_{2} - b_{2}\mathbf i)}{(a_{2} + b_{2}\mathbf i)(a_{2} - b_{2}\mathbf i)} \]
+\[  = \frac {a_{1}a_{2}-a_{1}b_{2}\mathbf i+b_{1}a_{2}\mathbf i-b_{1}b_{2}\mathbf i^{2} }{a_{2}^{2} + b_{2}^{2}} \]</p>
 
-<p>\[ = \frac {a_{1}a_{2} + b_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}   + \frac {b_{1}a_{2} - a_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}i \]</p>
+<p>\[ = \frac {a_{1}a_{2} + b_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}   + \frac {b_{1}a_{2} - a_{1}b_{2} }{a_{2}^{2} + b_{2}^{2}}\mathbf i \]</p>
 
 <h2>i的幂</h2>
 
-<p>如果i的平方等于-1，那么i的n次幂也应该存在：</p>
+<p>如果\(\mathbf i\)的平方等于-1，那么\(\mathbf i\)的n次幂也应该存在：</p>
 
-<p>\[ i^{0} = 1 \]
-\[ i^{1} = i \]
-\[ i^{2} = -1 \]
-\[ i^{3} = ii^{2} = -i \]
-\[ i^{4} = i^{2}i^{2} = 1 \]
-\[ i^{5} = ii^{4} = i \]
-\[ i^{6} = ii^{5} = i^{2} = -1 \]</p>
+<p>\[ \mathbf i^{0} = 1 \]
+\[ \mathbf i^{1} = \mathbf i \]
+\[ \mathbf i^{2} = -1 \]
+\[ \mathbf i^{3} = \mathbf i\mathbf i^{2} = -i \]
+\[ \mathbf i^{4} = \mathbf i^{2}\mathbf i^{2} = 1 \]
+\[ \mathbf i^{5} = \mathbf i \mathbf i^{4} = i \]
+\[ \mathbf i^{6} = \mathbf i\mathbf i^{5} = \mathbf i^{2} = -1 \]</p>
 
 <p>如果按照这个顺序写下去，会出现这样一个模式：
-(1,i,-1,-i,1,...)</p>
+(1,\mathbf i,-1,-\mathbf i,1,...)</p>
 
 <p>一个类似的模式也出现在递增的负数幂：</p>
 
-<p>\[ i^{0} = 1 \]
-\[ i^{-1} = -i \]
-\[ i^{-2} = -1 \]
-\[ i^{-3} = i \]
-\[ i^{-4} = 1 \]
-\[ i^{-5} = -i \]
-\[ i^{-6} = -1 \]</p>
+<p>\[ \mathbf i^{0} = 1 \]
+\[ \mathbf i^{-1} = -i \]
+\[ \mathbf i^{-2} = -1 \]
+\[ \mathbf i^{-3} = i \]
+\[ \mathbf i^{-4} = 1 \]
+\[ \mathbf i^{-5} = -i \]
+\[ \mathbf i^{-6} = -1 \]</p>
 
 <p>你可能已经在数学里头见过类似的模式，但是是以（x,y,-x,-y,x,...)的形式，这是在2D笛卡尔平面对一个点逆时针旋转90度时生成的；（x,-y,-x,y,x,...)则是在2D笛卡尔平面对一个点顺时针旋转90度时生成的。</p>
 
@@ -410,19 +410,19 @@ SQUARD
 
 <p>让我们看看这是不是真的。我们随机地在复数平面上取一个点：</p>
 
-<p>\[ p = 2 + i \]</p>
+<p>\[ p = 2 + \mathbf i \]</p>
 
 <p>p乘以i后得到q：
-\[ q = pi = (2+i)i = 2i+i^{2} = -1+2i \]</p>
+\[ q = p\mathbf i = (2+\mathbf i)\mathbf i = 2\mathbf i + \mathbf i^{2} = -1 + 2\mathbf i \]</p>
 
 <p>q乘以i后得到r：
-\[ r = qi = (-1+2i)i = -i+2i^{2} = -2-i \]</p>
+\[ r = q\mathbf i = (-1 + 2\mathbf i)\mathbf i = -\mathbf i + 2\mathbf i^{2} = -2 -\mathbf i \]</p>
 
 <p>r乘以i后得到s：
-\[ s = ri = (-2-i)i = -2i-i^{2} = 1-2i \]</p>
+\[ s = r\mathbf i = (-2 - \mathbf i)\mathbf i = -2\mathbf i-\mathbf i^{2} = 1 - 2\mathbf i \]</p>
 
 <p>s乘以i后得到t：
-\[ t = si = (1-2i)i = i-2i^{2} = 2+i \]</p>
+\[ t = s\mathbf i = (1-2\mathbf i)\mathbf i = \mathbf i - 2\mathbf i^{2} = 2 + \mathbf i \]</p>
 
 <p>t刚好是开始的p。如果我们把这些复数放到复数平面上，就得到下面的图：</p>
 
@@ -433,14 +433,14 @@ SQUARD
 <h3>旋转数（Rotors)</h3>
 
 <p>我们也可以在复数平面上进行任意角度的旋转，只需要定义下面这个复数：
-\[q = cos\theta +isin\theta \]</p>
+\[q = cos\theta + \mathbf i sin\theta \]</p>
 
 <p>任意的复数乘以q：</p>
 
-<p>\[ p = a + bi \]
-\[ q = cos\theta + isin\theta \]
-\[ pq = (a + bi)(cos\theta + isin\theta ) \]
-\[ a&#39; + b&#39;i = acos\theta -bsin\theta + (asin\theta +bcos\theta )i \] </p>
+<p>\[ p = a + b\mathbf i \]
+\[ q = cos\theta + \mathbf i sin\theta \]
+\[ pq = (a + b\mathbf i)(cos\theta + \mathbf i sin\theta ) \]
+\[ a&#39; + b&#39;\mathbf i = acos\theta -bsin\theta + (asin\theta +bcos\theta )\mathbf i \] </p>
 
 <p>也可以写成矩阵的形式：</p>
 
@@ -454,26 +454,26 @@ SQUARD
 
 <p>四元数的一般形式：</p>
 
-<p>\[ q = s + xi + yj + zk \ \ \ s,x,y,z \in \mathbb{R} \]</p>
+<p>\[ q = s + x\mathbf i + y\mathbf j + z\mathbf k \ \ \ s,x,y,z \in \mathbb{R} \]</p>
 
 <p>上面的公式是根据Hamilton的著名的表达式得到的：</p>
 
-<p>\[ i^{2} = j^{2} = k^{2} = ijk = -1 \]</p>
+<p>\[ \mathbf i^{2} = \mathbf j^{2} = \mathbf k^{2} = \mathbf i\mathbf j\mathbf k = -1 \]</p>
 
 <p>以及：</p>
 
-<p>\[ ij = k \ \ \ jk = i \ \ \ ki = j \]
-\[ ji = -k \ \ \ kj = -i \ \ \ ik = -j \]</p>
+<p>\[ \mathbf i \mathbf j = \mathbf k \ \ \ \mathbf j \mathbf k = \mathbf i \ \ \ \mathbf k \mathbf i = \mathbf j \]
+\[ \mathbf j \mathbf i = -\mathbf k \ \ \ \mathbf k \mathbf j = -\mathbf i \ \ \ \mathbf i \mathbf k = -\mathbf j \]</p>
 
 <p>你可能已经注意到了，i、j、k之间的关系非常像笛卡尔坐标系下单位向量的叉积规则：</p>
 
-<p>\[ x\times y = z \ \ \ y\times z = x \ \ \ z\times x = y \]
-\[ y\times x = -z \ \ \ z\times y = -x \ \ \ x\times z = -y \]</p>
+<p>\[ \mathbf x\times \mathbf y = \mathbf z \ \ \ \mathbf y\times \mathbf z = \mathbf x \ \ \ \mathbf z\times \mathbf x = \mathbf y \]
+\[ \mathbf y\times \mathbf x = -\mathbf z \ \ \ \mathbf z\times \mathbf y = -\mathbf x \ \ \ \mathbf x\times \mathbf z = -\mathbf y \]</p>
 
-<p>Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( i^{2} = j^{2} = k^{2} = -1 \)。</p>
+<p>Hamilton自己也发现i、j、k虚数可以被用来表达3个笛卡尔坐标系单位向量i、j、k，并且仍然保持有虚数的性质，也即\( \mathbf i^{2} = \mathbf j^{2} = \mathbf k^{2} = -1 \)。</p>
 
 <p><img src="../images/2015.9/6.png" alt="6.png">
-（ij, jk, ki这几个性质的可视化）</p>
+（\mathbf i \mathbf j, \mathbf j \mathbf k, \mathbf k \mathbf i这几个性质的可视化）</p>
 
 <p>上图展示了如何用i、j、k作为笛卡尔坐标系的单位向量。</p>
 
@@ -484,7 +484,7 @@ SQUARD
 
 <p>其中的v，也可以用它各自独立的3个分量表示：</p>
 
-<p>\[ q = [s,xi + yj + zk] \ \ \ s,x,y,z\in \mathbb{R} \]</p>
+<p>\[ q = [s,x\mathbf i + y\mathbf j + z\mathbf k] \ \ \ s,x,y,z\in \mathbb{R} \]</p>
 
 <p>使用这种表示法，我们可以更容易地展示四元数和复数之间的相似性。</p>
 
@@ -502,48 +502,48 @@ SQUARD
 <p>我们也可以表示四元数的乘积：</p>
 
 <p>\[ q_{a}q_{b} = [s_{a},\mathbf {a}][s_{b},\mathbf {b}] \]
-\[ = (s_{a} + x_{a}i + y_{a}j +z_{a}k)(s_{b} + x_{b}i + y_{b}j +z_{b}k) \]
+\[ = (s_{a} + x_{a}\mathbf i + y_{a}\mathbf j +z_{a}\mathbf k)(s_{b} + x_{b}\mathbf i + y_{b}\mathbf j +z_{b}\mathbf k) \]
 \[ = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}) \]
-\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i \]
-\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j \]
-\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k \]</p>
+\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})\mathbf i \]
+\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})\mathbf j \]
+\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})\mathbf k \]</p>
 
-<p>可以看到，四元数的乘积依然还是一个四元数。如果我们把虚数i、j、k替换成有序对：</p>
+<p>可以看到，四元数的乘积依然还是一个四元数。如果我们把虚数\(\mathbf i、\mathbf j、\mathbf k\)替换成有序对：</p>
 
-<p>\[ i = [0,i]\ \ \  j = [0,j]\ \ \  k = [0,k] \]</p>
+<p>\[ \mathbf i = [0, \mathbf i]\ \ \  \mathbf j = [0, \mathbf j]\ \ \  \mathbf k = [0, \mathbf k] \]</p>
 
 <p>以及还有[1,0] = 1，将它们代入前面的表达式，就得到了：</p>
 
-<p>\[ q_{a}q_{b} = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b})[1,0] \]
-\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})[0,i] \]
-\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})[0,j] \]
-\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})[0,k] \]</p>
+<p>\[ q_{a}q_{b} = (s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b})[1,\mathbf 0] \]
+\[ + (s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})[0,\mathbf i] \]
+\[ + (s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})[0,\mathbf j] \]
+\[ + (s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})[0,\mathbf k] \]</p>
 
 <p>再把这个表达式扩展成多个有序对的和：</p>
 
-<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
-\[ + [0,(s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})i] \]
-\[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})j] \]
-\[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})k] \]</p>
+<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),\mathbf 0] \]
+\[ + [0,(s_{a}x_{b} + s_{b}x_{a} + y_{a}z_{b} - y_{b}z_{a})\mathbf i] \]
+\[ + [0,(s_{a}y_{b}+s_{b}y_{a}+z_{a}x_{b}-z_{b}x_{a})\mathbf j] \]
+\[ + [0,(s_{a}z_{b}+s_{b}z_{a}+x_{a}y_{b}-x_{b}y_{a})\mathbf k] \]</p>
 
 <p>如果把后3个四元数相加，并提取公共部分，就可以把等式改写成：</p>
 
-<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),0] \]
-\[ + [0,s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
-\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]</p>
+<p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}),\mathbf 0] \]
+\[ + [0,s_{a}(x_{b}\mathbf i + y_{b}\mathbf j + z_{b}\mathbf k) + s_{b}(x_{a}\mathbf i + y_{a}\mathbf j + z_{a}\mathbf k)\]
+\[+(y_{a}z_{b}-y_{b}z_{a})\mathbf i + (z_{a}x_{b}-z_{b}x_{a})\mathbf j + (x_{a}y_{b}-x_{b}y_{a})\mathbf k] \]</p>
 
 <p>这个等式是2个有序对的和。第1个有序对是一个<strong>实</strong>四元数，第2个是一个<strong>纯</strong>四元数。这两个四元数也可以合并成一个：</p>
 
 <p>\[ q_{a}q_{b} = [(s_{a}s_{b} - x_{a}x_{b} - y_{a}y_{b} - z_{a}z_{b}), \]
-\[ s_{a}(x_{b}i + y_{b}j+z_{b}k) + s_{b}(x_{a}i+y_{a}j+z_{a}k)\]
-\[+(y_{a}z_{b}-y_{b}z_{a})i+(z_{a}x_{b}-z_{b}x_{a})j+(x_{a}y_{b}-x_{b}y_{a})k] \]</p>
+\[ s_{a}(x_{b}\mathbf i + y_{b}\mathbf j+z_{b}\mathbf k) + s_{b}(x_{a}\mathbf i+y_{a}\mathbf j+z_{a}\mathbf k)\]
+\[+(y_{a}z_{b}-y_{b}z_{a})\mathbf i+(z_{a}x_{b}-z_{b}x_{a})\mathbf j+(x_{a}y_{b}-x_{b}y_{a})\mathbf k] \]</p>
 
 <p>如果把下面的表达式代入上面的等式：</p>
 
-<p>\[ \mathbf a = x_{a}i + y_{a}j + z_{a}k\]
-\[ \mathbf b = x_{b}i + y_{b}j + z_{b}k\]
-\[ \mathbf a\cdot \mathbf b = x_{a}x_{b}i^{2}+y_{a}y_{b}j^{2}+z_{a}z_{b}k^{2} \]
-\[ \mathbf a\times \mathbf b = (y_{a}z_{b}-y_{b}z_{a})i + (z_{a}x_{b} - z_{b}x_{a})j + (x_{a}y_{b} - x_{b}y_{a})k  \]</p>
+<p>\[ \mathbf a = x_{a}\mathbf i + y_{a}\mathbf j + z_{a}\mathbf k\]
+\[ \mathbf b = x_{b}\mathbf i + y_{b}\mathbf j + z_{b}\mathbf k\]
+\[ \mathbf a\cdot \mathbf b = x_{a}x_{b}\mathbf i^{2}+y_{a}y_{b}\mathbf j^{2}+z_{a}z_{b}\mathbf k^{2} \]
+\[ \mathbf a\times \mathbf b = (y_{a}z_{b}-y_{b}z_{a})\mathbf i + (z_{a}x_{b} - z_{b}x_{a})\mathbf j + (x_{a}y_{b} - x_{b}y_{a})\mathbf k  \]</p>
 
 <p>（译注：注意，第三条和第四条并不是四元数的点积和叉积，而是向量的点积和叉积）</p>
 
@@ -567,9 +567,9 @@ SQUARD
 
 <p>这和2个虚部为0的复数的乘积几乎一样：</p>
 
-<p>\[ z_{1} = a_{1} + 0i \]
-\[ z_{2} = a_{2} + 0i \]
-\[ z_{1}z_{2} = (a_{1} + 0i)(a_{2} + 0i) = a_{1}a_{2} \] </p>
+<p>\[ z_{1} = a_{1} + 0\mathbf i \]
+\[ z_{2} = a_{2} + 0\mathbf i \]
+\[ z_{1}z_{2} = (a_{1} + 0\mathbf i)(a_{2} + 0\mathbf i) = a_{1}a_{2} \] </p>
 
 <h3>四元数的系数缩放</h3>
 
@@ -611,17 +611,17 @@ SQUARD
 
 <p>给定任意的向量v，我们可以把这个向量写成一个系数和一个单位方向向量的乘积：</p>
 
-<p>\[ \mathbf { v } = v\mathbf { \hat {v} } \ \  v = |\mathbf {v}|,|\mathbf { \hat {v} }|=1\]</p>
+<p>\[ \mathbf { v } = v\mathbf { \hat { \mathbf v } } \ \  v = |\mathbf {v}|,|\mathbf { \hat { \mathbf v } }|=1\]</p>
 
 <p>将这个定义和纯四元数的定义结合，就得到了：</p>
 
 <p>\[ q = [0,\mathbf { v }] \]
-\[ = [0, v \mathbf { \hat {v} }] \]
-\[ = v[0, \mathbf { \hat {v} }] \]</p>
+\[ = [0, v \mathbf { \hat { \mathbf v } }] \]
+\[ = v[0, \mathbf { \hat { \mathbf v } }] \]</p>
 
 <p>然后，我们可以定义单位四元数了，它是一个s=0、\( \mathbf { v } \)为单位向量的四元数：</p>
 
-<p>\[ \hat {q} = [0, \mathbf { \hat {v} }] \]</p>
+<p>\[ \hat {q} = [0, \mathbf { \hat { \mathbf v } }] \]</p>
 
 <h3>四元数的二元形式</h3>
 
@@ -629,7 +629,7 @@ SQUARD
 
 <p>\[ q = [s,\mathbf { v }] \]
 \[ = [s,\mathbf { 0 }] + [0, \mathbf { v }] \]
-\[ = [s,\mathbf { 0 }] + v [0,\mathbf { \hat {v}}] \]
+\[ = [s,\mathbf { 0 }] + v [0,\mathbf { \hat { \mathbf v }}] \]
 \[ = s + v \mathbf {\hat {q} }\]</p>
 
 <p>这就给了我们一种和复数非常相似的四元数表示法：</p>
@@ -660,69 +660,69 @@ SQUARD
 
 <p>类似的，四元数的范数可以这样定义：</p>
 
-<p>\[ q = [s,\mathbf {v}] \]
-\[ |q| = \sqrt {s^{2} + v^{2}} \]</p>
+<p>\[ \mathbf q = [s,\mathbf {v}] \]
+\[ |\mathbf q| = \sqrt {s^{2} + v^{2}} \]</p>
 
 <p>这也让我们可以这样表达四元数范数：</p>
 
-<p>\[ qq^{*} = |q|^{2} \]</p>
+<p>\[ \mathbf q\mathbf q^{*} = |\mathbf q|^{2} \]</p>
 
 <h3>四元数规范化</h3>
 
 <p>利用四元数范数的定义，就可以对四元数进行规范化。要让一个四元数规范化，只需要让这个四元数去除以它的范数：</p>
 
-<p>\[ q&#39; = \frac {q}{\sqrt {s^{2}+v^{2}}} \]</p>
+<p>\[ \mathbf q&#39; = \frac {\mathbf q}{\sqrt {s^{2}+v^{2}}} \]</p>
 
 <p>举一个例子，让我们规范化下面这个四元数：</p>
 
-<p>\[ q = [1, 4i + 4j - 4k] \]</p>
+<p>\[ \mathbf q = [1, 4\mathbf i + 4\mathbf j - 4\mathbf k] \]</p>
 
 <p>第一步，先计算q的范数：</p>
 
-<p>\[ |q| = \sqrt {1^{2}+4^{2}+4^{2}+(-4)^{2}} \]
+<p>\[ |\mathbf q| = \sqrt {1^{2}+4^{2}+4^{2}+(-4)^{2}} \]
 \[ = \sqrt {49} = 7 \]</p>
 
 <p>然后，q除以|q|:</p>
 
-<p>\[ q&#39; = \frac {q}{|q|} \]
-\[ = \frac {(1+4i+4j-4k)}{7} \]
-\[ = \frac {1}{7}+\frac {4}{7}i+\frac {4}{7}j-\frac {4}{7}k \]</p>
+<p>\[ \mathbf q&#39; = \frac {\mathbf q}{|\mathbf q|} \]
+\[ = \frac {(1+4\mathbf i+4\mathbf j-4\mathbf k)}{7} \]
+\[ = \frac {1}{7}+\frac {4}{7}\mathbf i+\frac {4}{7}\mathbf j-\frac {4}{7}\mathbf k \]</p>
 
 <h3>四元数的逆</h3>
 
-<p>四元数的逆用\(q^{-1} \)表示。要计算四元数的逆，需要用四元数的共轭四元数去除以四元数的范数的平方：</p>
+<p>四元数的逆用\(\mathbf q^{-1} \)表示。要计算四元数的逆，需要用四元数的共轭四元数去除以四元数的范数的平方：</p>
 
-<p>\[ q^{-1} = \frac {q^{*}}{|q|^{2} } \]</p>
+<p>\[ \mathbf q^{-1} = \frac {\mathbf q^{*}}{|\mathbf q|^{2} } \]</p>
 
 <p>为了证明这个式子，我们先根据<strong>逆</strong>的定义，有：</p>
 
-<p>\[ qq^{-1} = [1,0] = 1 \]</p>
+<p>\[ \mathbf q\mathbf q^{-1} = [1,\mathbf 0] = 1 \]</p>
 
-<p>两边都左乘共轭四元数 \( q^{*} \) :</p>
+<p>两边都左乘共轭四元数 \( \mathbf q^{*} \) :</p>
 
-<p>\[ q^{ * }qq^{ -1 } = q^{ * } \]</p>
+<p>\[ \mathbf q^{ * }\mathbf q\mathbf q^{ -1 } = \mathbf q^{ * } \]</p>
 
-<p>将上文中的\( qq^{*} = |q|^{2} \)代入这个式子，得到：</p>
+<p>将上文中的\( \mathbf q\mathbf q^{*} = |\mathbf q|^{2} \)代入这个式子，得到：</p>
 
-<p>\[ |q|^{2}q^{-1} = q^{*} \] </p>
+<p>\[ |\mathbf q|^{2}\mathbf q^{-1} = \mathbf q^{*} \] </p>
 
-<p>\[ q^{-1} = \frac {q^{*}}{|q|^{2}} \] </p>
+<p>\[ \mathbf q^{-1} = \frac {\mathbf q^{*}}{|\mathbf q|^{2}} \] </p>
 
 <p>对于单位四元数，它的范数是1，所以可以写成：</p>
 
-<p>\[ q^{-1} = q^{*} \]</p>
+<p>\[ \mathbf q^{-1} = \mathbf q^{*} \]</p>
 
 <h3>四元数的点积</h3>
 
 <p>和向量的点积相似，我们也可以计算2个四元数的点积，只需要将各个对应的系数相乘，然后相加:</p>
 
-<p>\[ q_{1} = [s_{1},x_{1}i+y_{1}j+z_{1}k] \]
-\[ q_{2} = [s_{2},x_{2}i+y_{2}j+z_{2}k] \]
-\[ q_{1}\cdot q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]</p>
+<p>\[ \mathbf q_{1} = [s_{1},x_{1}\mathbf i+y_{1}\mathbf j+z_{1}\mathbf k] \]
+\[ \mathbf q_{2} = [s_{2},x_{2}\mathbf i+y_{2}\mathbf j+z_{2}\mathbf k] \]
+\[ \mathbf q_{1}\cdot \mathbf q_{2} = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]</p>
 
 <p>我们也可以利用四元数点积，来计算四元数之间的角度差：</p>
 
-<p>\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]</p>
+<p>\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|\mathbf q_{1}||\mathbf q_{2}|} \]</p>
 
 <p>对于单位四元数，我们可以简化上面的等式：
 \[ cos\theta = s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2} \]</p>
@@ -730,33 +730,33 @@ SQUARD
 <h2>旋转</h2>
 
 <p>前面我们定义了一个特殊的复数：旋转数。它是用来旋转2D复数平面的点的：
-\[ q = cos\theta + isin\theta \]</p>
+\[ \mathbf q = cos\theta + \mathbf i sin\theta \]</p>
 
 <p>根据四元数和复数的相似性，应该有可能设计一个可以旋转3D空间的点的四元数：
-\[ q = [cos\theta, sin\theta \mathbf {v}] \]</p>
+\[ \mathbf q = [cos\theta, sin\theta \mathbf {v}] \]</p>
 
 <p>让我们测试一下这个理论是否可靠，方法就是计算四元数q和向量p的积。第一步，我们把p写成纯四元数的形式：</p>
 
-<p>\[ p = [0,\mathbf {p}] \]</p>
+<p>\[ \mathbf p = [0,\mathbf {p}] \]</p>
 
 <p>以及单位四元数q：</p>
 
-<p>\[ q = [s,\lambda \mathbf {\hat {v}}] \]</p>
+<p>\[ \mathbf q = [s,\lambda \mathbf {\hat { \mathbf v }}] \]</p>
 
 <p>从而：</p>
 
-<p>\[ p&#39; = qp = [s,\lambda \mathbf {\hat {v}}] [0,\mathbf {p}] \]
-\[ =  [-\lambda \mathbf {\hat {v}}\cdot \mathbf {p}, s\mathbf {p} + \lambda \mathbf {\hat {v}}\times \mathbf {p} ] \]</p>
+<p>\[ \mathbf p&#39; = \mathbf q\mathbf p = [s,\lambda \mathbf {\hat { \mathbf v }}] [0,\mathbf {p}] \]
+\[ =  [-\lambda \mathbf {\hat { \mathbf v }}\cdot \mathbf {p}, s\mathbf {p} + \lambda \mathbf {\hat { \mathbf v }}\times \mathbf {p} ] \]</p>
 
 <p>我们可以看到结果是一个同时有系数、有虚向量的四元数。</p>
 
-<p>让我们先考虑特殊的情形：\( \mathbf {p} \)与\( \mathbf {\hat {v}} \)正交。这种情况下，点乘部分等于0：\(-\lambda \mathbf {\hat {v}}\cdot \mathbf {p} = 0\)。所以上面的四元数就变成了纯四元数：</p>
+<p>让我们先考虑特殊的情形：\( \mathbf {p} \)与\( \mathbf {\hat { \mathbf v }} \)正交。这种情况下，点乘部分等于0：\(-\lambda \mathbf {\hat { \mathbf v }}\cdot \mathbf {p} = 0\)。所以上面的四元数就变成了纯四元数：</p>
 
-<p>\[ p&#39; =  [0, s\mathbf {p} + \lambda \mathbf {\hat {v}}\times \mathbf {p}] \]</p>
+<p>\[ p&#39; =  [0, s\mathbf {p} + \lambda \mathbf {\hat { \mathbf v }}\times \mathbf {p}] \]</p>
 
-<p>这时候，要使\( \mathbf {p} \)绕\( \mathbf {\hat {v}} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：</p>
+<p>这时候，要使\( \mathbf {p} \)绕\( \mathbf {\hat { \mathbf v }} \)旋转，我们只需要代入\(s=cos\theta \)和\( \lambda =sin\theta \)：</p>
 
-<p>\[ p&#39; =  [0, cos\theta \mathbf {p} + sin\theta \mathbf {\hat {v}}\times \mathbf {p}] \]</p>
+<p>\[ p&#39; =  [0, cos\theta \mathbf {p} + sin\theta \mathbf {\hat { \mathbf v }}\times \mathbf {p}] \]</p>
 
 <p>现在，让我们找一个例子来测试上面的公式。譬如绕z轴(就是k轴)旋转45度，那么我们的四元数q就变成：</p>
 
@@ -768,7 +768,7 @@ SQUARD
 
 <p>好了，现在计算下qp：</p>
 
-<p>\[ p&#39; = qp \]
+<p>\[ \mathbf p&#39; = \mathbf q\mathbf p \]
 \[ = [\frac {\sqrt {2}}{2},\frac {\sqrt {2}}{2}\mathbf {k}] [0,2\mathbf {i}] \]
 \[ = [0,2\frac {\sqrt {2}}{2}\mathbf {i} + 2\frac {\sqrt {2}}{2}\mathbf {k}\times \mathbf {i}]  \]
 \[  = [0, \sqrt {2}\mathbf {i} + \sqrt {2}\mathbf {j}] \]</p>
@@ -776,7 +776,7 @@ SQUARD
 <p>结果是一个绕了k轴转了45度的纯四元数。
 我们可以确认这个四元数的向量部分的长度是：</p>
 
-<p>\[  p&#39; = \sqrt { \sqrt {2}^{2} + \sqrt {2}^{2} }  =  2 \]</p>
+<p>\[  \mathbf p&#39; = \sqrt { \sqrt {2}^{2} + \sqrt {2}^{2} }  =  2 \]</p>
 
 <p>这正是我们所期望的！</p>
 
@@ -786,21 +786,21 @@ SQUARD
 
 <p>现在，让我们考虑更一般化的四元数，即和p不正交的四元数。现在让我们把p的向量部分偏移45度：</p>
 
-<p>\[ \hat {v} = \frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k} \]</p>
+<p>\[ \hat { \mathbf v } = \frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k} \]</p>
 
 <p>\[ \mathbf {p} = 2\mathbf {i} \]</p>
 
-<p>\[ q = [cos\theta , sin\theta \mathbf {\hat {v}} ] \]</p>
+<p>\[ q = [cos\theta , sin\theta \mathbf {\hat { \mathbf v }} ] \]</p>
 
 <p>\[ p = [0, \mathbf {p}] \]</p>
 
 <p>然后算qp：</p>
 
-<p>\[ p&#39; = qp \]
-\[ = [cos\theta ,sin\theta \mathbf { \hat {v} }] [0, \mathbf {p} ]  \]
-\[ [-sin\theta \hat {v}\cdot \mathbf {p}, cos\theta \mathbf {p}+sin\theta \mathbf { \hat {v} }\times \mathbf {p}] \]</p>
+<p>\[ \mathbf p&#39; = \mathbf q\mathbf p \]
+\[ = [cos\theta ,sin\theta \mathbf { \hat { \mathbf v } }] [0, \mathbf {p} ]  \]
+\[ [-sin\theta \hat { \mathbf v }\cdot \mathbf {p}, cos\theta \mathbf {p}+sin\theta \mathbf { \hat { \mathbf v } }\times \mathbf {p}] \]</p>
 
-<p>代入我们设定的\( \mathbf { \hat {v} }, \mathbf {p}\)，以及\(\theta = 45^{\circ } \)，得到：</p>
+<p>代入我们设定的\( \mathbf { \hat { \mathbf v } }, \mathbf {p}\)，以及\(\theta = 45^{\circ } \)，得到：</p>
 
 <p>\[ p&#39; = [-\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}\mathbf {i}  + \frac {\sqrt {2}}{2}\mathbf {k} )\cdot (2\mathbf {i} ), \frac {\sqrt {2}}{2}2\mathbf {i} +\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}\mathbf {i}  + \frac {\sqrt {2}}{2}\mathbf {k} )\times 2\mathbf {i} ] \]
 \[ = [-1, \sqrt {2}\mathbf {i}  + \mathbf {j} ] \]
@@ -818,21 +818,21 @@ SQUARD
 
 <p>首先计算:</p>
 
-<p>\[ q =  [cos\theta ,  sin\theta (\frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k})] \]</p>
+<p>\[ \mathbf q =  [cos\theta ,  sin\theta (\frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k})] \]</p>
 
-<p>\[ q^{-1} =  [cos\theta ,  -sin\theta (\frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k})] \]</p>
+<p>\[ \mathbf q^{-1} =  [cos\theta ,  -sin\theta (\frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k})] \]</p>
 
-<p>(译注：这里\(q^{-1}=q^{*}\)是因为q是单位四元数)</p>
+<p>(译注：这里\(\mathbf q^{-1}=\mathbf q^{*}\)是因为q是单位四元数)</p>
 
 <p>再代入\(\theta = 45^{\circ } \)，得到：</p>
 
-<p>\[ q^{-1} =  [\frac {\sqrt {2}}{2},  -\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k})] \]</p>
+<p>\[ \mathbf q^{-1} =  [\frac {\sqrt {2}}{2},  -\frac {\sqrt {2}}{2}(\frac {\sqrt {2}}{2}\mathbf {i} + \frac {\sqrt {2}}{2}\mathbf {k})] \]</p>
 
 <p>\[ \frac {1}{2}[\sqrt {2}, -\mathbf {i}-\mathbf {k}] \]</p>
 
 <p>现在，把前面算出来的qp再次拿出来：</p>
 
-<p>\[ qp = [-1, \sqrt {2}\mathbf {i} + \mathbf {j}] \]
+<p>\[ \mathbf q\mathbf p = [-1, \sqrt {2}\mathbf {i} + \mathbf {j}] \]
 \[ qpq^{-1}  = [-1, \sqrt {2}\mathbf {i} + \mathbf {j}]\frac {1}{2}[\sqrt {2}, -\mathbf {i}-\mathbf {k}] \]
 \[ = \frac {1}{2}[-\sqrt {2}-(\sqrt {2}\mathbf {i}+\mathbf {j})\cdot (-\mathbf {i}-\mathbf {k}), \mathbf {i}+\mathbf {k}+\sqrt {2}(\sqrt {2}\mathbf {i}+\mathbf {j})-\mathbf {i}+\sqrt {2}\mathbf {j}+\mathbf {k}] \]
 \[ = \frac {1}{2}[-\sqrt {2}+\sqrt {2},\mathbf {i}+\mathbf {k}+2\mathbf {i}+\sqrt {2}\mathbf {j}-\mathbf {i}+\sqrt {2}\mathbf {j}+\mathbf {k}] \]
@@ -840,7 +840,7 @@ SQUARD
 
 <p>这下是纯四元数了，并且它的范数是：</p>
 
-<p>\[ |qpq^{-1}| = \sqrt {1^{2} + \sqrt {2}^{2} + 1^{2} } = \sqrt {4} = 2 \]</p>
+<p>\[ |\mathbf q\mathbf p\mathbf q^{-1}| = \sqrt {1^{2} + \sqrt {2}^{2} + 1^{2} } = \sqrt {4} = 2 \]</p>
 
 <p>这和原始的p的范数一致。</p>
 
@@ -850,7 +850,7 @@ SQUARD
 
 <p>所以我们可以看到，这个结果是一个纯四元数，并且原四元数的向量的范数也保持住了。但是还有一个问题：向量被旋转了90度而不是45度。这刚好是我们需要的度数的两倍！为了正确地让一个向量绕某个轴向量旋转某个角度，我们必须以目标角度的一半来计算。因此，我们构造了下面的四元数：</p>
 
-<p>\[ q = [cos\frac {1}{2}\theta ,sin\frac {1}{2}\theta \mathbf { \hat {v} }] \]</p>
+<p>\[ q = [cos\frac {1}{2}\theta ,sin\frac {1}{2}\theta \mathbf { \hat { \mathbf v } }] \]</p>
 
 <p>这就是<strong>旋转四元数</strong>的一般形式！</p>
 
@@ -880,58 +880,58 @@ SQUARD
 
 <p>我们可以把这个基础公式，套用到2个用四元数表示的朝向的插值上。</p>
 
-<h3>四元数的差</h3>
+<h3>四元数的分数差</h3>
 
-<p>根据上面的公式的第一步，我们必须先计算\( q_{1}、 q_{2}\)的差。对于四元数来说，这等价于计算2个四元数的角度差：</p>
+<p>根据上面的公式的第一步，我们必须先计算\( q_{1}、 q_{2}\)的差。对于四元数来说，这等价于计算2个四元数的分数差（译注：不是角度差）：</p>
 
-<p>\[ diff =  q_{1}^{-1}q_{2} \]</p>
+<p>\[ diff = \mathbf q_{1}^{-1}\mathbf q_{2} \]</p>
 
-<p>（译注：这个公式用到了上述的四元数点积公式）</p>
+<p>（译注：由\( \mathbf q_{1}\mathbf p_{diff} = \mathbf q_{2} \)推出 ）</p>
 
 <h3>四元数的幂运算</h3>
 
-<p>接下来的目标是干掉上面的角度差的分数部分，方法是计算四元数的t次幂(就是上面的那个插值参数t，区间是[0,1])。</p>
+<p>接下来的目标是干掉上面四元数分数差的分数部分，方法是计算四元数的t次幂(就是上面的那个插值参数t，区间是[0,1])。</p>
 
 <p>四元数的幂运算的一般化公式是：</p>
 
-<p>\[ q^{t} = exp(t \log q) \]</p>
+<p>\[ \mathbf q^{t} = exp(t \log \mathbf q) \]</p>
 
 <p>其中，(纯)四元数的exp函数的公式是：</p>
 
-<p>\[ e^{q} = exp(q) = exp([0,\theta \mathbf { \hat {v} }]) \]
-\[ = [cos\theta ,sin\theta \mathbf { \hat {v} } ] \]</p>
+<p>\[ e^{\mathbf q} = exp(\mathbf q) = exp([0,\theta \mathbf { \hat { \mathbf v } }]) \]
+\[ = [cos\theta ,sin\theta \mathbf { \hat { \mathbf v } } ] \]</p>
 
 <p>(纯)四元数的对数公式是：</p>
 
-<p>\[ \log q = \log (cos\theta + sin \theta \mathbf { \hat {v} }) \]
-\[ = \log (exp(\theta \mathbf { \hat {v} } )) \]
-\[ = \theta \mathbf { \hat {v} } \]
-\[ = [0, \theta \mathbf { \hat {v} }] \]</p>
+<p>\[ \log \mathbf q = \log (cos\theta + sin \theta \mathbf { \hat {\mathbf v} }) \]
+\[ = \log (exp(\theta \mathbf { \hat { \mathbf v } } )) \]
+\[ = \theta \mathbf { \hat { \mathbf v } } \]
+\[ = [0, \theta \mathbf { \hat { \mathbf v } }] \]</p>
 
 <p>(译注：上述的2次公式推导，其实省略了很多证明过程。具体可以参考：<a href="http://bpeers.com/blog/?itemid=861">http://bpeers.com/blog/?itemid=861</a>,<a href="http://bpeers.com/blog/?itemid=863">http://bpeers.com/blog/?itemid=863</a>,<a href="http://bpeers.com/blog/?itemid=866">http://bpeers.com/blog/?itemid=866</a>, <a href="http://bpeers.com/blog/?itemid=1001">http://bpeers.com/blog/?itemid=1001</a> )</p>
 
 <p>对于t = 0，我们有：</p>
 
-<p>\[ q^{0} = exp(0\log q) \]
-\[ = exp([cos(0), sin(0)\mathbf { \hat {v} }]) \]
+<p>\[ q^{0} = exp(0\log \mathbf q) \]
+\[ = exp([cos(0), sin(0)\mathbf { \hat { \mathbf v } }]) \]
 \[ = exp([1,\mathbf {0}]) \]
 \[ = [1,\mathbf {0}] \]</p>
 
 <p>而对于t = 1，有：</p>
 
-<p>\[ q^{1} = exp(1\log q) = q \]</p>
+<p>\[ \mathbf q^{1} = exp(1\log \mathbf q) = \mathbf q \]</p>
 
 <h3>2个四元数的分数差</h3>
 
 <p>对于角旋转的插值计算，我们利用q1和q2的角度分数差来调整原始朝向q1：</p>
 
-<p>\[ q&#39; = q_{1}(q_{1}^{-1}q_{2})^{t} \]</p>
+<p>\[ \mathbf q&#39; = \mathbf q_{1}(\mathbf q_{1}^{-1}\mathbf q_{2})^{t} \]</p>
 
 <p>这也就是使用四元数的球面线性插值的一般形式。然而，这不是slerp函数的常用形式。</p>
 
 <p>我们可以应用类似的用于计算向量的球面插值公式，到四元数里。计算向量的球面插值的一般形式定义如下：</p>
 
-<p>\[ v_{t} = \frac {sin((1-t)\theta )}{sin\theta }v_{1} + \frac {sin(t\theta )}{sin\theta }v_{2} \]</p>
+<p>\[ \mathbf v_{t} = \frac {sin((1-t)\theta )}{sin\theta }\mathbf v_{1} + \frac {sin(t\theta )}{sin\theta }\mathbf v_{2} \]</p>
 
 <p>用图像表示如下：</p>
 
@@ -939,15 +939,15 @@ SQUARD
 
 <p>这个公式可以原封不动地应用到四元数：</p>
 
-<p>\[ q_{t} = \frac {sin((1-t)\theta )}{sin\theta }q_{1} + \frac {sin(t\theta )}{sin\theta }q_{2} \]</p>
+<p>\[ \mathbf q_{t} = \frac {sin((1-t)\theta )}{sin\theta }\mathbf q_{1} + \frac {sin(t\theta )}{sin\theta }\mathbf q_{2} \]</p>
 
-<p>但这个公式需要提供角度\(\theta \)，我们可以计算\(q_{1}\)和\(q_{2}\)的点积从而得出角度\(\theta \)：</p>
+<p>但这个公式需要提供角度\(\theta \)，我们可以计算\(\mathbf q_{1}\)和\(\mathbf q_{2}\)的点积从而得出角度\(\theta \)：</p>
 
-<p>\[ cos\theta  = \frac {q_{1}\cdot q_{2}}{ |q_{1}||q_{2}| } \]</p>
+<p>\[ cos\theta = \frac {\mathbf q_{1}\cdot \mathbf q_{2}}{ | \mathbf q_{1} || \mathbf q_{2}| } \]</p>
 
-<p>\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|} \]</p>
+<p>\[ cos\theta = \frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|\mathbf q_{1}||\mathbf q_{2}|} \]</p>
 
-<p>\[ \theta = cos^{-1}(\frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|q_{1}||q_{2}|}) \]</p>
+<p>\[ \theta = cos^{-1}(\frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|\mathbf q_{1}||\mathbf q_{2}|}) \]</p>
 
 <h3>注意事项</h3>
 
@@ -955,7 +955,7 @@ SQUARD
 
 <p>第一，如果四元数点积的结果是负值，那么后面的插值就会在4D球面上绕远路，这并不是我们想要的。为了解决这个问题，我们测试点积的结果，当结果是负值时，我们将2个四元数的其中一个取反，取反它的系数和向量部分，并不会改变它代表的朝向。而经过这一步操作，可以保证这个旋转走的是最短路径。</p>
 
-<p>当\(q_{1}\)和\(q_{2}\)的角度差非常小，小到导致\(sin\theta = 0\)时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(q_{1}\)和\(q_{2}\)的线性插值。</p>
+<p>当\(\mathbf q_{1}\)和\(\mathbf q_{2}\)的角度差非常小，小到导致\(sin\theta = 0 \) 时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(\mathbf q_{1}\)和\(\mathbf q_{2}\)的线性插值。</p>
 
 <h2>SQUAD</h2>
 
@@ -963,19 +963,19 @@ SQUARD
 
 <p>如果我们有四元数序列：</p>
 
-<p>\[ q_{1},q_{2},q_{3},\cdots,q_{n-2},q_{n-1},q_{n}\]</p>
+<p>\[ \mathbf q_{1},\mathbf q_{2},\mathbf q_{3},\cdots,\mathbf q_{n-2},\mathbf q_{n-1},\mathbf q_{n}\]</p>
 
 <p>然后我们再定义一个&quot;辅助&quot;四元数(\(s_{i}\))，它是一个中间控制点：</p>
 
-<p>\[ s_{i} = exp( - \frac {\log(q_{i+1}q_{i}^{-1})+\log(q_{i-1}q_{i}^{-1})}{4})q_{i} \]</p>
+<p>\[ s_{i} = exp( - \frac {\log(\mathbf q_{i+1}\mathbf q_{i}^{-1})+\log(\mathbf q_{i-1}\mathbf q_{i}^{-1})}{4})\mathbf q_{i} \]</p>
 
 <p>所以，沿着子曲线的朝向可以定义为：</p>
 
-<p>\[ q_{i-1},q_{i},q_{i+1},q_{i+2} \]</p>
+<p>\[ \mathbf q_{i-1},\mathbf q_{i},\mathbf q_{i+1},\mathbf q_{i+2} \]</p>
 
 <p>在t时刻的朝向就是：</p>
 
-<p>\[ squad(q_{i},q_{i+1},s_{i},s_{i+1},t ) = slerp(slerp(q_{i},q_{i+1},t),slerp(s_{i},s_{i+1},t),2t(1-t)) \]</p>
+<p>\[ squad(\mathbf q_{i}, \mathbf q_{i+1}, s_{i}, s_{i+1}, t ) = slerp(slerp(\mathbf q_{i}, \mathbf q_{i+1},t),slerp(s_{i},s_{i+1},t),2t(1-t)) \]</p>
 
 <h2>总结</h2>
 
