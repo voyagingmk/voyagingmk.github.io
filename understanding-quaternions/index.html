@@ -55,7 +55,7 @@ i的幂
 四元数的点积
 
 旋转
-四元数的插值
+四元数插值
 
 
 SLERP
@@ -68,9 +68,8 @@ SLERP
 
 SQUARD
 
-结论
+总结
 下载Demo
-引用
 
 " />
     <meta property="og:description" content="原文地址:http://www.3dgep.com/understanding-quaternions/
@@ -119,7 +118,7 @@ i的幂
 四元数的点积
 
 旋转
-四元数的插值
+四元数插值
 
 
 SLERP
@@ -132,9 +131,8 @@ SLERP
 
 SQUARD
 
-结论
+总结
 下载Demo
-引用
 
 " />
     
@@ -255,22 +253,21 @@ SQUARD
 <li><a href="#4.14">四元数的点积</a></li>
 </ul></li>
 <li><a href="#5">旋转</a></li>
-<li><a href="#6">四元数的插值</a>
+<li><a href="#6">四元数插值</a>
 
 <ul>
-<li><a href="#6.1">SLERP</a>
+<li><a href="#7">SLERP</a>
 
 <ul>
-<li><a href="#6.1">四元数的差</a></li>
-<li><a href="#6.2">四元数的幂运算</a></li>
-<li><a href="#6.3">2个四元数的分数差</a></li>
-<li><a href="#6.4">注意事项</a></li>
+<li><a href="#7.1">四元数的差</a></li>
+<li><a href="#7.2">四元数的幂运算</a></li>
+<li><a href="#7.3">2个四元数的分数差</a></li>
+<li><a href="#7.4">注意事项</a></li>
 </ul></li>
-<li>SQUARD</li>
+<li><a href="#8">SQUARD</a></li>
 </ul></li>
-<li><a href="#7">结论</a></li>
-<li><a href="#8">下载Demo</a></li>
-<li><a href="#9">引用</a></li>
+<li><a href="#9">总结</a></li>
+<li><a href="#10">下载Demo</a></li>
 </ul>
 
 <!--more-->
@@ -854,13 +851,13 @@ SQUARD
 
 <p>这就是<strong>旋转四元数</strong>的一般形式！</p>
 
-<h2>四元数插值</h2>
+<h2><div id="6"> 四元数插值</div></h2>
 
 <p>在计算机图形学中使用四元数，其中一个重要原因是四元数非常适合用来表示空间中的旋转。四元数解决了其他3维空间旋转算法会遇到的恼人的问题，比如使用欧拉角来表示旋转操作时会遇到的万向节锁问题(<a href="https://en.wikipedia.org/wiki/Gimbal_lock">Gimbal lock</a>)。</p>
 
 <p>使用四元数，我们可以定义好几种方案来表示3维空间的转动插值。第一种是SLERP，它被用来把一个点(物体)从一个朝向平滑地插值到另一个朝向。第二个是SLERP的扩展版本，被称为SQAD，它被用来处理用一系列朝向定义得到的一条路径的插值。</p>
 
-<h2>SLERP</h2>
+<h2><div id="7"> SLERP </div></h2>
 
 <p>SLERP代表<strong>S</strong>pherical <strong>L</strong>inear Int*<em>erp</em>*olation。SLERP可以在2个朝向之间平滑地插值。</p>
 
@@ -880,7 +877,7 @@ SQUARD
 
 <p>我们可以把这个基础公式，套用到2个用四元数表示的朝向的插值上。</p>
 
-<h3>四元数的差</h3>
+<h3><div id="7.1"> 四元数的差 </div></h3>
 
 <p>根据上面的公式的第一步，我们必须先计算\( q_{1}、 q_{2}\)的差。对于四元数来说，这等价于计算2个四元数的差（译注：不是角度差）：</p>
 
@@ -888,7 +885,7 @@ SQUARD
 
 <p>（译注：由\( \mathbf q_{1}\mathbf p_{diff} = \mathbf q_{2} \)推出 ）</p>
 
-<h3>四元数的幂运算</h3>
+<h3><div id="7.2"> 四元数的幂运算 </div></h3>
 
 <p>接下来的目标是干掉上面四元数的差的分数部分，方法是计算四元数的t次幂(就是上面的那个插值参数t，区间是[0,1])。</p>
 
@@ -921,7 +918,7 @@ SQUARD
 
 <p>\[ \mathbf q^{1} = exp(1\log \mathbf q) = \mathbf q \]</p>
 
-<h3>2个四元数的分数差</h3>
+<h3><div id="7.3"> 2个四元数的分数差 </div></h3>
 
 <p>对于角旋转的插值计算，我们利用q1和q2的角度分数差来调整原始朝向q1：</p>
 
@@ -949,7 +946,7 @@ SQUARD
 
 <p>\[ \theta = cos^{-1}(\frac {s_{1}s_{2}+x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}}{|\mathbf q_{1}||\mathbf q_{2}|}) \]</p>
 
-<h3>注意事项</h3>
+<h3><div id="7.4"> 注意事项 </div></h3>
 
 <p>这个方案有2个问题，必须在实现过程中加以考虑。</p>
 
@@ -957,7 +954,7 @@ SQUARD
 
 <p>当\(\mathbf q_{1}\)和\(\mathbf q_{2}\)的角度差非常小，小到导致\(sin\theta = 0 \) 时，会出现第二个问题。如果这个情况出现了，当我们除以\(sin\theta\)时就会得到一个未定义的结果。在这个情况下，我们可以回退去使用\(\mathbf q_{1}\)和\(\mathbf q_{2}\)的线性插值。</p>
 
-<h2>SQUAD</h2>
+<h2><div id="8"> SQUAD </div></h2>
 
 <p>正如一个SLERP可以被用来计算四元数之间的插值，一个SQUAD (<strong>S</strong>pherical and <strong>Quad</strong>rangle)可以被用来对旋转路径进行平滑插值。</p>
 
@@ -977,7 +974,7 @@ SQUARD
 
 <p>\[ squad(\mathbf q_{i}, \mathbf q_{i+1}, s_{i}, s_{i+1}, t ) = slerp(slerp(\mathbf q_{i}, \mathbf q_{i+1},t),slerp(s_{i},s_{i+1},t),2t(1-t)) \]</p>
 
-<h2>总结</h2>
+<h2><div id="9"> 总结 </div></h2>
 
 <p>除了特别难理解之外，相比矩阵或欧拉角，四元数在表示旋转这个事情上，拥有一些明显的优点。</p>
 
@@ -998,7 +995,7 @@ SQUARD
 
 <p>存在一些已经实现了四元数、并且是正确的的数学程序库。在我的个人经验里，我发现GLM(OpenGL Math Library)是一个优秀的数学库，它的四元数的实现极其不错。如果你对在你的程序中使用四元数感兴趣，那么我会推荐你使用这个数学库。</p>
 
-<h2>下载Demo</h2>
+<h2><div id="10"> 下载Demo </div></h2>
 
 <p>我实现了一个小demo来演示一个四元数如何被用来旋转一个3维物体。这个demo是用Unity3.5.2实现的，你可以免费下载它和阅读它的脚本。zip文件也包含了一个Windows版的Unity程序。当然你可以自己构建一个Mac的版本。</p>
 
