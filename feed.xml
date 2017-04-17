@@ -7,6 +7,121 @@
     <atom:link href="http://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>mini引擎开发备忘</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;跨平台问题汇总&lt;/h2&gt;
+
+&lt;h3&gt;XCode 8 + iOS + SDL2 + OpenGL ES&lt;/h3&gt;
+
+&lt;p&gt;首先是记录xcode项目的创建问题：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;创建一个iOS平台的game或Single View Application项目。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Main和Lauch Screen这2个storyboard可以去掉，去掉后还要把info.plist里2个storyboard的选项也去掉，并设置用默认的Lauch Screen storyboard： 【Launch screen interface file base name：iOS Launch Screen】。相应的ViewController的h和m文件也去掉，只留下AppDelegate和main.m。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;AppDelegate的h和m文件可以不修改，但main.m里面的代码需要全部删除（因为SDL自身会定义main入口）。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;下载SDL2源码，解压后找到里面的xcode-iOS目录，用xcode打开其中的SDL子目录里的工程，然后直接build，就获得里libsdl2.a静态库。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;把libsdl2.a放到刚才创建的xcode项目根目录里。并在Build Phases的Link项里把libsdl2.a加上。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;然后继续添加iOS项目需要的官方frameworks: GLKit、OpenGLES、CoreMotion、AVFoundation、GameController、AudioToolbox&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;把SDL2的include目录复制到项目目录，并把目录拖进xcode左边的目录树里，然后设置后search path，这样等下编译就能找到SDL2库了&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;然后就可以新建一个main.cpp文件，开始写SDL程序了&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        <pubDate>Mon, 17 Apr 2017 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/game-engine-notes/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/game-engine-notes/</guid>
+      </item>
+    
+      <item>
+        <title>四元数公式的补充</title>
+        <description>&lt;!--more--&gt;
+
+&lt;p&gt;继上一篇四元数的文章&lt;a href=&quot;http://www.qiujiawei.com/understanding-quaternions/&quot;&gt;Understanding Quaternions 中文翻译《理解四元数》&lt;/a&gt;，已经过去一两年了。我发现那篇文章有一些细节没有讲得特别清楚，遂现在写一篇关于四元数公式的文章补缺下。&lt;/p&gt;
+
+&lt;h2&gt;四元数的指数函数&lt;/h2&gt;
+
+&lt;p&gt;先给出最终公式。设有任意四元数q：&lt;/p&gt;
+
+&lt;p&gt;\[q = s + x\mathbf i + y\mathbf j + z\mathbf k = s + \mathbf {v} = [s,\mathbf {v}] = [s,\mathbf 0] + [0,\mathbf {v}] \]&lt;/p&gt;
+
+&lt;p&gt;则有：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{q} = e^{ s +\mathbf {v}} = e^{s}e^{\mathbf v} =e^{s}( cos|\mathbf v| + \mathbf v \frac {sin |\mathbf v| } { |\mathbf v| } ) \]&lt;/p&gt;
+
+&lt;h3&gt;推导过程&lt;/h3&gt;
+
+&lt;p&gt;首先搬出四元数的&lt;strong&gt;乘积&lt;/strong&gt;公式：&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a} = [s_{a},\mathbf {a}] \]&lt;/p&gt;
+
+&lt;p&gt;\[ q_{b} = [s_{b},\mathbf {b}] \]&lt;/p&gt;
+
+&lt;p&gt;\[ q_{a}q_{b} = [s_{a}s_{b} - a\cdot b, s_{a}b+s_{b}a+a\times b] \]&lt;/p&gt;
+
+&lt;p&gt;代入上面的\( \mathbf v = 0 + x\mathbf i + y\mathbf j + z\mathbf k \)，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf v ^{2} = [ 0 - \mathbf v\cdot \mathbf v, 0 * \mathbf v + 0 * \mathbf v + \mathbf v\times \mathbf v] \]&lt;/p&gt;
+
+&lt;p&gt;\[ = [ - \mathbf v\cdot \mathbf v, 0 + 0 + 0] \]&lt;/p&gt;
+
+&lt;p&gt;\[ = - \mathbf v\cdot \mathbf v \]&lt;/p&gt;
+
+&lt;p&gt;\[ = - (x^{2} + y^{2} + z^{2}) \]&lt;/p&gt;
+
+&lt;p&gt;\[ = -|\mathbf v|^{2} \]&lt;/p&gt;
+
+&lt;p&gt;这时候设\( |\mathbf v| = θ  \) （注意，这个θ没有实际意义，只是一个临时符号），那么就有：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf v ^{2} =  -θ^{2} \ \ ，\ \ \mathbf v ^{3} =  -θ^{2}\mathbf v \ \ ，\ \ \mathbf v ^{4} = θ^{4}  \ \ ，\ \ \mathbf v ^{5} = θ^{4}\mathbf v \ \ ，\ \ \mathbf v ^{6} = -θ^{6} \ \ ，\cdots \]&lt;/p&gt;
+
+&lt;p&gt;下一步，拿出指数函数使用极限形式的定义(证明见[2])：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{x} = \sum _{k=0}^{\infty } \frac {x^{k} }{k!} \ \ \ \ x是实数 \]&lt;/p&gt;
+
+&lt;p&gt;把实数x替换成上面的四元数\(\mathbf v\)，并利用上面的数列，则得到：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{\mathbf v} = \sum _{k=0}^{\infty } \frac {\mathbf v^{k} }{k!} \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 1 + \frac {\mathbf v}{1!} - \frac {θ^{2}}{2!} - \frac {θ^{2}\mathbf v}{3!} + \frac {θ^{4}}{4!} + \frac {θ^{4}\mathbf v}{5!}  - \frac {θ^{6}}{6!} + \cdots = \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 1 + \frac {θ\mathbf v}{1!θ} - \frac {θ^{2}}{2!} - \frac {θ^{3}\mathbf v}{3!θ} + \frac {θ^{4}}{4!} + \frac {θ^{5}\mathbf v}{5!θ}  - \frac {θ^{6}}{6!} + \cdots = \]&lt;/p&gt;
+
+&lt;p&gt;\[ = ( 1 - \frac {θ^{2}}{2!} + \frac {θ^{4}}{4!} - \frac {θ^{6}}{6!}  \cdots ) +  \frac { \mathbf v }{θ} ( \frac {θ}{1!} - \frac {θ^{3}}{3!} + \frac {θ^{5}}{5!} \cdots )  = \]&lt;/p&gt;
+
+&lt;p&gt;\[ = cosθ + \frac { \mathbf v }{θ} sinθ  \]&lt;/p&gt;
+
+&lt;p&gt;最后一步里，2个无穷数列变成三角函数，是用了泰勒公式[3]。&lt;/p&gt;
+
+&lt;p&gt;然后，把假设出来的θ去掉，得到： &lt;/p&gt;
+
+&lt;p&gt;\[ e^{\mathbf v}  = cos|\mathbf v| + \frac { \mathbf v }{|\mathbf v|} sin|\mathbf v|  \]&lt;/p&gt;
+
+&lt;p&gt;所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ e^{q} = e^{ s +\mathbf {v}} = e^{s}e^{\mathbf v} =e^{s}( cos|\mathbf v| + \mathbf v \frac {sin |\mathbf v| } { |\mathbf v| } ) \]&lt;/p&gt;
+
+&lt;p&gt;得证。&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;[1] &lt;a href=&quot;http://math.stackexchange.com/questions/1030737/exponential-function-of-quaternion-derivation&quot;&gt;Exponential Function of Quaternion - Derivation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[2]指数函数的泰勒展开公式的证明：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.songho.ca/math/taylor/taylor_exp.html&quot;&gt;MacLaurin series of Exponential function&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[3] cos sin三角函数的泰勒展开公式的证明：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.songho.ca/math/taylor/taylor_tri.html&quot;&gt;MacLaurin series of Trigonometric function&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://web.mit.edu/2.998/www/QuaternionReport1.pdf&quot;&gt;Quaternions, Interpolation and Animation&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 04 Apr 2017 00:00:00 +0800</pubDate>
+        <link>http://www.qiujiawei.com/quaternion3/</link>
+        <guid isPermaLink="true">http://www.qiujiawei.com/quaternion3/</guid>
+      </item>
+    
+      <item>
         <title>四元数公式的补充</title>
         <description>&lt;!--more--&gt;
 
@@ -650,318 +765,6 @@
         <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/redblacktree-2/</link>
         <guid isPermaLink="true">http://www.qiujiawei.com/redblacktree-2/</guid>
-      </item>
-    
-      <item>
-        <title>细说红黑树(1)-核心定理</title>
-        <description>&lt;p&gt;我一直觉得那些著名的数据结构，都是工程设计和数学的完美结合。&lt;/p&gt;
-
-&lt;p&gt;所有的数据&lt;strong&gt;结构&lt;/strong&gt;都是被精心&lt;strong&gt;设计&lt;/strong&gt;出来的，此所谓工程设计。但是，既然叫精心设计，就意味着有一套准则，这个准则就是数学。&lt;/p&gt;
-
-&lt;p&gt;没有数学基础的数据结构都是耍流氓。&lt;/p&gt;
-
-&lt;p&gt;红黑树拥有精巧的结构设计和强大的数学基础，但我总觉得有点过于复杂，故写本文来回顾总结下。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h1&gt;红黑树的定义&lt;/h1&gt;
-
-&lt;p&gt;红黑树是一种特殊的二叉树，每个节点有颜色bit，要么红色要么黑色。红黑树必然满足以下4个&lt;strong&gt;结构上&lt;/strong&gt;的性质：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;根节点是黑色&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;叶子节点（NULL）视为黑色节点&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;如果一个节点是红色，那么它的2个孩子节点都是黑色&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;对于每条从根节点出发、并到达叶子节点的路径，路径上黑色节点的数量一致（叶子节点也计算在内）&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这4个性质，稍微想一遍就知道是没有矛盾的。但是没有矛盾只是第一步，接着就是证明这4个性质为什么能使得红黑树变成牛逼的树。&lt;/p&gt;
-
-&lt;p&gt;牛逼指的是这棵树很&lt;strong&gt;平衡&lt;/strong&gt;。平衡的定义是：设二叉树的节点数目为n，那么树的高度h和n必须满足：\( h = O(\log _{2}n)\)。这个就是要证明的东西。&lt;/p&gt;
-
-&lt;h1&gt;红黑树的证明&lt;/h1&gt;
-
-&lt;p&gt;所谓的证明，其实就是从上面的4个结构性质，分析出各种各样的数学上的性质，然后看下这些数学性质究竟能不能决定红黑树是不是平衡。&lt;/p&gt;
-
-&lt;p&gt;若能够证明平衡，就可以抽丝剥茧，找出最关键的几条数学性质，就可以总结出一份简短的证明过程了。&lt;/p&gt;
-
-&lt;p&gt;下面就是一份老外给出的最简单的证明过程。&lt;/p&gt;
-
-&lt;h2&gt;定义BH(x)&lt;/h2&gt;
-
-&lt;p&gt;首先需要定义一个函数BH(x)：x指红黑树的一个节点，BH(x)指这个x节点到叶子节点的路径上黑色节点的数量。&lt;/p&gt;
-
-&lt;p&gt;根据上面的性质4，可以知道无论x走哪条路径到达叶子节点，BH(x)都一样。&lt;/p&gt;
-
-&lt;h2&gt;2个引理&lt;/h2&gt;
-
-&lt;h3&gt;引理1：对于以节点x为根节点的子树，设子树的总的节点数量n，那么有\( n \geq 2^{BH(x)} - 1  \)&lt;/h3&gt;
-
-&lt;p&gt;要分2个情况来证明这个引理：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;树只有黑色节点。此时根据性质4，可以知道这树是完全二叉树，完全二叉树的节点数量等于\( 2^{h} - 1  \)，而h又等于BH(x)
-。所以此种情况满足引理。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;2.树有黑色也有红色节点。可以把这种情况视作第一种情况下的红黑树被添加了一些红色节点，根据性质1-4，可知道红色节点并不会影响BH(x)值。所以满足引理。&lt;/p&gt;
-
-&lt;p&gt;综上，此引理没有问题。&lt;/p&gt;
-
-&lt;h3&gt;引理2：设树的高度为h，那么有\( BH(root) \geq \frac {h} {2} \)&lt;/h3&gt;
-
-&lt;p&gt;这个引理其实是在说，从根节点到叶子节点，黑色节点起码有高度的一半那么多。分2步来想：假如黑点节点数量是高度的一半，根据红黑树性质1-4，可以知道必然是黑红相间的排列方式：黑-红-黑-红 ···· ；当黑点节点数量是高度的一半再减一时，等于有一个黑色节点消失了，就说明出现了2个连在一起的红色节点了。就破坏了性质3。于是反证成功。&lt;/p&gt;
-
-&lt;p&gt;另外一种思路：&lt;/p&gt;
-
-&lt;p&gt;因为红黑树的性质3“红节点的2个孩子都是黑节点”，所以使得一条路径上红节点总数最大化的方法，必然是“黑(root)-红-黑-红-······-黑-红-黑-红-黑(leaf)”，注意，最后一个必然是叶子节点，根据性质2，这个叶子节点是黑节点，所以根据这个路径排列，就可以知道红节点必然比黑节点少，反而言之，黑节点数量必然大于等于高度的二分之一。&lt;/p&gt;
-
-&lt;h3&gt;定理：任意一棵红黑树必然满足：\( h \leq 2log_{2}(n+1) \)&lt;/h3&gt;
-
-&lt;p&gt;证明：&lt;/p&gt;
-
-&lt;p&gt;根据引理1，有：&lt;/p&gt;
-
-&lt;p&gt;\[  n \geq 2^{BH(root)} - 1 \]&lt;/p&gt;
-
-&lt;p&gt;再因为引理2，有：&lt;/p&gt;
-
-&lt;p&gt;\[  n \geq 2^{BH(root)} - 1 \geq 2^{\frac {h} {2}} - 1\]&lt;/p&gt;
-
-&lt;p&gt;\[  n \geq 2^{\frac {h} {2}} - 1\]&lt;/p&gt;
-
-&lt;p&gt;再变换一下：&lt;/p&gt;
-
-&lt;p&gt;\[  n + 1 \geq 2^{\frac {h} {2}} \]&lt;/p&gt;
-
-&lt;p&gt;\[  log_{2}(n + 1) \geq log_{2}2^{\frac {h} {2}} \]&lt;/p&gt;
-
-&lt;p&gt;\[  log_{2}(n + 1) \geq \frac {h} {2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ h \leq 2log_{2}(n + 1)   \]&lt;/p&gt;
-
-&lt;p&gt;得证。&lt;/p&gt;
-
-&lt;p&gt;这个定理的重要性在于，它保证了红黑树是&lt;strong&gt;平衡&lt;/strong&gt;的。&lt;/p&gt;
-
-&lt;h2&gt;总结&lt;/h2&gt;
-
-&lt;p&gt;红黑树和一般的二叉树相比，在空间上只是多了一个bit，这个特性对红黑树的实际运用非常棒；而围绕“red or black&amp;quot;设计出来的4个性质，恰好使得红黑树获得了最后的不等式，这个不等式使得红黑树和最理想的平衡二叉树也相差无几了。&lt;/p&gt;
-
-&lt;p&gt;虽然红黑树能够简单地被理解，但是它的发明过程想必是不简单的，这需要天才般的想象力(红黑树只用一个标记位)和数学分析能力。也可以称为发明创造能力，这是不容易的。吾等只能膜拜大神。&lt;/p&gt;
-
-&lt;p&gt;除了红黑树平衡性证明之外，还有别的算法设计工作要做，也就是红黑树的插入、删除、调整运算，必须足够快，不然实际价值就会降低。&lt;/p&gt;
-
-&lt;p&gt;当然，上文只能证明红黑树&lt;strong&gt;在理论上的优秀&lt;/strong&gt;。如果在工程上能够实现这套理论，才算是完美的，然而实际上不那么简单（要正确实现红黑树的插入、删除、旋转操作啊）。下一篇文章前我会自己实现一遍红黑树，再写下心得体会。&lt;/p&gt;
-
-&lt;h2&gt;参考资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.dgp.toronto.edu/people/JamesStewart/378notes/16redBlack/&quot;&gt;http://www.dgp.toronto.edu/people/JamesStewart/378notes/16redBlack/&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/redblacktree-1/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/redblacktree-1/</guid>
-      </item>
-    
-      <item>
-        <title>蒙特·卡罗(Monte Carlo)积分在图形学中的应用</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h1&gt;计算着色点的间接光照&lt;/h1&gt;
-
-&lt;p&gt;在计算一个着色点的间接光照时，理论上可以通过从着色点往上半球各个方向发射无数条光线，并计算这些光线返回的Rdiance值，就可以得到这个着色点的间接光照。但因为计算机的计算速度问题，不可能给一个着色点生成“无数”条光线，在工程实现上必然是得做成有限数量的光线，且很悲哀的，这个数量值不会很大。&lt;/p&gt;
-
-&lt;p&gt;那么如何用有限的光线，得到最真实的间接光照值呢？答案是用蒙特·卡罗积分。蒙特·卡罗积分的特性是，采样数越多就越接近真实积分值，而这正是做间接光照计算所需要的。譬如我们可以根据实际需求，设置采样数量，数量大就出图慢、精度高，数量小就出图快但粗糙。&lt;/p&gt;
-
-&lt;p&gt;下面开始数学环节。&lt;/p&gt;
-
-&lt;h2&gt;计算间接光照的蒙特·卡罗方法&lt;/h2&gt;
-
-&lt;p&gt;生成间接光照的各个光线时，需要有一个随机变量\(\omega \)，这个随机变量就是光线的“出射角度”，更严格地说应该是“&lt;a href=&quot;http://www.qiujiawei.com/solid-angle/&quot;&gt;立体角&lt;/a&gt;”。&lt;/p&gt;
-
-&lt;p&gt;对于一个半球，它的总立体角是2π，那么关于\(\omega \)的pdf函数记为\(p(\omega ) \)，而在上一篇文章中我们知道pdf的积分等于1，所以有：&lt;/p&gt;
-
-&lt;p&gt;\[ \int _{\omega = 0 }^{2π}p(\omega )d\omega = 1 \]&lt;/p&gt;
-
-&lt;p&gt;又因为我们希望\(\omega \)是符合均匀分布的，从而使得间接光照采样是概率无偏的，那么\(p(\omega ) \)是一个常数：&lt;/p&gt;
-
-&lt;p&gt;\[ p(\omega ) = C \]&lt;/p&gt;
-
-&lt;p&gt;\[ C\int _{\omega = 0 }^{2π}d\omega = 1 \]&lt;/p&gt;
-
-&lt;p&gt;这个方程是可以解出来的:&lt;/p&gt;
-
-&lt;p&gt;\[ C\int _{\omega = 0 }^{2π}d\omega = C(2π - 0 ) =  1 \]&lt;/p&gt;
-
-&lt;p&gt;\[  p(\omega ) = C = \frac {1}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;成功解决了第一个事情：&lt;strong&gt;随机变量\(\omega \)的pdf函数&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;下一个问题是：&lt;strong&gt;把立体角\(\omega \)转换成球形角\(\phi 、\theta  \)，从而方便实际计算&lt;/strong&gt;：&lt;/p&gt;
-
-&lt;p&gt;\[  p(\omega ) d\omega =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
-
-&lt;p&gt;其中，\(d\omega \)的转换方法在&lt;a href=&quot;http://www.qiujiawei.com/solid-angle/&quot;&gt;立体角(Solid Angle)详解&lt;/a&gt;中已经阐述过了，公式为：&lt;/p&gt;
-
-&lt;p&gt;\[ d\omega = sin\theta d\theta d\phi \]&lt;/p&gt;
-
-&lt;p&gt;所以有：&lt;/p&gt;
-
-&lt;p&gt;\[  p(\omega ) d\omega =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
-
-&lt;p&gt;\[  p(\omega ) sin\theta d\theta d\phi =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
-
-&lt;p&gt;\[  \frac {1}{2π} sin\theta d\theta d\phi =  p(\theta , \phi) d\theta d\phi \]&lt;/p&gt;
-
-&lt;p&gt;\[  \frac {1}{2π} sin\theta  =  p(\theta , \phi)  \]&lt;/p&gt;
-
-&lt;p&gt;\[  p(\theta , \phi) = \frac {sin\theta}{2π}  \]&lt;/p&gt;
-
-&lt;p&gt;\( p(θ,ϕ)\) 被称为联合概率分布(joint probability distribution)。此时，我们需要实现对θ,ϕ各自的独立采样，所以需要把\( p(θ,ϕ)\)拆分开，求出\( p(θ)\) 和 \( p(ϕ) \)。幸运地是，有简单的方法可以实现同样的效果，那就是用&lt;a href=&quot;https://en.wikipedia.org/wiki/Marginal_distribution&quot;&gt;边缘分布(marginal distribution)&lt;/a&gt;。计算过程如下：&lt;/p&gt;
-
-&lt;p&gt;\[ p(θ) = \int _{\phi = 0}^{2π}p(θ,ϕ)d\phi = \int _{\phi = 0}^{2π}\frac {sin\theta}{2π}d\phi = 2π \frac {sin\theta}{2π} =sin\theta \]&lt;/p&gt;
-
-&lt;p&gt;\[ p(ϕ) = \int _{θ = 0}^{ \frac {π}{2} }p(θ,ϕ)dθ = \int _{ θ = 0}^{ \frac {π}{2} }\frac {sin\theta}{2π}dθ = \frac {-cos\theta}{2π} | _{0}^{\frac {π}{2}}= \frac {-cos \frac {π}{2} }{2π} - \frac {-cos0 }{2π} = \frac {1}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;\(p(ϕ)\)也可以用联合概率公式来求解：&lt;/p&gt;
-
-&lt;p&gt;\[ p(ϕ) =\frac {p(θ,ϕ)}{p(θ)} =  \frac { \frac {sin\theta}{2π}  }{ sin\theta }  = \frac {1}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;到了这里，事情还没完，还有2个东西要学习：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Cumulative_distribution_function&quot;&gt;CDF, Cumulative distribution function&lt;/a&gt; 和 &lt;a href=&quot;https://en.wikipedia.org/wiki/Inverse_transform_sampling&quot;&gt;Inverse transform sampling&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h2&gt;CDF 累积分布函数&lt;/h2&gt;
-
-&lt;p&gt;公式如下：&lt;/p&gt;
-
-&lt;p&gt;\[ CDF(x) = P( -\infty &amp;lt; X \leq x ) \]&lt;/p&gt;
-
-&lt;p&gt;大写X是指随机变量，小写x指的是参数，P是概率函数，因此CDF(x)的含义是，&lt;strong&gt;随机变量X的值小于等于x的概率&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;对于连续随机变量X，CDF可以用积分形式表示：&lt;/p&gt;
-
-&lt;p&gt;\[ CDF(s) = \int _{-\infty }^{s}pdf(x)dx \]&lt;/p&gt;
-
-&lt;p&gt;从基本定义延伸出来的公式：&lt;/p&gt;
-
-&lt;p&gt;\[ P(a &amp;lt; x \leq b) = CDF(b) - CDF(a) = \int _{ a }^{b}pdf(x)dx  \]&lt;/p&gt;
-
-&lt;p&gt;CDF的性质：&lt;/p&gt;
-
-&lt;p&gt;\[ \lim _{x\to -\infty }CDF(x) = 0 \]&lt;/p&gt;
-
-&lt;p&gt;\[ \lim _{x\to +\infty }CDF(x) = 1 \]&lt;/p&gt;
-
-&lt;p&gt;实例，取值范围是[0,1]的随机变量X的CDF：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.8/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;CDF一般也可以用\(F_{X}\)表示。&lt;/p&gt;
-
-&lt;h2&gt;Inverse transform sampling 逆采样方法&lt;/h2&gt;
-
-&lt;p&gt;步骤一：获得一个均布分布的随机变量u，这个u必须落在[0,1]范围内，并把这个u解释为“概率值”（概率的范围也是[0,1])。&lt;/p&gt;
-
-&lt;p&gt;步骤二：获得一个CDF(x)函数&lt;/p&gt;
-
-&lt;p&gt;步骤三：计算使得下面的不等式成立的x的最大值：&lt;/p&gt;
-
-&lt;p&gt;\[ CDF(x) = P( -\infty &amp;lt; X \leq x ) = F_{X}(x) &amp;lt; u \]&lt;/p&gt;
-
-&lt;p&gt;因为&lt;strong&gt;逆采样&lt;/strong&gt;本质上是一个函数，变量是u，解是x，所以用这个不等式来表达逆采样方法是不方便的，更常见的做法是用\(F_{X}^{-1}(u) \)来表示&lt;strong&gt;逆采样&lt;/strong&gt;。\(F_{X}^{-1}(u) \)的完整表达式一般用&lt;a href=&quot;https://en.wikipedia.org/wiki/Infimum_and_supremum&quot;&gt;下确界或上确界&lt;/a&gt;等式表示：&lt;/p&gt;
-
-&lt;p&gt;上确界形式：&lt;/p&gt;
-
-&lt;p&gt;\[ F_{X}^{-1}(u) = \sup \lbrace F_{X}(x) &amp;lt; u \rbrace \]&lt;/p&gt;
-
-&lt;p&gt;下确界形式：&lt;/p&gt;
-
-&lt;p&gt;\[ F_{X}^{-1}(u) = \inf \lbrace F_{X}(x) \geq u \rbrace \]&lt;/p&gt;
-
-&lt;p&gt;\(F_{X}^{-1}(u) \)的重要性质：u的每一个取值都有唯一的x与之对应。使得这个性质的原因是CDF是一个递增的函数。&lt;/p&gt;
-
-&lt;p&gt;因此，在实际应用中，可以先随机一个u，再通过CDF函数计算出对应的x，又因为u是均匀采样(uniform sample)的，于是x也是均匀采样的。&lt;/p&gt;
-
-&lt;h2&gt;再回到间接光照的问题&lt;/h2&gt;
-
-&lt;p&gt;前面已经得到了\( p(θ)\) 和 \( p(ϕ) \):&lt;/p&gt;
-
-&lt;p&gt;\[ p(θ) = sin\theta \]&lt;/p&gt;
-
-&lt;p&gt;\[ p(ϕ) = \frac {1}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;现在可以推导它们的CDF函数了：&lt;/p&gt;
-
-&lt;p&gt;\[ CDF(θ) = \int _{0 }^{θ}p(θ)dθ = \int _{0 }^{θ}sin\theta dθ = (-cos\theta) |_{0}^{θ}  = -cos\theta - (-cos0) = 1 - cos\theta \]&lt;/p&gt;
-
-&lt;p&gt;\[ CDF(ϕ) = \int _{0 }^{ϕ}p(ϕ)dϕ = \int _{0 }^{ϕ}\frac {1}{2π}dϕ = \frac {1}{2π}\int _{0 }^{ϕ}dϕ = \frac {ϕ}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;即：&lt;/p&gt;
-
-&lt;p&gt;\[ F_{θ}(θ) = 1 - cos\theta  \]&lt;/p&gt;
-
-&lt;p&gt;\[ F_{ϕ}(ϕ) = \frac {ϕ}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;然后就是推导这两个CDF的逆采样公式，设：&lt;/p&gt;
-
-&lt;p&gt;\[ u_{1} = 1 - cos\theta \]&lt;/p&gt;
-
-&lt;p&gt;\[ cos\theta = 1 - u_{1}  \]&lt;/p&gt;
-
-&lt;p&gt;\[ \theta = cos^{-1}(1 - u_{1})  \]&lt;/p&gt;
-
-&lt;p&gt;即：&lt;/p&gt;
-
-&lt;p&gt;\[ F_{θ}^{-1}(u_{1}) = cos^{-1}(1 - u_{1}) \]&lt;/p&gt;
-
-&lt;p&gt;再设：&lt;/p&gt;
-
-&lt;p&gt;\[ u_{2} = \frac {ϕ}{2π} \]&lt;/p&gt;
-
-&lt;p&gt;\[ ϕ = u_{2}2π  \]&lt;/p&gt;
-
-&lt;p&gt;即：&lt;/p&gt;
-
-&lt;p&gt;\[ F_{ϕ}^{-1}(u_{2}) =  u_{2}2π   \]&lt;/p&gt;
-
-&lt;p&gt;汇总一下：&lt;/p&gt;
-
-&lt;p&gt;\[ F_{θ}^{-1}(u_{1}) = cos^{-1}(1 - u_{1}) \]&lt;/p&gt;
-
-&lt;p&gt;\[ F_{ϕ}^{-1}(u_{2}) =  u_{2}2π   \]&lt;/p&gt;
-
-&lt;p&gt;总结一下：只要生成2个在[0,1]范围的符合均匀分布的随机数\( u_{1}、u_{2}\)，就可以得到均匀分布的\(θ、ϕ\)了，就是这么简单。&lt;/p&gt;
-
-&lt;p&gt;有了\(θ、ϕ\)后，就可以代入3维的极坐标公式，得到3维的笛卡尔坐标：&lt;/p&gt;
-
-&lt;p&gt;\[ x= sinθ cosϕ \]&lt;/p&gt;
-
-&lt;p&gt;\[ y= cosθ \]&lt;/p&gt;
-
-&lt;p&gt;\[ z= sinθ sinϕ \]&lt;/p&gt;
-
-&lt;p&gt;坐标(x,y,z)必然落在圆心在原点、半径为1、法向量为(0,1,0)的半球的球面。&lt;/p&gt;
-
-&lt;p&gt;有了(x,y,z)坐标，就可以生成沿着半球面的均匀的出射光线了。之后的就是光线追踪的问题了。本文不表。&lt;/p&gt;
-
-&lt;h1&gt;实际测试&lt;/h1&gt;
-
-&lt;p&gt;把蒙特卡洛应用到我的离线渲染器中，效果如下：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.9/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;有看起来比较奇怪的边缘噪点。暂时先这样吧。&lt;/p&gt;
-
-&lt;h1&gt;参考资料&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&quot;&gt;http://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sat, 03 Sep 2016 00:00:00 +0800</pubDate>
-        <link>http://www.qiujiawei.com/monte-carlo2/</link>
-        <guid isPermaLink="true">http://www.qiujiawei.com/monte-carlo2/</guid>
       </item>
     
   </channel>

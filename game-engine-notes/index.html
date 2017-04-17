@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>记录c++一些神奇的报错 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>mini引擎开发备忘 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="记录c++一些神奇的报错" />
-    <meta property="twitter:title" content="记录c++一些神奇的报错" />
+    <meta property="og:title" content="mini引擎开发备忘" />
+    <meta property="twitter:title" content="mini引擎开发备忘" />
     
 
     <!--[if lt IE 9]>
@@ -36,8 +36,8 @@
 
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
-		  'page': '/c++-error-solved/',
-		  'title': '记录c++一些神奇的报错'
+		  'page': '/game-engine-notes/',
+		  'title': 'mini引擎开发备忘'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -76,77 +76,36 @@
     </div>
 
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>记录c++一些神奇的报错</h1>
-  <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>mini引擎开发备忘</h1>
+  <h3>Tags: <a href="/tag/game-engine/" rel="tag">game engine</a></h3>
   <div class="entry">
     <!--more-->
 
-<h2>Visual Studio的</h2>
+<h2>跨平台问题汇总</h2>
 
-<h3>lib include目录，继承的值丢失</h3>
+<h3>XCode 8 + iOS + SDL2 + OpenGL ES</h3>
 
-<p>在C:\Users\%{用户名}\AppData\Local\Microsoft\MSBuild\v4.0里面有2个文件要检查一下:</p>
+<p>首先是记录xcode项目的创建问题：</p>
 
-<p>Microsoft.Cpp.x64.user.props</p>
-
-<p>Microsoft.Cpp.Win32.user.props</p>
-
-<p>32位和64位的全局项目配置，里面的<PropertyGroup>的<IncludePath>或者<LibraryPath>是不是空的，是空的话要去掉该行，否则就意味着父级配置的path是空的，所以就继承不到值了。</p>
-
-<h3>glew和glfw的动态链接/静态链接问题</h3>
-
-<p>除了要在链接选项设置好lib文件名之外，还要在代码里面加以下代码，控制动态/静态链接：</p>
-
-<h1>define GLEW_STATIC</h1>
-
-<h1>define GLFW_DLL</h1>
-
-<p>否则会编译报错。</p>
-
-<h3>SDL_main链接错误</h3>
-
-<p>mian函数必须带参数：</p>
-
-<p>int main(int argc, char *argv[])</p>
-
-<p>如果只写int main() 就会链接报错。</p>
-
-<h2>Heap Corruption Deteched</h2>
-
-<p><img src="../images/2016.7/10.png" alt="10.png"></p>
-
-<p>这个报错发生在main函数返回时。出错原因是在堆数组的赋值上。</p>
-
-<p>先是初始化一个数组指针：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">bool</span> <span class="o">*</span> <span class="n">array</span> <span class="o">=</span> <span class="n">new</span> <span class="kt">bool</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
-</code></pre></div>
-<p>然后循环赋值：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-    <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>注意，这个循环溢出了，这个循环对array[100]进行了赋值，即数组的第101个元素，而数组长度只有100。</p>
-
-<p>然后再执行delete[] array就会出上面截图那个报错了。</p>
-
-<p>修了那个循环次数就没事了，就酱。</p>
-
-<h2>error C2338: tuple_element index out of bounds</h2>
-
-<p>参考了这篇文章 <a href="http://www.cnblogs.com/fengyubo/p/4866623.html">http://www.cnblogs.com/fengyubo/p/4866623.html</a></p>
-
-<p>其实就是placeholders::_1 placeholders::_2 这些填错了。</p>
-
-<h2>从mac拷贝git目录到windows后出现无法丢弃的修改</h2>
-
-<p>git config core.filemode false
-git config core.eol lf</p>
+<ol>
+<li><p>创建一个iOS平台的game或Single View Application项目。</p></li>
+<li><p>Main和Lauch Screen这2个storyboard可以去掉，去掉后还要把info.plist里2个storyboard的选项也去掉，并设置用默认的Lauch Screen storyboard： 【Launch screen interface file base name：iOS Launch Screen】。相应的ViewController的h和m文件也去掉，只留下AppDelegate和main.m。</p></li>
+<li><p>AppDelegate的h和m文件可以不修改，但main.m里面的代码需要全部删除（因为SDL自身会定义main入口）。</p></li>
+<li><p>下载SDL2源码，解压后找到里面的xcode-iOS目录，用xcode打开其中的SDL子目录里的工程，然后直接build，就获得里libsdl2.a静态库。</p></li>
+<li><p>把libsdl2.a放到刚才创建的xcode项目根目录里。并在Build Phases的Link项里把libsdl2.a加上。</p></li>
+<li><p>然后继续添加iOS项目需要的官方frameworks: GLKit、OpenGLES、CoreMotion、AVFoundation、GameController、AudioToolbox</p></li>
+<li><p>把SDL2的include目录复制到项目目录，并把目录拖进xcode左边的目录树里，然后设置后search path，这样等下编译就能找到SDL2库了</p></li>
+<li><p>然后就可以新建一个main.cpp文件，开始写SDL程序了</p></li>
+</ol>
 
   </div>
 
   <div class="date">
-    Written on July 25, 2016
+    Written on April 17, 2017
   </div>
 
   
@@ -167,6 +126,7 @@ git config core.eol lf</p>
 </div>
 
 </article>
+
 
     </div>
 
