@@ -26,6 +26,21 @@
 &lt;li&gt;&lt;p&gt;把SDL2的include目录复制到项目目录，并把目录拖进xcode左边的目录树里，然后设置后search path，这样等下编译就能找到SDL2库了&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;然后就可以新建一个main.cpp文件，开始写SDL程序了&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
+
+&lt;h3&gt;renderer的代码在xcode中编译遇到的报错&lt;/h3&gt;
+
+&lt;p&gt;一大堆报错，处理了一两个小时，主要产生原理是vc和gcc的不一致性，以及一些平台相关代码问题。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Point模板类，Vector模板继承Point，会出现一个便特化的问题，症状就是Vector的代码里调用父类成员x y z，gcc会找不到（vc没问题），原因暂时没完全搞懂，关键词是偏特化，gcc要求明确指出x y z是哪来的对象，也就是说要么写成Point&lt;T&gt;::x, 要么写成this-&amp;gt;x。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;当class的构造函数的参数没有加const限定符，但用右值作为参数去创建类实例时，vc不会报错，而gcc报错了，加上const后可以解决。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;【Non-constant-expression cannot be narrowed from type &amp;#39;unsigned long&amp;#39; to &amp;#39;int&amp;#39; in initializer list】 initial list初始化列表不支持非常量表达式的long到int的narrow转换，需要自行加上static_cast&lt;int&gt;。（vc不会报这个错）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;【Use of overloaded operator &amp;#39;/&amp;#39; is ambiguous (with operand types &amp;#39;value_type&amp;#39; (aka &amp;#39;nlohmann::basic_json&lt;std::map, std::vector, std::__1::basic_string&lt;char&gt;, bool, long long, double, std::allocator&amp;gt;&amp;#39;) and &amp;#39;float&amp;#39;) 】这个错和第三方json库有关，但vc没报错，大概就是编译器找到多个／操作符重载，不知道用哪个，需要把代码从 c[0] / 255.0f 改成 float(c[0]) / 255.0f&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;【Non-const lvalue reference to type &amp;#39;renderer::Ray&amp;#39; cannot bind to a temporary of type &amp;#39;renderer::Ray&amp;#39;】 问题处在函数返回值类型和变量类型上。函数返回的是Ray，而变量是Ray&amp;amp;，如果是vc，那么不会报错。如果是gcc，有三个办法解决报错，一改成const Ray&amp;amp;（注意，改const的话，其他代码可能会有冲突），二改成Ray&amp;amp;&amp;amp;，三改成Ray。vc真是人性化到有点可怕，这种返回值没弄好，分分钟变成性能瓶颈的。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;【Control may reach end of non-void function】，这个在vc里没有报，在gcc里报了，gcc要严格得多呀。这个报错就是要求说，每个函数能到达的结束位置，都必须有返回值。我这里是不小心写漏了。小问题。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;头文件include报错，这种属于工程问题，通过配置xcode的include路径应该可以解决。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;平台相关的编译报错，通过#if可以粗暴解决。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 </description>
         <pubDate>Mon, 17 Apr 2017 00:00:00 +0800</pubDate>
         <link>http://www.qiujiawei.com/game-engine-notes/</link>
