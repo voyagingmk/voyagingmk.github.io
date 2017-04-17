@@ -107,7 +107,7 @@
 <p>一大堆报错，处理了一两个小时，主要产生原理是vc和gcc的不一致性，以及一些平台相关代码问题。</p>
 
 <ol>
-<li><p>Point模板类，Vector模板继承Point，会出现一个便特化的问题，症状就是Vector的代码里调用父类成员x y z，gcc会找不到（vc没问题），原因暂时没完全搞懂，关键词是偏特化，gcc要求明确指出x y z是哪来的对象，也就是说要么写成Point<T>::x, 要么写成this-&gt;x。</p></li>
+<li><p>Point模板类，Vector模板继承Point，会出现一个偏特化的问题，症状就是Vector的代码里调用父类成员x y z，gcc会找不到（vc没问题），原因暂时没完全搞懂，关键词是偏特化，gcc要求明确指出x y z是哪来的对象，也就是说要么写成Point<T>::x, 要么写成this-&gt;x。</p></li>
 <li><p>当class的构造函数的参数没有加const限定符，但用右值作为参数去创建类实例时，vc不会报错，而gcc报错了，加上const后可以解决。</p></li>
 <li><p>【Non-constant-expression cannot be narrowed from type &#39;unsigned long&#39; to &#39;int&#39; in initializer list】 initial list初始化列表不支持非常量表达式的long到int的narrow转换，需要自行加上static_cast<int>。（vc不会报这个错）</p></li>
 <li><p>【Use of overloaded operator &#39;/&#39; is ambiguous (with operand types &#39;value_type&#39; (aka &#39;nlohmann::basic_json<std::map, std::vector, std::__1::basic_string<char>, bool, long long, double, std::allocator&gt;&#39;) and &#39;float&#39;) 】这个错和第三方json库有关，但vc没报错，大概就是编译器找到多个／操作符重载，不知道用哪个，需要把代码从 c[0] / 255.0f 改成 float(c[0]) / 255.0f</p></li>
