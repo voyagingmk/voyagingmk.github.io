@@ -98,12 +98,12 @@ Note: You may not slant the container.
 
 <!--more-->
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-<span class="lineno">2</span> <span class="k">public</span><span class="o">:</span>
-<span class="lineno">3</span>     <span class="kt">int</span> <span class="n">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">4</span>         
-<span class="lineno">5</span>     <span class="p">}</span>
-<span class="lineno">6</span> <span class="p">};</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno">1 </span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="lineno">2 </span><span class="k">public</span><span class="o">:</span>
+<span class="lineno">3 </span>    <span class="kt">int</span> <span class="n">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">4 </span>        
+<span class="lineno">5 </span>    <span class="p">}</span>
+<span class="lineno">6 </span><span class="p">};</span></code></pre></figure>
 
 <h3>题意：</h3>
 
@@ -128,7 +128,7 @@ S(i)是符合这个定义的，S(i)代表i阶段时的最优结果。</p>
 
 <p><img src="../images/2015.7/1.png" alt="1.png"></p>
 
-<p>S(3)的值是以[1,3]为边界的面积:(3-1)<em>min(4,2) = 4。按照无后效性定义“未来与过去无关”，S(3)是对0,1,2,3这4根柱子的一个总结，那么S(4)呢？容易看出，S(4)的值是以[1,4]为边界的面积：(4-1)</em>min(4,4) = 12。S(4)的值(未来），不仅与3有关系，还与0、1、2有关系，即过去影响了未来。</p>
+<p>S(3)的值是以[1,3]为边界的面积:(3-1)*min(4,2) = 4。按照无后效性定义“未来与过去无关”，S(3)是对0,1,2,3这4根柱子的一个总结，那么S(4)呢？容易看出，S(4)的值是以[1,4]为边界的面积：(4-1)*min(4,4) = 12。S(4)的值(未来），不仅与3有关系，还与0、1、2有关系，即过去影响了未来。</p>
 
 <p>这道题的真正解法是很简单的。假设T(i,j)代表我们能从整个区间里找的最大容器面积，T(i,j)=(j-i)*min(a[i],[j]) (i&lt;j)，可以证明，在j的右端肯定没有比j更高的柱子了（只可能小于或等于），不然T(i,j)就不成立。</p>
 
@@ -136,32 +136,32 @@ S(i)是符合这个定义的，S(i)代表i阶段时的最优结果。</p>
 
 <p>所以可以从两端向中间迭代，直接看代码：</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="kt">int</span> <span class="nf">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno"> 2</span>      <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-<span class="lineno"> 3</span>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 4</span>      <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-<span class="lineno"> 5</span>      <span class="kt">int</span> <span class="n">area</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 6</span>      <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">){</span>
-<span class="lineno"> 7</span>          <span class="kt">int</span> <span class="n">curArea</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="n">l</span><span class="p">);</span>
-<span class="lineno"> 8</span>          <span class="k">if</span> <span class="p">(</span><span class="n">curArea</span> <span class="o">&gt;</span> <span class="n">area</span><span class="p">)</span>
-<span class="lineno"> 9</span>              <span class="n">area</span> <span class="o">=</span> <span class="n">curArea</span><span class="p">;</span>
-<span class="lineno">10</span>          <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
-<span class="lineno">11</span>              <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span>
-<span class="lineno">12</span>              <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]){</span>
-<span class="lineno">13</span>                  <span class="n">k</span><span class="o">++</span><span class="p">;</span>
-<span class="lineno">14</span>              <span class="p">}</span>
-<span class="lineno">15</span>              <span class="n">l</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
-<span class="lineno">16</span>          <span class="p">}</span>
-<span class="lineno">17</span>          <span class="k">else</span><span class="p">{</span>
-<span class="lineno">18</span>              <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
-<span class="lineno">19</span>              <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
-<span class="lineno">20</span>                  <span class="n">k</span><span class="o">--</span><span class="p">;</span>
-<span class="lineno">21</span>              <span class="p">}</span>
-<span class="lineno">22</span>              <span class="n">r</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
-<span class="lineno">23</span>          <span class="p">}</span>
-<span class="lineno">24</span>      <span class="p">}</span>
-<span class="lineno">25</span>      <span class="k">return</span> <span class="n">area</span><span class="p">;</span>
-<span class="lineno">26</span>  <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span>  <span class="kt">int</span> <span class="nf">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="lineno"> 3 </span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 4 </span>     <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno"> 5 </span>     <span class="kt">int</span> <span class="n">area</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 6 </span>     <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">){</span>
+<span class="lineno"> 7 </span>         <span class="kt">int</span> <span class="n">curArea</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="n">l</span><span class="p">);</span>
+<span class="lineno"> 8 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">curArea</span> <span class="o">&gt;</span> <span class="n">area</span><span class="p">)</span>
+<span class="lineno"> 9 </span>             <span class="n">area</span> <span class="o">=</span> <span class="n">curArea</span><span class="p">;</span>
+<span class="lineno">10 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
+<span class="lineno">11 </span>             <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span>
+<span class="lineno">12 </span>             <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">l</span><span class="p">]){</span>
+<span class="lineno">13 </span>                 <span class="n">k</span><span class="o">++</span><span class="p">;</span>
+<span class="lineno">14 </span>             <span class="p">}</span>
+<span class="lineno">15 </span>             <span class="n">l</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+<span class="lineno">16 </span>         <span class="p">}</span>
+<span class="lineno">17 </span>         <span class="k">else</span><span class="p">{</span>
+<span class="lineno">18 </span>             <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+<span class="lineno">19 </span>             <span class="k">while</span> <span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="p">[</span><span class="n">r</span><span class="p">]){</span>
+<span class="lineno">20 </span>                 <span class="n">k</span><span class="o">--</span><span class="p">;</span>
+<span class="lineno">21 </span>             <span class="p">}</span>
+<span class="lineno">22 </span>             <span class="n">r</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+<span class="lineno">23 </span>         <span class="p">}</span>
+<span class="lineno">24 </span>     <span class="p">}</span>
+<span class="lineno">25 </span>     <span class="k">return</span> <span class="n">area</span><span class="p">;</span>
+<span class="lineno">26 </span> <span class="p">}</span></code></pre></figure>
 
   </div>
 

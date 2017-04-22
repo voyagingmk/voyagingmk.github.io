@@ -146,69 +146,69 @@ nopoll-0.2.8.b184
 </ul></li>
 </ol>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>       <span class="cm">/*</span>
-<span class="lineno"> 2</span> <span class="cm">      * Nopoll Library nopoll_config.h</span>
-<span class="lineno"> 3</span> <span class="cm">      * Platform dependant definitions.</span>
-<span class="lineno"> 4</span> <span class="cm">      *</span>
-<span class="lineno"> 5</span> <span class="cm">      * This is a generated file.  Please modify &#39;configure.in&#39;</span>
-<span class="lineno"> 6</span> <span class="cm">      */</span>
-<span class="lineno"> 7</span>       <span class="cp">#ifndef __NOPOLL_CONFIG_H__</span>
-<span class="lineno"> 8</span>       <span class="cp">#define __NOPOLL_CONFIG_H__</span>
-<span class="lineno"> 9</span>       <span class="cm">/**</span>
-<span class="lineno">10</span> <span class="cm">      * \addtogroup nopoll_decl_module</span>
-<span class="lineno">11</span> <span class="cm">      * @{</span>
-<span class="lineno">12</span> <span class="cm">      */</span>
-<span class="lineno">13</span>       <span class="cm">/**</span>
-<span class="lineno">14</span> <span class="cm">      * @brief Allows to convert integer value (including constant values)</span>
-<span class="lineno">15</span> <span class="cm">      * into a pointer representation.</span>
-<span class="lineno">16</span> <span class="cm">      *</span>
-<span class="lineno">17</span> <span class="cm">      * Use the oposite function to restore the value from a pointer to a</span>
-<span class="lineno">18</span> <span class="cm">      * integer: \ref PTR_TO_INT.</span>
-<span class="lineno">19</span> <span class="cm">      *</span>
-<span class="lineno">20</span> <span class="cm">      * @param integer The integer value to cast to pointer.</span>
-<span class="lineno">21</span> <span class="cm">      *</span>
-<span class="lineno">22</span> <span class="cm">      * @return A \ref noPollPtr reference.</span>
-<span class="lineno">23</span> <span class="cm">      */</span>
-<span class="lineno">24</span>       <span class="cp">#ifndef INT_TO_PTR</span>
-<span class="lineno">25</span>       <span class="cp">#define INT_TO_PTR(integer)   ((noPollPtr) (long) ((int)integer))</span>
-<span class="lineno">26</span>       <span class="cp">#endif</span>
-<span class="lineno">27</span>       <span class="cm">/**</span>
-<span class="lineno">28</span> <span class="cm">      * @brief Allows to convert a pointer reference (\ref noPollPtr),</span>
-<span class="lineno">29</span> <span class="cm">      * which stores an integer that was stored using \ref INT_TO_PTR.</span>
-<span class="lineno">30</span> <span class="cm">      *</span>
-<span class="lineno">31</span> <span class="cm">      * Use the oposite function to restore the pointer value stored in the</span>
-<span class="lineno">32</span> <span class="cm">      * integer value.</span>
-<span class="lineno">33</span> <span class="cm">      *</span>
-<span class="lineno">34</span> <span class="cm">      * @param ptr The pointer to cast to a integer value.</span>
-<span class="lineno">35</span> <span class="cm">      *</span>
-<span class="lineno">36</span> <span class="cm">      * @return A int value.</span>
-<span class="lineno">37</span> <span class="cm">      */</span>
-<span class="lineno">38</span>       <span class="cp">#ifndef PTR_TO_INT</span>
-<span class="lineno">39</span>       <span class="cp">#define PTR_TO_INT(ptr) ((int) (long) (ptr))</span>
-<span class="lineno">40</span>       <span class="cp">#endif</span>
-<span class="lineno">41</span>       <span class="cm">/**</span>
-<span class="lineno">42</span> <span class="cm">      * @brief Allows to get current platform configuration. This is used</span>
-<span class="lineno">43</span> <span class="cm">      * by Nopoll library but could be used by applications built on top of</span>
-<span class="lineno">44</span> <span class="cm">      * Nopoll to change its configuration based on the platform information.</span>
-<span class="lineno">45</span> <span class="cm">      */</span>
-<span class="lineno">46</span>       <span class="c1">//#define NOPOLL_OS_UNIX (1)</span>
-<span class="lineno">47</span>       <span class="cp">#define NOPOLL_OS_WIN32 (1)</span>
-<span class="lineno">48</span>       <span class="cp">#define R_OK 4</span>
-<span class="lineno">49</span>       <span class="cp">#define W_OK 2</span>
-<span class="lineno">50</span>       <span class="cm">/**</span>
-<span class="lineno">51</span> <span class="cm">      * @internal Allows to now if the platform support vasprintf</span>
-<span class="lineno">52</span> <span class="cm">      * function. Do not use this macro as it is supposed to be for</span>
-<span class="lineno">53</span> <span class="cm">      * internal use.</span>
-<span class="lineno">54</span> <span class="cm">      */</span>
-<span class="lineno">55</span>       <span class="c1">//#define NOPOLL_HAVE_VASPRINTF (1)</span>
-<span class="lineno">56</span>       <span class="cm">/**</span>
-<span class="lineno">57</span> <span class="cm">      * @brief Indicates that this platform have support for 64bits.</span>
-<span class="lineno">58</span> <span class="cm">      */</span>
-<span class="lineno">59</span>       <span class="cp">#define NOPOLL_64BIT_PLATFORM (1)</span>
-<span class="lineno">60</span>       <span class="cm">/* @} */</span>
-<span class="lineno">61</span>       <span class="cp">#endif</span>
-<span class="lineno">62</span>       </code></pre></figure>
-<div class="highlight"><pre><code class="language-text" data-lang="text">- 配置编译环境
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span>      <span class="cm">/*</span>
+<span class="lineno"> 2 </span><span class="cm">      * Nopoll Library nopoll_config.h</span>
+<span class="lineno"> 3 </span><span class="cm">      * Platform dependant definitions.</span>
+<span class="lineno"> 4 </span><span class="cm">      *</span>
+<span class="lineno"> 5 </span><span class="cm">      * This is a generated file.  Please modify &#39;configure.in&#39;</span>
+<span class="lineno"> 6 </span><span class="cm">      */</span>
+<span class="lineno"> 7 </span>      <span class="cp">#ifndef __NOPOLL_CONFIG_H__</span>
+<span class="lineno"> 8 </span>      <span class="cp">#define __NOPOLL_CONFIG_H__</span>
+<span class="lineno"> 9 </span>      <span class="cm">/**</span>
+<span class="lineno">10 </span><span class="cm">      * \addtogroup nopoll_decl_module</span>
+<span class="lineno">11 </span><span class="cm">      * @{</span>
+<span class="lineno">12 </span><span class="cm">      */</span>
+<span class="lineno">13 </span>      <span class="cm">/**</span>
+<span class="lineno">14 </span><span class="cm">      * @brief Allows to convert integer value (including constant values)</span>
+<span class="lineno">15 </span><span class="cm">      * into a pointer representation.</span>
+<span class="lineno">16 </span><span class="cm">      *</span>
+<span class="lineno">17 </span><span class="cm">      * Use the oposite function to restore the value from a pointer to a</span>
+<span class="lineno">18 </span><span class="cm">      * integer: \ref PTR_TO_INT.</span>
+<span class="lineno">19 </span><span class="cm">      *</span>
+<span class="lineno">20 </span><span class="cm">      * @param integer The integer value to cast to pointer.</span>
+<span class="lineno">21 </span><span class="cm">      *</span>
+<span class="lineno">22 </span><span class="cm">      * @return A \ref noPollPtr reference.</span>
+<span class="lineno">23 </span><span class="cm">      */</span>
+<span class="lineno">24 </span>      <span class="cp">#ifndef INT_TO_PTR</span>
+<span class="lineno">25 </span>      <span class="cp">#define INT_TO_PTR(integer)   ((noPollPtr) (long) ((int)integer))</span>
+<span class="lineno">26 </span>      <span class="cp">#endif</span>
+<span class="lineno">27 </span>      <span class="cm">/**</span>
+<span class="lineno">28 </span><span class="cm">      * @brief Allows to convert a pointer reference (\ref noPollPtr),</span>
+<span class="lineno">29 </span><span class="cm">      * which stores an integer that was stored using \ref INT_TO_PTR.</span>
+<span class="lineno">30 </span><span class="cm">      *</span>
+<span class="lineno">31 </span><span class="cm">      * Use the oposite function to restore the pointer value stored in the</span>
+<span class="lineno">32 </span><span class="cm">      * integer value.</span>
+<span class="lineno">33 </span><span class="cm">      *</span>
+<span class="lineno">34 </span><span class="cm">      * @param ptr The pointer to cast to a integer value.</span>
+<span class="lineno">35 </span><span class="cm">      *</span>
+<span class="lineno">36 </span><span class="cm">      * @return A int value.</span>
+<span class="lineno">37 </span><span class="cm">      */</span>
+<span class="lineno">38 </span>      <span class="cp">#ifndef PTR_TO_INT</span>
+<span class="lineno">39 </span>      <span class="cp">#define PTR_TO_INT(ptr) ((int) (long) (ptr))</span>
+<span class="lineno">40 </span>      <span class="cp">#endif</span>
+<span class="lineno">41 </span>      <span class="cm">/**</span>
+<span class="lineno">42 </span><span class="cm">      * @brief Allows to get current platform configuration. This is used</span>
+<span class="lineno">43 </span><span class="cm">      * by Nopoll library but could be used by applications built on top of</span>
+<span class="lineno">44 </span><span class="cm">      * Nopoll to change its configuration based on the platform information.</span>
+<span class="lineno">45 </span><span class="cm">      */</span>
+<span class="lineno">46 </span>      <span class="c1">//#define NOPOLL_OS_UNIX (1)</span>
+<span class="lineno">47 </span>      <span class="cp">#define NOPOLL_OS_WIN32 (1)</span>
+<span class="lineno">48 </span>      <span class="cp">#define R_OK 4</span>
+<span class="lineno">49 </span>      <span class="cp">#define W_OK 2</span>
+<span class="lineno">50 </span>      <span class="cm">/**</span>
+<span class="lineno">51 </span><span class="cm">      * @internal Allows to now if the platform support vasprintf</span>
+<span class="lineno">52 </span><span class="cm">      * function. Do not use this macro as it is supposed to be for</span>
+<span class="lineno">53 </span><span class="cm">      * internal use.</span>
+<span class="lineno">54 </span><span class="cm">      */</span>
+<span class="lineno">55 </span>      <span class="c1">//#define NOPOLL_HAVE_VASPRINTF (1)</span>
+<span class="lineno">56 </span>      <span class="cm">/**</span>
+<span class="lineno">57 </span><span class="cm">      * @brief Indicates that this platform have support for 64bits.</span>
+<span class="lineno">58 </span><span class="cm">      */</span>
+<span class="lineno">59 </span>      <span class="cp">#define NOPOLL_64BIT_PLATFORM (1)</span>
+<span class="lineno">60 </span>      <span class="cm">/* @} */</span>
+<span class="lineno">61 </span>      <span class="cp">#endif</span>
+<span class="lineno">62 </span>      </code></pre></figure>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>- 配置编译环境
 
     ![1.png](/images/2015.4/2.png)
 
@@ -245,9 +245,9 @@ nopoll-0.2.8.b184
 </ul></li>
 </ol>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span>             <span class="cp">#define _CRT_SECURE_NO_WARNINGS</span>
-<span class="lineno">2</span>        </code></pre></figure>
-<div class="highlight"><pre><code class="language-text" data-lang="text">    ![1.png](/images/2015.4/9.png)
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno">1 </span>           <span class="cp">#define _CRT_SECURE_NO_WARNINGS</span>
+<span class="lineno">2 </span>       </code></pre></figure>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>    ![1.png](/images/2015.4/9.png)
 
     unlink改成_unlink呗；
 

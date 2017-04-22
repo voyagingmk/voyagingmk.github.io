@@ -95,12 +95,12 @@ the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
 
 <!--more-->
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-<span class="lineno">2</span> <span class="k">public</span><span class="o">:</span>
-<span class="lineno">3</span>   <span class="kt">int</span> <span class="n">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">4</span>         
-<span class="lineno">5</span>     <span class="p">}</span>
-<span class="lineno">6</span> <span class="p">};</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno">1 </span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="lineno">2 </span><span class="k">public</span><span class="o">:</span>
+<span class="lineno">3 </span>  <span class="kt">int</span> <span class="n">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">4 </span>        
+<span class="lineno">5 </span>    <span class="p">}</span>
+<span class="lineno">6 </span><span class="p">};</span></code></pre></figure>
 
 <h3>题意：</h3>
 
@@ -127,41 +127,41 @@ the contiguous subarray [4,−1,2,1] has the largest sum = 6.</p>
 
 <h3>代码：</h3>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno"> 2</span>      <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<span class="lineno"> 3</span>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 4</span>      <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-<span class="lineno"> 5</span>          <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="lineno"> 6</span>      <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-<span class="lineno"> 7</span>      <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 8</span>      <span class="kt">int</span> <span class="n">maxS</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
-<span class="lineno"> 9</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-<span class="lineno">10</span>          <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
-<span class="lineno">11</span>          <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
-<span class="lineno">12</span>              <span class="n">maxS</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-<span class="lineno">13</span>          <span class="p">}</span>
-<span class="lineno">14</span>      <span class="p">}</span>
-<span class="lineno">15</span>      <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
-<span class="lineno">16</span>  <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span>  <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno"> 3 </span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 4 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="lineno"> 5 </span>         <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="lineno"> 6 </span>     <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+<span class="lineno"> 7 </span>     <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 8 </span>     <span class="kt">int</span> <span class="n">maxS</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
+<span class="lineno"> 9 </span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno">10 </span>         <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="lineno">11 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
+<span class="lineno">12 </span>             <span class="n">maxS</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="lineno">13 </span>         <span class="p">}</span>
+<span class="lineno">14 </span>     <span class="p">}</span>
+<span class="lineno">15 </span>     <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
+<span class="lineno">16 </span> <span class="p">}</span></code></pre></figure>
 
 <p>考虑到S(i)数组对于这个题目是多余的，题目只是要求S(i)的max值，那么可以改下代码，把空间复杂度从O(n)降到O(1)。</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno"> 2</span>      <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<span class="lineno"> 3</span>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 4</span>      <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-<span class="lineno"> 5</span>          <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="lineno"> 6</span>      <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxS</span><span class="o">=</span><span class="n">INT_MIN</span><span class="p">;</span>
-<span class="lineno"> 7</span>      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-<span class="lineno"> 8</span>          <span class="n">sum</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">;</span>
-<span class="lineno"> 9</span>          <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-<span class="lineno">10</span>              <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno">11</span>          <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
-<span class="lineno">12</span>              <span class="n">maxS</span> <span class="o">=</span> <span class="n">sum</span><span class="p">;</span>
-<span class="lineno">13</span>          <span class="p">}</span>
-<span class="lineno">14</span>      <span class="p">}</span>
-<span class="lineno">15</span>      <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
-<span class="lineno">16</span>  <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span>  <span class="kt">int</span> <span class="nf">maxSubArray</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno"> 3 </span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 4 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="lineno"> 5 </span>         <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="lineno"> 6 </span>     <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxS</span><span class="o">=</span><span class="n">INT_MIN</span><span class="p">;</span>
+<span class="lineno"> 7 </span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="lineno"> 8 </span>         <span class="n">sum</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum</span><span class="p">;</span>
+<span class="lineno"> 9 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno">10 </span>             <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno">11 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;</span> <span class="n">maxS</span><span class="p">){</span>
+<span class="lineno">12 </span>             <span class="n">maxS</span> <span class="o">=</span> <span class="n">sum</span><span class="p">;</span>
+<span class="lineno">13 </span>         <span class="p">}</span>
+<span class="lineno">14 </span>     <span class="p">}</span>
+<span class="lineno">15 </span>     <span class="k">return</span> <span class="n">maxS</span><span class="p">;</span>
+<span class="lineno">16 </span> <span class="p">}</span></code></pre></figure>
 
   </div>
 

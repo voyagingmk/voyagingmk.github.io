@@ -94,19 +94,6 @@
   
     <article class="post">
 
-      <h1><a href="/quaternion3/">四元数公式的补充</a></h1>
-      <div class="date">
-        Written on April  4, 2017
-      </div>
-      <div class="entry">
-        
-      </div>
-
-      <a href="/quaternion3/" class="read-more">Read More</a>
-    </article>
-  
-    <article class="post">
-
       <h1><a href="/quaternion2/">四元数公式的补充</a></h1>
       <div class="date">
         Written on April  4, 2017
@@ -505,10 +492,10 @@
 <h2>第三章</h2>
 
 <h3>ch03_drawcommands</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">render_model_matrix_loc</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">model_matrix</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">render_model_matrix_loc</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">model_matrix</span><span class="p">);</span>
 </code></pre></div>
 <p>应改为：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">render_model_matrix_loc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">model_matrix</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">render_model_matrix_loc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">model_matrix</span><span class="p">);</span>
 </code></pre></div>
 <p>原因：</p>
 
@@ -552,7 +539,7 @@ vmath::translation 要改为 vmath::translate</p>
 <h3>绝对路径....</h3>
 
 <p>ch03_instancing的Initialize函数里：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="c1">// Load the object</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="c1">// Load the object</span>
     <span class="n">object</span><span class="p">.</span><span class="n">LoadFromVBM</span><span class="p">(</span><span class="s">&quot;C:/Vermilion-Book/trunk/Code/media/armadillo_low.vbm&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </code></pre></div>
 <p>太坑了。</p>

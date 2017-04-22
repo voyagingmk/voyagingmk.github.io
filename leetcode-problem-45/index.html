@@ -145,28 +145,28 @@ Given array A = [2,3,1,1,4]</p>
 
 <p>按照这个思路我实现了下面的代码(runtime 16ms)：</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="kt">int</span> <span class="nf">jump</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
-<span class="lineno"> 2</span>      <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-<span class="lineno"> 3</span>      <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-<span class="lineno"> 4</span>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 5</span>      <span class="kt">int</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 6</span>      <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 7</span>      <span class="kt">int</span> <span class="n">maxStep</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-<span class="lineno"> 8</span>      <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">){</span>
-<span class="lineno"> 9</span>          <span class="k">if</span> <span class="p">(</span><span class="n">maxStep</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-<span class="lineno">10</span>              <span class="k">break</span><span class="p">;</span>
-<span class="lineno">11</span>          <span class="o">++</span><span class="n">depth</span><span class="p">;</span>
-<span class="lineno">12</span>          <span class="kt">int</span> <span class="n">next</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="lineno">13</span>          <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
-<span class="lineno">14</span>              <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">maxStep</span><span class="p">){</span><span class="c1">//在maxStep一样大的情况下，选择最靠右的</span>
-<span class="lineno">15</span>                  <span class="n">maxStep</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
-<span class="lineno">16</span>                  <span class="n">next</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
-<span class="lineno">17</span>              <span class="p">}</span>
-<span class="lineno">18</span>          <span class="p">}</span>
-<span class="lineno">19</span>          <span class="n">i</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-<span class="lineno">20</span>      <span class="p">}</span>
-<span class="lineno">21</span>      <span class="k">return</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-<span class="lineno">22</span>  <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span>  <span class="kt">int</span> <span class="nf">jump</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
+<span class="lineno"> 2 </span>     <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+<span class="lineno"> 3 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="lineno"> 4 </span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 5 </span>     <span class="kt">int</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 6 </span>     <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="lineno"> 7 </span>     <span class="kt">int</span> <span class="n">maxStep</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="lineno"> 8 </span>     <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">){</span>
+<span class="lineno"> 9 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">maxStep</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+<span class="lineno">10 </span>             <span class="k">break</span><span class="p">;</span>
+<span class="lineno">11 </span>         <span class="o">++</span><span class="n">depth</span><span class="p">;</span>
+<span class="lineno">12 </span>         <span class="kt">int</span> <span class="n">next</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="lineno">13 </span>         <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">){</span>
+<span class="lineno">14 </span>             <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">maxStep</span><span class="p">){</span><span class="c1">//在maxStep一样大的情况下，选择最靠右的</span>
+<span class="lineno">15 </span>                 <span class="n">maxStep</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+<span class="lineno">16 </span>                 <span class="n">next</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+<span class="lineno">17 </span>             <span class="p">}</span>
+<span class="lineno">18 </span>         <span class="p">}</span>
+<span class="lineno">19 </span>         <span class="n">i</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+<span class="lineno">20 </span>     <span class="p">}</span>
+<span class="lineno">21 </span>     <span class="k">return</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">22 </span> <span class="p">}</span></code></pre></figure>
 
   </div>
 

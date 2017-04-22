@@ -109,7 +109,7 @@
 <p>按照:<a href="https://jekyllrb.com/docs/windows/#installation">https://jekyllrb.com/docs/windows/#installation</a>，安装choco、ruby、gem、jekyll。</p>
 
 <p>choco安装命令(最好用官网的命令，因为可能会更新):</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="err">@</span><span class="n">powershell</span> <span class="o">-</span><span class="n">NoProfile</span> <span class="o">-</span><span class="n">ExecutionPolicy</span> <span class="n">Bypass</span> <span class="o">-</span><span class="n">Command</span> <span class="s">&quot;iex ((new-object net.webclient).DownloadString(&#39;https://chocolatey.org/install.ps1&#39;))&quot;</span> <span class="o">&amp;&amp;</span> <span class="n">SET</span> <span class="n">PATH</span><span class="o">=%</span><span class="n">PATH</span><span class="o">%</span><span class="p">;</span><span class="o">%</span><span class="n">ALLUSERSPROFILE</span><span class="o">%</span><span class="err">\</span><span class="n">chocolatey</span><span class="err">\</span><span class="n">bin</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="err">@</span><span class="n">powershell</span> <span class="o">-</span><span class="n">NoProfile</span> <span class="o">-</span><span class="n">ExecutionPolicy</span> <span class="n">Bypass</span> <span class="o">-</span><span class="n">Command</span> <span class="s">&quot;iex ((new-object net.webclient).DownloadString(&#39;https://chocolatey.org/install.ps1&#39;))&quot;</span> <span class="o">&amp;&amp;</span> <span class="n">SET</span> <span class="n">PATH</span><span class="o">=%</span><span class="n">PATH</span><span class="o">%</span><span class="p">;</span><span class="o">%</span><span class="n">ALLUSERSPROFILE</span><span class="o">%</span><span class="err">\</span><span class="n">chocolatey</span><span class="err">\</span><span class="n">bin</span>
 </code></pre></div>
 <p>安装ruby和gem：</p>
 
@@ -134,11 +134,11 @@
 <p>ruby dk.rb init</p>
 
 <p>然后执行ruby dk.rb review，检查是否能够正确安装，如果提示 ** Invalid configuration. Please fix &#39;config.yml.&#39;**，就需要编辑 config.yml文件，譬如我是改成了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">---</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="o">---</span>
 <span class="o">-</span> <span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">tools</span><span class="err">\</span><span class="n">ruby23</span>
 </code></pre></div>
 <p>然后再执行ruby dk.rb review，没报错就可以安装了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">devkit</span><span class="o">&gt;</span><span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="n">rb</span> <span class="n">install</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">devkit</span><span class="o">&gt;</span><span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="n">rb</span> <span class="n">install</span>
 <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Updating</span> <span class="n">convenience</span> <span class="n">notice</span> <span class="n">gem</span> <span class="n">override</span> <span class="k">for</span> <span class="err">&#39;</span><span class="nl">C</span><span class="p">:</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">ruby23</span><span class="err">&#39;</span>
 <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Installing</span> <span class="err">&#39;</span><span class="nl">C</span><span class="p">:</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">ruby23</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="n">site_ruby</span><span class="o">/</span><span class="n">devkit</span><span class="p">.</span><span class="n">rb</span><span class="err">&#39;</span>
 </code></pre></div>
@@ -151,7 +151,7 @@
 <p>gem install redcarpet</p>
 
 <p>然后就可以在Blog目录执行：jekyll serve 了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">wyman_blog</span><span class="o">&gt;</span><span class="n">jekyll</span> <span class="n">serve</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">wyman_blog</span><span class="o">&gt;</span><span class="n">jekyll</span> <span class="n">serve</span>
 <span class="n">Configuration</span> <span class="nl">file</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">_config</span><span class="p">.</span><span class="n">yml</span>
             <span class="nl">Source</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span>
        <span class="nl">Destination</span><span class="p">:</span> <span class="nl">D</span><span class="p">:</span><span class="o">/</span><span class="n">bitsync_default</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">wyman_blog</span><span class="o">/</span><span class="n">_site</span>
@@ -165,6 +165,24 @@
     <span class="n">Server</span> <span class="nl">address</span><span class="p">:</span> <span class="nl">http</span><span class="p">:</span><span class="c1">//127.0.0.1:4000/</span>
   <span class="n">Server</span> <span class="n">running</span><span class="p">...</span> <span class="n">press</span> <span class="n">ctrl</span><span class="o">-</span><span class="n">c</span> <span class="n">to</span> <span class="n">stop</span><span class="p">.</span>
 </code></pre></div>
+<h3>Mac</h3>
+
+<p>简单得很，首先，ruby和gem都是内置在MacOS里的。</p>
+
+<p>依次执行：</p>
+
+<p>sudo gem install jekyll</p>
+
+<p>sudo gem install jekyll-tagging</p>
+
+<p>sudo gem install jekyll-sitemap</p>
+
+<p>sudo gem install pygments.rb</p>
+
+<p>sudo gem install redcarpet</p>
+
+<p>即可。</p>
+
   </div>
 
   <div class="date">

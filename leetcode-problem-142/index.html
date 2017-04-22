@@ -146,27 +146,27 @@ Can you solve it without using extra space?
 
 <p>ngcl的代码如下：</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="lineno"> 1</span>    <span class="n">ListNode</span> <span class="o">*</span><span class="nf">detectCycle</span><span class="p">(</span><span class="n">ListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno"> 2</span>      <span class="k">if</span> <span class="p">(</span><span class="n">head</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
-<span class="lineno"> 3</span>          <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-<span class="lineno"> 4</span>  
-<span class="lineno"> 5</span>      <span class="n">ListNode</span> <span class="o">*</span><span class="n">slow</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-<span class="lineno"> 6</span>      <span class="n">ListNode</span> <span class="o">*</span><span class="n">fast</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-<span class="lineno"> 7</span>      <span class="n">ListNode</span> <span class="o">*</span><span class="n">entry</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-<span class="lineno"> 8</span>  
-<span class="lineno"> 9</span>      <span class="k">while</span> <span class="p">(</span><span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">&amp;&amp;</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">10</span>          <span class="n">slow</span> <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-<span class="lineno">11</span>          <span class="n">fast</span> <span class="o">=</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-<span class="lineno">12</span>          <span class="k">if</span> <span class="p">(</span><span class="n">slow</span> <span class="o">==</span> <span class="n">fast</span><span class="p">)</span> <span class="p">{</span>                      <span class="c1">// there is a cycle</span>
-<span class="lineno">13</span>              <span class="k">while</span><span class="p">(</span><span class="n">slow</span> <span class="o">!=</span> <span class="n">entry</span><span class="p">)</span> <span class="p">{</span>               <span class="c1">// found the entry location</span>
-<span class="lineno">14</span>                  <span class="n">slow</span>  <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-<span class="lineno">15</span>                  <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-<span class="lineno">16</span>              <span class="p">}</span>
-<span class="lineno">17</span>              <span class="k">return</span> <span class="n">entry</span><span class="p">;</span>
-<span class="lineno">18</span>          <span class="p">}</span>
-<span class="lineno">19</span>      <span class="p">}</span>
-<span class="lineno">20</span>      <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                                 <span class="c1">// there has no cycle</span>
-<span class="lineno">21</span>  <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span>  <span class="n">ListNode</span> <span class="o">*</span><span class="nf">detectCycle</span><span class="p">(</span><span class="n">ListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">head</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+<span class="lineno"> 3 </span>         <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="lineno"> 4 </span> 
+<span class="lineno"> 5 </span>     <span class="n">ListNode</span> <span class="o">*</span><span class="n">slow</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+<span class="lineno"> 6 </span>     <span class="n">ListNode</span> <span class="o">*</span><span class="n">fast</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+<span class="lineno"> 7 </span>     <span class="n">ListNode</span> <span class="o">*</span><span class="n">entry</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+<span class="lineno"> 8 </span> 
+<span class="lineno"> 9 </span>     <span class="k">while</span> <span class="p">(</span><span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">&amp;&amp;</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">10 </span>         <span class="n">slow</span> <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+<span class="lineno">11 </span>         <span class="n">fast</span> <span class="o">=</span> <span class="n">fast</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+<span class="lineno">12 </span>         <span class="k">if</span> <span class="p">(</span><span class="n">slow</span> <span class="o">==</span> <span class="n">fast</span><span class="p">)</span> <span class="p">{</span>                      <span class="c1">// there is a cycle</span>
+<span class="lineno">13 </span>             <span class="k">while</span><span class="p">(</span><span class="n">slow</span> <span class="o">!=</span> <span class="n">entry</span><span class="p">)</span> <span class="p">{</span>               <span class="c1">// found the entry location</span>
+<span class="lineno">14 </span>                 <span class="n">slow</span>  <span class="o">=</span> <span class="n">slow</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+<span class="lineno">15 </span>                 <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+<span class="lineno">16 </span>             <span class="p">}</span>
+<span class="lineno">17 </span>             <span class="k">return</span> <span class="n">entry</span><span class="p">;</span>
+<span class="lineno">18 </span>         <span class="p">}</span>
+<span class="lineno">19 </span>     <span class="p">}</span>
+<span class="lineno">20 </span>     <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                                 <span class="c1">// there has no cycle</span>
+<span class="lineno">21 </span> <span class="p">}</span></code></pre></figure>
 
   </div>
 

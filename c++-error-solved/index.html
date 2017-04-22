@@ -119,10 +119,10 @@
 <p>这个报错发生在main函数返回时。出错原因是在堆数组的赋值上。</p>
 
 <p>先是初始化一个数组指针：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">bool</span> <span class="o">*</span> <span class="n">array</span> <span class="o">=</span> <span class="n">new</span> <span class="kt">bool</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">bool</span> <span class="o">*</span> <span class="n">array</span> <span class="o">=</span> <span class="n">new</span> <span class="kt">bool</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
 </code></pre></div>
 <p>然后循环赋值：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
     <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
