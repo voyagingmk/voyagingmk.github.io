@@ -7,6 +7,87 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>碰撞检测算法</title>
+        <description>&lt;p&gt;碰撞检测算法，暴力解决是一个\( O(n^{2}) \)的过程：对于场景中的每一个obj都和所有其他的obj做相交测试。2个for循环解决问题，所以时间复杂度是\( O(n^{2}) \)，这是最坏情况了。于是可以说，现在流传的各种碰撞检测算法的存在意义都是为了降低这个复杂度\( O(n^{2}) \)。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;实际可用的碰撞检测算法，一般要分2个阶段：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Broadphase&quot;&gt;broad phase&lt;/a&gt; 快速找出潜在的碰撞物体对列表，不在这个列表里的是绝对没可能碰撞的。broad phase确定了一批需要进一步检查的物体对。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;narrow phase 准确找出发生碰撞的物体对列表。因为上一个阶段的部分物体对实际上是没有碰撞的，需要在这个阶段剔除。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;broad phase用的数据结构不一定和narrow phase用的数据结构是同一个结构。&lt;/p&gt;
+
+&lt;h3&gt;broad phase&lt;/h3&gt;
+
+&lt;p&gt;分2个阶段的好处是，在第一个阶段，可以用不那么精确但快速的算法，找出潜在的碰撞物体。总好过直接就是应用narrow phase的精确但缓慢的算法去处理n个物体。更深刻的原因是，如果单个物体具有复杂的几何结构，那么narrow phase的计算开销非常大。&lt;/p&gt;
+
+&lt;p&gt;broad phase阶段的算法和需要的数据结构数据信息和narrow phase是不一样的。&lt;/p&gt;
+
+&lt;p&gt;broad phase阶段要求提供物体的包围盒信息，例如AABB盒。这就是broad phase为什么快但不精确的原因：物体的几何信息被近似地压缩了。&lt;/p&gt;
+
+&lt;p&gt;broad phase还要求把场景所有物体的包围盒信息放进一个数据结构（一般是一个树结构）中，例如插入到一个四叉树、八叉树、AABB树等。通过这个数据结构来实现快速相交判定。例如在Box2d中，是设计了一个proxy机制，每个场景物体对应唯一一个proxyAABB盒，这些proxyAABB盒就记录在一颗称之为Dynamic AABB Tree里，然后就可以做broad phase了。&lt;/p&gt;
+
+&lt;p&gt;broad phase其中有一个简单算法叫&lt;a href=&quot;https://en.wikipedia.org/wiki/Sweep_and_prune&quot;&gt;sweep and prune(SAP)&lt;/a&gt;，本质上是利用了排序算法。第一步是初始化排序列表，列表中的元素是包围盒，可以用任意排序算法完成，例如快排；之后的排序就不是用快排了，而是用冒泡排序，为什么用冒泡排序更好呢？是因为一个默认的前提：物体的运动有&lt;strong&gt;时间相关性（temporal coherence）&lt;/strong&gt;，即当前帧和下一帧的位置是相近的，所以在冒泡排序过程中，发生的位置交换预期都很靠近。如果这个前提不成立，例如物体会经常发生远距离瞬移，那就不能用这种算法了。&lt;/p&gt;
+
+&lt;h3&gt;narrow phase&lt;/h3&gt;
+
+&lt;h2&gt;相交判定算法&lt;/h2&gt;
+
+&lt;p&gt;根据我的调研，在2维情况下，可以用SAT算法做任意凸多边形的碰撞检测，十分简单；但在3维情况下，只能GJK算法，因为SAT相对毕竟暴力、慢，以及GJK算法还有更多的SAT不具备的高级特性。另外，Box2D用的是GJK算法，所以证明了GJK算法是可以应用到2维情况的。除了SAT和GJK，还有一个sweep line算法可以求出多边形的相交点，此算法内部需要用到排序算法。&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Hyperplane_separation_theorem&quot;&gt;Separating Axis Theorem, SAT, 分离轴算法&lt;/a&gt;&lt;/h3&gt;
+
+&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm&quot;&gt;GJK算法&lt;/a&gt;&lt;/h3&gt;
+
+&lt;h2&gt;用于做碰撞检测的场景管理树&lt;/h2&gt;
+
+&lt;p&gt;这里讨论的场景管理树，只针对碰撞检测。&lt;/p&gt;
+
+&lt;h3&gt;基于空间划分的八叉树&lt;/h3&gt;
+
+&lt;p&gt;一般说到场景管理，都会想到四叉树（八叉树的简化）、八叉树，这种基于空间划分的结构，然而，基于空间划分的树，会遇到一个十分蛋疼的问题：物体可能会overlap边界。这种情况，有几种可行的处理方案：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;https://anteru.net/blog/2008/11/14/315/&quot;&gt;Loose OCTree&lt;/a&gt;，松散八叉树。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;大概就是说，空间划分后的各个cell bound，各对应一个loose bound（relaxing the bounds slightly！），loose bound应是cell bound的两倍大小，这个loose bound可以保证完全包含cell bound里的所有物体的包围盒。这是个重要的性质，比如说如果有一个物体的包围盒刚好和cell bound一样大，但是物体包围盒中心点刚好在cell bound里，那么此时可以保证loose bound仍然能完全包含物体包围盒。&lt;/p&gt;
+
+&lt;p&gt;有了这个性质后，根据任意物体的包围盒中心点，决定把它放进哪个cell的列表里。即不会出现一个物体同时存在于2个cell的情况。然后查询相交时，就好办了，只需要根据query point确定要检查的cell，不过缺点是，如果query point处于多个loose bound的重叠区域，就需要这些loose bound的cell都做一次相交判定。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;允许内部节点存物体的OCTree。overlap了边界的物体，通通丢到父节点去。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;允许一个物体同时存进多个叶子节点的OCTree。这种方案主要是怕出bug，因为2个叶子节点都存了这个物体。需要严格管理好节点的增删，防止出现不一致性。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;另外，还有一个问题是：当大量物体集中于一个cell。此时八叉树基本就废了，退化成了\( O(n^{2}) \)级别的算法了。&lt;/p&gt;
+
+&lt;p&gt;因此我觉得，八叉树适合处理的场景是，物体分布均匀、静态物体较多、动态物体较少的情况。&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href=&quot;http://www.bulletphysics.org/mediawiki-1.5.8/index.php?title=BtDbvt_dynamic_aabb_tree&quot;&gt;btDbvt - Dynamic AABB Tree&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;这个btDbvt数据结构是从Box2D、Bullet源码中发现的，并且Box2D在注释里写到Box2D的Dynamic AABB Tree是参考了Bullet的，那么可以知道Bullet的Dynamic AABB Tree才是根源。&lt;/p&gt;
+
+&lt;p&gt;更让人激动的是，Bullet的官网有介绍这个数据结构的&lt;a href=&quot;http://www.bulletphysics.org/mediawiki-1.5.8/index.php/BtDbvt_dynamic_aabb_tree&quot;&gt;资料&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;btDbvt是一个&lt;strong&gt;基于物体集合划分的二叉树&lt;/strong&gt;，注意和八叉树的区别，八叉树是基于空间划分的。btDbvt另一个性质是，它考虑到了时间相干性，这也是这个数据结构更适合物体引擎的原因，因为物理世界里，物体不会发生瞬移。&lt;/p&gt;
+
+&lt;p&gt;时间相干性是用了一个fatBound的机制体现的，大概意思是，每个物体的proxyBound都会比实际的Bound大那么一点，当物体移动时，如果移动后的没有超过fatBound范围，那么不会发生节点的移动。从而降低树的更新频率。&lt;/p&gt;
+
+&lt;p&gt;先贴出算法伪代码：&lt;/p&gt;
+
+&lt;h3&gt;场景管理树的比较&lt;/h3&gt;
+</description>
+        <pubDate>Wed, 10 May 2017 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/collision-detection/</link>
+        <guid isPermaLink="true">http://localhost:4000/collision-detection/</guid>
+      </item>
+    
+      <item>
         <title>mini引擎开发备忘</title>
         <description>&lt;!--more--&gt;
 
@@ -710,119 +791,6 @@
         <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redblacktree-2/</link>
         <guid isPermaLink="true">http://localhost:4000/redblacktree-2/</guid>
-      </item>
-    
-      <item>
-        <title>细说红黑树(1)-核心定理</title>
-        <description>&lt;p&gt;我一直觉得那些著名的数据结构，都是工程设计和数学的完美结合。&lt;/p&gt;
-
-&lt;p&gt;所有的数据&lt;strong&gt;结构&lt;/strong&gt;都是被精心&lt;strong&gt;设计&lt;/strong&gt;出来的，此所谓工程设计。但是，既然叫精心设计，就意味着有一套准则，这个准则就是数学。&lt;/p&gt;
-
-&lt;p&gt;没有数学基础的数据结构都是耍流氓。&lt;/p&gt;
-
-&lt;p&gt;红黑树拥有精巧的结构设计和强大的数学基础，但我总觉得有点过于复杂，故写本文来回顾总结下。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h1&gt;红黑树的定义&lt;/h1&gt;
-
-&lt;p&gt;红黑树是一种特殊的二叉树，每个节点有颜色bit，要么红色要么黑色。红黑树必然满足以下4个&lt;strong&gt;结构上&lt;/strong&gt;的性质：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;根节点是黑色&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;叶子节点（NULL）视为黑色节点&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;如果一个节点是红色，那么它的2个孩子节点都是黑色&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;对于每条从根节点出发、并到达叶子节点的路径，路径上黑色节点的数量一致（叶子节点也计算在内）&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这4个性质，稍微想一遍就知道是没有矛盾的。但是没有矛盾只是第一步，接着就是证明这4个性质为什么能使得红黑树变成牛逼的树。&lt;/p&gt;
-
-&lt;p&gt;牛逼指的是这棵树很&lt;strong&gt;平衡&lt;/strong&gt;。平衡的定义是：设二叉树的节点数目为n，那么树的高度h和n必须满足：\( h = O(\log _{2}n)\)。这个就是要证明的东西。&lt;/p&gt;
-
-&lt;h1&gt;红黑树的证明&lt;/h1&gt;
-
-&lt;p&gt;所谓的证明，其实就是从上面的4个结构性质，分析出各种各样的数学上的性质，然后看下这些数学性质究竟能不能决定红黑树是不是平衡。&lt;/p&gt;
-
-&lt;p&gt;若能够证明平衡，就可以抽丝剥茧，找出最关键的几条数学性质，就可以总结出一份简短的证明过程了。&lt;/p&gt;
-
-&lt;p&gt;下面就是一份老外给出的最简单的证明过程。&lt;/p&gt;
-
-&lt;h2&gt;定义BH(x)&lt;/h2&gt;
-
-&lt;p&gt;首先需要定义一个函数BH(x)：x指红黑树的一个节点，BH(x)指这个x节点到叶子节点的路径上黑色节点的数量。&lt;/p&gt;
-
-&lt;p&gt;根据上面的性质4，可以知道无论x走哪条路径到达叶子节点，BH(x)都一样。&lt;/p&gt;
-
-&lt;h2&gt;2个引理&lt;/h2&gt;
-
-&lt;h3&gt;引理1：对于以节点x为根节点的子树，设子树的总的节点数量n，那么有\( n \geq 2^{BH(x)} - 1  \)&lt;/h3&gt;
-
-&lt;p&gt;要分2个情况来证明这个引理：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;树只有黑色节点。此时根据性质4，可以知道这树是完全二叉树，完全二叉树的节点数量等于\( 2^{h} - 1  \)，而h又等于BH(x)
-。所以此种情况满足引理。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;2.树有黑色也有红色节点。可以把这种情况视作第一种情况下的红黑树被添加了一些红色节点，根据性质1-4，可知道红色节点并不会影响BH(x)值。所以满足引理。&lt;/p&gt;
-
-&lt;p&gt;综上，此引理没有问题。&lt;/p&gt;
-
-&lt;h3&gt;引理2：设树的高度为h，那么有\( BH(root) \geq \frac {h} {2} \)&lt;/h3&gt;
-
-&lt;p&gt;这个引理其实是在说，从根节点到叶子节点，黑色节点起码有高度的一半那么多。分2步来想：假如黑点节点数量是高度的一半，根据红黑树性质1-4，可以知道必然是黑红相间的排列方式：黑-红-黑-红 ···· ；当黑点节点数量是高度的一半再减一时，等于有一个黑色节点消失了，就说明出现了2个连在一起的红色节点了。就破坏了性质3。于是反证成功。&lt;/p&gt;
-
-&lt;p&gt;另外一种思路：&lt;/p&gt;
-
-&lt;p&gt;因为红黑树的性质3“红节点的2个孩子都是黑节点”，所以使得一条路径上红节点总数最大化的方法，必然是“黑(root)-红-黑-红-······-黑-红-黑-红-黑(leaf)”，注意，最后一个必然是叶子节点，根据性质2，这个叶子节点是黑节点，所以根据这个路径排列，就可以知道红节点必然比黑节点少，反而言之，黑节点数量必然大于等于高度的二分之一。&lt;/p&gt;
-
-&lt;h3&gt;定理：任意一棵红黑树必然满足：\( h \leq 2log_{2}(n+1) \)&lt;/h3&gt;
-
-&lt;p&gt;证明：&lt;/p&gt;
-
-&lt;p&gt;根据引理1，有：&lt;/p&gt;
-
-&lt;p&gt;\[  n \geq 2^{BH(root)} - 1 \]&lt;/p&gt;
-
-&lt;p&gt;再因为引理2，有：&lt;/p&gt;
-
-&lt;p&gt;\[  n \geq 2^{BH(root)} - 1 \geq 2^{\frac {h} {2}} - 1\]&lt;/p&gt;
-
-&lt;p&gt;\[  n \geq 2^{\frac {h} {2}} - 1\]&lt;/p&gt;
-
-&lt;p&gt;再变换一下：&lt;/p&gt;
-
-&lt;p&gt;\[  n + 1 \geq 2^{\frac {h} {2}} \]&lt;/p&gt;
-
-&lt;p&gt;\[  log_{2}(n + 1) \geq log_{2}2^{\frac {h} {2}} \]&lt;/p&gt;
-
-&lt;p&gt;\[  log_{2}(n + 1) \geq \frac {h} {2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ h \leq 2log_{2}(n + 1)   \]&lt;/p&gt;
-
-&lt;p&gt;得证。&lt;/p&gt;
-
-&lt;p&gt;这个定理的重要性在于，它保证了红黑树是&lt;strong&gt;平衡&lt;/strong&gt;的。&lt;/p&gt;
-
-&lt;h2&gt;总结&lt;/h2&gt;
-
-&lt;p&gt;红黑树和一般的二叉树相比，在空间上只是多了一个bit，这个特性对红黑树的实际运用非常棒；而围绕“red or black&amp;quot;设计出来的4个性质，恰好使得红黑树获得了最后的不等式，这个不等式使得红黑树和最理想的平衡二叉树也相差无几了。&lt;/p&gt;
-
-&lt;p&gt;虽然红黑树能够简单地被理解，但是它的发明过程想必是不简单的，这需要天才般的想象力(红黑树只用一个标记位)和数学分析能力。也可以称为发明创造能力，这是不容易的。吾等只能膜拜大神。&lt;/p&gt;
-
-&lt;p&gt;除了红黑树平衡性证明之外，还有别的算法设计工作要做，也就是红黑树的插入、删除、调整运算，必须足够快，不然实际价值就会降低。&lt;/p&gt;
-
-&lt;p&gt;当然，上文只能证明红黑树&lt;strong&gt;在理论上的优秀&lt;/strong&gt;。如果在工程上能够实现这套理论，才算是完美的，然而实际上不那么简单（要正确实现红黑树的插入、删除、旋转操作啊）。下一篇文章前我会自己实现一遍红黑树，再写下心得体会。&lt;/p&gt;
-
-&lt;h2&gt;参考资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.dgp.toronto.edu/people/JamesStewart/378notes/16redBlack/&quot;&gt;http://www.dgp.toronto.edu/people/JamesStewart/378notes/16redBlack/&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/redblacktree-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/redblacktree-1/</guid>
       </item>
     
   </channel>
