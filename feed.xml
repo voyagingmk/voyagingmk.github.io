@@ -7,6 +7,59 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>错误使用四元数依然会出现Gimble Lock</title>
+        <description>&lt;p&gt;一直都说用欧拉角做旋转会出现万向节锁Bug（Gimble Lock），而用四元数就不会。其实这样的说法是不准确的，当用四元数做旋转，如果使用姿势错误，依然会出现Gimble Lock。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;错误的用法&lt;/h2&gt;
+
+&lt;p&gt;下面是我自己录制的演示视频，当x轴转90度，y轴和z轴就合二为一了：&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/ZDQkzR_L7b0&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;演示代码：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;Transform4x4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Translate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vector3dF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Transform4x4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pitch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;yaw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;roll&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pitch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;90.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;yaw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;roll&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;3.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RotateX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pitch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// x&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RotateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yaw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// y&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotZ&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RotateZ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;roll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// z&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rot&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotZ&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Transform4x4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;modelTrans&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Transform4x4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toMatrix4x4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;pitch即x轴，pitch到90度时，yaw和roll转的是同一条轴。这和欧拉角的情况没有区别。&lt;/p&gt;
+
+&lt;p&gt;原因在于要理解Gimble Lock问题的本质。只要你是利用坐标系3个正交基x、y、z去做转换，当其中一个基旋转了90度时，&lt;strong&gt;另外的2个基的其中之一会跟着旋转90度&lt;/strong&gt;，然后和第三个基合并，那么对这合并的2个基做旋转，肯定都是一个效果。换句话说就是丢失一个自由度。&lt;/p&gt;
+
+&lt;p&gt;正确的旋转机制是，不要用3个&lt;strong&gt;互相关联的&lt;/strong&gt;变量来表示物体的旋转，例如pitch、yaw、roll；而是用一个变量表示，例如用唯一一个四元数或旋转矩阵（旋转矩阵也可以由一个四元数导出）来表示物体的&lt;strong&gt;朝向&lt;/strong&gt;，则是可行的。上面的例子虽然也用了四元数，但是错就错在用了三个四元数，所以就出bug了。&lt;/p&gt;
+
+&lt;p&gt;下面是正确的四元数转换代码:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pitch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;yaw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;roll&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;3.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RotateX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pitch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// x&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RotateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yaw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// y&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotZ&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RotateZ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;roll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// z&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;QuaternionF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;quatDiff&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotZ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;quatDiff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Transform4x4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;modelTrans&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Transform4x4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toMatrix4x4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;注意这段代码里依然出现了pitch、yaw、roll。为什么呢？这是因为&lt;strong&gt;旋转&lt;/strong&gt;的数学描述用正交基表示依然是最人性化的。这段代码之所以可行是在于用了一个新的变量orientation，来表示物体的当前&lt;strong&gt;朝向&lt;/strong&gt;。每次迭代更新朝向时，先把pitch、yaw、roll转成Quaternion，然后相乘，从而得到这一帧的&lt;strong&gt;朝向改变量quatDiff&lt;/strong&gt;，最后把quatDiff应用到orientation里，就改变了当前朝向了。&lt;/p&gt;
+
+&lt;p&gt;最后要注意的是，orientation每次改变后都要重新规范化&lt;strong&gt;(Normalize)&lt;/strong&gt;，否则旋转效果会和预期的不一样。&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/RfM83dFT9ks&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+</description>
+        <pubDate>Tue, 30 May 2017 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/quaternion3/</link>
+        <guid isPermaLink="true">http://localhost:4000/quaternion3/</guid>
+      </item>
+    
+      <item>
         <title>碰撞检测算法</title>
         <description>&lt;p&gt;碰撞检测算法，暴力解决是一个\( O(n^{2}) \)的过程：对于场景中的每一个obj都和所有其他的obj做相交测试。2个for循环解决问题，所以时间复杂度是\( O(n^{2}) \)，这是最坏情况了。于是可以说，现在流传的各种碰撞检测算法的存在意义都是为了降低这个复杂度\( O(n^{2}) \)。&lt;/p&gt;
 
@@ -689,108 +742,6 @@
         <pubDate>Sun, 16 Oct 2016 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/forwarder-buildsystem/</link>
         <guid isPermaLink="true">http://localhost:4000/forwarder-buildsystem/</guid>
-      </item>
-    
-      <item>
-        <title>细说红黑树(2)-基本操作之Insert</title>
-        <description>&lt;!--more--&gt;
-
-&lt;p&gt;本文争取用精简的文字描述清楚红黑树的各种基本操作：&lt;strong&gt;插入&lt;/strong&gt;、删除、查询。&lt;/p&gt;
-
-&lt;p&gt;在开始下文之前，再次祭出红黑树的四大性质：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;根节点是黑色&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;叶子节点（NULL）视为黑色节点&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;如果一个节点是红色，那么它的2个孩子节点都是黑色&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;对于每条从根节点出发、并到达叶子节点的路径，路径上黑色节点的数量一致（叶子节点也计算在内）&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h1&gt;Insert&lt;/h1&gt;
-
-&lt;p&gt;插入操作的第一个准则是，&lt;strong&gt;插入的节点先设置为红色&lt;/strong&gt;，插入后根据插入的节点在树中的&lt;strong&gt;位置&lt;/strong&gt;以及树的&lt;strong&gt;着色状态&lt;/strong&gt;，可以划分出多种情况，这些情况总结如下：&lt;/p&gt;
-
-&lt;p&gt;（注意，在以下所有情况中，在节点插入前红黑树是平衡的，即使从图片上看并不能看出平衡性）&lt;/p&gt;
-
-&lt;p&gt;1.插入的节点是根节点&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;显然无需调整红黑树。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;2.插入的节点的父节点是&lt;strong&gt;黑&lt;/strong&gt;色&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;插入红节点，并不影响性质4。无需调整红黑树。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;3.插入的节点的父节点是&lt;strong&gt;红&lt;/strong&gt;色&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;3a.叔节点（即父节点的兄弟节点）也是&lt;strong&gt;红&lt;/strong&gt;色&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这种情况下，需要把&lt;strong&gt;父、叔节点变为黑色，并把祖父节点变为红色&lt;/strong&gt;，这样就保证了当前局部范围内红黑树性质能够被满足，但因为祖父节点被改变了颜色，所以事情还没完，需要&lt;strong&gt;递归&lt;/strong&gt;本步骤（即把祖父节点当做是插入的节点），直到到达根节点。&lt;/p&gt;
-
-&lt;p&gt;这个步骤被称为&lt;strong&gt;Recoloring&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;3b.叔节点是&lt;strong&gt;黑&lt;/strong&gt;色&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;当处于这个情况下，根据&lt;strong&gt;父节点相对祖父节点的位置（Left or Right）和  插入节点相对父节点的位置（Left or Right）&lt;/strong&gt;，总共有四种细分状态：&lt;/p&gt;
-
-&lt;p&gt;i) Left-Left&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;步骤：&lt;/p&gt;
-
-&lt;p&gt;1）&lt;strong&gt;右&lt;/strong&gt;旋转g&lt;/p&gt;
-
-&lt;p&gt;2）交换g和p的颜色&lt;/p&gt;
-
-&lt;p&gt;ii) Right-Right&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/6.png&quot; alt=&quot;6.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;步骤：&lt;/p&gt;
-
-&lt;p&gt;1）&lt;strong&gt;左&lt;/strong&gt;旋转g&lt;/p&gt;
-
-&lt;p&gt;2）交换g和p的颜色&lt;/p&gt;
-
-&lt;p&gt;可以注意到，整个步骤和Left-Left非常相似，其实就是Left-Left的水平镜像。&lt;/p&gt;
-
-&lt;p&gt;iii) Left-Right&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;可以用一个旋转操作把这个case转换成Left-Left的case，步骤如下：&lt;/p&gt;
-
-&lt;p&gt;1）&lt;strong&gt;左&lt;/strong&gt;旋转p&lt;/p&gt;
-
-&lt;p&gt;iiii) Right-Left&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;可以用一个旋转操作把这个case转换成Right-Right的case，步骤如下：&lt;/p&gt;
-
-&lt;p&gt;1）&lt;strong&gt;右&lt;/strong&gt;旋转p&lt;/p&gt;
-
-&lt;h2&gt;资料&lt;/h2&gt;
-
-&lt;p&gt;本文配图使用yEd编辑：&lt;a href=&quot;http://www.yworks.com/products/yed/download&quot;&gt;http://www.yworks.com/products/yed/download&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.geeksforgeeks.org/red-black-tree-set-2-insert/&quot;&gt;http://www.geeksforgeeks.org/red-black-tree-set-2-insert/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;红黑树测试程序：&lt;a href=&quot;https://www.cs.usfca.edu/%7Egalles/visualization/RedBlack.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/RedBlack.html&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Fri, 07 Oct 2016 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/redblacktree-2/</link>
-        <guid isPermaLink="true">http://localhost:4000/redblacktree-2/</guid>
       </item>
     
   </channel>
