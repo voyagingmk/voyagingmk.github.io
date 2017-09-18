@@ -7,6 +7,54 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>渲染器开发笔记-1</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;目前进展：&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;已把项目改造使用ECS框架，顺眼很多&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;做了基本的一系列system设计和实现&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;正在弄Deferred Rendering框架&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;开发计划：&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;据某大牛说，不结合实际的游戏项目而去开发游戏引擎，就是扯淡。所以目前还不打算把这个renderer项目弄成引擎，而是当做一个纯粹的渲染器来做。focus在渲染这块，所以会忽略开发一些次要模块，如脚本引擎、音频播放器、控制器啥的，都不搞。不过渲染这个东西里面，还有很多问题得暂时忽略的，例如是否要嵌入一个物理引擎还是自己做一个简易版（当学习CD算法）、超大世界渲染是否要做、动画系统等。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;基于第一点，目前打算实现的是：Deferred + Forward的框架。实现之后的下一个计划是PBR渲染和SSAO。其他就不管先了。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;记录一些渲染的心得&lt;/h2&gt;
+
+&lt;h3&gt;单纯的Forward Rendering为什么不好？&lt;/h3&gt;
+
+&lt;p&gt;正向渲染，每一个模型都得跑一遍shader（vs做mvp变换、fs做光照），那么就是说每一个通过depth test的fragment都得做光照，而光照计算一般是一个线性叠加的过程，有几个光源就做几遍lighting pass，所以：&lt;/p&gt;
+
+&lt;p&gt;大致的时间复杂度 = O(模型面片数量 * 光源数量)&lt;/p&gt;
+
+&lt;p&gt;（注意，这里的光源数量非常关键，多一个光源就等于多跑了一遍fs。）&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;正向渲染的不足之处在于有大量的做了光照计算的fragment被覆盖掉了，即光照白做了。&lt;/strong&gt;例如我先draw一个10万面片的角色，然后又在这个角色前面draw了一堵墙，完全把这个角色挡住了，那么这个角色的光照计算就是白做的。&lt;/p&gt;
+
+&lt;h3&gt;Deferred Rendering的正确做法和优点&lt;/h3&gt;
+
+&lt;p&gt;延迟渲染的延迟指的是把光照计算延迟了，以刚刚的例子来说，先渲染一个10万面片的模型，再渲染一堵墙，不会再有光照计算的浪费。延迟渲染的GBuffer，不会有光照计算信息。&lt;strong&gt;光照计算延迟到geometry pass之后再做，和模型面片数量再无关系，而与frame buffer分辨率产生关系&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;大致的时间复杂度 = O(模型面片数量) + O(光源数量 * 分辨率)&lt;/p&gt;
+
+&lt;p&gt;从这条公式可以发现，即使模型再多面片再多，光照计算只会和分辨率有关系，从而理论上可以做到超多光源渲染。&lt;/p&gt;
+
+&lt;p&gt;但Deferred Rendering不是一种用来替代Forward Rendering的技术，而是一钟补充。延迟渲染的特性导致有一些技巧会不好使，例如半透明的混合渲染。正确的做法是先延迟后正向，两步渲染。&lt;/p&gt;
+
+&lt;p&gt;值得一提的是， O(光源数量 * 分辨率)，这一步还得特别优化下才能实现超多光源渲染。优化原理是：&lt;strong&gt;剔除掉和目标fragment无关的光照计算&lt;/strong&gt;。比如可以根据光源强度和距离，把足够远的光源排除掉，那么就可以省下很多计算量。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 18 Sep 2017 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/renderer-progress-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/renderer-progress-1/</guid>
+      </item>
+    
+      <item>
         <title>错误使用四元数依然会出现Gimble Lock</title>
         <description>&lt;p&gt;一直都说用欧拉角做旋转会出现万向节锁Bug（Gimble Lock），而用四元数就不会。其实这样的说法是不准确的，当用四元数做旋转，如果使用姿势错误，依然会出现Gimble Lock。&lt;/p&gt;
 
@@ -616,132 +664,6 @@
         <pubDate>Sat, 18 Mar 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/forwarder-progress/</link>
         <guid isPermaLink="true">http://localhost:4000/forwarder-progress/</guid>
-      </item>
-    
-      <item>
-        <title>forwarder开发备忘</title>
-        <description>&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/voyagingmk/forwarder&quot;&gt;https://github.com/voyagingmk/forwarder&lt;/a&gt;&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h1&gt;cmake&lt;/h1&gt;
-
-&lt;h3&gt;1.windows下安装cmake&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://cmake.org/files/v3.7/cmake-3.7.0-rc1-win64-x64.msi&quot;&gt;https://cmake.org/files/v3.7/cmake-3.7.0-rc1-win64-x64.msi&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;顺便可以下载cmake源码，源码里面有一个tests目录，有很多cmake工程可以参考，譬如官网的tutorials教程的代码都在tests里面了。&lt;/p&gt;
-
-&lt;h3&gt;2.手写CMakeLists.txt&lt;/h3&gt;
-
-&lt;p&gt;本文不谈cmake-gui的使用，原因是这东西界面有点怪，其次是cmake作为跨平台的构建系统，理应学习使用cmake的命令行模式，命令都是一致的，而cmake-gui是windows独有的。&lt;/p&gt;
-
-&lt;p&gt;那么，在执行cmake构建指令前，需要在forwarder项目根目录下手写一个CMakeLists.txt文件。&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;# 注：这个个CMakeLists.txt在将来的版本中会发生改动。&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmake_minimum_required&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VERSION&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;project&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forwarder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;cp&quot;&gt;# The version number.&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FORWARDER_VERSION_MAJOR&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FORWARDER_VERSION_MINOR&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;include_directories&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${PROJECT_SOURCE_DIR}/include&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;include_directories&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${PROJECT_SOURCE_DIR}/enet&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;add_subdirectory&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;enet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EXTRA_LIBS&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EXTRA_LIBS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;libenet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;cp&quot;&gt;# add the executable&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;add_executable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forwarder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cpp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;target_link_libraries&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forwarder&lt;/span&gt;  &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EXTRA_LIBS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;（这里推荐用vscode来编辑CMakeLists.txt，vscode有编辑CMakeLists.txt文件的插件，支持语法高亮和智能提示，很爽）&lt;/p&gt;
-
-&lt;h3&gt;3.构建&lt;/h3&gt;
-
-&lt;p&gt;forwarder项目目前用到了3个第三方库：enet、spdlog、rapidjson。&lt;/p&gt;
-
-&lt;p&gt;spdlog和rapidjson是头文件形式的第三方库，直接把头文件放到include就可以了。&lt;/p&gt;
-
-&lt;p&gt;enet则打算用静态链接的方式引入。需要建一个子目录&lt;strong&gt;enet&lt;/strong&gt;，然后添加enet的所有c文件、CMakeLists.txt。&lt;/p&gt;
-
-&lt;p&gt;（其实可以把enet整个源码文件夹搬进来，不过我为了forwarder的东西更少些，所以只添加了enet的c文件和CMakeLists.txt）&lt;/p&gt;
-
-&lt;p&gt;enet的CMakeLists.txt是作为根目录CMakeLists.txt的孩子存在的，由根目录的CMakeLists.txt来调用。&lt;/p&gt;
-
-&lt;p&gt;有了这2个个CMakeLists.txt后，在根目录新建一个文件夹叫build，然后cmd进入这个目录，并执行：&lt;/p&gt;
-
-&lt;p&gt;cmake ..&lt;/p&gt;
-
-&lt;p&gt;就会自动在build目录生成visual studio项目，启动forwarder.sln，点生成解决方案，如果没报错，就说明构建成功了。&lt;/p&gt;
-
-&lt;h1&gt;docker&lt;/h1&gt;
-
-&lt;p&gt;用docker来测试forwarder在linux系统下的运行情况，非常方便。&lt;/p&gt;
-
-&lt;h3&gt;1.首先windows安装docker：&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.docker.com/products/overview&quot;&gt;https://www.docker.com/products/overview&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3&gt;2.然后设置share目录：&lt;/h3&gt;
-
-&lt;p&gt;docker安装完毕后在任务栏会有一个图标，右键然后点setting：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/11.png&quot; alt=&quot;11.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2016.10/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;注意红圈的内容，提示了我们开启share目录后，怎么在docker中用（其实就是-v指令）。&lt;/p&gt;
-
-&lt;h3&gt;3.然后在cmd中执行：&lt;/h3&gt;
-
-&lt;p&gt;docker run --rm -it -v D:\workplace\project\forwarder:/data ubuntu:latest&lt;/p&gt;
-
-&lt;p&gt;run代表启动一个container；&lt;/p&gt;
-
-&lt;p&gt;最后的参数ubuntu:latest代表使用ubuntu的最新版本镜像(image)&lt;/p&gt;
-
-&lt;p&gt;其中的-rm作用是exit时会自动删除这个container；&lt;/p&gt;
-
-&lt;p&gt;-it作用是设置成交互模式(interactive)；&lt;/p&gt;
-
-&lt;p&gt;-v D:\workplace\project\forwarder:/data，是把windows的共享目录D:\workplace\project\forwarder 映射到container中的/data目录。&lt;/p&gt;
-
-&lt;p&gt;第一次执行时，会从docker官方服务器下载ubuntu:latest镜像到本地，所以会比较慢。&lt;/p&gt;
-
-&lt;p&gt;执行成功后，就进入这个临时生成的ubuntu的控制台啦！&lt;/p&gt;
-
-&lt;h3&gt;4.在ubuntu中构建forward&lt;/h3&gt;
-
-&lt;p&gt;第三步建立的ubuntu镜像不是持久化的，需要永久保存的镜像的话，需要自行写Dockerfile。&lt;/p&gt;
-
-&lt;p&gt;在forwarder根目录下的docker目录我已经写了一个。cmd进入这个目录并执行：&lt;/p&gt;
-
-&lt;p&gt;docker build -t myubuntu  .&lt;/p&gt;
-
-&lt;p&gt;就开始在本地创建一个自定义的image镜像了。&lt;/p&gt;
-
-&lt;p&gt;如果update太慢，可考虑更换国内的soureces，访问：&lt;a href=&quot;http://wiki.ubuntu.org.cn/%E6%A8%A1%E6%9D%BF:16.04source&quot;&gt;http://wiki.ubuntu.org.cn/%E6%A8%A1%E6%9D%BF:16.04source&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;把Dockerfile中的那些sources链接的地址替换成国内的镜像站点即可，例如我替换成阿里云的镜像站点。&lt;/p&gt;
-
-&lt;p&gt;镜像生成完毕后，在任意目录执行命令：&lt;/p&gt;
-
-&lt;p&gt;docker run --rm -it -v D:\workplace\project\forwarder:/data myubuntu&lt;/p&gt;
-
-&lt;p&gt;此时，进入的ubuntu只是一个临时的无持久化的系统，若你修改了这个系统下的东西，exit退出后再执行上面的命令进入ubuntu，是不会看到之前的修改的。&lt;/p&gt;
-
-&lt;p&gt;这个特性很适合用来做开发测试，保证了测试环境不会被轻易破坏掉。&lt;/p&gt;
-
-&lt;h3&gt;5.apt-get的一些技巧&lt;/h3&gt;
-
-&lt;p&gt;查询一个包的版本列表：&lt;/p&gt;
-
-&lt;p&gt;apt-cache policy &lt;package name&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 16 Oct 2016 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/forwarder-buildsystem/</link>
-        <guid isPermaLink="true">http://localhost:4000/forwarder-buildsystem/</guid>
       </item>
     
   </channel>
