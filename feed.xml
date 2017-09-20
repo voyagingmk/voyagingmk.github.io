@@ -7,6 +7,70 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>再谈四元数的应用：朝向还是旋转？</title>
+        <description>&lt;p&gt;最近在做的东西涉及到四元数的知识，做的过程中发现四元数有一些很容易让人迷惑的点，现写这篇文章备忘。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;四元数作为对象的朝向(Orientation)时&lt;/h2&gt;
+
+&lt;p&gt;一个3D的对象一般有这些基本几何属性：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;空间位置。用一个vector3d即可表示&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;缩放系数。同样也可以用一个vector3d表示，每个分量代表物体在每一个正交基的缩放系数&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;朝向。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;朝向，这是个看名字很容易知道含义的属性，但是用数学语言描述的话却有很多种方式，不像&amp;quot;位置&amp;quot;、&amp;quot;缩放&amp;quot;那么容易就可以确定用一个vector3d来实现。&lt;/p&gt;
+
+&lt;p&gt;基于笛卡尔3D坐标系，普遍在用的朝向表示方法有这么几种：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;欧拉角&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://www.qiujiawei.com/linear-algebra-14/&quot;&gt;旋转矩阵&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;四元数&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这3个随便一个都是蛮复杂的东西（不是学3D的应该都不知道这3个吧）。首先比较下3种方法的数据存储效率：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;欧拉角，需要3个分量（ 前进方向(heading)、海拔(elevation)、 倾斜(bank) 或 偏航(yaw),
+俯仰(pitch)、 翻滚（roll））。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;旋转矩阵。4 x 4 = 16个分量（不考虑压缩）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;四元数。4个分量。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;显然从数据存储上看，欧拉角最有优势，但问题是，欧拉角和旋转矩阵都是有万向节锁问题的。实际上，只要是用三个旋转角来表示朝向就会出现万向节锁问题，即使用了四元数，因为欧拉角和四元数可以等价转换，例如所有计算都是用欧拉角，只是存储的时候转换成四元数。&lt;/p&gt;
+
+&lt;p&gt;考虑这一点，四元数直接表示朝向的优势就凸现出来了，比欧拉角多一个分量，但能处理好万向节锁问题。为什么会这样呢？这其中的神奇之处就在于四元数的4个分量的含义和欧拉角的三个分量的含义差别很大，我举例说明下：&lt;/p&gt;
+
+&lt;p&gt;欧拉角(pitch yaw roll)  &amp;lt;—&amp;gt; 四元数(第一个值是虚部，后面三个是实部)&lt;/p&gt;
+
+&lt;p&gt;0.0,  0.0,  0.0  &amp;lt;—&amp;gt; 1.000000, 0.000000, 0.000000, 0.000000&lt;/p&gt;
+
+&lt;p&gt;90.0, 0.0,  0.0  &amp;lt;—&amp;gt; 0.707107, 0.707107, 0.000000, 0.000000&lt;/p&gt;
+
+&lt;p&gt;0.0, 90.0,  0.0  &amp;lt;—&amp;gt; 0.707107, 0.000000, 0.707107, 0.000000&lt;/p&gt;
+
+&lt;p&gt;0.0,  0.0, 90.0  &amp;lt;—&amp;gt; 0.707107, 0.000000, 0.000000, 0.707107&lt;/p&gt;
+
+&lt;p&gt;可以看到，用四元数表示的朝向，只看数值是无法直观知道这个四元数是代表什么朝向的。所以&lt;strong&gt;不能以轴-旋转角度的概念去看待四元数，完全不是同一回事&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3&gt;总结一下：&lt;/h3&gt;
+
+&lt;p&gt;明确你的程序里的欧拉角和四元数的对应关系后，做一个欧拉角到四元数的转换接口。初始化对象朝向时，先以欧拉角的思考角度确定欧拉角的三个值，然后用这个接口把欧拉角转成四元数，就可以用四元数来做朝向数据的存储（多消耗一个float）。&lt;/p&gt;
+
+&lt;p&gt;使用四元数朝向数据时，不能转换回欧拉角来使用（如果你这样就等同于只在存储时应用四元数），而是应该继续以四元数的思考角度来做各种操作。一般就是控制物体朝向，也就是2个朝向的平滑插值（&lt;a href=&quot;http://www.qiujiawei.com/understanding-quaternions/#7&quot;&gt;四元数SLERP&lt;/a&gt;）。&lt;/p&gt;
+
+&lt;h2&gt;四元数作为旋转变换参数时&lt;/h2&gt;
+</description>
+        <pubDate>Wed, 20 Sep 2017 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/quaternion4/</link>
+        <guid isPermaLink="true">http://localhost:4000/quaternion4/</guid>
+      </item>
+    
+      <item>
         <title>渲染器开发笔记-1</title>
         <description>&lt;!--more--&gt;
 
@@ -585,85 +649,6 @@
         <pubDate>Sat, 18 Mar 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/partial-derivatives/</link>
         <guid isPermaLink="true">http://localhost:4000/partial-derivatives/</guid>
-      </item>
-    
-      <item>
-        <title>forwarder概况</title>
-        <description>&lt;p&gt;5个月没更新博客，是因为这段时间主要用在开发&lt;a href=&quot;https://github.com/voyagingmk/forwarder&quot;&gt;forwarder&lt;/a&gt;。forwarder是因为工作需要而开发的一个工具，它统一了游戏前后端之间、后端各个服务之间的通信，目前forwarder不仅已经通过了初步的压力和稳定性测试，并且已经在项目中发挥了实际作用。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;目前成果&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;已经实现两种通信模式：enet(udp)和websocket(http based tcp)的一键切换&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;我们一开始用了websocket来实现服务端和客户端之间的通信。服务端架构做深入后，涌现了复杂的多服务器间通信的需求，为求快速开发，我们用上了npm上的一个websocket库，这样前后端、后端之间的通信模式就统一了：js + websocket。但是这个websocket库偶而会出现一个莫名其妙的error，第三方库的原因，修复无望，也不想死磕这个websocket，于是发现了新的方案：enet。&lt;/p&gt;
-
-&lt;p&gt;enet是一个神奇的库，它把udp通信做了一层封装，使得通过enet通信，不仅可以发不可靠的udp，也可以发可靠的udp，使得通过udp也可以做网游（作者似乎也是某个游戏公司的）。&lt;/p&gt;
-
-&lt;p&gt;更重要的是，tcp相比udp，有一个缺点，在网络状况不好时，tcp表现得很差，原因是RTO（Retransmission TimeOut)重传定时器跟不上RTT（Round Trip Time）的变化（这也是tcp的故意设计）。具体细节推荐这篇文章：&lt;a href=&quot;http://blog.csdn.net/heiyeshuwu/article/details/46402517&quot;&gt;TCP超时重传机制探索&lt;/a&gt;。RTO过高时，延迟就会变大，对有实时联网战斗的游戏是致命的。&lt;/p&gt;
-
-&lt;p&gt;除了可靠性，enet还有很多features：有序、连接管理、带宽控制、跨平台等，都是无缝地从tcp通信切换到enet通信的有利条件。&lt;/p&gt;
-
-&lt;p&gt;但我们项目如果要切换到enet还有很多问题，例如：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;我们的web版客户端无法嵌入enet库（因为浏览器不支持），即使服务端支持了enet，web客户端也无法与之建立通信&lt;/li&gt;
-&lt;li&gt;websocket在浏览器的js、spidermonkey的js、node.js（npm有现成的库），都算是内置的功能，但enet就需要我们自行解决这些平台问题了&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;因此，forwarder就应运而生了。forwarder对通信方式做了一层简单的抽象，把enet亦或者websocket都隐藏了，使得通过forwarder做通信时，不需要太关心通信方式细节。&lt;/p&gt;
-
-&lt;p&gt;对于上面第一个问题就有了解决方案，服务端只需要开放2个访问端口，一个tcp(websocket)、一个udp(enet)，前者给web客户端连接，后者给支持enet的客户端连接，例如手机端、PC端。forwarder收到websocket线路来的包时，也交给enet线路的packer_handler处理就可以了，发包接口也类似。&lt;/p&gt;
-
-&lt;p&gt;第二个问题的处理就是写driver，forwarder对收发的packet包一层scheme，用于做加密等功能，而web端既然无法使用forwarder的代码，那么就只能写一个scheme parser和一套简易的forwarder-js接口，实现解包、压包；node.js的话也实现了一个&lt;a href=&quot;https://www.npmjs.com/package/forwarder-node&quot;&gt;forwarder-node&lt;/a&gt;了；而spidermonkey或者说cocos2d-x中的spidermonkey，我也写了一套driver用于项目中。&lt;/p&gt;
-
-&lt;p&gt;汇总下目前已经实现的driver：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;node.js&lt;/li&gt;
-&lt;li&gt;spidermonkey(cocos2d-x)&lt;/li&gt;
-&lt;li&gt;unity
-
-&lt;ul&gt;
-&lt;li&gt;windows&lt;/li&gt;
-&lt;li&gt;ios&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;还有一个driver是web-js。因为浏览器不支持native代码，所以我实现了一个纯js版本的forwarder协议解析器，并封装了和其他driver一样的forwarder接口。但这个解析器暂时不支持上述的加密、压缩等功能。要实现这些功能需要接入web版的AES加密插件等，暂时还不必要。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;动态长度header，支持加密、压缩、base64、ip查询&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;加密使用了AES算法，密钥要求128位；压缩使用了zlib库；动态长度header是指，在不开启任何功能时，单个packet的header最少需要8个字节，根据开启的flag，header会动态增长。（初期写了固定长度的header，发现很不好使，中间重构了一遍）&lt;/p&gt;
-
-&lt;h3&gt;以后计划&lt;/h3&gt;
-
-&lt;p&gt;目前forwarder代码比较稳定，可以实际使用了，开发速度将放缓。&lt;/p&gt;
-
-&lt;p&gt;forwarder目前待做的事项：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;完善log代码&lt;/li&gt;
-&lt;li&gt;完善API&lt;/li&gt;
-&lt;li&gt;规范文档&lt;/li&gt;
-&lt;li&gt;做新的通信模式：基于epoll&lt;/li&gt;
-&lt;li&gt;针对各种需求，实现更多的driver层&lt;/li&gt;
-&lt;li&gt;写测试代码&lt;/li&gt;
-&lt;li&gt;protobuf插件？&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;log这个东西必须得弄好，一是因为forwarder本身开发调试很需要看log情况，二是对于用户来说，让用户更好地中控forwarder的运行情况也是很有利的。API的设计，需要结合实际需求，最近因为项目需要，强行扩展了几个接口，之后还需要想办法弄好点。&lt;/p&gt;
-
-&lt;p&gt;开发新通信模式，必要性在于，forwarder需要有属于自己的底层通信代码，就可以减少对第三方库的依赖了，例如可以把websocket、enet都变成插件代码，用户可以设置编译选项，决定要不要把websocket、enet编译进来。这样就可以减少forwarder代码体积了。&lt;/p&gt;
-</description>
-        <pubDate>Sat, 18 Mar 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/forwarder-progress/</link>
-        <guid isPermaLink="true">http://localhost:4000/forwarder-progress/</guid>
       </item>
     
   </channel>
