@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>渲染器开发笔记1-ECS框架实现 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>渲染器开发笔记2-延迟渲染下的天空盒 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="渲染器开发笔记1-ECS框架实现" />
-    <meta property="twitter:title" content="渲染器开发笔记1-ECS框架实现" />
+    <meta property="og:title" content="渲染器开发笔记2-延迟渲染下的天空盒" />
+    <meta property="twitter:title" content="渲染器开发笔记2-延迟渲染下的天空盒" />
     
 
     <!--[if lt IE 9]>
@@ -36,8 +36,8 @@
 
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
-		  'page': '/renderer-progress-1/',
-		  'title': '渲染器开发笔记1-ECS框架实现'
+		  'page': '/renderer-progress-2/',
+		  'title': '渲染器开发笔记2-延迟渲染下的天空盒'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -77,56 +77,56 @@
 
     <div id="main" role="main" class="container">
       <article class="post">
-  <h1>渲染器开发笔记1-ECS框架实现</h1>
+  <h1>渲染器开发笔记2-延迟渲染下的天空盒</h1>
   <h3>Tags: <a href="/tag/renderer/" rel="tag">renderer</a></h3>
   <div class="entry">
     <!--more-->
 
-<h2>目前进展：</h2>
+<p>defer和forward框架下实现天空盒渲染，区别并不是很大，这里备忘下流程：</p>
+
+<h2>Deferred rendering:</h2>
 
 <ol>
-<li><p>已把项目改造使用ECS框架，顺眼很多</p></li>
-<li><p>做了基本的一系列system设计和实现</p></li>
-<li><p>正在弄Deferred Rendering框架</p></li>
+<li><p>geometry pass（计算GBuffer）</p></li>
+<li><p>Deferred lighting pass（根据GBuffer计算光照）</p></li>
+<li><p>把GBuffer的深度信息复制到main framebuffer</p></li>
+<li><p>渲染天空盒</p></li>
 </ol>
 
-<h2>开发计划：</h2>
+<h2>Forward rendering:</h2>
 
 <ol>
-<li><p>据某大牛说，不结合实际的游戏项目而去开发游戏引擎，就是扯淡。所以目前还不打算把这个renderer项目弄成引擎，而是当做一个纯粹的渲染器来做。focus在渲染这块，所以会忽略开发一些次要模块，如脚本引擎、音频播放器、控制器啥的，都不搞。不过渲染这个东西里面，还有很多问题得暂时忽略的，例如是否要嵌入一个物理引擎还是自己做一个简易版（当学习CD算法）、超大世界渲染是否要做、动画系统等。</p></li>
-<li><p>基于第一点，目前打算实现的是：Deferred + Forward的框架。实现之后的下一个计划是PBR渲染和SSAO。其他就不管先了。</p></li>
+<li><p>正常渲染场景（一遍vs + fs？）</p></li>
+<li><p>渲染天空盒</p></li>
 </ol>
 
-<h2>记录一些渲染的心得</h2>
+<h2>对比</h2>
 
-<h3>单纯的Forward Rendering为什么不好？</h3>
+<p>可以看到，天空盒都是放在最后一步渲染的。这是因为天空盒体积巨大，如果放在第一步就渲染就可能会有多余的fs着色是白做的，具体地说就是和视角有关，如果摄像机朝天，那么天空盒提前算也没关系，最终还是看得到这些像素，但如果视角朝地面，可能所有天空盒的像素都被深度剔除了，那就不好了。</p>
 
-<p>正向渲染，每一个模型都得跑一遍shader（vs做mvp变换、fs做光照），那么就是说每一个通过depth test的fragment都得做光照，而光照计算一般是一个线性叠加的过程，有几个光源就做几遍lighting pass，所以：</p>
+<h2>天空盒的实现要点</h2>
 
-<p>大致的时间复杂度 = O(模型面片数量 * 光源数量)</p>
+<h3>view矩阵问题</h3>
 
-<p>（注意，这里的光源数量非常关键，多一个光源就等于多跑了一遍fs。）</p>
+<p>首先天空盒的渲染需要用到Proj和View矩阵，但需要做一点trick：天空盒不需要translate变换（摄像机不能&quot;靠近&quot;天空盒），需要把view矩阵的translate信息剔除掉。学到的一个很聪明的做法是：mat4(mat3(view))，即剔除view矩阵的前三行前三列信息（translate信息在最后一列），然后再恢复成mat4。</p>
 
-<p><strong>正向渲染的不足之处在于有大量的做了光照计算的fragment被覆盖掉了，即光照白做了。</strong>例如我先draw一个10万面片的角色，然后又在这个角色前面draw了一堵墙，完全把这个角色挡住了，那么这个角色的光照计算就是白做的。</p>
+<h3>天空盒的深度值问题</h3>
 
-<h3>Deferred Rendering的正确做法和优点</h3>
+<p>天空盒必须渲染后到最深的位置，所以天空盒的每一个fragment的depth必须为1.0。怎么保证呢？做法就是在vertex shader里加一行这样的代码：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>gl_Position = pos.xyww;
+</code></pre></div>
+<p>因为OpenGL有一个perspective divide的过程，会在vs着色完成时，对gl_Position除以gl_Position的z值，所以x、y、w、w会变成x/w、y/w、1.0, 1.0，z值就固定1.0了。</p>
 
-<p>延迟渲染的延迟指的是把光照计算延迟了，以刚刚的例子来说，先渲染一个10万面片的模型，再渲染一堵墙，不会再有光照计算的浪费。延迟渲染的GBuffer，不会有光照计算信息。<strong>光照计算延迟到geometry pass之后再做，和模型面片数量再无关系，而与frame buffer分辨率产生关系</strong>。</p>
+<h3>glDepthFunc问题</h3>
 
-<p>大致的时间复杂度 = O(模型面片数量) + O(光源数量 * 分辨率)</p>
-
-<p>从这条公式可以发现，即使模型再多面片再多，光照计算只会和分辨率有关系，从而理论上可以做到超多光源渲染。</p>
-
-<p>但Deferred Rendering不是一种用来替代Forward Rendering的技术，而是一钟补充。延迟渲染的特性导致有一些技巧会不好使，例如半透明的混合渲染。正确的做法是先延迟后正向，两步渲染。</p>
-
-<p>值得一提的是， O(光源数量 * 分辨率)，这一步还得特别优化下才能实现超多光源渲染。优化原理是：<strong>剔除掉和目标fragment无关的光照计算</strong>。比如可以根据光源强度和距离，把足够远的光源排除掉，那么就可以省下很多计算量。</p>
+<p>glDepthFunc的默认值为GL_LESS，渲染天空盒时需要临时改为GL_LEQUAL，因为对于屏幕上空白的地方（没有任何fragment画上去），depth buffer的深度值为1.0，如果是GL_LESS，那么天空盒的深度值即使是1.0也会过不了depth test。所以要加上EQUAL。</p>
 
   </div>
   <div class="entry">
   (未经授权禁止转载)
   </div>
   <div class="date">
-    Written on September 18, 2017
+    Written on September 21, 2017
   </div>
  <img src="../images/dashang.png" />
     
