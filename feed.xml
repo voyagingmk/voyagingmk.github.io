@@ -140,7 +140,7 @@
 
 &lt;p&gt;\[ k = \frac { (\alpha + 1)^{2} }{ 8 } \]&lt;/p&gt;
 
-&lt;p&gt;为了更加地近似模拟平面几何属性，可以用再应用一条公式（Smith&amp;#39;s method）:&lt;/p&gt;
+&lt;p&gt;为了更加地近似模拟平面几何属性，可以再应用一条公式（Smith&amp;#39;s method）:&lt;/p&gt;
 
 &lt;p&gt;\[ G&amp;#39;(n,v,l,k) = G(n,v,k)G(n,l,k) \]&lt;/p&gt;
 
@@ -166,7 +166,13 @@
 
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Cook-Torrance reflectance equation&lt;/h2&gt;
+
+&lt;p&gt;有了brdf函数后，之前的渲染方程就可以变成：&lt;/p&gt;
+
+&lt;p&gt;\[ L_{o}(p, \omega _{o}) = L_{e}(p, \omega _{o})  + \int _{\Omega } (k_{d}\frac {c}{\pi } + k_{s}\frac { DFG }{ 4 (\omega _{o} \cdot \mathbf n)(\omega _{i} \cdot \mathbf n) } ) L_{i}(p, \omega _{i}) |cos \theta _{i}|d\omega _{i} \]&lt;/p&gt;
+</description>
         <pubDate>Sat, 23 Sep 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/pbr-rendering/</link>
         <guid isPermaLink="true">http://localhost:4000/pbr-rendering/</guid>
