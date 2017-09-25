@@ -7,6 +7,172 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>PBR渲染原理</title>
+        <description>&lt;p&gt;基于PBR做渲染，需要涉及到很多物理学、几何学、热辐射学概念，本文将逐一介绍每个关键概念，并给出相关重要公式。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;微平面(microfacets)理论&lt;/h2&gt;
+
+&lt;p&gt;微观尺度下的任意一个平面(surface)都可以用多个微小的、完美反射的镜面来描述，这些微小镜面被称为&lt;strong&gt;微平面&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3&gt;粗糙度(roughness)&lt;/h3&gt;
+
+&lt;p&gt;平面的&lt;strong&gt;粗糙度&lt;/strong&gt;决定了它的各个微平面的镜面反射情况：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2017.9/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;粗糙度可以用0.0到1.0来近似。&lt;/p&gt;
+
+&lt;h3&gt;中间方向矢量(halfway vector)&lt;/h3&gt;
+
+&lt;p&gt;halfway vector(简称h)等于光线方向矢量l加上视角方向矢量v并单位化（即处于l和v的中间）：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf h = \frac { \mathbf l + \mathbf v}{ \parallel \mathbf l + \mathbf v \parallel } \]&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2017.9/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;h的特性是：h与平面法线越靠近，那么镜面光越强。&lt;/p&gt;
+
+&lt;p&gt;在这个微平面理论下，可以推出：&lt;strong&gt;越多的微平面的法线与h对齐，这个平面的镜面反射就会越强&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h2&gt;能量守恒(energy conservation)&lt;/h2&gt;
+
+&lt;p&gt;不考虑自发光的平面，所有平面的出射光能量总和不能高于入射光能量总和。&lt;/p&gt;
+
+&lt;p&gt;观察下图，可以发现一个规律，粗糙度越高、镜面反射区域越大、镜面反射区域亮度越低。如果反射区域变大，然而亮度不变，那说明能量不守恒了。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2017.9/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;在渲染里，简单地说，要做到能量守恒，就是要遵守一个原则：&lt;strong&gt;平面接收到的光能量要么被反射，要么被吸收&lt;/strong&gt;，也就是说，吸收和反射，是互斥关系。&lt;/p&gt;
+
+&lt;p&gt;直接反射出去的光能量，也叫镜面光、反射光；吸收的光能量，大部分也会变成光发射出去（真正被吸收的就变成热能了），叫漫反射光、折射光。&lt;/p&gt;
+
+&lt;p&gt;镜面/反射光、漫反射/折射光的能量可以用2个系数kS、kD控制，两者满足关系式kD + kS = 1、kD &amp;gt; 0、kS &amp;gt; 0，从而确保发射的光能量不超过接收的光能量。&lt;/p&gt;
+
+&lt;h2&gt;渲染方程&lt;/h2&gt;
+
+&lt;p&gt;渲染方程的详细讨论已经写在&lt;a href=&quot;http://www.qiujiawei.com/rendering-equation/&quot;&gt;渲染基础理论的介绍&lt;/a&gt;一文。&lt;/p&gt;
+
+&lt;h2&gt;双向反射分布函数BRDF&lt;/h2&gt;
+
+&lt;p&gt;在&lt;a href=&quot;http://www.qiujiawei.com/rendering-equation/&quot;&gt;渲染基础理论的介绍&lt;/a&gt;一文里，没有详细讨论到的是brdf这个东西。简单地说，brdf是个控制系数，这个系数并不是常量，需要根据平面属性、光线属性计算得到，是个动态属性。基于PBR渲染，关键点就是选择合理的brdf函数。brdf函数将囊括上文提到的各个概念。&lt;/p&gt;
+
+&lt;p&gt;brdf很多种，最主流的是cook-Torrance BRDF，其基本框架公式是：&lt;/p&gt;
+
+&lt;p&gt;\[ f_{r} = k_{d}f_{lambert} + k_{s}f_{cook−torrance} \]&lt;/p&gt;
+
+&lt;p&gt;其中：&lt;/p&gt;
+
+&lt;p&gt;\[ f_{lambert} = \frac {c}{\pi } \]&lt;/p&gt;
+
+&lt;p&gt;这里的c是指平面自身的颜色值，一般就是指采样纹理贴图出来的颜色。&lt;/p&gt;
+
+&lt;p&gt;右边的镜面光部分才是最复杂的：&lt;/p&gt;
+
+&lt;p&gt;\[ f_{cook−torrance} = \frac { DFG }{ 4 (\omega _{o} \cdot \mathbf n)(\omega _{i} \cdot \mathbf n) } \]&lt;/p&gt;
+
+&lt;p&gt;这条公式怎么来的，改天再写一篇数学推导文。现在需要重点关注右边的分子部分：DFG。DFG其实是3个函数，每个函数算出一个scalar因子，3个因子得到后相乘。D、F、G有很多公式可以选择，下面会介绍几个常用的DFG函数。&lt;/p&gt;
+
+&lt;h3&gt;D， Normal Distribution Function，法线分布函数&lt;/h3&gt;
+
+&lt;p&gt;这个函数其实不是正态分布函数，不要被normal这个单词搞懵了。在渲染一个mesh的一个fragment时，就是在渲染一个平面，这个平面又是由一堆更加小的&lt;strong&gt;微平面&lt;/strong&gt;组成。这些微平面有自己的&lt;strong&gt;微法线&lt;/strong&gt;，D函数就是用来近似算出究竟有多少微法线和h向量对齐。&lt;/p&gt;
+
+&lt;h4&gt;Trowbridge-Reitz GGX&lt;/h4&gt;
+
+&lt;p&gt;\[ D(n, h, \alpha ) = \frac { \alpha ^{2} } { \pi ( (n\cdot h)^{2}(\alpha ^{2} - 1) + 1 )^{2} } \]&lt;/p&gt;
+
+&lt;p&gt;输入参数：平面法线n、h向量、粗糙度\( \alpha \)。&lt;/p&gt;
+
+&lt;p&gt;shader：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;DistributionGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt;     &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotH&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotH2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotH2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;        &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;F，Fresnel equation，菲涅尔方程&lt;/h3&gt;
+
+&lt;p&gt;对于真实的物理材质，光照向量、视角向量不同，平面的反射情况就会不同。F函数能算出不同角度时的反射光情况，也是用一个比值(也叫做平面的真实的反射率）表示。这个比值能反应出有多少百分比的光被反射和被吸收(记住反射和吸收是互斥关系)。&lt;/p&gt;
+
+&lt;h4&gt;Fresnel-Schlick approximation&lt;/h4&gt;
+
+&lt;p&gt;\[ F_{Schlick}(n, v, F_{0}) = F_{0} + (1 - F_{0})( 1- (n\cdot v))^{5} \]&lt;/p&gt;
+
+&lt;p&gt;\( F_{0} \)就是垂直观察平面时的&lt;strong&gt;基本反射率&lt;/strong&gt;，一般要用一个vec3表示。注意，这条公式其实只适用于绝缘体（dielectric），对于金属/导体（metal/conductor）是不适用的。这时就有了些取巧的做法。&lt;/p&gt;
+
+&lt;p&gt;一是先预计算出各种常见材质的基本反射率，汇总成一个表，然后需要的时候查表即可。&lt;/p&gt;
+
+&lt;p&gt;有了表之后就会发现，对于绝缘体，基本反射率基本都在0.17这个水平线以下，且rgb分量一致；而对于导体，基本反射率都在0.5到1.0之间，且rgb分量值不一致（正是这个不一致性，使得不同的金属有显著的颜色差异，如金、铜、银颜色各异）。&lt;/p&gt;
+
+&lt;p&gt;综上,\( F_{0} \)的求取实际上可以做得非常简化，用shader代码可以看出：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.04&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+&lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;surfaceColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;metalness&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;第一行是绝缘体基本反射率，0.04是统计了大部分绝缘体的基本反射率并取平均值得到。&lt;/p&gt;
+
+&lt;p&gt;第二行使用了一个新的参数叫金属性metalness，这是个十分人为的控制变量，范围为0.0到1.0；surfaceColor就是反射颜色值，例如黄金反射颜色为(1.00, 0.71, 0.29)。然后就可以使用mix函数和metalness做插值，metalness越接近0，那么就越接近绝缘体，metalness越接近1，那么就越接近surfaceColor。&lt;/p&gt;
+
+&lt;p&gt;有了\( F_{0} \)后，就可以代入到菲涅尔方程做运算了：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;fresnelSchlick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;5.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;G，Geometry function，几何属性函数&lt;/h3&gt;
+
+&lt;p&gt;微平面的起伏不定，导致微平面之间产生了自阴影（self-shadowing）。G函数模拟计算的就是这个事情. 粗糙度越高，自阴影越多，反射出去的光就越少。G函数输出的是一个比值，0.0表示百分百自阴影（全黑掉），1.0表示没有任何自阴影（全白）。&lt;/p&gt;
+
+&lt;h4&gt;Smith&amp;#39;s Schlick-GGX&lt;/h4&gt;
+
+&lt;p&gt;\[ G(n, v, k) = \frac { n\cdot v }{ (n\cdot v)(1 - k) + k } \]&lt;/p&gt;
+
+&lt;p&gt;输入参数：平面法线n、视角向量v、粗糙度\( \alpha \)的重新映射k。&lt;/p&gt;
+
+&lt;p&gt;k的公式要看情况做选择，例如对于方向光，有:&lt;/p&gt;
+
+&lt;p&gt;\[ k = \frac { (\alpha + 1)^{2} }{ 8 } \]&lt;/p&gt;
+
+&lt;p&gt;为了更加地近似模拟平面几何属性，可以用再应用一条公式（Smith&amp;#39;s method）:&lt;/p&gt;
+
+&lt;p&gt;\[ G&amp;#39;(n,v,l,k) = G(n,v,k)G(n,l,k) \]&lt;/p&gt;
+
+&lt;p&gt;Smith&amp;#39;s method同时处理掉了微平面的高低起伏导致的对光线、对视角的障碍问题，如下图。图中左边，视角向量（红色）的路线上有一个微平面突起，导致接收不到左边的光线的反射，这种情况叫&lt;strong&gt;几何障碍（geometry obstruction）&lt;/strong&gt;；图中右边，光线到达微平面后又反射到另一个微平面上（能量衰减了），没有直接反射到眼睛，这种情况叫&lt;strong&gt;几何遮蔽（geometry shadowing）&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2017.9/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;shader：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GeometrySmith&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+        <pubDate>Sat, 23 Sep 2017 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/pbr-rendering/</link>
+        <guid isPermaLink="true">http://localhost:4000/pbr-rendering/</guid>
+      </item>
+    
+      <item>
         <title>渲染器开发笔记2-延迟渲染下的天空盒</title>
         <description>&lt;!--more--&gt;
 
@@ -537,74 +703,6 @@
         <pubDate>Sat, 01 Apr 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/game-synchronize2/</link>
         <guid isPermaLink="true">http://localhost:4000/game-synchronize2/</guid>
-      </item>
-    
-      <item>
-        <title>实时战斗游戏的同步——问题分析</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;前言&lt;/h2&gt;
-
-&lt;p&gt;做了几年游戏服务端编程，目前对战斗系统、网络通信这些东西也比较熟悉了，就差一些细节问题没打通。所以下文将记录我对战斗同步算法的思考。&lt;/p&gt;
-
-&lt;h2&gt;两种同步技术的对比：状态同步和帧同步&lt;/h2&gt;
-
-&lt;h3&gt;状态同步&lt;/h3&gt;
-
-&lt;p&gt;状态同步算法，我自己的理解是，在联网游戏里面，通过同步所有游戏实体的&lt;strong&gt;状态&lt;/strong&gt;信息，来同步多个客户端。以球球大作战这个游戏为例，用状态同步算法去同步的过程应该是这样子的：每个玩家的每个球都是一个游戏实体(按了分裂键后会一变多)，每个实体有自己的坐标、速度、加速度、图标等&lt;strong&gt;状态信息&lt;/strong&gt;，每个客户端都需要有这些信息，当所有客户端再任意一个时刻，这些信息都是一致的话，那么就是完美同步。状态同步算法的目标就是通过各种手段，使得各个实体的状态信息在各个客户端一直保持&lt;strong&gt;一致&lt;/strong&gt;或者&lt;strong&gt;近似&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;具体去实现这种状态同步技术，会遇到三大问题：&lt;strong&gt;网络延迟对状态信息同步的干扰问题、玩家操作体验问题、同步对象过多问题&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;假设网络环境是完美，例如延迟小于1ms（局域网游戏就做得到），玩家的任意操作对游戏实体的影响，都可以瞬时同步到其他客户端，那么对于游戏过程就没什么影响。反之，如果网络环境差(延迟大于1000ms)，那么所有客户端的同步9成9不会一致，如果是服务器本身的问题导致延迟高，那么所有客户端都会卡，如果是单个客户端的延迟高，那么这个客户端会卡，而其他客户端一般不受影响。&lt;/p&gt;
-
-&lt;p&gt;玩家操作体验问题，是一个可以巧妙解决的问题。这个问题要处理好，关键点在于操作响应速度。譬如，玩家点了前进键，过了0.5秒后才开始动，和瞬间就开始动，感受完全不同的。（就像打开一个网站主页，花了0.5秒还是1秒、2秒、5秒，有很大的用户体验差距）。这个问题可以细分成各种各样的小问题，对于MMORPG，最主要的问题是位置同步，必须让玩家点了前进键，就立即开始移动，同时又要保证其他客户端的‘我’和自己客户端的‘我’是一致的位置。这个问题的解决方案就是著名的位置预测和位置拉扯技术。这里就不详述了。除了控制移动之外，玩家一般还会有很多操作，但这些操作一般对延迟的忍受都比较高，例如换装、购物，1秒左右的延迟都是可以忍受住的。&lt;/p&gt;
-
-&lt;p&gt;状态同步还有一大问题是同步对象数量过多的问题。这个问题的产生是因为，状态同步为了同步各个客户端里各个游戏对象的状态，需要不断发送游戏对象的状态信息。先不考虑发送频率的问题，单单考虑游戏对象数量，问题就很可怕了。假设现在游戏关卡里面有10个玩家，但是每个玩家有100只宠物辅助战斗，每个宠物根据自己的AI作战，那么就是说1000个游戏实体需要同步。假设每个实体平均1秒就会发一个状态包，1000个实体的话，平均每毫秒就得发一个包。简直不可能做到。&lt;/p&gt;
-
-&lt;p&gt;对象数量问题，比前两个问题更难搞，一般解决方法就是在游戏设计上设限制，保持同屏的同步对象不会过多。而在技术上只能是尽量降低单个对象的同步开销，使得数量上限高一点。&lt;/p&gt;
-
-&lt;h2&gt;帧同步&lt;/h2&gt;
-
-&lt;p&gt;帧同步技术的第一个要点就是，游戏的战斗必须变成一个确定性函数系统。确定性函数系统的特征是，给定固定的输入参数，这个系统就会有固定的输出（类似hash表结构）。为了做到这一点，就必须剔除掉战斗系统的&lt;strong&gt;各种不确定性因素&lt;/strong&gt;，例如随机数生成器必须可控，浮点数计算在不同机器上计算结果需要一致等。&lt;/p&gt;
-
-&lt;p&gt;除此之外，一个战斗系统，必然是支持&lt;strong&gt;逐帧更新&lt;/strong&gt;的，这个机制就好比实时渲染系统，每秒渲染60个画面（离散），当FPS足够高时，画面看起来就是&lt;strong&gt;连续&lt;/strong&gt;的。在支持了逐帧更新后，这个战斗系统就是我所认为的&lt;strong&gt;帧逻辑系统&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;为什么大费周章地把战斗系统变成这样子呢？这是因为帧同步可以解决状态同步所不能解决的那第三个问题：游戏实体过多问题。这是因为，基于帧同步的游戏战斗系统，需要做多客户端同步的东西并不是各个实体的状态信息，而是&lt;strong&gt;玩家的操作输入&lt;/strong&gt;。因为一个确定性函数系统，给定固定输入后，就必然会有固定的输出，那么只要保证各个客户端的战斗系统是同一个确定性函数系统，并且保证各个客户端的玩家操作（函数输入）都是一致的，那么所得到的每一逻辑帧的战斗状态就是一致的。&lt;/p&gt;
-
-&lt;p&gt;但可惜的是，帧同步技术依然要面临网络延迟问题和玩家操作体验问题。&lt;/p&gt;
-
-&lt;p&gt;基于帧逻辑系统的游戏战斗系统的设计要点：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;客户端-服务端都需要有战斗代码&lt;/li&gt;
-&lt;li&gt;以服务端的帧逻辑系统为准，客户端依据服务端保持同步&lt;/li&gt;
-&lt;li&gt;客户端之间不互相等待，避免1个客户端卡，导致所有其他客户端也卡&lt;/li&gt;
-&lt;li&gt;因为第3点的存在，服务端帧逻辑系统是不等待客户端的，不管客户端状态如何，服务端一直按照固定的时间间隔迭代更新&lt;/li&gt;
-&lt;li&gt;玩家的操作包不能本地立即处理，而是需要先发给服务端，服务端汇集所有客户端操作包并等待下一个关键帧，服务端到达下一个关键帧时，把汇集的操作包广播给所有客户端，客户端收到关键帧操作包后，才能继续更新帧逻辑系统，没有收到前，客户端到达关键帧时需要暂停逻辑更新&lt;/li&gt;
-&lt;li&gt;因为第5点，玩家的各种操作会有延迟，延迟间隔为( 收到服务端关键帧信息包t1 - 发送操作包时刻t0)，因此理论上最大延迟值为关键帧间隔时间，这个时间越小，操作延迟越低，但关键帧发包频率就越高，网络负担就越重，反过来说，这个时间越大，操作延迟越高，而关键帧发包频率变低。一般实时战斗游戏，延迟超过200ms就会造成对游戏体验的不良影响了，那么上关键帧最大间隔必须小于200ms&lt;/li&gt;
-&lt;li&gt;非玩家控制角色，根据帧逻辑系统迭代更新，例如怪物的生成、移动、攻击、死亡等&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;从玩家体验角度看，帧逻辑系统需要做到：
-1. 玩家对自己的角色的操作，必须实时响应
-2. 其他玩家的角色的操作包，需要尽可能快地发给自己，并播放出来
-4. 玩家角色的关键判定，必须以帧逻辑系统为主，比如玩家的扣血、死亡、技能施放等&lt;/p&gt;
-
-&lt;h3&gt;两种同步方案的综合总结&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;两种同步方案在实现位置同步的问题中，技术原理是大致的，都得用位置预测。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;两者都需要尽可能相信客户端的移动操作。这是因为，假设A在t0时刻向前移动，服务端在t1时刻收到A的移动操作包时，A实际上已经以速度v移动了v*(t1 -t0)的距离，服务端可以根据A的速度v和时间差t1-t0，直接把A挪到新位置，这样就同步了客户端A和服务端A；剩下的问题就是同步服务端和其他客户端，仍然使用这个同步方法，服务端把A的移动包广播到其他客户端，其他客户端根据时间差，判定A的新位置，并使用仔细设计过的缓动逻辑，把A快速移动新位置，然后按照A当前的速度、加速度继续更新。当然，如果相信了客户端发来的信息，就存在作弊问题，就需要在反作弊上花一点心思。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;帧同步方案，对于负杂的游戏逻辑都可以轻松应对，反之，状态同步的游戏逻辑一般不能太复杂，因为需要时不时地做一次全局的游戏实体信息同步校对，毕竟每个客户端的状态没有强一致性。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;在帧同步中，除了移动操作之外的玩家操作，因为需要以帧系统为主，所以必须忍受一定时间的延迟，最大延迟时间一般在一个关键帧周期(200ms)；而在状态同步中，玩家操作只要服务端确认OK，就可以直接执行了，而不需要等到下个关键帧才执行。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;帧同步方案可以为游戏带来一个额外加分，即&lt;strong&gt;回放系统&lt;/strong&gt;。一个高效的游戏回放系统必然是基于帧同步的，例如war3的replay文件，一场一个小时的多人游戏，replay文件仅仅只有不到1MB，这里面必然只是存储了战斗初始化数据以及最重要的&lt;strong&gt;所有玩家的操作输入数据&lt;/strong&gt;。除了war3，moba游戏如dota、王者荣耀、lol，非moba游戏如守望先锋、coc、东方project系列游戏（注意，coc和东方project比较特殊，战斗是单机战斗，不需要多端同步），都有这种帧回放系统。假如没有帧回放系统，游戏战斗过程的记录可能就只有录屏这个方案了，随便就是几百MB大小。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;要应用帧同步技术，前提是这个游戏的战斗是&lt;strong&gt;有始有终&lt;/strong&gt;的。就是说，游戏要有&lt;strong&gt;场次&lt;/strong&gt;的概念，不能像MMORPG大地图模式、minecraft那样，游戏战斗没有明确的开始和结束时间点。这样的游戏模式，也就不需要回放系统了。同时也很难看到这类游戏同屏出现大量的游戏实体————不只是人物怪物，子弹这些小实体也要算进去。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;为了应用帧同步方案，需要客户端和服务端都有战斗的代码，那么也就是说，这份代码一般都得是同种语言缩写，脚本语言js、python，或者native语言c++都行，就是要保持一致。基本不可能用不同的语言写出同样的战斗系统，即使你能做到，也很难保证以后维护过程不出bug，而且开发成本急剧升高。&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-</description>
-        <pubDate>Fri, 31 Mar 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/game-synchronize/</link>
-        <guid isPermaLink="true">http://localhost:4000/game-synchronize/</guid>
       </item>
     
   </channel>
