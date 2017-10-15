@@ -57,7 +57,9 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;注意，这里先对mat4的M做了个mat3的操作。这是为了去掉M变换的translation信息（因为normal和position不同，它是个朝向向量）。&lt;/p&gt;
 
-&lt;!--more--&gt;
+&lt;h2&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/&quot;&gt;http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 15 Oct 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/linear-algebra-18/</link>
