@@ -14,6 +14,8 @@
 
 &lt;p&gt;下面开始推导正确的只属于的normal的变换矩阵。&lt;/p&gt;
 
+&lt;!--more--&gt;
+
 &lt;h3&gt;推导&lt;/h3&gt;
 
 &lt;p&gt;在做顶点变换时，model、view、projection三个连续变换矩阵一般可以合并为一个变换矩阵，设为M。&lt;/p&gt;
