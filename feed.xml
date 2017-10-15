@@ -7,6 +7,62 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>法向量矩阵</title>
+        <description>&lt;p&gt;在对vertex做model、view、projection计算过程中，还有一个要同时考虑的东西是&lt;strong&gt;法向量的矩阵变换&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;normal的变换并不能直接使用vertex的变换。如果直接使用的话，就会放了一个定时炸弹在你的shader里面，当哪天你的object做了一个不uniform的缩放变换时，例如x、y轴放大1.5倍，而z轴放大3倍，输出的normal就会出错，进而导致光照计算出错。&lt;/p&gt;
+
+&lt;p&gt;下面开始推导正确的只属于的normal的变换矩阵。&lt;/p&gt;
+
+&lt;h3&gt;推导&lt;/h3&gt;
+
+&lt;p&gt;在做顶点变换时，model、view、projection三个连续变换矩阵一般可以合并为一个变换矩阵，设为M。&lt;/p&gt;
+
+&lt;p&gt;假设现在要渲染一个三角形，它的三个顶点分别为P1、P2、P3。&lt;/p&gt;
+
+&lt;p&gt;那么可以设，做M变换前，有切向量T = P2 - P1， P2&amp;#39; = P2 * M， P1‘ = P1 * M。&lt;/p&gt;
+
+&lt;p&gt;且有关系式：&lt;/p&gt;
+
+&lt;p&gt;T * M = (P2 - P1) * M = P2 * M - P1 * M = P2&amp;#39; - P1&amp;#39; =  T&amp;#39;&lt;/p&gt;
+
+&lt;p&gt;M变换后，T’是P2、P1的切向量，且有T * M = T&amp;#39;。也就是说，M变换对切向量也同时成立。&lt;/p&gt;
+
+&lt;p&gt;现在，假设做M变换前三角形面片的法向量为N，则有：&lt;/p&gt;
+
+&lt;p&gt;\[ N \cdot T = N^{T}T = 0 \]&lt;/p&gt;
+
+&lt;p&gt;设M变换后，新的三角形P1&amp;#39;、P2&amp;#39;、P3&amp;#39;的法向量为N&amp;#39;，那么可以列出等式：&lt;/p&gt;
+
+&lt;p&gt;\[ N&amp;#39; \cdot T&amp;#39; = (GN) \cdot (MT) \]&lt;/p&gt;
+
+&lt;p&gt;其中，新出现的G是法向量专属的变换矩阵，也是我们要求出来的东西。&lt;/p&gt;
+
+&lt;p&gt;因为上式是一个点积，所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ (GN) \cdot (MT) =  (GN)^{T}(MT) = N^{T}G^{T}MT  \]&lt;/p&gt;
+
+&lt;p&gt;回顾刚才的一个式子：\( N^{T}T = 0 \)，那么可以假设存在一个合适的G使得等式\( G^{T}M = I \)成立，从而使\( N&amp;#39; \cdot T&amp;#39; = 0 \) 也成立。&lt;/p&gt;
+
+&lt;p&gt;解开\( G^{T}M = I \)很简单：&lt;/p&gt;
+
+&lt;p&gt;\[ G^{T} = M^{-1} \]&lt;/p&gt;
+
+&lt;p&gt;\[ G = (M^{-1})^{T} \]&lt;/p&gt;
+
+&lt;p&gt;G就是我们要求的normal matrix，相应的G变换的shader代码就是：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;G&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transpose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inverse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mat3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;注意，这里先对mat4的M做了个mat3的操作。这是为了去掉M变换的translation信息（因为normal和position不同，它是个朝向向量）。&lt;/p&gt;
+
+&lt;!--more--&gt;
+</description>
+        <pubDate>Sun, 15 Oct 2017 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/linear-algebra-18/</link>
+        <guid isPermaLink="true">http://localhost:4000/linear-algebra-18/</guid>
+      </item>
+    
+      <item>
         <title>ssao介绍</title>
         <description>&lt;h2&gt;AO，ambient occlusion&lt;/h2&gt;
 
@@ -801,35 +857,6 @@
         <pubDate>Tue, 04 Apr 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/quaternion2/</link>
         <guid isPermaLink="true">http://localhost:4000/quaternion2/</guid>
-      </item>
-    
-      <item>
-        <title>forwarder的应用</title>
-        <description>&lt;!--more--&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.4/2.jpg&quot; alt=&quot;2.jpg&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这是我在开发的游戏的通信架构图。&lt;/p&gt;
-
-&lt;p&gt;这里面除开GS和数据库后端的连接，其他连接都基于forwarder。&lt;/p&gt;
-
-&lt;p&gt;下面的客户端C连接，涵盖了三大平台：web、ios、android客户端。都可以通过forwarder和服务器通讯。&lt;/p&gt;
-
-&lt;p&gt;这套系统已经熬过了压力测试。之前写了robot程序，几千机器人并发登录和战斗。刚开始压力测试时，确实forwarder崩了，经过几轮测试、调试、修bug，现在已经能完美运行。有信心可以做到超长时间不停机。单个服务器节点(16核16G内存)可以同时处理上万场战斗。增加cpu核心数和内存，还可以继续增大负载。&lt;/p&gt;
-
-&lt;p&gt;解决了通信问题后，这套架构剩下的问题就是用户规模问题。越高的用户规模，就越需要仔细思考架构的每个地方是否会出现负载瓶颈。&lt;/p&gt;
-
-&lt;p&gt;其实，我们的架构目标是&lt;strong&gt;分布式&lt;/strong&gt;，分布式就是说，后端是一个服务器集群，服务器数量可随意增加减少，就像cpu的核心数，核心越多，并发性能越好。总之，我们的后端服务器可以横向扩展，用户增多-&amp;gt;增加服务器。这样子是比较省事的。但实际上要做到这点很难。预期的最高同时在线用户数、预期的总注册用户总数，是做架构设计的2个指标。&lt;/p&gt;
-
-&lt;p&gt;另外，我们做的是&lt;strong&gt;世界服&lt;/strong&gt;。玩家不需要选择服务器登录。对于玩家来说，只有一个服。不过对于后端来说，当然还是要分服的。这也是使得我们可以做分布式架构的原因。世界服若要做分服，就是分服务器集群。例如可以ios用户一个集群，android用户一个集群，两个集群完全隔离。&lt;/p&gt;
-
-&lt;p&gt;其实游戏服务器架构很看游戏设计，但不管怎么变，都是要做网络通信的，基于forwarder去做跨进程、跨机器、跨机房通信，非常简单。只需要设置host和port即可。&lt;/p&gt;
-
-&lt;p&gt;因为是公司项目，这里就不过多描述细节了。架构图仅供参考。&lt;/p&gt;
-</description>
-        <pubDate>Sun, 02 Apr 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/forwarder-application/</link>
-        <guid isPermaLink="true">http://localhost:4000/forwarder-application/</guid>
       </item>
     
   </channel>
