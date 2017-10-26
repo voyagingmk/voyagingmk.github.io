@@ -25,12 +25,12 @@
 &lt;p&gt;总共3个pass：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Pass 1，边缘检测原始图像得到edgesTex&lt;/li&gt;
-&lt;li&gt;Pass 2，用edgesTex得到weightTex&lt;/li&gt;
+&lt;li&gt;Pass 1，算edgeTex&lt;/li&gt;
+&lt;li&gt;Pass 2，用edgeTex算weightTex&lt;/li&gt;
 &lt;li&gt;Pass 3，用weightTex混合原始图像，得到抗锯齿图像&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2&gt;边缘检测 Edge Detection&lt;/h2&gt;
+&lt;h2&gt;边缘纹理的计算 Edge Detection (edgeTex)&lt;/h2&gt;
 
 &lt;p&gt;锯齿问题体现在图像上几何物体的边缘处，也就是说，如果能准确地post process出图像上哪些地方是边，哪些地方不是。检测过少，锯齿边就会残留；检测过多，图像就会糊。为来更好地提升AA质量，SMAA边缘检测算法的选取非常关键。&lt;/p&gt;
 
@@ -94,17 +94,82 @@
 
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edges&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;权重混合计算 Blending Weight Calculation&lt;/h2&gt;
+&lt;h2&gt;权重纹理的计算 Blending Weight Calculation (weightTex)&lt;/h2&gt;
 
-&lt;p&gt;最复杂的一个pass&lt;/p&gt;
+&lt;p&gt;最复杂的一个pass，需要分成多个部分讲解。&lt;/p&gt;
 
-&lt;h3&gt;模式处理&lt;/h3&gt;
+&lt;h3&gt;areaTex&lt;/h3&gt;
+
+&lt;h3&gt;searchTex&lt;/h3&gt;
+
+&lt;p&gt;根据当前像素坐标，搜索当前这个像素对应的边的2个端点，求出2个距离值\(d_{1}、d_{2}\)，是实现模式分类的关键。&lt;/p&gt;
+
+&lt;p&gt;因为edgeTex已经包含了边的信息，如果直接暴力搜索端点，就需要对edgeTex做非常多次的纹理采样（我没搞错的话，次数应该等于\(d_{1} + d_{2}\)  ）。在Jimenez&amp;#39;s MLAA中，使用一个叫bilinear filtering的搜索技巧，能大约减少一半的纹理采样数。原理大致如下：&lt;/p&gt;
+
+&lt;p&gt;假设有2个要采样的相邻像素点，现在目标是用一次采样得到这2个点的&amp;#39;边&amp;#39;值：\(b_{1}、b_{2}\) （要么等于0要么等于1，代表有无边）。首先得把这个edgeTex纹理的过滤设置，设置成GL_LINEAR。这样就可以利用GPU的插值机制，通过求2个像素点连线上的某一个中间点x的纹理坐标，做一次采样，得到一个[0,1]之间的值。有了这个值后，是能够恢复出\(b_{1}、b_{2}\) 的值的。是不是很神奇？数学原理是这样的：&lt;/p&gt;
+
+&lt;p&gt;\[ f_{x}(b_{1},b_{2},x) = x\cdot b_{1} + (1 - x)\cdot b_{2}，b_{1} = 0／1，b_{2} = 0／1 \]&lt;/p&gt;
+
+&lt;p&gt;假设我们先取x=0.5，那么f的取值范围为[0, 0.5, 1]，具体的映射关系为：&lt;/p&gt;
+
+&lt;p&gt;\( b_{1}\ \ \ b_{2}\ \ \ —— \ \ \ f \)&lt;/p&gt;
+
+&lt;p&gt;\( 0\ \ \ \ \ 0\ \ \ \ —— \ \ \ 0 \)&lt;/p&gt;
+
+&lt;p&gt;\( 0\ \ \ \ \ 1\ \ \ \ —— \ \ \ 0.5 \)&lt;/p&gt;
+
+&lt;p&gt;\( 1\ \ \ \ \ 0\ \ \ \ —— \ \ \ 0.5 \)&lt;/p&gt;
+
+&lt;p&gt;\( 1\ \ \ \ \ 1\ \ \ \ —— \ \ \ 1 \)&lt;/p&gt;
+
+&lt;p&gt;可以看到左右两边并不是一一对应的关系，0.5对应了2种情况。那么假设我们再取别的值，且满足\(x \neq 0.5，x \neq 0 ，x \neq 1 \)，那么有：&lt;/p&gt;
+
+&lt;p&gt;\( b_{1}\ \ \ b_{2}\ \ \ —— \ \ \ f \)&lt;/p&gt;
+
+&lt;p&gt;\( 0\ \ \ \ \ 0\ \ \ \ —— \ \ \ 0 \)&lt;/p&gt;
+
+&lt;p&gt;\( 0\ \ \ \ \ 1\ \ \ \ —— \ \ \ 1 - x \)&lt;/p&gt;
+
+&lt;p&gt;\( 1\ \ \ \ \ 0\ \ \ \ —— \ \ \ x \)&lt;/p&gt;
+
+&lt;p&gt;\( 1\ \ \ \ \ 1\ \ \ \ —— \ \ \ 1 \)&lt;/p&gt;
+
+&lt;p&gt;神奇的事情发生了，左右两边满足了一一对应关系！也就是说，只需要知道x的值，就能&amp;#39;解码&amp;#39;出\(b_{1}、b_{2}\)的值！&lt;/p&gt;
+
+&lt;p&gt;这个bilinear filtering虽好，但它只能搜索一个方向（一维）。而在SMAA中，因为需要进一步做好模式分类，需要支持二维的edgeTex搜索。所以SMAA拓展了bilinear filtering到了二维：&lt;/p&gt;
+
+&lt;p&gt;\[ f_{xy}(b_{1},b_{2},b_{3},b_{4},x,y) = f_{x}(b_{1},b_{2},x) \cdot y + f_{x}(b_{3},b_{4},x) \cdot (1 - y) \]&lt;/p&gt;
+
+&lt;h3&gt;search算法&lt;/h3&gt;
 
 &lt;p&gt;SMAA的模式处理较之MLAA有了新的改进。MLAA的方法，对sharp物体的轮廓的&amp;quot;边角&amp;quot;和&amp;quot;锯齿角&amp;quot;并不能区分（都认为是交叉角crossing edges），导致边角也被当作锯齿角处理，导致边角被修成了圆角。而SMAA中，做了进一步的观察：对于锯齿角，大小不超过一个像素，而sharp的边角很大几率超过1个像素。&lt;/p&gt;
 
 &lt;p&gt;因此，SMAA判断锯齿角需要计算2个像素长度的范围，也从而识别出真的边角。&lt;/p&gt;
 
 &lt;p&gt;(待续)&lt;/p&gt;
+
+&lt;h2&gt;用weightTex混合原图像&lt;/h2&gt;
+
+&lt;h1&gt;总结&lt;/h1&gt;
+
+&lt;p&gt;SMAA的优点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;强配置性，可以根据需要决定使用SMAA 1x/SMAA t2x/SMAA 4x&lt;/li&gt;
+&lt;li&gt;SMAA 4x的性能和质量足以抗衡SSAA&lt;/li&gt;
+&lt;li&gt;支持defer框架&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;SMAA的缺点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;pass 2的逻辑太复杂了，仅读论文是看不懂代码的。只能边看代码边读论文，结合地去理解。&lt;/li&gt;
+&lt;li&gt;需要预生成areaTex、searchTex，定制修改SMAA比较复杂&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其实我说的缺点比较naive，对大佬来说这套SMAA可能并不复杂。&lt;/p&gt;
+
+&lt;p&gt;本文仅介绍SMAA 1x的技术原理，至于SMAA t2x和SMAA 4x需要用到temporal reprojection和supersampliing，就是更进一步的话题了。&lt;/p&gt;
 
 &lt;h1&gt;最终效果&lt;/h1&gt;
 
