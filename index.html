@@ -81,6 +81,26 @@
   
     <article class="post">
 
+      <h1><a href="/antialiasing/">现代抗锯齿技术——PPAA中的新星SMAA</a></h1>
+      <div class="date">
+        Written on October 22, 2017
+      </div>
+      <div class="entry">
+        <h1>PPAA</h1>
+
+<p>所谓PPAA（Post Process Antialiasing)，也叫FBAA（Filter-Based Antialiasing），是基于后处理的各种抗锯齿技术的统称。在PPAA之前，主流AA技术是MSAA（MultiSamples AA）、SSAA（SuperSamples AA）。SSAA是AA中最暴力也是最完美的解决方案，而MSAA是与硬件紧密结合的built-in AA。对于forward rendering来说，MSAA几乎是唯一的选择。</p>
+
+<p>然而，MSAA这种古老的、built-in的技术，已经不太能满足现代渲染器的需求了。它有两大问题，一是MSAA会有多余的AA计算，二是MSAA不适用于deferred rendering。</p>
+
+<p>鉴于MSAA的不足，PPAA就蓬勃发展起来了。PPAA强大之处在于可以自定义、且硬件无关、兼容forward／defer，所以基于PPAA的算法非常多。而其中的翘楚，SMAA(Subpixel Morphological Antialiasing)，性能以及AA质量都很不错。本文将着重介绍SMAA。</p>
+
+      </div>
+
+      <a href="/antialiasing/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
       <h1><a href="/linear-algebra-18/">法向量矩阵</a></h1>
       <div class="date">
         Written on October 15, 2017

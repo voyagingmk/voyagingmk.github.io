@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>现代抗锯齿技术——PPAA中的新星SMAA – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="PPAA
+
+所谓PPAA（Post Process Antialiasing)，也叫FBAA（Filter-Based Antialiasing），是基于后处理的各种抗锯齿技术的统称。在PPAA之前，主流AA技术是MSAA（MultiSamples AA）、SSAA（SuperSamples AA）。SSAA是AA中最暴力也是最完美的解决方案，而MSAA是与硬件紧密结合的built-in AA。对于forward rendering来说，MSAA几乎是唯一的选择。
+
+然而，MSAA这种古老的、built-in的技术，已经不太能满足现代渲染器的需求了。它有两大问题，一是MSAA会有多余的AA计算，二是MSAA不适用于deferred rendering。
+
+鉴于MSAA的不足，PPAA就蓬勃发展起来了。PPAA强大之处在于可以自定义、且硬件无关、兼容forward／defer，所以基于PPAA的算法非常多。而其中的翘楚，SMAA(Subpixel Morphological Antialiasing)，性能以及AA质量都很不错。本文将着重介绍SMAA。
+" />
+    <meta property="og:description" content="PPAA
+
+所谓PPAA（Post Process Antialiasing)，也叫FBAA（Filter-Based Antialiasing），是基于后处理的各种抗锯齿技术的统称。在PPAA之前，主流AA技术是MSAA（MultiSamples AA）、SSAA（SuperSamples AA）。SSAA是AA中最暴力也是最完美的解决方案，而MSAA是与硬件紧密结合的built-in AA。对于forward rendering来说，MSAA几乎是唯一的选择。
+
+然而，MSAA这种古老的、built-in的技术，已经不太能满足现代渲染器的需求了。它有两大问题，一是MSAA会有多余的AA计算，二是MSAA不适用于deferred rendering。
+
+鉴于MSAA的不足，PPAA就蓬勃发展起来了。PPAA强大之处在于可以自定义、且硬件无关、兼容forward／defer，所以基于PPAA的算法非常多。而其中的翘楚，SMAA(Subpixel Morphological Antialiasing)，性能以及AA质量都很不错。本文将着重介绍SMAA。
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="现代抗锯齿技术——PPAA中的新星SMAA" />
+    <meta property="twitter:title" content="现代抗锯齿技术——PPAA中的新星SMAA" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/antialiasing/',
+		  'title': '现代抗锯齿技术——PPAA中的新星SMAA'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>现代抗锯齿技术——PPAA中的新星SMAA</h1>
+  <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+  <div class="entry">
+    <h1>PPAA</h1>
+
+<p>所谓PPAA（Post Process Antialiasing)，也叫FBAA（Filter-Based Antialiasing），是基于后处理的各种抗锯齿技术的统称。在PPAA之前，主流AA技术是MSAA（MultiSamples AA）、SSAA（SuperSamples AA）。SSAA是AA中最暴力也是最完美的解决方案，而MSAA是与硬件紧密结合的built-in AA。对于forward rendering来说，MSAA几乎是唯一的选择。</p>
+
+<p>然而，MSAA这种古老的、built-in的技术，已经不太能满足现代渲染器的需求了。它有两大问题，一是MSAA会有多余的AA计算，二是MSAA不适用于deferred rendering。</p>
+
+<p>鉴于MSAA的不足，PPAA就蓬勃发展起来了。PPAA强大之处在于可以自定义、且硬件无关、兼容forward／defer，所以基于PPAA的算法非常多。而其中的翘楚，SMAA(Subpixel Morphological Antialiasing)，性能以及AA质量都很不错。本文将着重介绍SMAA。</p>
+
+<!--more-->
+
+<p>值得一提的是，SMAA的前身是Jimenez&#39;s MLAA，也是同一个团队做出来的，SMAA可以认为是在质量和性能两方面都超越Jimenez&#39;s MLAA的一个进化版。所以可以先阅读Jimenez&#39;s MLAA的论文再来学习SMAA。</p>
+
+<h1>SMAA</h1>
+
+<p>总共3个pass：</p>
+
+<ul>
+<li>Pass 1，边缘检测原始图像得到edgesTex</li>
+<li>Pass 2，用edgesTex得到weightTex</li>
+<li>Pass 3，用weightTex混合原始图像，得到抗锯齿图像</li>
+</ul>
+
+<h2>边缘检测 Edge Detection</h2>
+
+<p>锯齿问题体现在图像上几何物体的边缘处，也就是说，如果能准确地post process出图像上哪些地方是边，哪些地方不是。检测过少，锯齿边就会残留；检测过多，图像就会糊。为来更好地提升AA质量，SMAA边缘检测算法的选取非常关键。</p>
+
+<p>相比基于normal map、depth map，基于颜色的边缘检测尤佳。一是因为，颜色信息容易获得，而深度图／法线图相对难获得，例如对于图像处理领取，用户提供的只有照片而已；二是因为它还有一个优点：对于做了shading后才产生的锯齿，也一样能处理（例如有梯度的toon shading）。</p>
+
+<p>SMAA首推的是基于Luma（亮度）的边缘检测算法。</p>
+
+<p>1，vertex shader，根据纹理坐标输出3组offset，每组2个边，总共6个边要检测：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">vec4</span> <span class="n">SMAA_RT_METRICS</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">imgSize</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">imgSize</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">imgSize</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">imgSize</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+    <span class="n">Offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fma</span><span class="p">(</span><span class="n">SMAA_RT_METRICS</span><span class="p">.</span><span class="n">xyxy</span><span class="p">,</span> <span class="n">vec4</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">texCoord</span><span class="p">.</span><span class="n">xyxy</span><span class="p">);</span> <span class="c1">// Left / Top Edge</span>
+    <span class="n">Offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fma</span><span class="p">(</span><span class="n">SMAA_RT_METRICS</span><span class="p">.</span><span class="n">xyxy</span><span class="p">,</span> <span class="n">vec4</span><span class="p">(</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">),</span> <span class="n">texCoord</span><span class="p">.</span><span class="n">xyxy</span><span class="p">);</span> <span class="c1">// Right / Bottom Edge</span>
+    <span class="n">Offsets</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">fma</span><span class="p">(</span><span class="n">SMAA_RT_METRICS</span><span class="p">.</span><span class="n">xyxy</span><span class="p">,</span> <span class="n">vec4</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">texCoord</span><span class="p">.</span><span class="n">xyxy</span><span class="p">);</span> <span class="c1">// Leftx2 / Topx2 Edge</span>
+</code></pre></div>
+<p><img src="../images/2017.10/smaa1.png" alt="smaa1.png"></p>
+
+<p>2，fragment shader，先求出当前fragment的luma值：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="c1">// Calculate lumas:</span>
+    <span class="n">float3</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">float3</span><span class="p">(</span><span class="mf">0.2126</span><span class="p">,</span> <span class="mf">0.7152</span><span class="p">,</span> <span class="mf">0.0722</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">L</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">texcoord</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+</code></pre></div>
+<p>（RGB-&gt;luma的公式来自wiki <a href="https://en.wikipedia.org/wiki/Relative_luminance">https://en.wikipedia.org/wiki/Relative_luminance</a>  ）</p>
+
+<p>3，算Left和Top的luma值，以及算Left和L的差值delta.x、Top和L的差值delta.y；如果delta.x &lt; threshold.x，edges.x就等于0.0，代表不是边（因为差值很小，即亮度差异小），y方向同理：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="kt">float</span> <span class="n">Lleft</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">xy</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">Ltop</span>  <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">zw</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+
+    <span class="n">float4</span> <span class="n">delta</span><span class="p">;</span>
+    <span class="n">delta</span><span class="p">.</span><span class="n">xy</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="n">float2</span><span class="p">(</span><span class="n">Lleft</span><span class="p">,</span> <span class="n">Ltop</span><span class="p">));</span>
+    <span class="n">float2</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">delta</span><span class="p">.</span><span class="n">xy</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">float2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">discard</span><span class="p">;</span> <span class="c1">// 如果2个方向都没有边，就可以排除这个fragment了</span>
+</code></pre></div>
+<ol>
+<li>如果Left或Top至少有一个是边，就再进一步做检测。</li>
+</ol>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="c1">// 计算Right Bottom的luma差值</span>
+    <span class="kt">float</span> <span class="n">Lright</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">xy</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">Lbottom</span>  <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">zw</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+    <span class="n">delta</span><span class="p">.</span><span class="n">zw</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="n">float2</span><span class="p">(</span><span class="n">Lright</span><span class="p">,</span> <span class="n">Lbottom</span><span class="p">));</span> <span class="c1">// 和算delta.xy过程差不多</span>
+
+    <span class="c1">// 分别算出x、y方向的最大luma差值</span>
+    <span class="n">float2</span> <span class="n">maxDelta</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">delta</span><span class="p">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">delta</span><span class="p">.</span><span class="n">zw</span><span class="p">);</span>
+
+    <span class="c1">// 算出 Left x2 and Top x2 的luma:</span>
+    <span class="kt">float</span> <span class="n">Lleftleft</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">xy</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">Ltoptop</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">colorTex</span><span class="p">,</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">zw</span><span class="p">).</span><span class="n">rgb</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+    <span class="c1">// 算出Left和Left x2的luma差值、Top和Top x2的luma差值</span>
+    <span class="n">delta</span><span class="p">.</span><span class="n">zw</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">float2</span><span class="p">(</span><span class="n">Lleft</span><span class="p">,</span> <span class="n">Ltop</span><span class="p">)</span> <span class="o">-</span> <span class="n">float2</span><span class="p">(</span><span class="n">Lleftleft</span><span class="p">,</span> <span class="n">Ltoptop</span><span class="p">));</span>
+
+    <span class="c1">// Calculate the final maximum delta:</span>
+    <span class="c1">// x、y方向分别最终的最大luma差值</span>
+    <span class="n">maxDelta</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">maxDelta</span><span class="p">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">delta</span><span class="p">.</span><span class="n">zw</span><span class="p">);</span>
+    <span class="c1">// x、y两个方向中取其中最大的luma差值</span>
+    <span class="kt">float</span> <span class="n">finalDelta</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">maxDelta</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">maxDelta</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+
+    <span class="c1">// Local contrast adaptation:</span>
+    <span class="kt">float</span> <span class="n">SMAA_LOCAL_CONTRAST_ADAPTATION_FACTOR</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+    <span class="c1">// Left、Top亮度差值*2后需超过finalDelta才真的是边</span>
+    <span class="n">edges</span><span class="p">.</span><span class="n">xy</span> <span class="o">*=</span> <span class="n">step</span><span class="p">(</span><span class="n">finalDelta</span><span class="p">,</span> <span class="n">SMAA_LOCAL_CONTRAST_ADAPTATION_FACTOR</span> <span class="o">*</span> <span class="n">delta</span><span class="p">.</span><span class="n">xy</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">edges</span><span class="p">;</span>
+</code></pre></div>
+<h2>权重混合计算 Blending Weight Calculation</h2>
+
+<p>最复杂的一个pass</p>
+
+<h3>模式处理</h3>
+
+<p>SMAA的模式处理较之MLAA有了新的改进。MLAA的方法，对sharp物体的轮廓的&quot;边角&quot;和&quot;锯齿角&quot;并不能区分（都认为是交叉角crossing edges），导致边角也被当作锯齿角处理，导致边角被修成了圆角。而SMAA中，做了进一步的观察：对于锯齿角，大小不超过一个像素，而sharp的边角很大几率超过1个像素。</p>
+
+<p>因此，SMAA判断锯齿角需要计算2个像素长度的范围，也从而识别出真的边角。</p>
+
+<p>(待续)</p>
+
+<h1>最终效果</h1>
+
+<p>原始图像:</p>
+
+<p><img src="../images/2017.10/alias.png" alt="alias.png"></p>
+
+<p>经过SMAA 1x过滤后:</p>
+
+<p><img src="../images/2017.10/antialias.png" alt="antialias.png"></p>
+
+<h1>资料</h1>
+
+<p><a href="http://www.iryoku.com/smaa/">http://www.iryoku.com/smaa/</a></p>
+
+<p><a href="http://www.iryoku.com/mlaa/">http://www.iryoku.com/mlaa/</a></p>
+
+  </div>
+  <div class="entry">
+  (未经授权禁止转载)
+  </div>
+  <div class="date">
+    Written on October 22, 2017
+  </div>
+ <img src="../images/dashang.png" />
+    
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
