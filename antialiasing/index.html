@@ -233,6 +233,115 @@
 
 <p>这里增加了一个y，y和x是类似的，需要赋予一个不等于0.5的值，但需要附加一个限制是y = 0.5x（可以假设y!=0.5x去推导上面的公式，会得到无法一一对应的情况）。这样拓展后，就可以用2个常量值x、y，对\(b_{1}、b_{2}、b_{3}、b_{4}\)所有组合编码出\(2^{4} \)共16种取值情况。也就是依然可以用一个f值，反向找出\(b_{1}、b_{2}、b_{3}、b_{4}\)！</p>
 
+<p>这个映射关系可以打表到代码里减少shader计算，但这样还不够，SMAA做啦进一步的优化，减少了对这个映射表的访问。作者写了一个脚本来生成一个叫searchTex的东西。先讲一下生成步骤再说用法。</p>
+
+<p>首先，确定了刚才提到的常量x，y的值，x等于0.25，y等于0.5x=0.125。然后枚举16种情况，调用bilinear函数，生成映射表:</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="c1"># Interpolates between two values:</span>
+<span class="k">def</span> <span class="nf">lerp</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">v0</span> <span class="o">+</span> <span class="p">(</span><span class="n">v1</span> <span class="o">-</span> <span class="n">v0</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span>
+
+<span class="c1"># Calculates the bilinear fetch for a certain edge combination:</span>
+<span class="k">def</span> <span class="nf">bilinear</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="c1"># e[0]       e[1]</span>
+    <span class="c1">#</span>
+    <span class="c1">#          x &lt;-------- Sample position:    (-0.25,-0.125)</span>
+    <span class="c1"># e[2]       e[3] &lt;--- Current pixel [3]:  (  0.0, 0.0  )</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">lerp</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">0.25</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">lerp</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">0.25</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lerp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">0.125</span><span class="p">)</span>
+
+<span class="c1"># This dict returns which edges are active for a certain bilinear fetch:</span>
+<span class="c1"># (it&#39;s the reverse lookup of the bilinear function)</span>
+<span class="n">edge</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.0</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.65625</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.21875</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.875</span>
+
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.09375</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.75</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.3125</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.96875</span>
+
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.03125</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.6875</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.25</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.90625</span>
+
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.125</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 0.78125</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c1"># 0.34375</span>
+    <span class="n">bilinear</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># 1.0</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>然后观察16个bilinear值，发现它们有最大公约数0.03125，于是，可以设计一个大小为33 x 33的数组（这是因为33 = 1 / 0.03125 + 1），又因为搜索的是line，需要分左右（也只有左右2个方向），所以数组要乘2，变成66 x 33。</p>
+
+<p>然后开始枚举所有pattern：</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="c1"># Calculate delta distances to the left:</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">66</span><span class="p">,</span> <span class="mi">33</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">33</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">33</span><span class="p">):</span>
+        <span class="n">texcoord</span> <span class="o">=</span> <span class="mf">0.03125</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="mf">0.03125</span> <span class="o">*</span> <span class="n">y</span>
+        <span class="k">if</span> <span class="n">texcoord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">edge</span> <span class="ow">and</span> <span class="n">texcoord</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">edge</span><span class="p">:</span>
+            <span class="n">edges</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="n">texcoord</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">edge</span><span class="p">[</span><span class="n">texcoord</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="mi">127</span> <span class="o">*</span> <span class="n">deltaLeft</span><span class="p">(</span><span class="o">*</span><span class="n">edges</span><span class="p">)</span> <span class="c1"># Maximize dynamic range to help compression</span>
+            <span class="n">image</span><span class="o">.</span><span class="n">putpixel</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="c1">#debug(&quot;left: &quot;, texcoord, val, *edges)</span>
+
+<span class="c1"># Calculate delta distances to the right:</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">33</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">33</span><span class="p">):</span>
+        <span class="n">texcoord</span> <span class="o">=</span> <span class="mf">0.03125</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="mf">0.03125</span> <span class="o">*</span> <span class="n">y</span>
+        <span class="k">if</span> <span class="n">texcoord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">edge</span> <span class="ow">and</span> <span class="n">texcoord</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">edge</span><span class="p">:</span>
+            <span class="n">edges</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="n">texcoord</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">edge</span><span class="p">[</span><span class="n">texcoord</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="mi">127</span> <span class="o">*</span> <span class="n">deltaRight</span><span class="p">(</span><span class="o">*</span><span class="n">edges</span><span class="p">)</span> <span class="c1"># Maximize dynamic range to help compression</span>
+            <span class="n">image</span><span class="o">.</span><span class="n">putpixel</span><span class="p">((</span><span class="mi">33</span> <span class="o">+</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="c1">#debug(&quot;right: &quot;, texcoord, val, *edges)</span>
+</code></pre></div>
+<p>其中的if texcoord[0] in edge and texcoord[1] in edge意思是当前这2个纹理坐标x y，都刚好是一个f，f就对应了某四个bool值，2个f就组成一个pattern。edges = edge[texcoord[0]], edge[texcoord[1]]，分别解码出了x y方向的4个bool值。接着是另外两个函数:</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="c1"># Delta distance to add in the last step of searches to the left:</span>
+<span class="k">def</span> <span class="nf">deltaLeft</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># If there is an edge, continue:</span>
+    <span class="k">if</span> <span class="n">top</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># If we previously found an edge, there is another edge and no crossing</span>
+    <span class="c1"># edges, continue:</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">top</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">d</span>
+<span class="c1"># Delta distance to add in the last step of searches to the right:</span>
+<span class="k">def</span> <span class="nf">deltaRight</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># If there is an edge, and no crossing edges, continue:</span>
+    <span class="k">if</span> <span class="n">top</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># If we previously found an edge, there is another edge and no crossing</span>
+    <span class="c1"># edges, continue:</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">top</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">d</span>
+</code></pre></div>
+<p>deltaLeft，就是根据x y方向2组bool值，算出一个分类值d，d的取值范围是0/1/2。top[3]是指当前像素在y方向上的bool值，如果为1，就是有边，那么d = 1，再如果top[2]也有边，且x方向没有边(没有交叉角)，那么d = 2.deltaRight过程类似。</p>
+
+<p>以下图为例，上面的是top，下面的是left，标绿色／红色的是边，那么经过deltaLeft运算后，下面的pattern会得到d=1(又交叉角)。</p>
+
+<p><img src="../images/2017.10/e1.png" alt="e1.png"></p>
+
+<p><img src="../images/2017.10/e2.png" alt="e2.png"></p>
+
+<p>求出d后， val = 127 * d，把d映射到0／127/254，然后就可以填入到searchTex了，相当于是在生成一张三值的灰度值。</p>
+
+<p><img src="../images/2017.10/searchTex.png" alt="searchTex.png"></p>
+
+<p>观察searchTex发现，这图有很大部分是全黑的。略显多余，于是作者补充了一个裁剪操作：</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">crop</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">33</span><span class="p">])</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">FLIP_TOP_BOTTOM</span><span class="p">)</span>
+</code></pre></div>
+<p>把上面的17行黑色区域都裁掉，searchTex就变成了64x16的大小，符合2的幂次方，更迷你更优雅。第二行代码做了个上下翻转，用意不明。最终的searchTex如下:</p>
+
+<p><img src="../images/2017.10/searchTex2.png" alt="searchTex2.png"></p>
+
 <h3>search算法</h3>
 
 <p>SMAA的模式处理较之MLAA有了新的改进。MLAA的方法，对sharp物体的轮廓的&quot;边角&quot;和&quot;锯齿角&quot;并不能区分（都认为是交叉角crossing edges），导致边角也被当作锯齿角处理，导致边角被修成了圆角。而SMAA中，做了进一步的观察：对于锯齿角，大小不超过一个像素，而sharp的边角很大几率超过1个像素。</p>
