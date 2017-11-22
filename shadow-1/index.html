@@ -411,6 +411,108 @@
 
 <p>理论到此为止，剩下的就是工程问题了。</p>
 
+<h1>工程实现</h1>
+
+<p>如果你的工程里已经实现了Standard Shadow Map，那么只需要几个步骤即可实现基本的VSM：</p>
+
+<ul>
+<li>把Shadow Map Buffer改为输出depth和depth平方到颜色buffer。可能需要先修改RT的创建代码，下面以OpenGL 4.x为例：</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 32位高精度双通道纹理 用来存moment1和moment2</span>
+<span class="n">glTexImage2D</span><span class="p">(</span><span class="n">GL_TEXTURE_2D</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GL_RG32F</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GL_RG</span><span class="p">,</span> <span class="n">GL_FLOAT</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</code></pre></div>
+<p>然后修改shadow map着色器：</p>
+
+<p>vs:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#version 410 core</span>
+
+<span class="n">layout</span> <span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="n">in</span> <span class="n">vec3</span> <span class="n">position</span><span class="p">;</span>
+
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">lightPV</span><span class="p">;</span>
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">model</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">lightPV</span> <span class="o">*</span> <span class="n">model</span> <span class="o">*</span> <span class="n">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>fs:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#version 410 core</span>
+
+<span class="n">in</span> <span class="n">vec4</span> <span class="n">v_position</span><span class="p">;</span>
+<span class="n">out</span> <span class="n">vec2</span> <span class="n">outColor</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>             
+    <span class="kt">float</span> <span class="n">depth</span> <span class="o">=</span> <span class="n">v_position</span><span class="p">.</span><span class="n">z</span> <span class="o">/</span> <span class="n">v_position</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">;</span><span class="c1">// TO NDC [0, 1]</span>
+
+    <span class="kt">float</span> <span class="n">moment1</span> <span class="o">=</span> <span class="n">depth</span><span class="p">;</span> <span class="c1">// 一阶矩</span>
+    <span class="kt">float</span> <span class="n">moment2</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">depth</span><span class="p">;</span> <span class="c1">// 二阶矩</span>
+
+    <span class="kt">float</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">dFdx</span><span class="p">(</span><span class="n">depth</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">dFdy</span><span class="p">(</span><span class="n">depth</span><span class="p">);</span>
+    <span class="n">moment2</span> <span class="o">+=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span><span class="p">);</span> <span class="c1">// 解决acne问题</span>
+    <span class="n">outColor</span> <span class="o">=</span> <span class="n">vec2</span><span class="p">(</span><span class="n">moment1</span><span class="p">,</span> <span class="n">moment2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>可以渲染下Shadow Map是否正常:</p>
+
+<p>rg通道一起输出：</p>
+
+<p><img src="../images/2017.11/2.png" alt="2.png"></p>
+
+<p>只有r通道(moment1):</p>
+
+<p><img src="../images/2017.11/3.png" alt="3.png"></p>
+
+<p>只有g通道(moment2):</p>
+
+<p><img src="../images/2017.11/4.png" alt="4.png"></p>
+
+<p>然后是应用的问题，需要修改lighting shader里的阴影计算代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 只贴下核心代码：</span>
+<span class="n">uniform</span> <span class="n">sampler2D</span> <span class="n">shadowMap</span><span class="p">;</span>
+
+<span class="c1">// 这个函数是用来算出上文说的Pmax</span>
+<span class="kt">float</span> <span class="nf">chebyshevUpperBound</span><span class="p">(</span><span class="n">sampler2D</span> <span class="n">shadowMap</span><span class="p">,</span> <span class="kt">float</span> <span class="n">d</span><span class="p">,</span> <span class="n">vec2</span> <span class="n">coord</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">vec2</span> <span class="n">moments</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">shadowMap</span><span class="p">,</span> <span class="n">coord</span><span class="p">).</span><span class="n">rg</span><span class="p">;</span>
+    <span class="c1">// Surface is fully lit. as the current fragment is before the light occluder</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">&lt;=</span> <span class="n">moments</span><span class="p">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">1.0</span><span class="p">;</span>
+
+    <span class="c1">// The fragment is either in shadow or penumbra. We now use chebyshev&#39;s upperBound to check</span>
+    <span class="c1">// How likely this pixel is to be lit (p_max)</span>
+    <span class="kt">float</span> <span class="n">variance</span> <span class="o">=</span> <span class="n">moments</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="p">(</span><span class="n">moments</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">moments</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+    <span class="c1">//variance = max(variance, 0.000002);</span>
+    <span class="n">variance</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="mf">0.00002</span><span class="p">);</span>
+
+    <span class="kt">float</span> <span class="n">d_minus_mean</span> <span class="o">=</span> <span class="n">d</span> <span class="o">-</span> <span class="n">moments</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">p_max</span> <span class="o">=</span> <span class="n">variance</span> <span class="o">/</span> <span class="p">(</span><span class="n">variance</span> <span class="o">+</span> <span class="n">d_minus_mean</span> <span class="o">*</span> <span class="n">d_minus_mean</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">p_max</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 返回阴影百分比[0,1], 然后拿去乘以光照颜色即可</span>
+<span class="kt">float</span> <span class="nf">ShadowCalculation_Dir</span><span class="p">(</span><span class="n">vec3</span> <span class="n">fragPos</span><span class="p">,</span> <span class="n">Light</span> <span class="n">light</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">vec4</span> <span class="n">fragPosLightSpace</span> <span class="o">=</span> <span class="n">light</span><span class="p">.</span><span class="n">lightPV</span> <span class="o">*</span> <span class="n">vec4</span><span class="p">(</span><span class="n">fragPos</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+    <span class="c1">// perform perspective divide</span>
+    <span class="n">vec3</span> <span class="n">projCoords</span> <span class="o">=</span> <span class="n">fragPosLightSpace</span><span class="p">.</span><span class="n">xyz</span> <span class="o">/</span> <span class="n">fragPosLightSpace</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+    <span class="c1">// transform to [0,1] range</span>
+    <span class="n">projCoords</span> <span class="o">=</span> <span class="n">projCoords</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">currentDepth</span> <span class="o">=</span> <span class="n">projCoords</span><span class="p">.</span><span class="n">z</span><span class="p">;</span>
+    <span class="n">shadow</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">chebyshevUpperBound</span><span class="p">(</span><span class="n">shadowMap</span><span class="p">,</span> <span class="n">currentDepth</span><span class="p">,</span> <span class="n">projCoords</span><span class="p">.</span><span class="n">xy</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">shadow</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>最终效果:</p>
+
+<p><img src="../images/2017.11/5.png" alt="5.png"></p>
+
+<p>这里可以看到阴影边缘是变模糊了的，不过还是有锯齿。可以进一步对shadow map做blur来实现软化。</p>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)
