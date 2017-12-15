@@ -1287,7 +1287,7 @@
 
 &lt;p&gt;\[ f_{cook−torrance} = \frac { DFG }{ 4 (\omega _{o} \cdot \mathbf n)(\omega _{i} \cdot \mathbf n) } \]&lt;/p&gt;
 
-&lt;p&gt;这条公式怎么来的，改天再写一篇数学推导文。现在需要重点关注右边的分子部分：DFG。DFG其实是3个函数，每个函数算出一个scalar因子，3个因子得到后相乘。D、F、G有很多公式可以选择，下面会介绍几个常用的DFG函数。&lt;/p&gt;
+&lt;p&gt;这条公式怎么来的，改天再写一篇数学推导文。现在需要重点关注右边的分子部分：DFG。DFG其实是3个函数，每个函数算出一个标量因子，3个因子得到后相乘。D、F、G有很多公式可以选择，下面会介绍几个常用的DFG函数。&lt;/p&gt;
 
 &lt;h3&gt;D， Normal Distribution Function，法线分布函数&lt;/h3&gt;
 
