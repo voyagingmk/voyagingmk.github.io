@@ -81,12 +81,37 @@
   
     <article class="post">
 
-      <h1><a href="/bvh/">Bounding Volume Hierachy of pbrt 解析</a></h1>
+      <h1><a href="/bvh-2/">Bounding Volume Hierachy of pbrt 解析(2) HLBVH</a></h1>
       <div class="date">
         Written on December 20, 2017
       </div>
       <div class="entry">
-        <h1>二叉树BVH</h1>
+        <h2>HLBVH</h2>
+
+<p>上一篇文章介绍了recursiveBuild函数，它对静态场景做了一次自顶向下的BVH构造，且使用了一个叫SAH的切分技术。</p>
+
+<p>recursiveBuild有2个缺点：</p>
+
+<ol>
+<li><p>SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能并不是很理想；</p></li>
+<li><p>自顶向下地构造BVH，很难应用并行计算来优先性能。</p></li>
+</ol>
+
+<p>于是作者又发明了更复杂的HLBVHBuild，即 Hierarchical Linear Bounding Volume Hierarchy。</p>
+
+      </div>
+
+      <a href="/bvh-2/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
+      <h1><a href="/bvh-1/">Bounding Volume Hierachy of pbrt 解析(1)</a></h1>
+      <div class="date">
+        Written on December 20, 2017
+      </div>
+      <div class="entry">
+        <h2>二叉树BVH</h2>
 
 <p>BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。</p>
 
@@ -94,7 +119,7 @@
 
       </div>
 
-      <a href="/bvh/" class="read-more">Read More</a>
+      <a href="/bvh-1/" class="read-more">Read More</a>
     </article>
   
     <article class="post">

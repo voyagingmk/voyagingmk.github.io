@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bounding Volume Hierachy of pbrt 解析(2) HLBVH – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="HLBVH
+
+上一篇文章介绍了recursiveBuild函数，它对静态场景做了一次自顶向下的BVH构造，且使用了一个叫SAH的切分技术。
+
+recursiveBuild有2个缺点：
+
+
+SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能并不是很理想；
+自顶向下地构造BVH，很难应用并行计算来优先性能。
+
+
+于是作者又发明了更复杂的HLBVHBuild，即 Hierarchical Linear Bounding Volume Hierarchy。
+" />
+    <meta property="og:description" content="HLBVH
+
+上一篇文章介绍了recursiveBuild函数，它对静态场景做了一次自顶向下的BVH构造，且使用了一个叫SAH的切分技术。
+
+recursiveBuild有2个缺点：
+
+
+SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能并不是很理想；
+自顶向下地构造BVH，很难应用并行计算来优先性能。
+
+
+于是作者又发明了更复杂的HLBVHBuild，即 Hierarchical Linear Bounding Volume Hierarchy。
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="Bounding Volume Hierachy of pbrt 解析(2) HLBVH" />
+    <meta property="twitter:title" content="Bounding Volume Hierachy of pbrt 解析(2) HLBVH" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/bvh-2/',
+		  'title': 'Bounding Volume Hierachy of pbrt 解析(2) HLBVH'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<article class="post">
+  <h1>Bounding Volume Hierachy of pbrt 解析(2) HLBVH</h1>
+  <h3>Tags: <a href="/tag/renderer/" rel="tag">renderer</a></h3>
+  <div class="entry">
+    <h2>HLBVH</h2>
+
+<p>上一篇文章介绍了recursiveBuild函数，它对静态场景做了一次自顶向下的BVH构造，且使用了一个叫SAH的切分技术。</p>
+
+<p>recursiveBuild有2个缺点：</p>
+
+<ol>
+<li><p>SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能并不是很理想；</p></li>
+<li><p>自顶向下地构造BVH，很难应用并行计算来优先性能。</p></li>
+</ol>
+
+<p>于是作者又发明了更复杂的HLBVHBuild，即 Hierarchical Linear Bounding Volume Hierarchy。</p>
+
+<!--more-->
+
+<h2>莫顿码 <a href="https://en.wikipedia.org/wiki/Z-order_curve">Morton Code</a></h2>
+
+<p>要理解HLBVH，首先要学一下莫顿码。</p>
+
+<h3>LeftShift3</h3>
+
+<p>LeftShift3函数： 输入一个32位正整数（这个数实际上必须小于等于1&lt;&lt;10即1024），函数会把第i位的值写入到第3i位，然后把其他无关的位清0。</p>
+
+<p>因为输入的数小于等于1&lt;&lt;10，即只有10个有效bit[0,1,2,···,9]，最大的是第9bit，9*3=27，所以27bit之后的最后4个bits [28, 29, 30 ,31]，必然都是0。下面函数的注释也已标明。</p>
+
+<p>示意图：</p>
+
+<p><img src="../images/2017.12/1.png" alt="1.png"></p>
+
+<p>（from pbrt v3)</p>
+
+<p>实现代码如下，用了位运算技巧，需要慢慢理解（看注释，每一轮变换都是一次分隔，变换后都给出了有效位的新位置）：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="nf">LeftShift3</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">))</span> <span class="o">--</span><span class="n">x</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00000011000000000000000011111111</span><span class="p">;</span>
+    <span class="c1">// x = ---- --98 ---- ---- ---- ---- 7654 3210</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00000011000000001111000000001111</span><span class="p">;</span>
+    <span class="c1">// x = ---- --98 ---- ---- 7654 ---- ---- 3210</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00000011000011000011000011000011</span><span class="p">;</span>
+    <span class="c1">// x = ---- --98 ---- 76-- --54 ---- 32-- --10</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00001001001001001001001001001001</span><span class="p">;</span>
+    <span class="c1">// x = ---- 9--8 --7- -6-- 5--4 --3- -2-- 1--0</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3>EncodeMorton3</h3>
+
+<p>理解了LeftShift3后再来理解EncodeMorton3就很简单了，就一行代码：</p>
+
+<p>(LeftShift3(v.z) &lt;&lt; 2) | (LeftShift3(v.y) &lt;&lt; 1) | LeftShift3(v.x);</p>
+
+<p>调用了三次LeftShift3，分别输入了向量v的x、y、z分量。因为LeftShift3作用是用2个0bit分割有效位，所以EncodeMorton3里，LeftShift3(v.y) 需要整体左移1个bit，LeftShift3(v.z)则是2个bit，填满了总共3 * 10 = 30个bit（还有2个0bit可不管）。</p>
+
+<p>实现代码如下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="nf">EncodeMorton3</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="p">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="p">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">z</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="p">.</span><span class="n">z</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">LeftShift3</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">LeftShift3</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">LeftShift3</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>示意图：</p>
+
+<p><img src="../images/2017.12/2.png" alt="2.png"></p>
+
+<h2>HLBVHBuild</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">BVHSystem</span><span class="o">::</span><span class="n">HLBVHBuild</span><span class="p">(</span>
+    <span class="n">ComponentHandle</span><span class="o">&lt;</span><span class="n">BVHAccel</span><span class="o">&gt;</span> <span class="n">bvhAccel</span><span class="p">,</span>
+    <span class="n">MemoryArena</span> <span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHObjInfo</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">totalNodes</span><span class="p">,</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ObjectID</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">orderedObjs</span><span class="p">)</span>  <span class="p">{</span>
+
+    <span class="c1">// 1. 计算所有物体中心坐标的包围盒</span>
+    <span class="n">BBox</span> <span class="n">bounds</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">BVHObjInfo</span> <span class="o">&amp;</span><span class="nl">pi</span> <span class="p">:</span> <span class="n">objInfo</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">pi</span><span class="p">.</span><span class="n">centroid</span><span class="p">);</span>
+
+    <span class="c1">// 2. 并行计算每所有物体的MortonObj信息</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="n">mortonObjs</span><span class="p">(</span><span class="n">objInfo</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="n">ParallelFor</span><span class="p">([</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 莫顿码共10位</span>
+        <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">mortonBits</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">mortonScale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">mortonBits</span><span class="p">;</span>
+        <span class="n">mortonObjs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">objIndex</span> <span class="o">=</span> <span class="n">objInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">objNumber</span><span class="p">;</span>
+        <span class="c1">// centroidOffset是该obj中心在包围盒里的百分比坐标</span>
+        <span class="n">Vector3dF</span> <span class="n">centroidOffset</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">.</span><span class="n">Offset</span><span class="p">(</span><span class="n">objInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">centroid</span><span class="p">);</span>
+        <span class="c1">// 把百分比坐标映射到[0, 1024]，然后编成莫顿码</span>
+        <span class="n">mortonObjs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">=</span> <span class="n">EncodeMorton3</span><span class="p">(</span><span class="n">centroidOffset</span> <span class="o">*</span> <span class="n">mortonScale</span><span class="p">);</span>
+    <span class="p">},</span> <span class="n">objInfo</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">512</span><span class="p">);</span>
+
+    <span class="c1">// 3. mortonObjs数组做排序</span>
+    <span class="n">RadixSort</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mortonObjs</span><span class="p">);</span>
+
+    <span class="n">Create</span> <span class="n">LBVH</span> <span class="n">treelets</span> <span class="n">at</span> <span class="n">bottom</span> <span class="n">of</span> <span class="n">BVH</span> 
+    <span class="n">Create</span> <span class="n">and</span> <span class="k">return</span> <span class="n">SAH</span> <span class="n">BVH</span> <span class="n">from</span> <span class="n">LBVH</span> <span class="n">treelets</span>  
+<span class="p">}</span>
+</code></pre></div>
+<p>RadixSort代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">RadixSort</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="n">tempVector</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">());</span>
+    <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">bitsPerPass</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">nBits</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+    <span class="n">Assert</span><span class="p">((</span><span class="n">nBits</span> <span class="o">%</span> <span class="n">bitsPerPass</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">nPasses</span> <span class="o">=</span> <span class="n">nBits</span> <span class="o">/</span> <span class="n">bitsPerPass</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">pass</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pass</span> <span class="o">&lt;</span> <span class="n">nPasses</span><span class="p">;</span> <span class="o">++</span><span class="n">pass</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Perform one pass of radix sort, sorting _bitsPerPass_ bits</span>
+        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="n">pass</span> <span class="o">*</span> <span class="n">bitsPerPass</span><span class="p">;</span>
+
+        <span class="c1">// Set in and out vector pointers for radix sort pass</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">in</span> <span class="o">=</span> <span class="p">(</span><span class="n">pass</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">?</span> <span class="nl">tempVector</span> <span class="p">:</span> <span class="o">*</span><span class="n">v</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">pass</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">?</span> <span class="o">*</span><span class="nl">v</span> <span class="p">:</span> <span class="n">tempVector</span><span class="p">;</span>
+
+        <span class="c1">// Count number of zero bits in array for current radix sort bit</span>
+        <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">nBuckets</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bitsPerPass</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">bucketCount</span><span class="p">[</span><span class="n">nBuckets</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+        <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">bitMask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bitsPerPass</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">MortonObj</span> <span class="o">&amp;</span><span class="nl">mp</span> <span class="p">:</span> <span class="n">in</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">bucket</span> <span class="o">=</span> <span class="p">(</span><span class="n">mp</span><span class="p">.</span><span class="n">mortonCode</span> <span class="o">&gt;&gt;</span> <span class="n">lowBit</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">bitMask</span><span class="p">;</span>
+            <span class="n">Assert</span><span class="p">(</span><span class="n">bucket</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">bucket</span> <span class="o">&lt;</span> <span class="n">nBuckets</span><span class="p">);</span>
+            <span class="o">++</span><span class="n">bucketCount</span><span class="p">[</span><span class="n">bucket</span><span class="p">];</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Compute starting index in output array for each bucket</span>
+        <span class="kt">int</span> <span class="n">outIndex</span><span class="p">[</span><span class="n">nBuckets</span><span class="p">];</span>
+        <span class="n">outIndex</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nBuckets</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">outIndex</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">outIndex</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bucketCount</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+
+        <span class="c1">// Store sorted values in output array</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">MortonObj</span> <span class="o">&amp;</span><span class="nl">mp</span> <span class="p">:</span> <span class="n">in</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">bucket</span> <span class="o">=</span> <span class="p">(</span><span class="n">mp</span><span class="p">.</span><span class="n">mortonCode</span> <span class="o">&gt;&gt;</span> <span class="n">lowBit</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">bitMask</span><span class="p">;</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">outIndex</span><span class="p">[</span><span class="n">bucket</span><span class="p">]</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1">// Copy final result from _tempVector_, if needed</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nPasses</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="n">std</span><span class="o">::</span><span class="n">swap</span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="n">tempVector</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+  </div>
+  <div class="entry">
+  (未经授权禁止转载)
+  </div>
+  <div class="date">
+    Written on December 20, 2017
+  </div>
+ <img src="../images/dashang.png" />
+    
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

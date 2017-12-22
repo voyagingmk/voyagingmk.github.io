@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Bounding Volume Hierachy of pbrt 解析 – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
+    <title>Bounding Volume Hierachy of pbrt 解析(1) – Wyman的技术博客 – 博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -25,8 +25,8 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="Bounding Volume Hierachy of pbrt 解析" />
-    <meta property="twitter:title" content="Bounding Volume Hierachy of pbrt 解析" />
+    <meta property="og:title" content="Bounding Volume Hierachy of pbrt 解析(1)" />
+    <meta property="twitter:title" content="Bounding Volume Hierachy of pbrt 解析(1)" />
     
 
     <!--[if lt IE 9]>
@@ -46,8 +46,8 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
 
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
-		  'page': '/bvh/',
-		  'title': 'Bounding Volume Hierachy of pbrt 解析'
+		  'page': '/bvh-1/',
+		  'title': 'Bounding Volume Hierachy of pbrt 解析(1)'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -90,10 +90,10 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1>Bounding Volume Hierachy of pbrt 解析</h1>
+  <h1>Bounding Volume Hierachy of pbrt 解析(1)</h1>
   <h3>Tags: <a href="/tag/renderer/" rel="tag">renderer</a></h3>
   <div class="entry">
-    <h1>二叉树BVH</h1>
+    <h2>二叉树BVH</h2>
 
 <p>BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。</p>
 
@@ -342,11 +342,10 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
     <span class="p">});</span>
 <span class="p">}</span>
 <span class="k">else</span> <span class="p">{</span>
-    <span class="c1">// Allocate _BucketInfo_ for SAH partition buckets</span>
     <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">nBuckets</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
     <span class="n">BucketInfo</span> <span class="n">buckets</span><span class="p">[</span><span class="n">nBuckets</span><span class="p">];</span>
 
-    <span class="c1">// Initialize _BucketInfo_ for SAH partition buckets</span>
+    <span class="c1">// 初始化bucket</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
         <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">nBuckets</span> <span class="o">*</span>
             <span class="n">centroidBounds</span><span class="p">.</span><span class="n">Offset</span><span class="p">(</span>
@@ -358,7 +357,7 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
             <span class="n">Union</span><span class="p">(</span><span class="n">buckets</span><span class="p">[</span><span class="n">b</span><span class="p">].</span><span class="n">bounds</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bounds</span><span class="p">);</span>
     <span class="p">}</span>
 
-    <span class="c1">// Compute costs for splitting after each bucket</span>
+    <span class="c1">// 计算切分开销</span>
     <span class="kt">float</span> <span class="n">cost</span><span class="p">[</span><span class="n">nBuckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nBuckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">BBox</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">;</span>
@@ -377,7 +376,7 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
             <span class="n">bounds</span><span class="p">.</span><span class="n">SurfaceArea</span><span class="p">();</span>
     <span class="p">}</span>
 
-    <span class="c1">// Find bucket to split at that minimizes SAH metric</span>
+    <span class="c1">// 线性遍历，找出cost最小的</span>
     <span class="kt">float</span> <span class="n">minCost</span> <span class="o">=</span> <span class="n">cost</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
     <span class="kt">int</span> <span class="n">minCostSplitBucket</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nBuckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
@@ -386,10 +385,8 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
             <span class="n">minCostSplitBucket</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
-
-    <span class="c1">// Either create leaf or split objs at selected SAH</span>
-    <span class="c1">// bucket</span>
     <span class="kt">float</span> <span class="n">leafCost</span> <span class="o">=</span> <span class="n">nObjs</span><span class="p">;</span>
+    <span class="c1">// 如果数量比maxObjsInNode大 或者 切分开销比直接弄成叶子节点开销小，就做切分</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">nObjs</span> <span class="o">&gt;</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">maxObjsInNode</span> <span class="o">||</span> <span class="n">minCost</span> <span class="o">&lt;</span> <span class="n">leafCost</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">BVHObjInfo</span> <span class="o">*</span><span class="n">pmid</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">partition</span><span class="p">(</span>
             <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">[</span><span class="n">start</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">[</span><span class="n">end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
@@ -403,7 +400,7 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
         <span class="n">mid</span> <span class="o">=</span> <span class="n">pmid</span> <span class="o">-</span> <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="p">{</span>
-        <span class="c1">// Create leaf _BVHBuildNode_</span>
+        <span class="c1">// 否则，弄成叶子节点就行了（这段代码出现第三次了）</span>
         <span class="kt">int</span> <span class="n">firstObjOffset</span> <span class="o">=</span> <span class="n">orderedObjs</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
         <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
             <span class="kt">int</span> <span class="n">objNum</span> <span class="o">=</span> <span class="n">objInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">objNumber</span><span class="p">;</span>
