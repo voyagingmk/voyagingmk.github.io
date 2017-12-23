@@ -173,7 +173,7 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
 
 <p><img src="../images/2017.12/2.png" alt="2.png"></p>
 
-<h2>HLBVHBuild</h2>
+<h2>HLBVHBuild 概览</h2>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">BVHSystem</span><span class="o">::</span><span class="n">HLBVHBuild</span><span class="p">(</span>
     <span class="n">ComponentHandle</span><span class="o">&lt;</span><span class="n">BVHAccel</span><span class="o">&gt;</span> <span class="n">bvhAccel</span><span class="p">,</span>
     <span class="n">MemoryArena</span> <span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span>
@@ -199,14 +199,58 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
         <span class="n">mortonObjs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">=</span> <span class="n">EncodeMorton3</span><span class="p">(</span><span class="n">centroidOffset</span> <span class="o">*</span> <span class="n">mortonScale</span><span class="p">);</span>
     <span class="p">},</span> <span class="n">objInfo</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">512</span><span class="p">);</span>
 
-    <span class="c1">// 3. mortonObjs数组做排序</span>
+    <span class="c1">// 3. mortonObjs数组做基数排序</span>
     <span class="n">RadixSort</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mortonObjs</span><span class="p">);</span>
 
-    <span class="n">Create</span> <span class="n">LBVH</span> <span class="n">treelets</span> <span class="n">at</span> <span class="n">bottom</span> <span class="n">of</span> <span class="n">BVH</span> 
-    <span class="n">Create</span> <span class="n">and</span> <span class="k">return</span> <span class="n">SAH</span> <span class="n">BVH</span> <span class="n">from</span> <span class="n">LBVH</span> <span class="n">treelets</span>  
+    <span class="c1">// 4. 按照莫顿码的高位是否一样（都属于同一个grid），对所有物体分组</span>
+    <span class="c1">// 如果物体分布很稀疏的话，就是一个物体一个treelet, nObjs为1</span>
+    <span class="c1">// （treelet可以叫做幼树，意指整个BVH树的下层部分的单个子树）</span>
+    <span class="c1">// 被mask为1的bits有12个，所以总共有2^12=4096个grid （treelet）</span>
+    <span class="c1">// 因为有3个维度，所以单维度上是2^4=16个grid</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">LBVHTreelet</span><span class="o">&gt;</span> <span class="n">treeletsToBuild</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">end</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">mortonObjs</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">end</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">uint32_t</span> <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b00111111111111000000000000000000</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">end</span> <span class="o">==</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">mortonObjs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">||</span>
+            <span class="p">((</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">start</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">!=</span>
+            <span class="p">(</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">end</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">nObjs</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">;</span>
+            <span class="kt">int</span> <span class="n">maxBVHNodes</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nObjs</span><span class="p">;</span>
+            <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">arena</span><span class="p">.</span><span class="n">Alloc</span><span class="o">&lt;</span><span class="n">BVHBuildNode</span><span class="o">&gt;</span><span class="p">(</span><span class="n">maxBVHNodes</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+            <span class="n">treeletsToBuild</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span> <span class="n">start</span><span class="p">,</span> <span class="n">nObjs</span><span class="p">,</span> <span class="n">nodes</span> <span class="p">});</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">end</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 5.开始构造BVH了</span>
+    <span class="c1">// 5.1 这段代码最关键的就是并行调用emitLBVH，和统计totalNodes</span>
+    <span class="c1">// 注意，这里构建了n个BVH子树，n=treeletsToBuild.size()</span>
+    <span class="c1">// 下一个步骤会把这n个BVH子树当成n个物体，和recursiveBuild一样自顶向下构建BVH</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">atomicTotal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">orderedObjsOffset</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="n">orderedObjs</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="n">ParallelFor</span><span class="p">([</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Generate _i_th LBVH treelet</span>
+        <span class="kt">int</span> <span class="n">nodesCreated</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">const</span> <span class="kt">int</span> <span class="n">firstBitIndex</span> <span class="o">=</span> <span class="mi">29</span> <span class="o">-</span> <span class="mi">12</span><span class="p">;</span>
+        <span class="n">LBVHTreelet</span> <span class="o">&amp;</span><span class="n">tr</span> <span class="o">=</span> <span class="n">treeletsToBuild</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="n">tr</span><span class="p">.</span><span class="n">buildNodes</span> <span class="o">=</span> <span class="n">emitLBVH</span><span class="p">(</span><span class="n">bvhAccel</span><span class="p">,</span> <span class="n">tr</span><span class="p">.</span><span class="n">buildNodes</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">tr</span><span class="p">.</span><span class="n">startIndex</span><span class="p">],</span>
+            <span class="n">tr</span><span class="p">.</span><span class="n">nObjs</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nodesCreated</span><span class="p">,</span> <span class="n">orderedObjs</span><span class="p">,</span>
+            <span class="o">&amp;</span><span class="n">orderedObjsOffset</span><span class="p">,</span> <span class="n">firstBitIndex</span><span class="p">);</span>
+        <span class="n">atomicTotal</span> <span class="o">+=</span> <span class="n">nodesCreated</span><span class="p">;</span>
+    <span class="p">},</span> <span class="n">treeletsToBuild</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="o">*</span><span class="n">totalNodes</span> <span class="o">=</span> <span class="n">atomicTotal</span><span class="p">;</span>
+
+    <span class="c1">// 5.2 把std::vector&lt;LBVHTreelet&gt;的buildNodes 放进 finishedTreelets</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHBuildNode</span> <span class="o">*&gt;</span> <span class="n">finishedTreelets</span><span class="p">;</span>
+    <span class="n">finishedTreelets</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">treeletsToBuild</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">LBVHTreelet</span> <span class="o">&amp;</span><span class="nl">treelet</span> <span class="p">:</span> <span class="n">treeletsToBuild</span><span class="p">)</span>
+        <span class="n">finishedTreelets</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">treelet</span><span class="p">.</span><span class="n">buildNodes</span><span class="p">);</span>
+
+    <span class="c1">// 5.3 构造BVH的上层部分</span>
+    <span class="k">return</span> <span class="nf">buildUpperSAH</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="n">finishedTreelets</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">finishedTreelets</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span>
+        <span class="n">totalNodes</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>RadixSort代码：</p>
+<h3>RadixSort</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">RadixSort</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="n">tempVector</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">());</span>
     <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">bitsPerPass</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
@@ -247,6 +291,186 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
     <span class="k">if</span> <span class="p">(</span><span class="n">nPasses</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="n">std</span><span class="o">::</span><span class="n">swap</span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="n">tempVector</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
+<h3>emitLBVH</h3>
+
+<p>emitLBVH会递归调用自己，自顶向下构建BVH树。</p>
+
+<p>注意，emitLBVH依然采用自顶向下的构建流程，但是却可以多线程并行构建n(1&lt;=n&lt;=4096)个grid的BVH，这是第一个性能优化点；第二个性能优化点，在于emitLBVH构造BVH是线性的，即O(n)时间复杂度，这归功于前面的莫顿码排序。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">BVHSystem</span><span class="o">::</span><span class="n">emitLBVH</span><span class="p">(</span><span class="n">ComponentHandle</span><span class="o">&lt;</span><span class="n">BVHAccel</span><span class="o">&gt;</span> <span class="n">bvhAccel</span><span class="p">,</span>
+    <span class="n">BVHBuildNode</span> <span class="o">*&amp;</span><span class="n">buildNodes</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHObjInfo</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">,</span>
+    <span class="n">MortonObj</span> <span class="o">*</span><span class="n">mortonObjs</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nObjs</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">totalNodes</span><span class="p">,</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ObjectID</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">orderedObjs</span><span class="p">,</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">orderedObjsOffset</span><span class="p">,</span> <span class="kt">int</span> <span class="n">bitIndex</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">nObjs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">bitIndex</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">||</span> <span class="n">nObjs</span> <span class="o">&lt;</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">maxObjsInNode</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Create and return leaf node of LBVH treelet</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">totalNodes</span><span class="p">)</span><span class="o">++</span><span class="p">;</span>
+        <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">node</span> <span class="o">=</span> <span class="n">buildNodes</span><span class="o">++</span><span class="p">;</span>
+        <span class="n">BBox</span> <span class="n">bounds</span><span class="p">;</span>
+        <span class="c1">// 对orderedObjsOffset做原子操作：+=nObjs。并返回+=前的值</span>
+        <span class="kt">int</span> <span class="n">firstObjOffset</span> <span class="o">=</span> <span class="n">orderedObjsOffset</span><span class="o">-&gt;</span><span class="n">fetch_add</span><span class="p">(</span><span class="n">nObjs</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nObjs</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">objIndex</span> <span class="o">=</span> <span class="n">mortonObjs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">objIndex</span><span class="p">;</span>
+            <span class="n">orderedObjs</span><span class="p">[</span><span class="n">firstObjOffset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">[</span><span class="n">objIndex</span><span class="p">];</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">[</span><span class="n">objIndex</span><span class="p">].</span><span class="n">bounds</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">InitLeaf</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">firstObjOffset</span><span class="p">,</span> <span class="n">nObjs</span><span class="p">,</span> <span class="n">bounds</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">node</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">mask</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bitIndex</span><span class="p">;</span>
+        <span class="c1">// 如果第一个物体和最后一个物体的mask bit是一样的，那么这批物体位置很集中，可直接进入下一个 mask bit</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">mortonObjs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">==</span>
+            <span class="p">(</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">nObjs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">emitLBVH</span><span class="p">(</span><span class="n">bvhAccel</span><span class="p">,</span> <span class="n">buildNodes</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">,</span> <span class="n">mortonObjs</span><span class="p">,</span> <span class="n">nObjs</span><span class="p">,</span>
+                <span class="n">totalNodes</span><span class="p">,</span> <span class="n">orderedObjs</span><span class="p">,</span> <span class="n">orderedObjsOffset</span><span class="p">,</span>
+                <span class="n">bitIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+
+        <span class="c1">// 二分查找切分位置，即mask bit发生‘突变’的物体的索引</span>
+        <span class="kt">int</span> <span class="n">searchStart</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">searchEnd</span> <span class="o">=</span> <span class="n">nObjs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">searchStart</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">searchEnd</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Assert</span><span class="p">(</span><span class="n">searchStart</span> <span class="o">!=</span> <span class="n">searchEnd</span><span class="p">);</span>
+            <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">searchStart</span> <span class="o">+</span> <span class="n">searchEnd</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">searchStart</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">==</span>
+                <span class="p">(</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">mid</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">))</span>
+                <span class="n">searchStart</span> <span class="o">=</span> <span class="n">mid</span><span class="p">;</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="n">Assert</span><span class="p">((</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">mid</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">==</span>
+                    <span class="p">(</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">searchEnd</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">));</span>
+                <span class="n">searchEnd</span> <span class="o">=</span> <span class="n">mid</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="kt">int</span> <span class="n">splitOffset</span> <span class="o">=</span> <span class="n">searchEnd</span><span class="p">;</span>
+        <span class="n">Assert</span><span class="p">(</span><span class="n">splitOffset</span> <span class="o">&lt;=</span> <span class="n">nObjs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">Assert</span><span class="p">((</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">splitOffset</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">!=</span>
+            <span class="p">(</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">splitOffset</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">));</span>
+
+
+        <span class="c1">// 找到切分点了，现在建立一个内部节点node，并对切分点左右两批物体递归调用emitLBVH，建立子树</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">totalNodes</span><span class="p">)</span><span class="o">++</span><span class="p">;</span>
+        <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">node</span> <span class="o">=</span> <span class="n">buildNodes</span><span class="o">++</span><span class="p">;</span> <span class="c1">// 内部节点</span>
+        <span class="c1">// lbvh[0]和lbvh[1]分别是node的左右孩子节点</span>
+        <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">lbvh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">emitLBVH</span><span class="p">(</span><span class="n">bvhAccel</span><span class="p">,</span> <span class="n">buildNodes</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">,</span> <span class="n">mortonObjs</span><span class="p">,</span> <span class="n">splitOffset</span><span class="p">,</span>
+            <span class="n">totalNodes</span><span class="p">,</span> <span class="n">orderedObjs</span><span class="p">,</span> <span class="n">orderedObjsOffset</span><span class="p">,</span>
+            <span class="n">bitIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">emitLBVH</span><span class="p">(</span><span class="n">bvhAccel</span><span class="p">,</span> <span class="n">buildNodes</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">splitOffset</span><span class="p">],</span> <span class="n">nObjs</span> <span class="o">-</span> <span class="n">splitOffset</span><span class="p">,</span>
+            <span class="n">totalNodes</span><span class="p">,</span> <span class="n">orderedObjs</span><span class="p">,</span> <span class="n">orderedObjsOffset</span><span class="p">,</span>
+            <span class="n">bitIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">};</span>
+        <span class="c1">// 这个mask bit对应的是哪条坐标轴</span>
+        <span class="n">Axis</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">Axis</span><span class="o">&gt;</span><span class="p">(</span><span class="n">bitIndex</span> <span class="o">%</span> <span class="mi">3</span><span class="p">);</span>
+        <span class="n">InitInterior</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">lbvh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lbvh</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="k">return</span> <span class="n">node</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3>buildUpperSAH</h3>
+
+<p>对所有treelet，自顶向下构建BVH的上层部分，用了递归。</p>
+
+<p>第一次调用buildUpperSAH创建的是根节点，包含所有treelet；</p>
+
+<p>如果nNodes为1，那么已经到达某个treelet，终止递归；</p>
+
+<p>如果nNodes &gt; 1，创建内部节点，并调用2次buildUpperSAH，创建该内部节点的左右子树。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">BVHSystem</span><span class="o">::</span><span class="n">buildUpperSAH</span><span class="p">(</span><span class="n">MemoryArena</span> <span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHBuildNode</span> <span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">treeletRoots</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">totalNodes</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">nNodes</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nNodes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="n">treeletRoots</span><span class="p">[</span><span class="n">start</span><span class="p">];</span> <span class="c1">// 已经到底了，终止递归</span>
+    <span class="p">(</span><span class="o">*</span><span class="n">totalNodes</span><span class="p">)</span><span class="o">++</span><span class="p">;</span>
+    <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">node</span> <span class="o">=</span> <span class="n">arena</span><span class="p">.</span><span class="n">Alloc</span><span class="o">&lt;</span><span class="n">BVHBuildNode</span><span class="o">&gt;</span><span class="p">();</span>
+
+    <span class="c1">// Compute bounds of all nodes under this HLBVH node</span>
+    <span class="n">BBox</span> <span class="n">bounds</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">treeletRoots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">);</span>
+
+    <span class="c1">// Compute bound of HLBVH node centroids, choose split dimension _dim_</span>
+    <span class="n">BBox</span> <span class="n">centroidBounds</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Vector3dF</span> <span class="n">centroid</span> <span class="o">=</span>
+            <span class="p">(</span><span class="n">treeletRoots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">.</span><span class="n">pMin</span> <span class="o">+</span> <span class="n">treeletRoots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">)</span> <span class="o">*</span>
+            <span class="mf">0.5f</span><span class="p">;</span>
+        <span class="n">centroidBounds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">(</span><span class="n">centroidBounds</span><span class="p">,</span> <span class="n">centroid</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Axis</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">centroidBounds</span><span class="p">.</span><span class="n">MaximumExtent</span><span class="p">();</span>
+    <span class="c1">// FIXME: if this hits, what do we need to do?</span>
+    <span class="c1">// Make sure the SAH split below does something... ?</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">!=</span> <span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">]);</span>
+
+    <span class="c1">// 计算buckets, 可参考recursiveBuild</span>
+    <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">nBuckets</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+
+    <span class="n">BucketInfo</span> <span class="n">buckets</span><span class="p">[</span><span class="n">nBuckets</span><span class="p">];</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">float</span> <span class="n">centroid</span> <span class="o">=</span> <span class="p">(</span><span class="n">treeletRoots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">+</span>
+            <span class="n">treeletRoots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="o">*</span>
+            <span class="mf">0.5f</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span>
+            <span class="n">nBuckets</span> <span class="o">*</span> <span class="p">((</span><span class="n">centroid</span> <span class="o">-</span> <span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="o">/</span>
+            <span class="p">(</span><span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">]));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">nBuckets</span><span class="p">)</span> <span class="n">b</span> <span class="o">=</span> <span class="n">nBuckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">Assert</span><span class="p">(</span><span class="n">b</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">nBuckets</span><span class="p">);</span>
+        <span class="n">buckets</span><span class="p">[</span><span class="n">b</span><span class="p">].</span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+        <span class="n">buckets</span><span class="p">[</span><span class="n">b</span><span class="p">].</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">(</span><span class="n">buckets</span><span class="p">[</span><span class="n">b</span><span class="p">].</span><span class="n">bounds</span><span class="p">,</span> <span class="n">treeletRoots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">float</span> <span class="n">cost</span><span class="p">[</span><span class="n">nBuckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="n">computeCosts</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">buckets</span><span class="p">,</span> <span class="n">nBuckets</span><span class="p">,</span> <span class="mf">.125f</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">minCost</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">minCostSplitBucket</span><span class="p">;</span>
+    <span class="n">findMinCost</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">nBuckets</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">minCost</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">minCostSplitBucket</span><span class="p">);</span>
+
+    <span class="c1">// 每个treelet拿自己的bucket值和minCostSplitBucket比较大小，切分成2部分</span>
+    <span class="n">BVHBuildNode</span> <span class="o">**</span><span class="n">pmid</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">partition</span><span class="p">(</span>
+        <span class="o">&amp;</span><span class="n">treeletRoots</span><span class="p">[</span><span class="n">start</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">treeletRoots</span><span class="p">[</span><span class="n">end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span> <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">node</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">float</span> <span class="n">centroid</span> <span class="o">=</span>
+            <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.5f</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">nBuckets</span> <span class="o">*</span>
+            <span class="p">((</span><span class="n">centroid</span> <span class="o">-</span> <span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="o">/</span>
+            <span class="p">(</span><span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroidBounds</span><span class="p">.</span><span class="n">pMin</span><span class="p">[</span><span class="n">dim</span><span class="p">]));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">nBuckets</span><span class="p">)</span> <span class="n">b</span> <span class="o">=</span> <span class="n">nBuckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">Assert</span><span class="p">(</span><span class="n">b</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">nBuckets</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">b</span> <span class="o">&lt;=</span> <span class="n">minCostSplitBucket</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">pmid</span> <span class="o">-</span> <span class="o">&amp;</span><span class="n">treeletRoots</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="n">Assert</span><span class="p">(</span><span class="n">mid</span> <span class="o">&gt;</span> <span class="n">start</span> <span class="o">&amp;&amp;</span> <span class="n">mid</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">);</span>
+    <span class="n">InitInterior</span><span class="p">(</span><span class="n">node</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span> <span class="n">buildUpperSAH</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="n">treeletRoots</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">totalNodes</span><span class="p">),</span>
+        <span class="n">buildUpperSAH</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="n">treeletRoots</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">totalNodes</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">node</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>总结</h2>
+
+<p>HLBVHBuild的特点：</p>
+
+<ol>
+<li><p>把整个BVH树的构建，拆成上层、下层两部分工作：</p>
+
+<p>下层：并行构建treelet（幼树）</p>
+
+<p>上层：把构建好的所有treelet作为叶子节点，进而构造BVH上层部分</p></li>
+<li><p>和recursiveBuild，依然还是用自顶向下的构造流程（上层、下层都是）</p></li>
+<li><p>HLBVHBuild的上层部分计算和recursiveBuild基本是一样的，并没有什么改进，一样用了SAH算法</p></li>
+<li><p>HLBVHBuild的下层部分计算才是性能关键之处：</p>
+
+<p>关键点1：对所有物体进行了莫顿编码，莫顿编码后用了自定义的高效基数排序，然后就可以快速把所有物体根据空间位置分组，生成treelet</p>
+
+<p>关键点2: 用了多线程从而并行构建treelet的BVH结构</p>
+
+<p>关键点3：每个treelet还可以利用排好序的莫顿码信息，线性（O(n)复杂度）构建treelet的BVH结构</p></li>
+</ol>
+
+<p>总之，HLBVHBuild实际上是在recursiveBuild的基础上，做了改进的版本，因为HLBVHBuild的上层部分就相当于recursiveBuild。</p>
+
+<p>另外，HLBVHBuild也可以认为是自底向上的算法，因为是先遍历了所有物体算莫顿码并构建各个treelet。</p>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)
