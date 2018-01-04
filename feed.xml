@@ -7,22 +7,22 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>矩阵和四元数的运用：骨骼动画与蒙皮矩阵</title>
+        <title>骨骼动画与蒙皮矩阵</title>
         <description>&lt;p&gt;《Game Engine Architecture》这本书里最让我欣喜的就是动画相关的章节了，非常详细，比中文搜索引擎能搜到的资料都要系统、全面。据说作者以前就是做动画的。其他章节相对的只是抛砖引玉，例如阴影，只写了几页。&lt;/p&gt;
 
 &lt;p&gt;通过这本书并结合github上的ozz-animation源码，基本搞懂了骨骼蒙皮动画的核心原理。下面将简单做一份笔记。&lt;/p&gt;
 
 &lt;!--more--&gt;
 
-&lt;h3&gt;Bind Poses (绑定姿势)&lt;/h3&gt;
+&lt;h3&gt;基础概念&lt;/h3&gt;
 
 &lt;p&gt;3D美术人员制作一个带骨骼动画的模型时，主要要分2个步骤，一是建模（可能包括画贴图），二是给模型加上骨骼并制作骨骼动画。&lt;/p&gt;
 
 &lt;p&gt;给一个模型加上骨骼前，一般要求这个模型摆成T字型，才方便动作师加骨骼和做动作。此时，&lt;strong&gt;加骨骼&lt;/strong&gt;操作被称为&lt;strong&gt;骨骼绑定(Skeleton Binding)&lt;/strong&gt;；或者从模型角度讲叫做，模型&lt;strong&gt;蒙皮(Model Skinning)&lt;/strong&gt;到骨骼。&lt;/p&gt;
 
-&lt;p&gt;这个初始骨骼摆位，就是Bind Poses。但要注意，Bind Poses本身只记录了骨骼各个关节的姿势信息，并不包括&lt;strong&gt;蒙皮信息&lt;/strong&gt;。蒙皮信息是存储于模型数据里的，因为所谓蒙皮，即是让每一个顶点绑定至1-n个关节，这n个关节运动的时候，会影响到该顶点的当前位置。&lt;/p&gt;
+&lt;p&gt;这个初始骨骼摆位，就是&lt;strong&gt;绑定姿势(Bind Poses)&lt;/strong&gt;。但要注意，Bind Poses本身只记录了骨骼各个关节的姿势信息，并不包括&lt;strong&gt;蒙皮信息&lt;/strong&gt;。蒙皮信息是存储于模型数据里的，因为所谓蒙皮，即是让每一个顶点绑定至1-n个关节，这n个关节运动的时候，会影响到该顶点的当前位置。&lt;/p&gt;
 
-&lt;h3&gt;局部关节姿势&lt;/h3&gt;
+&lt;h3&gt;局部关节姿势 Local Joint Poses&lt;/h3&gt;
 
 &lt;p&gt;关节姿势分为&lt;strong&gt;局部&lt;/strong&gt;关节姿势和&lt;strong&gt;全局&lt;/strong&gt;关节姿势。先从局部关节姿势说起。&lt;/p&gt;
 
@@ -55,9 +55,9 @@
 
 &lt;p&gt;例如假设有\( v_{j} = (0,0,0) \)，表示是关节j的局部坐标系的原点，\(P_{j} \)是一个Translate(100, 0, 0)，那么\( P_{j} v_{j}  \) 的结果就是(100, 0, 0)，即\( v_{p} \)表示父关节p坐标系下的坐标(100,0,0)。&lt;/p&gt;
 
-&lt;p&gt;可以定义子关节j到父关节的变换为\( (P_{C\to P})j \)。这样的形式不太好看，可以换一种，先定义一个函数p(j)，p(j)返回关节j的父关节索引。那么\( (P_{C\rightarrow P})j \) 可以写成 \( P_{j\to p(j)} \)。&lt;/p&gt;
+&lt;p&gt;可以定义子关节j到父关节的变换为\( (P_{C\to P})j \)。这样的形式不太好看，可以换一种，先定义一个函数p(j)，p(j)返回关节j的父关节索引。那么\( (P_{C\to P})j \) 可以写成 \( P_{j\to p(j)} \)。&lt;/p&gt;
 
-&lt;h3&gt;全局关节姿势 （Global Joint Poses）&lt;/h3&gt;
+&lt;h3&gt;全局关节姿势 Global Joint Poses&lt;/h3&gt;
 
 &lt;p&gt;局部关节姿势是一种原始信息，实际上在渲染蒙皮动画前，需要做预处理，把局部关节姿势转换成全局关节姿势。&lt;/p&gt;
 
@@ -76,9 +76,44 @@
     &lt;span class=&quot;n&quot;&gt;Matrix44&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;globalPoses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 多个全局关节姿势 全局关节姿势的存储，并不只限定于用RTS，而是既可以用RTS也可以用矩阵。因为实时渲染里矩阵更通用快速，所以得存成矩阵。&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;Bind Poses Matrix (绑定姿势矩阵)&lt;/h3&gt;
+&lt;h3&gt;绑定姿势矩阵、绑定姿势逆矩阵 Bind Poses Matrix 、Inversed Bind Poses Matrix&lt;/h3&gt;
 
-&lt;h3&gt;Inversed Bind Poses Matrix (绑定姿势逆矩阵)&lt;/h3&gt;
+&lt;p&gt;定义矩阵 \( B_{j\to M} \)为关节j在模型空间的&lt;strong&gt;全局绑定姿势矩阵&lt;/strong&gt;。根据上文， \( \mathbf v B_{j\to M} \) 可以把\(  \mathbf v \)从关节j的局部空间变换到模型空间。&lt;/p&gt;
+
+&lt;p&gt;反过来说，要把一个点或向量（想象下模型的任意一个顶点），变换到关节j的空间，就是：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf v&amp;#39; (B_{j\to M})^{-1} \] &lt;/p&gt;
+
+&lt;p&gt;\( (B_{j\to M})^{-1}  \)就是&lt;strong&gt;绑定姿势逆矩阵&lt;/strong&gt;。并且有：&lt;/p&gt;
+
+&lt;p&gt;\[ (B_{j\to M})^{-1} = B_{M\to j} \] &lt;/p&gt;
+
+&lt;p&gt;再定义\(\mathbf v _{M}^{B} \)为模型任意顶点v在&lt;strong&gt;绑定姿势&lt;/strong&gt;的模型空间坐标， 而 \(\mathbf v _{M}^{C} \) 为在&lt;strong&gt;当前姿势&lt;/strong&gt;的模型空间坐标。如果要求\(\mathbf v _{M}^{B} \)在关节j的局部空间坐标\( v_{j} \)，则公式为：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf v _{j} = \mathbf v _{M}^{B} B_{M\to j} = \mathbf v _{M}^{B} (B_{j\to M})^{-1}  \] &lt;/p&gt;
+
+&lt;p&gt;然后再乘以当前姿势的姿势矩阵C，得到当前姿势的模型空间坐标 \(\mathbf v _{M}^{C} \)：&lt;/p&gt;
+
+&lt;p&gt;\[ v _{M}^{C} = \mathbf v _{j} C_{j \to M}  \] &lt;/p&gt;
+
+&lt;h3&gt;蒙皮矩阵 Skinning Matrix&lt;/h3&gt;
+
+&lt;p&gt;\[ v _{M}^{C} = \mathbf v _{j} C_{j \to M}  = \mathbf v _{M}^{B} (B_{j\to M})^{-1}  C_{j \to M} =   \mathbf v _{M}^{B}  K_{j} \] &lt;/p&gt;
+
+&lt;p&gt;\[ K_{j} = (B_{j\to M})^{-1}  C_{j \to M} \]&lt;/p&gt;
+
+&lt;p&gt;\( K_{j} \) 就是关节j的蒙皮矩阵了。&lt;/p&gt;
+
+&lt;p&gt;ozz-animation中的算K矩阵的代码片段：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;models&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;skinning_matrices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;models&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mesh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inverse_bind_poses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;models[j]就是当前姿势当前时刻第j个关节的\( C_{j \to M}\)。&lt;/p&gt;
+
+&lt;p&gt;mesh.inverse_bind_poses[j]就是\( (B_{j\to M})^{-1} \)，可见，这个逆矩阵是预先算好的，比运行时再算逆矩阵要快得多，一般的蒙皮动画引擎都是这样做。&lt;/p&gt;
+
+&lt;p&gt;注意这里的乘法顺序和公式相反（公式是右乘，一般OGL程序中是用左乘）。&lt;/p&gt;
 </description>
         <pubDate>Thu, 04 Jan 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/linear-algebra-19/</link>
