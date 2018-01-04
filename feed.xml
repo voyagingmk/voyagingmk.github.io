@@ -7,6 +7,85 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>矩阵和四元数的运用：骨骼动画与蒙皮矩阵</title>
+        <description>&lt;p&gt;《Game Engine Architecture》这本书里最让我欣喜的就是动画相关的章节了，非常详细，比中文搜索引擎能搜到的资料都要系统、全面。据说作者以前就是做动画的。其他章节相对的只是抛砖引玉，例如阴影，只写了几页。&lt;/p&gt;
+
+&lt;p&gt;通过这本书并结合github上的ozz-animation源码，基本搞懂了骨骼蒙皮动画的核心原理。下面将简单做一份笔记。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h3&gt;Bind Poses (绑定姿势)&lt;/h3&gt;
+
+&lt;p&gt;3D美术人员制作一个带骨骼动画的模型时，主要要分2个步骤，一是建模（可能包括画贴图），二是给模型加上骨骼并制作骨骼动画。&lt;/p&gt;
+
+&lt;p&gt;给一个模型加上骨骼前，一般要求这个模型摆成T字型，才方便动作师加骨骼和做动作。此时，&lt;strong&gt;加骨骼&lt;/strong&gt;操作被称为&lt;strong&gt;骨骼绑定(Skeleton Binding)&lt;/strong&gt;；或者从模型角度讲叫做，模型&lt;strong&gt;蒙皮(Model Skinning)&lt;/strong&gt;到骨骼。&lt;/p&gt;
+
+&lt;p&gt;这个初始骨骼摆位，就是Bind Poses。但要注意，Bind Poses本身只记录了骨骼各个关节的姿势信息，并不包括&lt;strong&gt;蒙皮信息&lt;/strong&gt;。蒙皮信息是存储于模型数据里的，因为所谓蒙皮，即是让每一个顶点绑定至1-n个关节，这n个关节运动的时候，会影响到该顶点的当前位置。&lt;/p&gt;
+
+&lt;h3&gt;局部关节姿势&lt;/h3&gt;
+
+&lt;p&gt;关节姿势分为&lt;strong&gt;局部&lt;/strong&gt;关节姿势和&lt;strong&gt;全局&lt;/strong&gt;关节姿势。先从局部关节姿势说起。&lt;/p&gt;
+
+&lt;p&gt;局部关节姿势是相对直属父关节而言的，可以用一个strcut表示:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;JointPose&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Quaternion&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// R 关节旋转信息&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Vector3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trans&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// T 关节位移信息&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Vector3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// S 关节缩放信息&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;一个关节只需要存一组RTS信息。这3个信息可分别转换成3个矩阵，并且可以合并成一个矩阵。合并后的矩阵就被称为关节仿射变换矩阵\( P_{j} \)：&lt;/p&gt;
+
+&lt;p&gt;\[ P_{j} =  \left[ \begin{matrix} S_{j}R_{j}&amp;amp;0\\ T_{j}&amp;amp;1\\ \end{matrix} \right] \]&lt;/p&gt;
+
+&lt;p&gt;（注意，JointPose存的不是矩阵，而是RTS，即1个四元数和2个向量。）&lt;/p&gt;
+
+&lt;p&gt;一个骨骼，就是所有关节仿射变换的集合：&lt;/p&gt;
+
+&lt;p&gt;\[ P^{skel} = { P_{j} } | _{j=0}^{N-1} \]&lt;/p&gt;
+
+&lt;p&gt;即：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SkeletonPose&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jointCount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 关节数量&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;JointPose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;localPoses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 多个局部关节姿势&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;把\( P_{j} \)应用到关节j的局部坐标系的某个点或向量\( v_{j} \)，就能把它变换到父关节p的坐标系：&lt;/p&gt;
+
+&lt;p&gt;\[ v_{p} =  v_{j} P_{j} \]&lt;/p&gt;
+
+&lt;p&gt;例如假设有\( v_{j} = (0,0,0) \)，表示是关节j的局部坐标系的原点，\(P_{j} \)是一个Translate(100, 0, 0)，那么\( P_{j} v_{j}  \) 的结果就是(100, 0, 0)，即\( v_{p} \)表示父关节p坐标系下的坐标(100,0,0)。&lt;/p&gt;
+
+&lt;p&gt;可以定义子关节j到父关节的变换为\( (P_{C\to P})j \)。这样的形式不太好看，可以换一种，先定义一个函数p(j)，p(j)返回关节j的父关节索引。那么\( (P_{C\rightarrow P})j \) 可以写成 \( P_{j\to p(j)} \)。&lt;/p&gt;
+
+&lt;h3&gt;全局关节姿势 （Global Joint Poses）&lt;/h3&gt;
+
+&lt;p&gt;局部关节姿势是一种原始信息，实际上在渲染蒙皮动画前，需要做预处理，把局部关节姿势转换成全局关节姿势。&lt;/p&gt;
+
+&lt;p&gt;全局关节姿势变换，指的是把关节姿势，用&lt;strong&gt;模型空间坐标系&lt;/strong&gt;表示。首先定义\( p(0) \equiv M \)，即根关节的父节点为模型空间。&lt;/p&gt;
+
+&lt;p&gt;每个关节j的全局关节姿势变换P，可以用刚才的 \( P_{j\to p(j)} \)来表示：&lt;/p&gt;
+
+&lt;p&gt;\[ P_{2\to M} = P_{2\to 1} P_{1\to 0} P_{0\to M} \]&lt;/p&gt;
+
+&lt;p&gt;\[ P_{j\to M} = \prod _{i=j}^{0} P_{i\to p(i)} \]&lt;/p&gt;
+
+&lt;p&gt;对每个关节都做一遍这个公式，就能得到一个全局关节姿势数组。然后就可以写入SkeletonPose：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SkeletonPose&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jointCount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 关节数量&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;JointPose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;localPoses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 多个局部关节姿势 JointPose&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Matrix44&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;globalPoses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 多个全局关节姿势 全局关节姿势的存储，并不只限定于用RTS，而是既可以用RTS也可以用矩阵。因为实时渲染里矩阵更通用快速，所以得存成矩阵。&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;Bind Poses Matrix (绑定姿势矩阵)&lt;/h3&gt;
+
+&lt;h3&gt;Inversed Bind Poses Matrix (绑定姿势逆矩阵)&lt;/h3&gt;
+</description>
+        <pubDate>Thu, 04 Jan 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/linear-algebra-19/</link>
+        <guid isPermaLink="true">http://localhost:4000/linear-algebra-19/</guid>
+      </item>
+    
+      <item>
         <title>Bounding Volume Hierachy of pbrt 解析(2) HLBVH</title>
         <description>&lt;h2&gt;HLBVH&lt;/h2&gt;
 
@@ -2211,54 +2290,6 @@
         <pubDate>Wed, 20 Sep 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/quaternion4/</link>
         <guid isPermaLink="true">http://localhost:4000/quaternion4/</guid>
-      </item>
-    
-      <item>
-        <title>渲染器开发笔记1-ECS框架实现</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;目前进展：&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;已把项目改造使用ECS框架，顺眼很多&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;做了基本的一系列system设计和实现&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;正在弄Deferred Rendering框架&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;开发计划：&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;据某大牛说，不结合实际的游戏项目而去开发游戏引擎，就是扯淡。所以目前还不打算把这个renderer项目弄成引擎，而是当做一个纯粹的渲染器来做。focus在渲染这块，所以会忽略开发一些次要模块，如脚本引擎、音频播放器、控制器啥的，都不搞。不过渲染这个东西里面，还有很多问题得暂时忽略的，例如是否要嵌入一个物理引擎还是自己做一个简易版（当学习CD算法）、超大世界渲染是否要做、动画系统等。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;基于第一点，目前打算实现的是：Deferred + Forward的框架。实现之后的下一个计划是PBR渲染和SSAO。其他就不管先了。&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;记录一些渲染的心得&lt;/h2&gt;
-
-&lt;h3&gt;单纯的Forward Rendering为什么不好？&lt;/h3&gt;
-
-&lt;p&gt;正向渲染，每一个模型都得跑一遍shader（vs做mvp变换、fs做光照），那么就是说每一个通过depth test的fragment都得做光照，而光照计算一般是一个线性叠加的过程，有几个光源就做几遍lighting pass，所以：&lt;/p&gt;
-
-&lt;p&gt;大致的时间复杂度 = O(模型面片数量 * 光源数量)&lt;/p&gt;
-
-&lt;p&gt;（注意，这里的光源数量非常关键，多一个光源就等于多跑了一遍fs。）&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;正向渲染的不足之处在于有大量的做了光照计算的fragment被覆盖掉了，即光照白做了。&lt;/strong&gt;例如我先draw一个10万面片的角色，然后又在这个角色前面draw了一堵墙，完全把这个角色挡住了，那么这个角色的光照计算就是白做的。&lt;/p&gt;
-
-&lt;h3&gt;Deferred Rendering的正确做法和优点&lt;/h3&gt;
-
-&lt;p&gt;延迟渲染的延迟指的是把光照计算延迟了，以刚刚的例子来说，先渲染一个10万面片的模型，再渲染一堵墙，不会再有光照计算的浪费。延迟渲染的GBuffer，不会有光照计算信息。&lt;strong&gt;光照计算延迟到geometry pass之后再做，和模型面片数量再无关系，而与frame buffer分辨率产生关系&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;大致的时间复杂度 = O(模型面片数量) + O(光源数量 * 分辨率)&lt;/p&gt;
-
-&lt;p&gt;从这条公式可以发现，即使模型再多面片再多，光照计算只会和分辨率有关系，从而理论上可以做到超多光源渲染。&lt;/p&gt;
-
-&lt;p&gt;但Deferred Rendering不是一种用来替代Forward Rendering的技术，而是一钟补充。延迟渲染的特性导致有一些技巧会不好使，例如半透明的混合渲染。正确的做法是先延迟后正向，两步渲染。&lt;/p&gt;
-
-&lt;p&gt;值得一提的是， O(光源数量 * 分辨率)，这一步还得特别优化下才能实现超多光源渲染。优化原理是：&lt;strong&gt;剔除掉和目标fragment无关的光照计算&lt;/strong&gt;。比如可以根据光源强度和距离，把足够远的光源排除掉，那么就可以省下很多计算量。&lt;/p&gt;
-</description>
-        <pubDate>Mon, 18 Sep 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/renderer-progress-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/renderer-progress-1/</guid>
       </item>
     
   </channel>
