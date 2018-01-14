@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Wyman的技术博客</title>
-    <description>博主主要学习方向：图形学、机器学习，以及各种有趣的数学。联系QQ：234707482。</description>
+    <description>写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</description>
     <link>http://localhost:4000</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
