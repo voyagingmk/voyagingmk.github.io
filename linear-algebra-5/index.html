@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><复习向>线性代数之正交矩阵 – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
+    <title>线性代数之正交矩阵与QR分解 – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -37,8 +37,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="<复习向>线性代数之正交矩阵" />
-    <meta property="twitter:title" content="<复习向>线性代数之正交矩阵" />
+    <meta property="og:title" content="线性代数之正交矩阵与QR分解" />
+    <meta property="twitter:title" content="线性代数之正交矩阵与QR分解" />
     
 
     <!--[if lt IE 9]>
@@ -59,7 +59,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/linear-algebra-5/',
-		  'title': '<复习向>线性代数之正交矩阵'
+		  'title': '线性代数之正交矩阵与QR分解'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -102,7 +102,7 @@
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <article class="post">
-  <h1><复习向>线性代数之正交矩阵</h1>
+  <h1>线性代数之正交矩阵与QR分解</h1>
   <h3>Tags: <a href="/tag/matrix/" rel="tag">matrix</a>, <a href="/tag/linear-algebra/" rel="tag">linear algebra</a></h3>
   <div class="entry">
     <h2>基础知识</h2>
@@ -178,15 +178,15 @@
 
 <h2>矩阵的正交化算法</h2>
 
-<p>因为从A可以得到Q，所以必然某个矩阵R，使得 A = QR 成立，这个过程叫做A的QR分解（QR decomposition)。</p>
+<p>因为从A可以得到Q，所以必然有某个矩阵R，使得 A = QR 成立，这个过程叫做A的QR分解（QR decomposition)。</p>
 
 <h3>先举一个二维的例子：</h3>
 
-<p>设 a1 = (3,4)、a2 = (4,3)，显然a1和a2线性无关（不在同一条直线上），且a1和a2的长度都不是1。a1、a2是二维空间的一组基(basis)。</p>
+<p>设 \(\mathbf a1 = (3,4)、\mathbf a2 = (4,3)\)，显然\(\mathbf a1、\mathbf a2\)线性无关（不在同一条直线上），且\(\mathbf a1、\mathbf a2\)的长度都不是1。\(\mathbf a1、\mathbf a2\)是二维空间的一组基(basis)。</p>
 
-<p>a1,a2对应的矩阵为：</p>
+<p>\(\mathbf a1、\mathbf a2\)对应的矩阵为：</p>
 
-<p>\[ A =  \left[ \begin{matrix} a_{1}&amp;a_{2}\\ \end{matrix} \right] =  \left[ \begin{matrix} 3&amp;4\\ 4&amp;3\\ \end{matrix} \right] \]</p>
+<p>\[ A =  \left[ \begin{matrix} \mathbf a_{1}&amp; \mathbf a_{2}\\ \end{matrix} \right] =  \left[ \begin{matrix} 3&amp;4\\ 4&amp;3\\ \end{matrix} \right] \]</p>
 
 <p>显然，A是一个方阵。接下来就是实现A的QR分解。</p>
 
@@ -197,61 +197,61 @@
 <li>标准化(normalize)</li>
 </ol>
 
-<p>二维空间下，让2个向量正交化，即等于是要找出2个互相垂直的向量。怎么找最简单呢？因为这样的向量组无限多，于是a1或a2都可以是某组正交向量的其中一个向量。</p>
+<p>二维空间下，让2个向量正交化，即等于是要找出2个互相垂直的向量。怎么找最简单呢？因为这样的向量组无限多，于是\(\mathbf a1 或 \mathbf a2\)都可以是某组正交向量的其中一个向量。</p>
 
-<p>那么，我们可以让a1作为一个正交向量，然后再找出一个与a1垂直的向量，就得到一组正交向量了。</p>
+<p>那么，我们可以让\(\mathbf a1\)作为一个正交向量，然后再找出一个与\(\mathbf a1\)垂直的向量，就得到一组正交向量了。</p>
 
-<p>设u1、u2为要求的标准正交向量组，n1、n2代表a1、a2的单位向量，那么可以有：</p>
+<p>设\(\mathbf u1、\mathbf u2\)为要求的标准正交向量组，\(\mathbf n1、\mathbf n2\)代表\(\mathbf a1、\mathbf a2\)的单位向量，那么可以有：</p>
 
-<p>\[ u_{1} = n_{1} \]</p>
+<p>\[ \mathbf u_{1} = \mathbf n_{1} \]</p>
 
-<p>u2怎么求？很简单，利用投影矩阵的知识即可完成。因为a2和a1线性无关，那么a2在a1上有且只有一个投影点p2，算出这个投影点p2，就能快速得到a2关于a1的error向量：</p>
+<p>\(\mathbf u2\)怎么求？很简单，利用投影矩阵的知识即可完成。因为\(\mathbf a2 和 \mathbf a1\)线性无关，那么\(\mathbf a2 在 \mathbf a1\)上有且只有一个投影点\(\mathbf p2\)，算出这个投影点\(\mathbf p2\)，就能快速得到\(\mathbf a2\)关于\(\mathbf a1\)的error向量：</p>
 
-<p>\[ e_{2} = a_{2} - p_{2} \]</p>
+<p>\[ \mathbf e_{2} = \mathbf a_{2} - \mathbf p_{2} \]</p>
 
-<p>为什么要算e2向量？因为e2向量的一个重要性质是，e2和a1是互相垂直的，换句话说就是，<strong>e2和a1正交!</strong>。有了e2，将其单位化后，就是u2了。</p>
+<p>为什么要算\(\mathbf e2\)向量？因为\(\mathbf e2\)向量的一个重要性质是，\(\mathbf e2\)和\(\mathbf a1\)是互相垂直的，换句话说就是，<strong>\(\mathbf e2\)和\(\mathbf a1\)正交!</strong>。有了\(\mathbf e2\)，将其单位化后，就是\(\mathbf u2\)了。</p>
 
-<p>求u2的步骤：</p>
-
-<ul>
-<li>先求n1，即a1的单位向量</li>
-</ul>
-
-<p>\[ n_{1} = \dfrac { a_{1} }{ ||a_{1}|| } \] </p>
+<p>求\(\mathbf u2\)的步骤：</p>
 
 <ul>
-<li>求出a2的投影点p2</li>
+<li>先求\(\mathbf n1\)，即\(\mathbf a1\)的单位向量</li>
 </ul>
 
-<p>\[ p_{2} = n_{1}\dfrac { n_{1}^{T}a_{2} }{  n_{1}^{T} n_{1} } = n_{1}(n_{1}^{T}a_{2}) \] </p>
-
-<p>那个分母为什么可以去掉呢？这是因为n1是单位向量，\( n_{1}^{T} n_{1} \)是n1的内积，显然这个内积等于1。</p>
+<p>\[ \mathbf n_{1} = \dfrac { \mathbf a_{1} }{ ||\mathbf a_{1}|| } \] </p>
 
 <ul>
-<li>求e2</li>
+<li>求出\(\mathbf a2\)在\(\mathbf a1\)上的投影点\(\mathbf p2\) <a href="https://en.wikipedia.org/wiki/Vector_projection">vector projection</a></li>
 </ul>
 
-<p>\[ e_{2} = a_{2} - p_{2} = a_{2} - n_{1}(n_{1}^{T}a_{2}) \]</p>
+<p>\[ \mathbf p_{2} = \mathbf n_{1}\dfrac { \mathbf n_{1}\cdot \mathbf a_{2} }{  \mathbf n_{1}\cdot \mathbf n_{1} } = \mathbf n_{1}(\mathbf n_{1}\cdot \mathbf a_{2}) \] </p>
+
+<p>那个分母为什么可以去掉呢？这是因为\(\mathbf n1\)是单位向量，\( \mathbf n_{1}\cdot \mathbf n_{1} \)是\(\mathbf n1\)的内积，显然这个内积等于1。</p>
 
 <ul>
-<li>单位化e2，得到u2</li>
+<li>求\(\mathbf e2\)</li>
 </ul>
 
-<p>\[ u_{2} = \dfrac { e_{2} }{ ||e_{2}|| } \]</p>
+<p>\[ \mathbf e_{2} = \mathbf a_{2} - \mathbf p_{2} = \mathbf a_{2} - \mathbf n_{1}(\mathbf n_{1}\cdot \mathbf a_{2}) \]</p>
+
+<ul>
+<li>单位化\(\mathbf e2\)，得到\(\mathbf u2\)</li>
+</ul>
+
+<p>\[ \mathbf u_{2} = \dfrac { \mathbf e_{2} }{ ||\mathbf e_{2}|| } \]</p>
 
 <p>好了，公式出来了，拿上面的例子验证下：</p>
 
-<p>\[ u_{1} = n_{1} = \dfrac { a_{1} }{ ||a_{1}|| } = (\dfrac {3}{5},\dfrac {4}{5} ) \]</p>
+<p>\[ \mathbf u_{1} = \mathbf n_{1} = \dfrac { \mathbf a_{1} }{ ||\mathbf a_{1}|| } = (\dfrac {3}{5},\dfrac {4}{5} ) \]</p>
 
-<p>\[ e_{2} = a_{2} - p_{2} = a_{2} - n_{1}(n_{1}^{T}a_{2}) = (\dfrac {28}{25},\dfrac {-21}{25}) \]</p>
+<p>\[ \mathbf e_{2} = \mathbf a_{2} - \mathbf p_{2} = \mathbf a_{2} - \mathbf n_{1}(\mathbf n_{1}\cdot \mathbf a_{2}) = (\dfrac {28}{25},\dfrac {-21}{25}) \]</p>
 
-<p>\[ u_{2} = \dfrac { e_{2} }{ ||e_{2}|| } = (\dfrac {4}{5},\dfrac {-3}{5}) \]</p>
+<p>\[ \mathbf u_{2} = \dfrac { \mathbf e_{2} }{ ||\mathbf e_{2}|| } = (\dfrac {4}{5},\dfrac {-3}{5}) \]</p>
 
-<p>\[ u_{1} \cdot u_{2} = (\dfrac {3}{5},\dfrac {4}{5}) \cdot (\dfrac {4}{5},\dfrac {-3}{5}) = 0 \]</p>
+<p>\[ \mathbf u_{1} \cdot \mathbf u_{2} = (\dfrac {3}{5},\dfrac {4}{5}) \cdot (\dfrac {4}{5},\dfrac {-3}{5}) = 0 \]</p>
 
 <p>u1和u2的内积为0，且长度均为1，所以U1和u2是一组标准正交向量。</p>
 
-<p>\[ Q =  \left[ \begin{matrix} u_{1}&amp;u_{2}\\ \end{matrix} \right] \]</p>
+<p>\[ Q =  \left[ \begin{matrix} \mathbf u_{1}&amp; \mathbf u_{2}\\ \end{matrix} \right] \]</p>
 
 <h3>高维时的通用QR解法</h3>
 
@@ -261,7 +261,7 @@
 
 <ul>
 <li>A矩阵由3个线性无关的向量构成，A的列空间是一个三维空间，即三维空间的任意一个点都可以通过线性组合这3个向量得到</li>
-<li>设3个向量为a1、a2、a3，先对a1、a2进行正交化运算，过程和上述的一致，除了\(a_{i}\)变成了3个分量。</li>
+<li>设3个向量为a1、a2、a3，先对a1、a2进行正交化运算，过程和上述的一致，除了\(\mathbf a_{i}\)变成了3个分量。</li>
 <li>正交化a1、a2，就得到了a1、a2对应的平面空间的一组标准正交基u1、u2</li>
 <li>于是原问题变成：求解u1、u2、a3的正交化。u1和u2已经是标准正交向量，不用管它们，问题就是求出u3。</li>
 <li>a3是在u1、u2对应的平面<strong>之外</strong>的一个点，a3在这个平面上有且只有一个投影点p3，将它求出来</li>

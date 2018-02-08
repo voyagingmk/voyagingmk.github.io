@@ -74,10 +74,36 @@
 
     <div id="main" role="main" class="container">
       <h3>Tags: <div id="tag-cloud">
-  <a href="/tag/c%2B%2B/" class="set-4">c++</a> <a href="/tag/calculus/" class="set-1">calculus</a> <a href="/tag/collision-detection/" class="set-1">collision detection</a> <a href="/tag/computer-graphics/" class="set-2">computer graphics</a> <a href="/tag/curve/" class="set-1">curve</a> <a href="/tag/data-structure/" class="set-1">data structure</a> <a href="/tag/fourier/" class="set-1">fourier</a> <a href="/tag/game/" class="set-1">game</a> <a href="/tag/game-engine/" class="set-1">game engine</a> <a href="/tag/gamejam/" class="set-1">gamejam</a> <a href="/tag/jekyll/" class="set-1">jekyll</a> <a href="/tag/leetcode/" class="set-4">leetcode</a> <a href="/tag/linear-algebra/" class="set-5">linear algebra</a> <a href="/tag/math/" class="set-5">math</a> <a href="/tag/matrix/" class="set-5">matrix</a> <a href="/tag/ml/" class="set-1">ml</a> <a href="/tag/nopoll/" class="set-1">nopoll</a> <a href="/tag/opengl/" class="set-1">opengl</a> <a href="/tag/pbrt/" class="set-1">pbrt</a> <a href="/tag/quaternion/" class="set-1">quaternion</a> <a href="/tag/raytrace/" class="set-1">raytrace</a> <a href="/tag/renderer/" class="set-1">renderer</a> <a href="/tag/shader/" class="set-1">shader</a>
+  <a href="/tag/c%2B%2B/" class="set-3">c++</a> <a href="/tag/calculus/" class="set-1">calculus</a> <a href="/tag/collision-detection/" class="set-1">collision detection</a> <a href="/tag/computer-graphics/" class="set-2">computer graphics</a> <a href="/tag/curve/" class="set-1">curve</a> <a href="/tag/data-structure/" class="set-1">data structure</a> <a href="/tag/fourier/" class="set-1">fourier</a> <a href="/tag/game/" class="set-1">game</a> <a href="/tag/game-engine/" class="set-1">game engine</a> <a href="/tag/gamejam/" class="set-1">gamejam</a> <a href="/tag/jekyll/" class="set-1">jekyll</a> <a href="/tag/leetcode/" class="set-3">leetcode</a> <a href="/tag/linear-algebra/" class="set-5">linear algebra</a> <a href="/tag/math/" class="set-5">math</a> <a href="/tag/matrix/" class="set-5">matrix</a> <a href="/tag/ml/" class="set-1">ml</a> <a href="/tag/nopoll/" class="set-1">nopoll</a> <a href="/tag/opengl/" class="set-1">opengl</a> <a href="/tag/pbrt/" class="set-1">pbrt</a> <a href="/tag/quaternion/" class="set-1">quaternion</a> <a href="/tag/raytrace/" class="set-1">raytrace</a> <a href="/tag/renderer/" class="set-1">renderer</a> <a href="/tag/shader/" class="set-1">shader</a>
 </div>
 </h3>
 <div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/linear-algebra-20/">Canvas的transform函数与2D仿射变换矩阵分解</a></h1>
+      <div class="date">
+        Written on February  7, 2018
+      </div>
+      <div class="entry">
+        <p>最近偶然接触了一下canvas的2D仿射变换。和3D一样，canvas有scale、translate、rotate操作，本质上这3个函数也是矩阵乘法。</p>
+
+<p>canvas应该内置了一套矩阵运算系统，并且canvas内含有一个仿射变换矩阵（大概认为是3x3=9个浮点数变量即可，2D是3x3矩阵，3D是4x4矩阵）。每次调用scale、translate、rotate就是对这个矩阵做矩阵乘法。</p>
+
+<p>另外还有3个函数可以控制canvas的仿射变换：</p>
+
+<ul>
+<li>resetTransform 重置为单位矩阵</li>
+<li>transform(a,b,c,d,e,f) 以a,b,c,d,e,f构造一个仿射变换矩阵并乘到当前canvas的仿射变换矩阵</li>
+<li>setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f)</li>
+</ul>
+
+<p>我遇到的需求是，<strong>如果canvas没有提供transform函数，怎么用scale、translate、rotate三个函数的组合，来模拟transform函数？</strong></p>
+
+      </div>
+
+      <a href="/linear-algebra-20/" class="read-more">Read More</a>
+    </article>
   
     <article class="post">
 
@@ -1248,7 +1274,7 @@ vmath::translation 要改为 vmath::translate</p>
   
     <article class="post">
 
-      <h1><a href="/linear-algebra-5/"><复习向>线性代数之正交矩阵</a></h1>
+      <h1><a href="/linear-algebra-5/">线性代数之正交矩阵与QR分解</a></h1>
       <div class="date">
         Written on September 26, 2015
       </div>

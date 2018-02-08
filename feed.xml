@@ -7,6 +7,231 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Canvas的transform函数与2D仿射变换矩阵分解</title>
+        <description>&lt;p&gt;最近偶然接触了一下canvas的2D仿射变换。和3D一样，canvas有scale、translate、rotate操作，本质上这3个函数也是矩阵乘法。&lt;/p&gt;
+
+&lt;p&gt;canvas应该内置了一套矩阵运算系统，并且canvas内含有一个仿射变换矩阵（大概认为是3x3=9个浮点数变量即可，2D是3x3矩阵，3D是4x4矩阵）。每次调用scale、translate、rotate就是对这个矩阵做矩阵乘法。&lt;/p&gt;
+
+&lt;p&gt;另外还有3个函数可以控制canvas的仿射变换：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;resetTransform 重置为单位矩阵&lt;/li&gt;
+&lt;li&gt;transform(a,b,c,d,e,f) 以a,b,c,d,e,f构造一个仿射变换矩阵并乘到当前canvas的仿射变换矩阵&lt;/li&gt;
+&lt;li&gt;setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我遇到的需求是，&lt;strong&gt;如果canvas没有提供transform函数，怎么用scale、translate、rotate三个函数的组合，来模拟transform函数？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2&gt;自定义的transform函数实现&lt;/h2&gt;
+
+&lt;p&gt;先抛出答案：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;180&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;45&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 旋转度数&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// x 轴缩放倍数&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// y 轴缩放倍数&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;180&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 斜切度数 &lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// x轴平移&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ty&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// y轴平移&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;args&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;tx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;transform&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;angle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;atan2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;denom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;skewX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;atan2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;skewY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;angle&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;angle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;180&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;skewX&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;skewX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;scale&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;translate&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;    Outout:&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;    angle 45&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;    skewX 0&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;    scale 0.5 2&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;    translate 200 100&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;    */&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;translate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;translateX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rotate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;angle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;canvas&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;test2&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;canvas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getContext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;2d&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fillRect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;font&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;30px Verdana&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fillText&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;Hello, World&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;90&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;上面代码大意是，用户输入任意degree，sx， sy，t，tx，ty，并计算出它们的a,b,c,d,e,f，然后调用这个自定义transform函数，就能得到和内置的transform一样的变换效果。&lt;/p&gt;
+
+&lt;p&gt;下面将逐步讲解transform函数怎么得来。&lt;/p&gt;
+
+&lt;h2&gt;2D仿射变换矩阵的分解&lt;/h2&gt;
+
+&lt;p&gt;transform的参数a, b, c, d, e, f组成了一个3x3仿射变换矩阵A：&lt;/p&gt;
+
+&lt;p&gt;\( A =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;e\\ b&amp;amp;d&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;设有2维向量\(\mathbf p=(x, y, 1)\)，让它左乘A，就会得到经过A变换后的向量\(\mathbf p&amp;#39;=(x&amp;#39;, y&amp;#39;, 1)\)。&lt;/p&gt;
+
+&lt;p&gt;\( \mathbf p =  \left[ \begin{matrix} x\\ y\\ 1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;\( \mathbf p&amp;#39; = A\mathbf p  =  \left[ \begin{matrix} x&amp;#39;\\ y&amp;#39;\\ 1\\ \end{matrix} \right] =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;e\\ b&amp;amp;d&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} x\\ y\\ 1\\ \end{matrix} \right] =  \left[ \begin{matrix} ax+cy+e\\ bx+dy+f\\ 1\\ \end{matrix} \right] \)&lt;/p&gt;
+
+&lt;p&gt;现在问题是，怎么把A分解成T(translate)、R(rotate)、S(scale)三个矩阵。&lt;/p&gt;
+
+&lt;h3&gt;提取T&lt;/h3&gt;
+
+&lt;p&gt;首先先把translate矩阵提取出来：&lt;/p&gt;
+
+&lt;p&gt;\( T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;e\\ 0&amp;amp;1&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;显然这是正确的，可以试一下：&lt;/p&gt;
+
+&lt;p&gt;\( \mathbf p&amp;#39; = T\mathbf p =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;e\\ 0&amp;amp;1&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} x\\ y\\ 1\\ \end{matrix} \right] =  \left[ \begin{matrix} x+e\\ y+f\\ 1\\ \end{matrix} \right] \)&lt;/p&gt;
+
+&lt;p&gt;x偏移了e，y偏移了f。&lt;/p&gt;
+
+&lt;p&gt;再设等式：A = TQ。Q是未知矩阵，且Q包含了scale、rotate变换。&lt;/p&gt;
+
+&lt;p&gt;Q可以用参数a, b, c, d, e, f表示：&lt;/p&gt;
+
+&lt;p&gt;\( Q =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;0\\ b&amp;amp;d&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;验证下：&lt;/p&gt;
+
+&lt;p&gt;\( TQ =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;e\\ 0&amp;amp;1&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} a&amp;amp;c&amp;amp;0\\ b&amp;amp;d&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \)&lt;/p&gt;
+
+&lt;p&gt;\( =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;e\\ b&amp;amp;d&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] = A \)&lt;/p&gt;
+
+&lt;h3&gt;分解Q&lt;/h3&gt;
+
+&lt;p&gt;设 Q = RS，S是scale，R是rotate。2D的R、S矩阵分别为：&lt;/p&gt;
+
+&lt;p&gt;\( R =  \left[ \begin{matrix} cosθ&amp;amp; -sinθ&amp;amp; 0\\  sinθ&amp;amp; cosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;\( S =  \left[ \begin{matrix} x&amp;amp; 0&amp;amp; 0\\  0&amp;amp; y&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;其实，Q还可能包含了shear斜切变换。一般来说斜切是比较少见到的一种变换，且canvas并没有单独的shear函数。所以本文开头的目标，自定义custom，怎么弄都不能实现shear变换（只有scale、translate、rotate可用）。&lt;/p&gt;
+
+&lt;p&gt;现在要分解Q，可以把shear也一并考虑。shear矩阵形式如下；&lt;/p&gt;
+
+&lt;p&gt;\( Shear =  \left[ \begin{matrix} 1&amp;amp; s&amp;amp; 0\\  t&amp;amp; 1&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;如果没有shear变换，那么s=t=0。&lt;/p&gt;
+
+&lt;p&gt;同时用s和t是不对的，其中一个必需为0。下面推导的前提是s != 0，t = 0。&lt;/p&gt;
+
+&lt;p&gt;综上，得到Q&amp;#39; = Rotate * Scale * Shear&lt;/p&gt;
+
+&lt;p&gt;\( Q&amp;#39; = \left[ \begin{matrix} cosθ&amp;amp; -sinθ&amp;amp; 0\\  sinθ&amp;amp; cosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \left[ \begin{matrix} x&amp;amp; 0&amp;amp; 0\\  0&amp;amp; y&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp; s&amp;amp; 0\\  t&amp;amp; 1&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]   \)&lt;/p&gt;
+
+&lt;p&gt;\( =   \left[ \begin{matrix} xcosθ&amp;amp; -ysinθ&amp;amp; 0\\  xsinθ&amp;amp; ycosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]   \left[ \begin{matrix} 1&amp;amp; s&amp;amp; 0\\  t&amp;amp; 1&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right] \)&lt;/p&gt;
+
+&lt;p&gt;\( =  \left[ \begin{matrix} xcosθ - tysinθ&amp;amp; sxcosθ - ysinθ&amp;amp; 0\\  xsinθ + tycosθ&amp;amp; sxsinθ + ycosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;再回顾上一小节的Q：&lt;/p&gt;
+
+&lt;p&gt;\( Q =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;0\\ b&amp;amp;d&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
+
+&lt;p&gt;对比Q和Q&amp;#39;，可以得到方程组：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;\( a =  x cosθ - t y sinθ = x cosθ  \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( b = x sinθ + t y cosθ = x sinθ  \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( c = s x cosθ - y sinθ = sa - y sinθ = sa - y(b/x) \)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;\( d = s x sinθ + y cosθ = sb + y cosθ = sb + y(a/x) \)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;看起来有点乱，慢慢拆解下吧:&lt;/p&gt;
+
+&lt;p&gt;一二等式相除解出θ：&lt;/p&gt;
+
+&lt;p&gt;\( tanθ = \frac { b } { a } \)&lt;/p&gt;
+
+&lt;p&gt;\( θ = atan2(b, a) \)&lt;/p&gt;
+
+&lt;p&gt;一二等式分别平方后相加，解出x：&lt;/p&gt;
+
+&lt;p&gt;\( a^{2} + b^{2} = x^{2} \)&lt;/p&gt;
+
+&lt;p&gt;\( x = \sqrt { a^{2} + b^{2} } \)&lt;/p&gt;
+
+&lt;p&gt;三四等式消去s：&lt;/p&gt;
+
+&lt;p&gt;\( c = sa - y(b/x) \)&lt;/p&gt;
+
+&lt;p&gt;\( s = (c + y(b/x))/a \)&lt;/p&gt;
+
+&lt;p&gt;\( d = sb + y(a/x) =  b(c + y(b/x))/a + y(a/x)  \)&lt;/p&gt;
+
+&lt;p&gt;对上式两边乘a：&lt;/p&gt;
+
+&lt;p&gt;\( ad =  b(c + y(b/x)) + ay(a/x)  \)&lt;/p&gt;
+
+&lt;p&gt;\( ad =  bc + by(b/x) + ay(a/x)  \)&lt;/p&gt;
+
+&lt;p&gt;\( ad -  bc = by(b/x) + ay(a/x)  \)&lt;/p&gt;
+
+&lt;p&gt;\( ad -  bc = y(b^{2}/x + a^{2}/x)  \)&lt;/p&gt;
+
+&lt;p&gt;\( ad -  bc = y(a^{2} + b^{2})/ \sqrt { a^{2} + b^{2} }    \)&lt;/p&gt;
+
+&lt;p&gt;\( ad -  bc = y \sqrt { a^{2} + b^{2} }    \)&lt;/p&gt;
+
+&lt;p&gt;\( y = \frac { ad -  bc } {  \sqrt { a^{2} + b^{2} }  } \)&lt;/p&gt;
+
+&lt;p&gt;然后可以求s了：&lt;/p&gt;
+
+&lt;p&gt;\( s = (c + y(b/x))/a \)&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { c } { a } + \frac { yb } { xa } \)&lt;/p&gt;
+
+&lt;p&gt;y/x上面已经有了，代入：&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { c } { a } + \frac { (ad -  bc)b } { (a^{2} + b^{2})a } \)&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { c(a^{2} + b^{2}) + (ad -  bc)b } { (a^{2} + b^{2})a } \)&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { ca^{2} + cb^{2} + adb -  cb^{2} } { (a^{2} + b^{2})a } \)&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { ca^{2} + adb } { (a^{2} + b^{2})a } \)&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { a(ca + bd) } { (a^{2} + b^{2})a } \)&lt;/p&gt;
+
+&lt;p&gt;\( s = \frac { ca + bd } { a^{2} + b^{2} } \)&lt;/p&gt;
+
+&lt;h2&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/5107134/find-the-rotation-and-skew-of-a-matrix-transformation/32125700#32125700&quot;&gt;stackoverflow - Find the Rotation and Skew of a Matrix transformation
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/matthewmueller/unmatrix/blob/master/index.js&quot;&gt;unmatrix - parse(str) &lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://hg.mozilla.org/mozilla-central/file/7cb3e9795d04/layout/style/nsStyleAnimation.cpp&quot;&gt;DecomposeMatrix 此代码最原始出处（有注释）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;《GRAPHICS GEMS II edited by JAMES ARVO》&lt;/p&gt;
+</description>
+        <pubDate>Wed, 07 Feb 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/linear-algebra-20/</link>
+        <guid isPermaLink="true">http://localhost:4000/linear-algebra-20/</guid>
+      </item>
+    
+      <item>
         <title>骨骼动画与蒙皮矩阵</title>
         <description>&lt;p&gt;《Game Engine Architecture》这本书里最让我欣喜的就是动画相关的章节了，非常详细，比中文搜索引擎能搜到的资料都要系统、全面。据说作者以前就是做动画的。其他章节相对的只是抛砖引玉，例如阴影，只写了几页。&lt;/p&gt;
 
@@ -2249,82 +2474,6 @@
         <pubDate>Thu, 21 Sep 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/renderer-progress-2/</link>
         <guid isPermaLink="true">http://localhost:4000/renderer-progress-2/</guid>
-      </item>
-    
-      <item>
-        <title>再谈四元数的应用：朝向四元数、朝向四元数插值、旋转四元数？</title>
-        <description>&lt;p&gt;最近在做的东西涉及到四元数的知识，做的过程中发现四元数有一些很容易让人迷惑的点，现写这篇文章备忘。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;四元数作为对象的朝向(Orientation)以及需要做朝向之间的插值时&lt;/h2&gt;
-
-&lt;p&gt;一个3D的对象一般有这些基本几何属性：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;空间位置。用一个vector3d即可表示&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;缩放系数。同样也可以用一个vector3d表示，每个分量代表物体在每一个正交基的缩放系数&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;朝向。&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;朝向，这是个看名字很容易知道含义的属性，但是用数学语言描述的话却有很多种方式，不像&amp;quot;位置&amp;quot;、&amp;quot;缩放&amp;quot;那么容易就可以确定用一个vector3d来实现。&lt;/p&gt;
-
-&lt;p&gt;基于笛卡尔3D坐标系，普遍在用的朝向表示方法有这么几种：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;欧拉角&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://www.qiujiawei.com/linear-algebra-14/&quot;&gt;旋转矩阵&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;四元数&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;这3个随便一个都是蛮复杂的东西（不是学3D的应该都不知道这3个吧）。首先比较下3种方法的数据存储效率：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;欧拉角，需要3个分量（ 前进方向(heading)、海拔(elevation)、 倾斜(bank) 或 偏航(yaw),
-俯仰(pitch)、 翻滚（roll））。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;旋转矩阵。4 x 4 = 16个分量（不考虑压缩）&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;四元数。4个分量。&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;显然从数据存储上看，欧拉角最有优势，但问题是，欧拉角（or旋转矩阵）是有万向节锁问题的。实际上，只要是用三个旋转角来表示朝向的变化就会出现万向节锁问题，即使存储朝向时用了四元数。这是因为欧拉角和四元数可以等价转换，朝向变换计算时用欧拉角，只是存储的时候转换成四元数，这样四元数并没有什么卵用。&lt;/p&gt;
-
-&lt;p&gt;考虑这一点，&lt;strong&gt;四元数直接表示朝向以及朝向之间的插值&lt;/strong&gt;的优势就凸现出来了，比欧拉角多一个分量，但能处理好万向节锁问题。为什么会这样呢？这其中的神奇之处就在于四元数的4个分量的含义和欧拉角的三个分量的含义差别很大，我举例说明下：&lt;/p&gt;
-
-&lt;p&gt;欧拉角(pitch yaw roll)  &amp;lt;—&amp;gt; 四元数(第一个值是虚部，后面三个是实部)&lt;/p&gt;
-
-&lt;p&gt;0.0,  0.0,  0.0  &amp;lt;—&amp;gt; 1.000000, 0.000000, 0.000000, 0.000000&lt;/p&gt;
-
-&lt;p&gt;90.0, 0.0,  0.0  &amp;lt;—&amp;gt; 0.707107, 0.707107, 0.000000, 0.000000&lt;/p&gt;
-
-&lt;p&gt;0.0, 90.0,  0.0  &amp;lt;—&amp;gt; 0.707107, 0.000000, 0.707107, 0.000000&lt;/p&gt;
-
-&lt;p&gt;0.0,  0.0, 90.0  &amp;lt;—&amp;gt; 0.707107, 0.000000, 0.000000, 0.707107&lt;/p&gt;
-
-&lt;p&gt;可以看到，用四元数表示的朝向，只看数值是无法直观知道这个四元数是代表什么朝向的。所以&lt;strong&gt;不能以轴-旋转角度的概念去看待朝向四元数，完全不是同一回事&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h3&gt;总结一下：&lt;/h3&gt;
-
-&lt;p&gt;明确你的程序里的欧拉角和四元数的对应关系后，做一个欧拉角到四元数的转换接口。初始化对象朝向时，先以欧拉角的思考角度确定欧拉角的三个值，然后用这个接口把欧拉角转成四元数，就可以用四元数来做朝向数据的存储（多消耗一个float）。&lt;/p&gt;
-
-&lt;p&gt;使用四元数朝向数据时，不能转换回欧拉角来使用（如果你这样就等同于只在存储时应用四元数），而是应该继续以四元数的思考角度来做各种操作，如做朝向的插值。（&lt;a href=&quot;http://www.qiujiawei.com/understanding-quaternions/#7&quot;&gt;四元数SLERP&lt;/a&gt;）。&lt;/p&gt;
-
-&lt;h2&gt;四元数作为旋转变换参数时&lt;/h2&gt;
-
-&lt;p&gt;这种情景下，朝向是否用四元数存储不再重要。只是在做&lt;strong&gt;旋转&lt;/strong&gt;这个事情时，使用了四元数。这个四元数也被称为旋转四元数。旋转四元数的构造需要2个东西：&lt;strong&gt;笛卡尔坐标系下的旋转轴\( \hat { \mathbf v } \)（Vector3d）和绕着这个旋转轴的旋转角度\( \theta \)(Radian)&lt;/strong&gt;：&lt;/p&gt;
-
-&lt;p&gt;\[ q = [cos\frac {1}{2}\theta ,sin\frac {1}{2}\theta \mathbf { \hat { \mathbf v } }] \]&lt;/p&gt;
-
-&lt;p&gt;构造了旋转四元数后，剩下的就是怎么使用的问题。假设现在要对一个3D坐标点\( \vec p \)做\( \mathbf q \)旋转，那么变换公式如下：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf p&amp;#39; = \mathbf q \mathbf p \mathbf q^{-1} \]&lt;/p&gt;
-
-&lt;p&gt;其中的\( \mathbf p \)四元数的虚部为0，实部为\( \vec p \)向量。&lt;/p&gt;
-
-&lt;p&gt;(详细的公式细节可以查阅&lt;a href=&quot;http://www.qiujiawei.com/understanding-quaternions&quot;&gt;Understanding Quaternions 中文翻译《理解四元数》&lt;/a&gt;)&lt;/p&gt;
-</description>
-        <pubDate>Wed, 20 Sep 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/quaternion4/</link>
-        <guid isPermaLink="true">http://localhost:4000/quaternion4/</guid>
       </item>
     
   </channel>
