@@ -215,6 +215,20 @@
 
 &lt;p&gt;\( s = \frac { ca + bd } { a^{2} + b^{2} } \)&lt;/p&gt;
 
+&lt;p&gt;逆向思维一下，现在已经求出未知数x,y,sx,sy,s,θ，它们都可以用a,b,c,d,e,f来表示。&lt;/p&gt;
+
+&lt;p&gt;那么反过来，用户自己提供了x,y,sx,sy,s,θ，那么就可以求出a,b,c,d,e,f，从而调用这个自定义函数。&lt;/p&gt;
+
+&lt;p&gt;回去上面再比对下代码和公式就清楚了。&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;用这个自定义函数就能几乎满足需求了。只不过这个自定义函数是不能实现斜切效果的，&lt;/p&gt;
+
+&lt;p&gt;对于符合标准的web js，一般是用transform函数来做斜切，TRS就分别用translate、rotate、scale函数来做。&lt;/p&gt;
+
+&lt;p&gt;如果canvas再提供一个单独的skew函数就完美了。&lt;/p&gt;
+
 &lt;h2&gt;参考资料&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/5107134/find-the-rotation-and-skew-of-a-matrix-transformation/32125700#32125700&quot;&gt;stackoverflow - Find the Rotation and Skew of a Matrix transformation
