@@ -571,6 +571,38 @@ GJK各种实现
     <span class="n">simplex</span><span class="p">.</span><span class="n">WriteCache</span><span class="p">(</span><span class="n">cache</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>下面继续介绍这段代码里出现的GetSearchDirection、Solve2、Solve3函数。</p>
+
+<h2>simplex.GetSearchDirection</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">b2Vec2</span> <span class="nf">GetSearchDirection</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="n">m_count</span><span class="p">)</span>
+  <span class="p">{</span>
+  <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+
+  <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+    <span class="p">{</span>
+      <span class="n">b2Vec2</span> <span class="n">e12</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">.</span><span class="n">w</span> <span class="o">-</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+      <span class="n">float32</span> <span class="n">sgn</span> <span class="o">=</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="o">-</span><span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">sgn</span> <span class="o">&gt;</span> <span class="mf">0.0f</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="c1">// Origin is left of e12.</span>
+        <span class="k">return</span> <span class="n">b2Cross</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span>
+      <span class="p">{</span>
+        <span class="c1">// Origin is right of e12.</span>
+        <span class="k">return</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+  <span class="k">default</span><span class="o">:</span>
+    <span class="n">b2Assert</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">b2Vec2_zero</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 <h2>simplex.Solve2</h2>
 
 <p>Solve2主要目的：找出原点在当前这个1-simplex的哪个区域。</p>
