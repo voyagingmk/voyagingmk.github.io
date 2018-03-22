@@ -81,6 +81,70 @@
   
     <article class="post">
 
+      <h1><a href="/collision-detection-2/">碰撞检测算法(二)：原始GJK详解</a></h1>
+      <div class="date">
+        Written on March 20, 2018
+      </div>
+      <div class="entry">
+        <p>GJK的主要特性：</p>
+
+<ul>
+<li>只适用于凸包几何体</li>
+<li>GJK算法与维度无关，2D、3D都可以用</li>
+<li>不要求对顶点数组做排序</li>
+<li>存在一些技巧可以大大优化GJK的性能</li>
+</ul>
+
+<p>原始GJK包含的知识点：</p>
+
+<ul>
+<li>闵可夫斯基和 Minkowski sum</li>
+<li>向量混合积 vector triple product</li>
+<li>k阶单纯形 k-Simplex</li>
+<li>supporting point和Support函数</li>
+</ul>
+
+<p>增强GJK的知识点:
+- witness point
+- <a href="http://www.dyn4j.org/2010/05/epa-expanding-polytope-algorithm/">EPA</a>算法</p>
+
+<p>原始GJK告诉调用者2个几何体有没发生碰撞，而增强GJK不仅告知有没碰撞，还返回了碰撞点、碰撞距离信息。</p>
+
+<p>本文将详解原始GJK的来龙去脉。</p>
+
+<h3>目录：</h3>
+
+<ul>
+<li><a href="#1">数学知识点</a>
+
+<ul>
+<li><a href="#1.1">闵可夫斯基数学 Minkowski Math</a></li>
+<li><a href="#1.2">单纯形 Simplex</a></li>
+<li><a href="#1.3">向量混合积 Vector Triple Product</a></li>
+</ul></li>
+<li><a href="#2">GJK算法原理</a>
+
+<ul>
+<li><a href="#2.1">GJK伪代码</a></li>
+<li><a href="#2.2">Support函数</a></li>
+<li><a href="#2.3">NearestSimplex函数</a></li>
+</ul></li>
+<li><a href="#3">GJK算法实现</a> </li>
+<li><a href="#4">其他细节</a> </li>
+<li><a href="#5">参考资料</a> 
+
+<ul>
+<li><a href="#5.1">GJK各种实现</a></li>
+</ul></li>
+</ul>
+
+      </div>
+
+      <a href="/collision-detection-2/" class="read-more">Read More</a>
+    </article>
+  
+    <article class="post">
+
       <h1><a href="/linear-algebra-20/">Canvas的transform函数与2D仿射变换矩阵分解</a></h1>
       <div class="date">
         Written on February  7, 2018
@@ -807,7 +871,7 @@ vmath::translation 要改为 vmath::translate</p>
 
 <p>B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什么这样说呢？是因为贝塞尔曲线某些情况下不实用：曲线上每个点受所有控制点影响，这会给调整曲线工作带来麻烦。可以想到的第一个优化是，把整个贝塞尔曲线变成多段贝塞尔子曲线的拼接。然而，这个方案也不好用，因为拼接工作很难做好，因为要拼接曲线显得“光滑”前提是保证相邻曲线之间的连续性。</p>
 
-<p>于是，老外发明了一个算法:<a href="https://en.wikipedia.org/wiki/De_Boor%27s_algorithm">De Boor&#39;s algorithm</a>，基于这个算法的曲线也被称为贝塞尔曲线的变种：B-Spline(B样条)曲线。为什么叫Spline曲线呢？我猜是因为Spline曲线在4个控制点的情况下，有个典型的形状：</p>
+<p>于是，老外发明了一个算法:<a href="https://en.wikipedia.org/wiki/De_Boor%27s_algorithm">De Boor&#39;s algorithm</a>，基于这个算法的曲线也被称为贝塞尔曲线的变种：B-Spline(B样条)曲线。</p>
 
       </div>
 
