@@ -9,18 +9,18 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
-    <meta name="description" content="GJK的主要特性：
+    <meta name="description" content="GJK，全称Gilbert–Johnson–Keerthi distance algorithm，是非常常用的碰撞检测算法。
+
+原始GJK的功能：准确地告诉调用者2个几何体是否碰撞。
+
+GJK的主要特性：
 
 
-只适用于凸包几何体
+只适用于凸体
 GJK算法与维度无关，2D、3D都可以用
 不要求对顶点数组做排序
 存在一些技巧可以大大优化GJK的性能
 
-
-原始GJK的功能：
-
-准确地告诉调用者2个几何体是否碰撞。
 
 本文将详解原始GJK的来龙去脉。
 
@@ -58,18 +58,18 @@ GJK各种实现
 
 
 " />
-    <meta property="og:description" content="GJK的主要特性：
+    <meta property="og:description" content="GJK，全称Gilbert–Johnson–Keerthi distance algorithm，是非常常用的碰撞检测算法。
+
+原始GJK的功能：准确地告诉调用者2个几何体是否碰撞。
+
+GJK的主要特性：
 
 
-只适用于凸包几何体
+只适用于凸体
 GJK算法与维度无关，2D、3D都可以用
 不要求对顶点数组做排序
 存在一些技巧可以大大优化GJK的性能
 
-
-原始GJK的功能：
-
-准确地告诉调用者2个几何体是否碰撞。
 
 本文将详解原始GJK的来龙去脉。
 
@@ -179,18 +179,18 @@ GJK各种实现
     <h1>碰撞检测算法(二)：原始GJK详解</h1>
     <h3>Tags: <a href="/tag/collision-detection/" rel="tag">collision detection</a></h3>
     <div class="entry">
-        <p>GJK的主要特性：</p>
+        <p>GJK，全称<a href="https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm">Gilbert–Johnson–Keerthi distance algorithm</a>，是非常常用的碰撞检测算法。</p>
+
+<p>原始GJK的功能：准确地告诉调用者2个几何体<strong>是否</strong>碰撞。</p>
+
+<p>GJK的主要特性：</p>
 
 <ul>
-<li>只适用于凸包几何体</li>
+<li>只适用于凸体</li>
 <li>GJK算法与维度无关，2D、3D都可以用</li>
 <li>不要求对顶点数组做排序</li>
 <li>存在一些技巧可以大大优化GJK的性能</li>
 </ul>
-
-<p>原始GJK的功能：</p>
-
-<p>准确地告诉调用者2个几何体<strong>是否</strong>碰撞。</p>
 
 <p>本文将详解原始GJK的来龙去脉。</p>
 
@@ -322,6 +322,12 @@ GJK各种实现
 <p>我想读者做的都是2D或3D的项目，2D项目最多用到2-Simplex，3D项目最多用到3-Simplex。k&gt;3的Simplex，忽略吧。</p>
 
 <h1><div id="2">GJK算法原理</div></h1>
+
+<p>GJK算法，本质就是利用Minkowski差来判断2个几何体有没碰撞。</p>
+
+<p>因为如果碰撞了，那么2个几何体至少包含了同一个点，也就意味着它们的Minkowski差必然包含原点。</p>
+
+<p>明白这一点后，GJK其实就已经学到大半了。</p>
 
 <h2><div id="2.1">划重点：来自wiki的GJK伪代码</div></h2>
 

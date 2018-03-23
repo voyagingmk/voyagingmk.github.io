@@ -8,18 +8,18 @@
     
       <item>
         <title>碰撞检测算法(二)：原始GJK详解</title>
-        <description>&lt;p&gt;GJK的主要特性：&lt;/p&gt;
+        <description>&lt;p&gt;GJK，全称&lt;a href=&quot;https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm&quot;&gt;Gilbert–Johnson–Keerthi distance algorithm&lt;/a&gt;，是非常常用的碰撞检测算法。&lt;/p&gt;
+
+&lt;p&gt;原始GJK的功能：准确地告诉调用者2个几何体&lt;strong&gt;是否&lt;/strong&gt;碰撞。&lt;/p&gt;
+
+&lt;p&gt;GJK的主要特性：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;只适用于凸包几何体&lt;/li&gt;
+&lt;li&gt;只适用于凸体&lt;/li&gt;
 &lt;li&gt;GJK算法与维度无关，2D、3D都可以用&lt;/li&gt;
 &lt;li&gt;不要求对顶点数组做排序&lt;/li&gt;
 &lt;li&gt;存在一些技巧可以大大优化GJK的性能&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;原始GJK的功能：&lt;/p&gt;
-
-&lt;p&gt;准确地告诉调用者2个几何体&lt;strong&gt;是否&lt;/strong&gt;碰撞。&lt;/p&gt;
 
 &lt;p&gt;本文将详解原始GJK的来龙去脉。&lt;/p&gt;
 
@@ -151,6 +151,12 @@
 &lt;p&gt;我想读者做的都是2D或3D的项目，2D项目最多用到2-Simplex，3D项目最多用到3-Simplex。k&amp;gt;3的Simplex，忽略吧。&lt;/p&gt;
 
 &lt;h1&gt;&lt;div id=&quot;2&quot;&gt;GJK算法原理&lt;/div&gt;&lt;/h1&gt;
+
+&lt;p&gt;GJK算法，本质就是利用Minkowski差来判断2个几何体有没碰撞。&lt;/p&gt;
+
+&lt;p&gt;因为如果碰撞了，那么2个几何体至少包含了同一个点，也就意味着它们的Minkowski差必然包含原点。&lt;/p&gt;
+
+&lt;p&gt;明白这一点后，GJK其实就已经学到大半了。&lt;/p&gt;
 
 &lt;h2&gt;&lt;div id=&quot;2.1&quot;&gt;划重点：来自wiki的GJK伪代码&lt;/div&gt;&lt;/h2&gt;
 
