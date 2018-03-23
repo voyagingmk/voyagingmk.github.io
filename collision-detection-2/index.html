@@ -41,7 +41,7 @@ GJK伪代码
 Support函数
 NearestSimplex函数
 
-GJK算法实现 
+二维平面的GJK算法实现 
 
 
 b2Distance核心逻辑
@@ -90,7 +90,7 @@ GJK伪代码
 Support函数
 NearestSimplex函数
 
-GJK算法实现 
+二维平面的GJK算法实现 
 
 
 b2Distance核心逻辑
@@ -211,7 +211,7 @@ GJK各种实现
 <li><a href="#2.2">Support函数</a></li>
 <li><a href="#2.3">NearestSimplex函数</a></li>
 </ul></li>
-<li><a href="#3">GJK算法实现</a> 
+<li><a href="#3">二维平面的GJK算法实现</a> 
 
 <ul>
 <li><a href="#3.1">b2Distance核心逻辑</a></li>
@@ -447,7 +447,7 @@ GJK各种实现
 
 <p>法向量方向有2个，需要选择朝向origin的那一侧的法向。</p>
 
-<h1><div id="3">GJK算法实现</div></h1>
+<h1><div id="3">二维平面的GJK算法实现</div></h1>
 
 <p>为了学到真正靠谱的GJK算法，所以下面使用Box2D的b2Distance函数，作为学习对象。（找到的其他GJK代码都觉得奇奇怪怪的）</p>
 
@@ -737,6 +737,34 @@ GJK各种实现
 <p>\[ a_1 = \frac { d12\_1 } { d12\_2  + d12\_1 } \]</p>
 
 <p>\[ a_2 = \frac { d12\_2 } { d12\_2 + d12\_1 } \]</p>
+
+<p>因为\( a_1 、a_2 \)之和等于1，所以\( a_1 、a_2 \)不可能同时小于0，可列出所有情况：</p>
+
+<p>\(a_1 、a_2  \)都大于0时，p点在线段w1w2里面；</p>
+
+<p>\(a_1 \) 小于0时，p在w2区域里面；</p>
+
+<p>\(a_2 \) 小于0时，p在w1区域里面。</p>
+
+<p>（后面2个，不好解释，最好自己画图理解下）</p>
+
+<p>这里可能会有个担忧：如果d12_1、d12_2都小于0的话，分母会小于0，结果会如何？</p>
+
+<p>实际上是不可能的，可以反证下：</p>
+
+<p>\[ d12\_2 + d12\_1 &lt; 0 \]</p>
+
+<p>\[ -\mathbf w_{1} \cdot \mathbf e_{12} +  \mathbf w_{2} \cdot \mathbf e_{12}  &lt; 0 \]</p>
+
+<p>\[ ( \mathbf w_{2} - \mathbf w_{1} ) \cdot \mathbf e_{12}  &lt; 0 \]</p>
+
+<p>\[ \mathbf e_{12} \cdot \mathbf e_{12}  &lt; 0 \]</p>
+
+<p>\[ | \mathbf e_{12} |^{2} &lt; 0 \]</p>
+
+<p>显然不成立。</p>
+
+<p>下面展示的Box2D的Solve2，就用到了说到的这些数学知识。其中，Solve2用d12_2、d12_1的正负来等价表示\( a_1 、a_2 \)的正负。</p>
 <div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve2</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="n">b2Vec2</span> <span class="n">w1</span> <span class="o">=</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
@@ -747,9 +775,10 @@ GJK各种实现
     <span class="n">float32</span> <span class="n">d12_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">b2Dot</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">d12_2</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
     <span class="p">{</span>
-    <span class="c1">// p在w1区域，那么保留w1，干掉w2，单纯形退化成0-simplex</span>
-        <span class="c1">// a2 &lt;= 0, so we clamp it to 0</span>
-    <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="c1">// 根据上面的公式，可知此时a2也是&lt;=0</span>
+        <span class="c1">// 所以p在w1区域</span>
+        <span class="c1">// 保留w1，干掉w2，单纯形退化成0-simplex</span>
+        <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
@@ -758,15 +787,14 @@ GJK各种实现
     <span class="n">float32</span> <span class="n">d12_1</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w2</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
     <span class="p">{</span>
-    <span class="c1">// p在w2区域，那么保留w2，干掉w1，单纯形退化成0-simplex</span>
-        <span class="c1">// a1 &lt;= 0, so we clamp it to 0</span>
-    <span class="c1">// p在w2区域</span>
+        <span class="c1">// p在w2区域，那么保留w2，干掉w1，单纯形退化成0-simplex</span>
+        <span class="c1">// p在w2区域</span>
         <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="n">m_v1</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">;</span> <span class="c1">// 保留下来的顶点需要放到数组第一个位置</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
-  <span class="c1">// p必然在w1w2中间了，求出a1、a2，并分别保存进m_v1 m_v2里</span>
+    <span class="c1">// p必然在w1w2中间了，求出a1、a2，并分别保存进m_v1 m_v2里</span>
     <span class="n">float32</span> <span class="n">inv_d12</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">+</span> <span class="n">d12_2</span><span class="p">);</span>
     <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d12_1</span> <span class="o">*</span> <span class="n">inv_d12</span><span class="p">;</span>
     <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d12_2</span> <span class="o">*</span> <span class="n">inv_d12</span><span class="p">;</span>
@@ -774,12 +802,17 @@ GJK各种实现
 <span class="p">}</span>
 </code></pre></div>
 <h2><div id="3.4">b2Simplex::Solve3</div></h2>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="c1">// Possible regions:</span>
-<span class="c1">// - points[2]</span>
-<span class="c1">// - edge points[0]-points[2]</span>
-<span class="c1">// - edge points[1]-points[2]</span>
-<span class="c1">// - inside the triangle</span>
-<span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve3</span><span class="p">()</span>
+
+<p>Solve3大同小异，也是各种找原点在simplex的哪个区域，用一个图来表示：</p>
+
+<p><img src="../images/2018.3/11.png" alt="11.png"></p>
+
+<p>如果原点落在w1、w2、w3区域，会导致simplex退化成0-simplex；</p>
+
+<p>如果原点落在e12、e13、e23区域，会导致simplex退化成1-simplex；</p>
+
+<p>否则，原点必然落在三角形内部，simplex仍然是2-simplex。</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve3</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="n">b2Vec2</span> <span class="n">w1</span> <span class="o">=</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
     <span class="n">b2Vec2</span> <span class="n">w2</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
@@ -994,6 +1027,12 @@ Minkowski difference</a></p>
 </ul>
 
 <p><a href="https://github.com/bulletphysics/bullet3">https://github.com/bulletphysics/bullet3</a></p>
+
+<ul>
+<li>reactphysics3d，非产品级的轻量物理引擎，适合学习用：</li>
+</ul>
+
+<p><a href="https://github.com/DanielChappuis/reactphysics3d">https://github.com/DanielChappuis/reactphysics3d</a></p>
 
     </div>
     <div class="entry">

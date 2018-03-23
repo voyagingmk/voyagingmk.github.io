@@ -40,7 +40,7 @@
 &lt;li&gt;&lt;a href=&quot;#2.2&quot;&gt;Support函数&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#2.3&quot;&gt;NearestSimplex函数&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3&quot;&gt;GJK算法实现&lt;/a&gt; 
+&lt;li&gt;&lt;a href=&quot;#3&quot;&gt;二维平面的GJK算法实现&lt;/a&gt; 
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;#3.1&quot;&gt;b2Distance核心逻辑&lt;/a&gt;&lt;/li&gt;
@@ -276,7 +276,7 @@
 
 &lt;p&gt;法向量方向有2个，需要选择朝向origin的那一侧的法向。&lt;/p&gt;
 
-&lt;h1&gt;&lt;div id=&quot;3&quot;&gt;GJK算法实现&lt;/div&gt;&lt;/h1&gt;
+&lt;h1&gt;&lt;div id=&quot;3&quot;&gt;二维平面的GJK算法实现&lt;/div&gt;&lt;/h1&gt;
 
 &lt;p&gt;为了学到真正靠谱的GJK算法，所以下面使用Box2D的b2Distance函数，作为学习对象。（找到的其他GJK代码都觉得奇奇怪怪的）&lt;/p&gt;
 
@@ -566,6 +566,34 @@
 &lt;p&gt;\[ a_1 = \frac { d12\_1 } { d12\_2  + d12\_1 } \]&lt;/p&gt;
 
 &lt;p&gt;\[ a_2 = \frac { d12\_2 } { d12\_2 + d12\_1 } \]&lt;/p&gt;
+
+&lt;p&gt;因为\( a_1 、a_2 \)之和等于1，所以\( a_1 、a_2 \)不可能同时小于0，可列出所有情况：&lt;/p&gt;
+
+&lt;p&gt;\(a_1 、a_2  \)都大于0时，p点在线段w1w2里面；&lt;/p&gt;
+
+&lt;p&gt;\(a_1 \) 小于0时，p在w2区域里面；&lt;/p&gt;
+
+&lt;p&gt;\(a_2 \) 小于0时，p在w1区域里面。&lt;/p&gt;
+
+&lt;p&gt;（后面2个，不好解释，最好自己画图理解下）&lt;/p&gt;
+
+&lt;p&gt;这里可能会有个担忧：如果d12_1、d12_2都小于0的话，分母会小于0，结果会如何？&lt;/p&gt;
+
+&lt;p&gt;实际上是不可能的，可以反证下：&lt;/p&gt;
+
+&lt;p&gt;\[ d12\_2 + d12\_1 &amp;lt; 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ -\mathbf w_{1} \cdot \mathbf e_{12} +  \mathbf w_{2} \cdot \mathbf e_{12}  &amp;lt; 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ ( \mathbf w_{2} - \mathbf w_{1} ) \cdot \mathbf e_{12}  &amp;lt; 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf e_{12} \cdot \mathbf e_{12}  &amp;lt; 0 \]&lt;/p&gt;
+
+&lt;p&gt;\[ | \mathbf e_{12} |^{2} &amp;lt; 0 \]&lt;/p&gt;
+
+&lt;p&gt;显然不成立。&lt;/p&gt;
+
+&lt;p&gt;下面展示的Box2D的Solve2，就用到了说到的这些数学知识。其中，Solve2用d12_2、d12_1的正负来等价表示\( a_1 、a_2 \)的正负。&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Simplex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -576,9 +604,10 @@
     &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// p在w1区域，那么保留w1，干掉w2，单纯形退化成0-simplex&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// a2 &amp;lt;= 0, so we clamp it to 0&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// 根据上面的公式，可知此时a2也是&amp;lt;=0&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// 所以p在w1区域&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// 保留w1，干掉w2，单纯形退化成0-simplex&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
@@ -587,15 +616,14 @@
     &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// p在w2区域，那么保留w2，干掉w1，单纯形退化成0-simplex&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// a1 &amp;lt;= 0, so we clamp it to 0&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// p在w2区域&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// p在w2区域，那么保留w2，干掉w1，单纯形退化成0-simplex&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// p在w2区域&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 保留下来的顶点需要放到数组第一个位置&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// p必然在w1w2中间了，求出a1、a2，并分别保存进m_v1 m_v2里&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// p必然在w1w2中间了，求出a1、a2，并分别保存进m_v1 m_v2里&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -603,12 +631,17 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2&gt;&lt;div id=&quot;3.4&quot;&gt;b2Simplex::Solve3&lt;/div&gt;&lt;/h2&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// Possible regions:&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// - points[2]&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// - edge points[0]-points[2]&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// - edge points[1]-points[2]&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// - inside the triangle&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Simplex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;p&gt;Solve3大同小异，也是各种找原点在simplex的哪个区域，用一个图来表示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.3/11.png&quot; alt=&quot;11.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;如果原点落在w1、w2、w3区域，会导致simplex退化成0-simplex；&lt;/p&gt;
+
+&lt;p&gt;如果原点落在e12、e13、e23区域，会导致simplex退化成1-simplex；&lt;/p&gt;
+
+&lt;p&gt;否则，原点必然落在三角形内部，simplex仍然是2-simplex。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Simplex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -823,6 +856,12 @@ Minkowski difference&lt;/a&gt;&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/bulletphysics/bullet3&quot;&gt;https://github.com/bulletphysics/bullet3&lt;/a&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;reactphysics3d，非产品级的轻量物理引擎，适合学习用：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/DanielChappuis/reactphysics3d&quot;&gt;https://github.com/DanielChappuis/reactphysics3d&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 20 Mar 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/collision-detection-2/</link>
