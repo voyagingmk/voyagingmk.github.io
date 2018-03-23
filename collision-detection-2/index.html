@@ -812,42 +812,35 @@ GJK各种实现
 <p>如果原点落在e12、e13、e23区域，会导致simplex退化成1-simplex；</p>
 
 <p>否则，原点必然落在三角形内部，simplex仍然是2-simplex。</p>
+
+<p>还有就是，因为现在有3个顶点了，质心坐标公式会需要3个参数\( a_1 、a_2 、a_3\)。可以参考Solve2小节的方法，解出3个参数。</p>
+
+<p>（有空再更新解法）</p>
 <div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve3</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="n">b2Vec2</span> <span class="n">w1</span> <span class="o">=</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
     <span class="n">b2Vec2</span> <span class="n">w2</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
     <span class="n">b2Vec2</span> <span class="n">w3</span> <span class="o">=</span> <span class="n">m_v3</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
 
-    <span class="c1">// Edge12</span>
-    <span class="c1">// [1      1     ][a1] = [1]</span>
-    <span class="c1">// [w1.e12 w2.e12][a2] = [0]</span>
-    <span class="c1">// a3 = 0</span>
     <span class="n">b2Vec2</span> <span class="n">e12</span> <span class="o">=</span> <span class="n">w2</span> <span class="o">-</span> <span class="n">w1</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">w1e12</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
     <span class="n">float32</span> <span class="n">w2e12</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w2</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
     <span class="n">float32</span> <span class="n">d12_1</span> <span class="o">=</span> <span class="n">w2e12</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">d12_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">w1e12</span><span class="p">;</span>
 
-    <span class="c1">// Edge13</span>
-    <span class="c1">// [1      1     ][a1] = [1]</span>
-    <span class="c1">// [w1.e13 w3.e13][a3] = [0]</span>
-    <span class="c1">// a2 = 0</span>
     <span class="n">b2Vec2</span> <span class="n">e13</span> <span class="o">=</span> <span class="n">w3</span> <span class="o">-</span> <span class="n">w1</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">w1e13</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">e13</span><span class="p">);</span>
     <span class="n">float32</span> <span class="n">w3e13</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w3</span><span class="p">,</span> <span class="n">e13</span><span class="p">);</span>
     <span class="n">float32</span> <span class="n">d13_1</span> <span class="o">=</span> <span class="n">w3e13</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">d13_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">w1e13</span><span class="p">;</span>
 
-    <span class="c1">// Edge23</span>
-    <span class="c1">// [1      1     ][a2] = [1]</span>
-    <span class="c1">// [w2.e23 w3.e23][a3] = [0]</span>
-    <span class="c1">// a1 = 0</span>
     <span class="n">b2Vec2</span> <span class="n">e23</span> <span class="o">=</span> <span class="n">w3</span> <span class="o">-</span> <span class="n">w2</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">w2e23</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w2</span><span class="p">,</span> <span class="n">e23</span><span class="p">);</span>
     <span class="n">float32</span> <span class="n">w3e23</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w3</span><span class="p">,</span> <span class="n">e23</span><span class="p">);</span>
     <span class="n">float32</span> <span class="n">d23_1</span> <span class="o">=</span> <span class="n">w3e23</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">d23_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">w2e23</span><span class="p">;</span>
 
+    <span class="c1">// 这里的n123、d123_1、d123_2、d123_3都和质心坐标公式有关</span>
     <span class="c1">// Triangle123</span>
     <span class="n">float32</span> <span class="n">n123</span> <span class="o">=</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="n">e13</span><span class="p">);</span>
 
