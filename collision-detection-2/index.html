@@ -571,9 +571,9 @@ GJK各种实现
     <span class="n">simplex</span><span class="p">.</span><span class="n">WriteCache</span><span class="p">(</span><span class="n">cache</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>下面继续介绍这段代码里出现的GetSearchDirection、Solve2、Solve3函数。</p>
+<p>下面继续介绍这段代码里出现的GetSearchDirection、Solve2、Solve3、GetSupport函数。</p>
 
-<h2>simplex.GetSearchDirection</h2>
+<h2>b2Simplex::GetSearchDirection</h2>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">b2Vec2</span> <span class="nf">GetSearchDirection</span><span class="p">()</span> <span class="k">const</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">m_count</span><span class="p">)</span>
@@ -603,7 +603,7 @@ GJK各种实现
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2>simplex.Solve2</h2>
+<h2>b2Simplex::Solve2</h2>
 
 <p>Solve2主要目的：找出原点在当前这个1-simplex的哪个区域。</p>
 
@@ -692,7 +692,7 @@ GJK各种实现
     <span class="n">m_count</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2>simplex.Solve3</h2>
+<h2>b2Simplex::Solve3</h2>
 <div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="c1">// Possible regions:</span>
 <span class="c1">// - points[2]</span>
 <span class="c1">// - edge points[0]-points[2]</span>
@@ -805,6 +805,26 @@ GJK各种实现
     <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d123_2</span> <span class="o">*</span> <span class="n">inv_d123</span><span class="p">;</span>
     <span class="n">m_v3</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d123_3</span> <span class="o">*</span> <span class="n">inv_d123</span><span class="p">;</span>
     <span class="n">m_count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>b2DistanceProxy::GetSupport函数</h2>
+
+<p>b2DistanceProxy的GetSupport和上面章节给出的support伪代码，几乎是一样的：</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kr">inline</span> <span class="n">int32</span> <span class="n">b2DistanceProxy</span><span class="o">::</span><span class="n">GetSupport</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="n">int32</span> <span class="n">bestIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">float32</span> <span class="n">bestValue</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">int32</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m_count</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">float32</span> <span class="n">value</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">d</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&gt;</span> <span class="n">bestValue</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">bestIndex</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+            <span class="n">bestValue</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">bestIndex</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
 <h1><div id="4">GJK的其他细节</div></h1>
