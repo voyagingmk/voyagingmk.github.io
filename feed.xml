@@ -51,7 +51,15 @@
 &lt;li&gt;&lt;a href=&quot;#2.2&quot;&gt;Support函数&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#2.3&quot;&gt;NearestSimplex函数&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3&quot;&gt;GJK算法实现&lt;/a&gt; &lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3&quot;&gt;GJK算法实现&lt;/a&gt; 
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#3.1&quot;&gt;b2Distance核心逻辑&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3.2&quot;&gt;b2Simplex::GetSearchDirection&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3.3&quot;&gt;b2Simplex::Solve2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3.4&quot;&gt;b2Simplex::Solve3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3.5&quot;&gt;b2DistanceProxy::GetSupport&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#4&quot;&gt;其他细节&lt;/a&gt; &lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#5&quot;&gt;参考资料&lt;/a&gt; 
 
@@ -268,7 +276,7 @@
 
 &lt;h1&gt;&lt;div id=&quot;3&quot;&gt;GJK算法实现&lt;/div&gt;&lt;/h1&gt;
 
-&lt;p&gt;为了学到真正靠谱的GJK算法，所以下面使用Box2D的b2Distance函数，作为参考对象。（找到的其他GJK代码都觉得奇奇怪怪的）&lt;/p&gt;
+&lt;p&gt;为了学到真正靠谱的GJK算法，所以下面使用Box2D的b2Distance函数，作为学习对象。（找到的其他GJK代码都觉得奇奇怪怪的）&lt;/p&gt;
 
 &lt;p&gt;b2Distance不仅实现了GJK算法，还实现了Simplex Cache机制，即支持时间相干性，从而提升计算效率。&lt;/p&gt;
 
@@ -276,7 +284,7 @@
 
 &lt;p&gt;下面将精简b2Distance代码（去掉了Simplex Cache、input-&amp;gt;useRadii等），只保留和GJK相关的，来方便读者理解b2Distance。&lt;/p&gt;
 
-&lt;h2&gt;b2Distance核心逻辑&lt;/h2&gt;
+&lt;h2&gt;&lt;div id=&quot;3.1&quot;&gt;b2Distance核心逻辑&lt;/div&gt;&lt;/h2&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Distance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2DistanceOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
                 &lt;span class=&quot;n&quot;&gt;b2SimplexCache&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
                 &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2DistanceInput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -396,26 +404,103 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;下面继续介绍这段代码里出现的GetSearchDirection、Solve2、Solve3、GetSupport函数。&lt;/p&gt;
 
-&lt;h2&gt;b2Simplex::GetSearchDirection&lt;/h2&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetSearchDirection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+&lt;h2&gt;&lt;div id=&quot;3.2&quot;&gt;b2Simplex::GetSearchDirection&lt;/div&gt;&lt;/h2&gt;
+
+&lt;p&gt;根据算法上下文，执行到GetSearchDirection时，单纯形顶点数只能是1或2。&lt;/p&gt;
+
+&lt;p&gt;如果顶点数为1，下个搜索方向就是该顶点向量的反方向。so easy。&lt;/p&gt;
+
+&lt;p&gt;如果顶点数为2，需要判断原点在\( e_{12} \)的哪一侧，并计算朝向那一侧的垂直于w1w2的向量。&lt;/p&gt;
+
+&lt;p&gt;这个问题的解决，需要用到2D叉积公式。读者可能不清楚这是什么但没关系。现先从3D叉积公式说起。&lt;/p&gt;
+
+&lt;p&gt;叉积(&lt;a href=&quot;https://en.wikipedia.org/wiki/Cross_product&quot;&gt;cross product&lt;/a&gt;)运算\( \times \)，本是3D空间特有的一种向量二元运算。执行\( \mathbf a \times \mathbf b \)，会得到一个同时和\( \mathbf a 、 \mathbf b \)正交的向量\( \mathbf c\)，\( \mathbf c\)的方向可以按右手规则推知：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.3/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;可把\( \mathbf a 、 \mathbf b \)用标准基&lt;a href=&quot;https://en.wikipedia.org/wiki/Standard_basis&quot;&gt;Standard basis&lt;/a&gt; \( \mathbf i、  \mathbf j 、 \mathbf k\)表示：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf a = u_1 \mathbf i + u_2 \mathbf j + u_3 \mathbf k \]&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf b = v_1 \mathbf i + v_2 \mathbf j + v_3 \mathbf k \]&lt;/p&gt;
+
+&lt;p&gt;此时，\( \mathbf a 、 \mathbf b \)的叉积可以用矩阵秩(determinant)表示：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf a \times \mathbf b =    \left| \begin{matrix} \mathbf i \  \mathbf j \  \mathbf k \\  u_1 \   u_2 \  u_3 \\  v_1 \  v_2 \  v_3\\ \end{matrix} \right|  \]&lt;/p&gt;
+
+&lt;p&gt;展开这个式子，得到向量形式的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf a \times \mathbf b =    \left| \begin{matrix} u_2 \  u_3 \\  v_2 \  v_3\\ \end{matrix} \right|  \mathbf i -    \left| \begin{matrix} u_1 \  u_3 \\  v_1 \  v_3\\ \end{matrix} \right|  \mathbf j +    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right|  \mathbf k  \]&lt;/p&gt;
+
+&lt;p&gt;对于2D空间下的\( \mathbf a 、 \mathbf b \)，可认为它们是z分部为0的3D向量，从而可以套进上述公式：&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf a = u_1 \mathbf i + u_2 \mathbf j + 0 \mathbf k \]&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf b = v_1 \mathbf i + v_2 \mathbf j + 0 \mathbf k \]&lt;/p&gt;
+
+&lt;p&gt;\[ \mathbf a \times \mathbf b =    \left| \begin{matrix} u_2 \  u_3 \\  v_2 \  v_3\\ \end{matrix} \right|  \mathbf i -    \left| \begin{matrix} u_1 \  u_3 \\  v_1 \  v_3\\ \end{matrix} \right|  \mathbf j +    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right|  \mathbf k  \]&lt;/p&gt;
+
+&lt;p&gt;\[ = 0\mathbf i - 0\mathbf j +    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right|  \mathbf k \]&lt;/p&gt;
+
+&lt;p&gt;\[ =    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right| \]&lt;/p&gt;
+
+&lt;p&gt;\[ = u_1 v_2 - u_2 v_1 \]&lt;/p&gt;
+
+&lt;p&gt;最后一步用到了2阶的determinant公式(&lt;a href=&quot;https://en.wikipedia.org/wiki/Determinant&quot;&gt;from wiki&lt;/a&gt;) ：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.3/9.png&quot; alt=&quot;9.png&quot;&gt;  &lt;/p&gt;
+
+&lt;p&gt;这就是所谓的2D叉积公式了，其实只是3D叉积的一种特殊情况。&lt;/p&gt;
+
+&lt;p&gt;2D叉积公式有什么用呢？请注意，2D叉积后得到的是一个标量s。这个标量的正负号，就告诉了我们\( \mathbf a \times \mathbf b \)得到的向量( \( 0\mathbf i - 0\mathbf j + s\mathbf k \) )在z轴上的朝向。&lt;/p&gt;
+
+&lt;p&gt;但知道朝向后又有什么意义呢？这时，要结合右手坐标系来理解（可回顾下上面的手势图）：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;当标量s符号为正时，根据右手坐标系规则，可知\( \mathbf b \)在\( \mathbf a \)的左侧（记住观察视角是从+z到-z）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;当标量s符号为负时，根据右手坐标系规则，可知\( \mathbf b \)在\( \mathbf a \)的右侧&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;理解2D叉积后，GetSearchDirection理解起来就轻松了：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 2D叉积公式&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// 这2条公式其实是为了得到和a正交的向量，s的值一般为1&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// b2Cross(a, 1.0)返回一个在a右侧的正交向量&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// b2Cross(1.0, a)返回一个在a左侧的正交向量&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetSearchDirection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// 直接取w1的反方向就行了&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
   &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+      &lt;span class=&quot;c1&quot;&gt;// 计算2D叉积&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sgn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
       &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sgn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Origin is left of e12.&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+        &lt;span class=&quot;c1&quot;&gt;// -m_v1.w在e12左侧，即原点也在左侧&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
       &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
       &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
       &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Origin is right of e12.&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// -m_v1.w在e12右侧，即原点也在右侧&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
       &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
@@ -426,7 +511,7 @@
   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;b2Simplex::Solve2&lt;/h2&gt;
+&lt;h2&gt;&lt;div id=&quot;3.3&quot;&gt;b2Simplex::Solve2&lt;/div&gt;&lt;/h2&gt;
 
 &lt;p&gt;Solve2主要目的：找出原点在当前这个1-simplex的哪个区域。&lt;/p&gt;
 
@@ -434,7 +519,7 @@
 
 &lt;p&gt;&lt;img src=&quot;../images/2018.3/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
 
-&lt;p&gt;w12就是w1和w22个顶点夹住的那片黄色。&lt;/p&gt;
+&lt;p&gt;w12就是w1和w2两个顶点夹住的那片黄色。&lt;/p&gt;
 
 &lt;p&gt;solve2的原理是，通过求原点在w1w2的投影点p（最近点），从而知道原点和线段w1w2的关系。&lt;/p&gt;
 
@@ -515,7 +600,7 @@
     &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;b2Simplex::Solve3&lt;/h2&gt;
+&lt;h2&gt;&lt;div id=&quot;3.4&quot;&gt;b2Simplex::Solve3&lt;/div&gt;&lt;/h2&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// Possible regions:&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;// - points[2]&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;// - edge points[0]-points[2]&lt;/span&gt;
@@ -630,7 +715,7 @@
     &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;b2DistanceProxy::GetSupport函数&lt;/h2&gt;
+&lt;h2&gt;&lt;div id=&quot;3.5&quot;&gt;b2DistanceProxy::GetSupport&lt;/div&gt;&lt;/h2&gt;
 
 &lt;p&gt;b2DistanceProxy的GetSupport和上面章节给出的support伪代码，几乎是一样的：&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2DistanceProxy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetSupport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
