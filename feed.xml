@@ -315,7 +315,7 @@ RTO = srtt + 4(rttvar)&lt;/p&gt;
 
 &lt;p&gt;当接收端收到&lt;strong&gt;当前期望序列号的后续分组&lt;/strong&gt;时，当前期望的包可能丢失了，也可能是延迟到达，2者无法区分。&lt;/p&gt;
 
-&lt;p&gt;因此需要等待一定数目的重复ACK（重复ACK阈值，一般为3，也有动态的），才能判断数据是否丢失并快速重传。&lt;/p&gt;
+&lt;p&gt;因此需要等待一定数目的重复ACK（重复ACK阈值 dupthresh，一般为3，也有动态的），才能判断数据是否丢失并快速重传。&lt;/p&gt;
 
 &lt;p&gt;总之，发送端收到至少3个重复ACK后，马上重传&lt;strong&gt;可能丢失的分组&lt;/strong&gt;，而不必等计时器超时。&lt;/p&gt;
 
@@ -383,6 +383,43 @@ RTO = srtt + 4(rttvar)&lt;/p&gt;
 &lt;p&gt;包的问题有三种：丢失、失序、重复。tcp需要区分。&lt;/p&gt;
 
 &lt;p&gt;失序：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果发生在反向链路（ACK），发送端收到的ACK是乱序，那么可能先收到后面的ACK，导致发送窗口快速前移（并且后面收到的ACK被丢弃）。快速前移会导致&lt;strong&gt;流量突发&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;发生在正向链路，tcp可能无法正确识别失序or丢包。失序程度不大时，可以迅速得到处理；反之，tcp可能会误认为数据丢失，也就导致伪重传（主要是指快速重传）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;区分丢失和失序不是重要问题；互联网中严重的失序并不常见，dupthresh设3就足够了。&lt;/p&gt;
+
+&lt;p&gt;重复：&lt;/p&gt;
+
+&lt;p&gt;链路层重传时会生成重复副本。会导致接收端生成一系列重复的ACK，触发伪快速重传。&lt;/p&gt;
+
+&lt;p&gt;但DSACK能处理这种情况，因为重复ACK没有包含失序信息，意味着ACK是重复数据。&lt;/p&gt;
+
+&lt;h3&gt;目的度量&lt;/h3&gt;
+
+&lt;p&gt;即操作系统在tcp断开连接后依然缓存了该条路径的rtt之类的信息。方便下次和该地址建立连接时，初始化srtt rttvar。&lt;/p&gt;
+
+&lt;h3&gt;重新组包&lt;/h3&gt;
+
+&lt;p&gt;当发生重传，并不需要完全重传相同的报文段，而可以重新组包，发送一个更大的报文段来提高性能。&lt;/p&gt;
+
+&lt;h3&gt;重传相关的攻击&lt;/h3&gt;
+
+&lt;p&gt;低速率DoS攻击：&lt;/p&gt;
+
+&lt;p&gt;每次受害tcp重传时，就发一堆数据给它并导致重传超时，进而导致对方减小发送速率、退避发送，最终导致无法正常使用网络带宽。&lt;/p&gt;
+
+&lt;p&gt;预防方法是，随机随选RTO，使得攻击者无法预知确切的重传时间。&lt;/p&gt;
+
+&lt;p&gt;减慢受害tcp的发送并使RTT估计值过大（过分被动）：&lt;/p&gt;
+
+&lt;p&gt;导致丢包后不会立即重传。&lt;/p&gt;
+
+&lt;p&gt;伪造ACK使受害tcp的RTT估计值过小（过分积极）：&lt;/p&gt;
+
+&lt;p&gt;导致过分发送，造成大量的无效传输。&lt;/p&gt;
 </description>
         <pubDate>Sat, 24 Mar 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/tcpip-1/</link>
