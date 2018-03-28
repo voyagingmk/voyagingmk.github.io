@@ -7,6 +7,389 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>《TCP IP详解卷1》笔记</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;12章 TCP初步&lt;/h2&gt;
+
+&lt;p&gt;tcp features：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;tcp有差错纠正，ip udp 没有&lt;/li&gt;
+&lt;li&gt;窗口：分组数量的大小限制了网络利用率（吞吐量）&lt;/li&gt;
+&lt;li&gt;窗口滑动：收到ACK时，窗口可能会向右滑动&lt;/li&gt;
+&lt;li&gt;流控：基于发送速率和基于窗口&lt;/li&gt;
+&lt;li&gt;窗口更新(通告)：接收方发送窗口通告给发送方，一般和和ACK一起发，窗口向友滑动的时候同事变更窗口大小&lt;/li&gt;
+&lt;li&gt;通信速率SW/R (bits/s)：S是分组比特总大小，W是窗口大小，R是RTT&lt;/li&gt;
+&lt;li&gt;如果发送速率超过中间路由器的能力，就需要拥塞控制(congestion control)，否则会路由器丢包&lt;/li&gt;
+&lt;li&gt;显性通告：用协议字段告诉发送方网络情况&lt;/li&gt;
+&lt;li&gt;隐性通告：根据其他网络特征自主减慢发送速率&lt;/li&gt;
+&lt;li&gt;组包(packetization)：把一个字节流转换成一组IP可以携带的分组&lt;/li&gt;
+&lt;li&gt;分组序列号：代表了每个分组的第一个字节在整个数据流中的字节偏移，而不是分组号&lt;/li&gt;
+&lt;li&gt;分组大小可变，并允许分组重新组合（repacketization)&lt;/li&gt;
+&lt;li&gt;校验和：报文段收到时如果检验和不对，会丢弃分组&lt;/li&gt;
+&lt;li&gt;差错保护：发送大数据时检验和可能会失效，需要用户自己做更强大的校验和（CRC）&lt;/li&gt;
+&lt;li&gt;ACK：一个指示字节号N的ACK暗示了所有&amp;lt;=N的字节都呗成功接收了&lt;/li&gt;
+&lt;li&gt;若前面的ACK丢失，后续的ACK也可以确认前面的分组（robust）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;重要性能问题：重传超时时间&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;往返时间估计（RTT estimation）：采样最近的多个RTT并取平均&lt;/li&gt;
+&lt;li&gt;超时并不能等于RTT均值，因为可能有很多RTT是超过均值的，从而导致不断超时重传&lt;/li&gt;
+&lt;li&gt;超时应略大于RTT均值，但也不能过大，否则网络会变得空闲&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;tcp头部：&lt;/p&gt;
+
+&lt;p&gt;-2字节：源端口
+-2字节：目的端口
+-4字节：序列号seq
+-4字节：ACK
+-4位：头部长度
+-4位：保留
+-8位：flags
+-2字节：窗口大小
+-2字节：校验和
+-2字节：紧急指针
+-40字节：选项&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;长度：默认20字节，带选项的话最多60字节&lt;/li&gt;
+&lt;li&gt;四元组：客户端主机IP+socket端口号、服务端主机IP+socket端口号&lt;/li&gt;
+&lt;li&gt;SACK: Seletive地ACK，要比普通ACK高效，因为可以对次序杂乱的报文先ACK。&lt;/li&gt;
+&lt;li&gt;头部长度：虽然只有4位，但是单位是word（32bits），所以可表示(2&lt;sup&gt;4&lt;/sup&gt; - 1)* 4bytes = 60字节的头部长度。&lt;/li&gt;
+&lt;li&gt;窗口大小：字节数，所以最大窗口大小字节数为2&lt;sup&gt;16&lt;/sup&gt; - 1 = 65535字节&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;处理差错的办法：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;差错矫正码&lt;/li&gt;
+&lt;li&gt;数据重传&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;13章 TCP连接管理&lt;/h2&gt;
+
+&lt;p&gt;建立连接：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;C发送ISN(c)（主动打开）&lt;/li&gt;
+&lt;li&gt;S收到ISN(c)，发送ACK=ISN(c)+1 、 ISN(s) （被动打开）&lt;/li&gt;
+&lt;li&gt;C收到ACK和ISN(s)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;断开连接：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;一方发送FIN（主动关闭者），要发送当前序列号K，且带有一个ACK（序列号L，代表最近一次收到的数据）&lt;/li&gt;
+&lt;li&gt;另一方收到FIN后，发送ACK=k+1作为响应（被动关闭者），同时通知上层应用程序&lt;/li&gt;
+&lt;li&gt;另一方应用程序发FIN（转变为主动关闭者），序列号为L&lt;/li&gt;
+&lt;li&gt;一方收到FIN，发给另一方ACK确认&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;两次半关闭：两边都要发FIN，才能变成完全关闭&lt;/p&gt;
+
+&lt;p&gt;半关闭：close、shutdown双方都可以调用，close是全关闭，shutdown能实现半关闭&lt;/p&gt;
+
+&lt;p&gt;ISN：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;4微秒+1&lt;/li&gt;
+&lt;li&gt;伪造包问题：只要四元组一样，就能伪造发包。ISN需要设计成难以被猜出，方法是：随机、散列、加密。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;连接建立超时：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;syn重发次数：cat /proc/sys/net/ipv4/tcp_syn_retries（或sysctl net.ipv4.tcp_syn_retries），一般等于6&lt;/li&gt;
+&lt;li&gt;synack重发次数：cat /proc/sys/net/ipv4/tcp_synack_retries，一般等于2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;MTU： 最大传输单元。路径MTU为1500字节。ipv4：1460+40字节，ipv6：1440+60字节。&lt;/p&gt;
+
+&lt;h3&gt;选项：&lt;/h3&gt;
+
+&lt;p&gt;MSS：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;最大段大小，记录数据（不包括头部）长度，占2个字节。最小保证536字节（默认值），一般是1460字节&lt;/li&gt;
+&lt;li&gt;最大段大小不是协商值，而是限定值，&lt;/li&gt;
+&lt;li&gt;65535特殊值，ipv6网络中超长数据报会用到。但实际MSS仍受路径MTU限制，所以MSS值为MTU-(40 IPv6头+20 tcp头）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;SACK：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;发SYN/SYNACK时就得发这个SACK告诉对方支持SACK（双向）&lt;/li&gt;
+&lt;li&gt;当接收到乱序的数据时，可向发送方发送SACK选项&lt;/li&gt;
+&lt;li&gt;长度为8n+2，2个字节一个表示选项种类一个表示n，n等于SACK块数量&lt;/li&gt;
+&lt;li&gt;SACK块：已经成功接收的序列号范围（序列号32位，需要start和end，所以总共要8个字节）&lt;/li&gt;
+&lt;li&gt;最大n为3，SACK最多占8*3 + 2 = 26字节（因为一般还有个时间戳）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;窗口缩放选项：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;字节：16bits&lt;/li&gt;
+&lt;li&gt;范围： 0-14，0表示没有缩放。&lt;/li&gt;
+&lt;li&gt;最大窗口大小：65535 x 2&lt;sup&gt;14&lt;/sup&gt; ，约1GB。&lt;/li&gt;
+&lt;li&gt;tcp终端内部会维护这个真实的窗口大小&lt;/li&gt;
+&lt;li&gt;主动打开者发WSCALE，被动打开者接收到WSCALE才能在SYNACK中发WSCALE&lt;/li&gt;
+&lt;li&gt;如果主动打开者没接收到被动打开者的WSCALE，就设为0&lt;/li&gt;
+&lt;li&gt;自己的为S，发窗口大小给对方时，右移S位后将16数值填充到头部&lt;/li&gt;
+&lt;li&gt;对方的为R，收到对方的窗口大小时，左移R位才是真实大小&lt;/li&gt;
+&lt;li&gt;缩放大小是根据接收缓存的大小自动选取的&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;时间戳选项：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;作用1：估算RTT&lt;/li&gt;
+&lt;li&gt;作用2：用来防止序列号回绕导致的旧包无法去除问题&lt;/li&gt;
+&lt;li&gt;TSV：发送报文时放自己的当前时间戳 （Timestamp Value)&lt;/li&gt;
+&lt;li&gt;TSER：发ACK的时候把最新的TSV（TsRecent）复制进去（Timesatamp Echo Reply）&lt;/li&gt;
+&lt;li&gt;TsRecent并不是来自最新到达的报文段，而是来自最早的一个未经确认的报文段&lt;/li&gt;
+&lt;li&gt;RTT = current time - TSER&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;路径MTU发现&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;主要方案是：发大包，收到PTB（packet too big）消息后，调整自己MSS&lt;/li&gt;
+&lt;li&gt;黑洞问题：防火墙导致无法收到PTB消息，无法知道是网络不通还是包太大&lt;/li&gt;
+&lt;li&gt;黑洞探测：报文重传失败多次后，尝试改成较小报文段（分片）&lt;/li&gt;
+&lt;li&gt;路由是动态变化的，所以每10分钟要尝试一个更大的MSS（接近初始的发送方MSS）&lt;/li&gt;
+&lt;li&gt;MSS大小影响吞吐量和窗口大小&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;TCP状态转换&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.3/20.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.3/19.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;TIME_WAIT：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;让迷途的报文可以在网络中消失&lt;/li&gt;
+&lt;li&gt;防止新连接错误接收旧的迷途的报文&lt;/li&gt;
+&lt;li&gt;一般要持续2个MSL（60秒）&lt;/li&gt;
+&lt;li&gt;静默时间：如果TIME_WAIT主机崩溃重启，需要等待2MSL后才能建立新连接（但一般操作系统不会这样做）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;TIME_WAIT状态其实不做什么事情，就是限制1分钟内这条连接的其中一端不能发起对另一端的新连接，这也是为什么只有一端进入TIME_WAIT而另一端可以直接CLOSED的原因。&lt;/p&gt;
+
+&lt;p&gt;FIN_WAIT_2:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;主动关闭方发送fin并收到finack就进入了FIN_WAIT_2&lt;/li&gt;
+&lt;li&gt;处于FIN_WAIT_2时需要等另一方发送fin（永久等待）&lt;/li&gt;
+&lt;li&gt;close系统调用会自动启动定时器，60秒后强制进入CLOSED状态&lt;/li&gt;
+&lt;li&gt;用shutdown的半关闭不会启动定时器&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;同时打开同时关闭：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;是可以正确处理的，并且只会建立一条连接&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;RST重置报文段&lt;/h3&gt;
+
+&lt;p&gt;发送时机：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;客户端连接请求没有对应的监听socket时&lt;/li&gt;
+&lt;li&gt;强制终止连接时。排队报文会被丢弃，并马上发RST&lt;/li&gt;
+&lt;li&gt;一端崩溃重启，收到正常工作（半开连接）的另一端的报文时&lt;/li&gt;
+&lt;li&gt;TIME_WAIT错误时，TIME_WAIT端收到迷途的报文并发送ACK但被CLOSED的对端RST&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;TIME_WAIT错误：是一种需要避免的错误，TIME_WAIT状态需要忽略RST，否则就会过早地进入CLOSED&lt;/p&gt;
+
+&lt;p&gt;强制终止方法：SO_LINGER设0（socket逗留选项），含义是，不会为了确定数据是否到达另一端而逗留任何时间。&lt;/p&gt;
+
+&lt;p&gt;接收到的RST，必然要带ACK，且序列号要在对端窗口范围内，否则可能会遭到伪造RST攻击。&lt;/p&gt;
+
+&lt;p&gt;发送RST，不需要一个RSTACK。对端收到RST就自然重置连接了（可能对端会丢失RST）。&lt;/p&gt;
+
+&lt;p&gt;UDP没有RST，但是有ICMP目的地不可达消息&lt;/p&gt;
+
+&lt;h2&gt;14章 TCP超时和重传&lt;/h2&gt;
+
+&lt;p&gt;tcp_retries1：连接已经建立后，基本重传次数。次数达到后，会先尝试让网络层更新路由再继续发包。一般为3次.&lt;/p&gt;
+
+&lt;p&gt;tcp_retries2：连接已经建立后，最大重传次数。次数达到后，会断开连接。&lt;/p&gt;
+
+&lt;p&gt;重传超时&amp;lt;RTT：对网络引入不必要的重复数据&lt;/p&gt;
+
+&lt;p&gt;重传超时&amp;gt;RTT：网络利用率(吞吐量)下降&lt;/p&gt;
+
+&lt;p&gt;RTT是每个tcp连接独立计算的。&lt;/p&gt;
+
+&lt;h3&gt;RTO估算方法：&lt;/h3&gt;
+
+&lt;p&gt;经典方法：&lt;/p&gt;
+
+&lt;p&gt;SRTT = a(SRTT) + (1-a)RTT，a一般为0.8~0.9，称为指数加权移动平均/低通过滤器（EWMA）&lt;/p&gt;
+
+&lt;p&gt;RTO = min(ubound, max(lbound, (SRTT)b))，b为时延离散因子，推荐值1.3 ～ 2.0&lt;/p&gt;
+
+&lt;p&gt;ubound：1分钟，lbound：1秒。&lt;/p&gt;
+
+&lt;p&gt;适用于稳定RTT的网络。&lt;/p&gt;
+
+&lt;p&gt;标准方法：&lt;/p&gt;
+
+&lt;p&gt;srtt = (1-g)srtt + (g)M
+rttvar = (1-h)rttvar + (h)(|M - srtt|)
+RTO = srtt + 4(rttvar)&lt;/p&gt;
+
+&lt;p&gt;M就是经典方法里的RTT；srtt和SRTT等价；|M - srtt|为平均偏差，所以rttvar为平均偏差的EWMA。&lt;/p&gt;
+
+&lt;p&gt;g：新样本M占srtt估计值的权重，1/8&lt;/p&gt;
+
+&lt;p&gt;h：新平均偏差样本|M-srtt|占rttvar的权重，1/4&lt;/p&gt;
+
+&lt;p&gt;最终，RTO为srtt加上4倍rttvar，4是一个研究出来的常量值。&lt;/p&gt;
+
+&lt;p&gt;当M变化时，|M-srtt|越大，rttvar也越大，RTO增长越快&lt;/p&gt;
+
+&lt;p&gt;时钟粒度：&lt;/p&gt;
+
+&lt;p&gt;Linux计时器时钟粒度为1ms，设为G。&lt;/p&gt;
+
+&lt;p&gt;RTO = srtt + max(G，4(rttvar))&lt;/p&gt;
+
+&lt;p&gt;Linux RTO默认RTO最小值200ms&lt;/p&gt;
+
+&lt;p&gt;收到第一个RTT测量值时再次初始化：&lt;/p&gt;
+
+&lt;p&gt;srtt = M&lt;/p&gt;
+
+&lt;p&gt;rttvar = M/2&lt;/p&gt;
+
+&lt;p&gt;RTO = srtt + 4(rttvar) = 3M &lt;/p&gt;
+
+&lt;p&gt;重传二义性：&lt;/p&gt;
+
+&lt;p&gt;发生重传时，若收到ACK，并不能知道是对第一次还是第二次发包的确认，所以无法计算RTT，需要跳过。(Karn算法第一部分)&lt;/p&gt;
+
+&lt;p&gt;若用了时间戳选项则可以处理二义性，因为ACK包附带了发包的时间戳，就可以知道ACK是对第一次还是第二次发包的确认。&lt;/p&gt;
+
+&lt;p&gt;退避系数(backoff factor)：每当重传计时器出现超时，退避系数加倍，&lt;strong&gt;直到接收到非重传数据时重设为1&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3&gt;基于定时器的重传：&lt;/h3&gt;
+
+&lt;p&gt;需要记录被计时的报文段序列号，若及时收到该报文段的ACK，那么计时器被取消。&lt;/p&gt;
+
+&lt;p&gt;没丢包的话计时器不会超时。&lt;/p&gt;
+
+&lt;p&gt;若在设定的RTO内，没收到ACK，就会触发超时重传。&lt;/p&gt;
+
+&lt;p&gt;此时需要降低发送速率：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;减小发送窗口大小&lt;/li&gt;
+&lt;li&gt;重传大于1次时，增大RTO退避因子，RTO = γRTO，γ = 1 2 4 8 ··· 。但RTO不会TCP_RTO_MAX&lt;/li&gt;
+&lt;li&gt;一旦收到ACK，γ重置为1&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;基于定时器的重传不是好东西，会导致网络利用率下降。&lt;/p&gt;
+
+&lt;h3&gt;快速重传&lt;/h3&gt;
+
+&lt;p&gt;基于对端的反馈信息来引发重传。（和基于计时器的重传的本质区别）&lt;/p&gt;
+
+&lt;p&gt;更加及时。&lt;/p&gt;
+
+&lt;p&gt;tcp一般都实现了基于计时器的重传和快速重传。&lt;/p&gt;
+
+&lt;p&gt;重点：接收端收到失序报文段时，需要&lt;strong&gt;立即&lt;/strong&gt;生成&lt;strong&gt;重复ACK&lt;/strong&gt;并&lt;strong&gt;立即发送&lt;/strong&gt;，失序情况表明出现了丢段（接收缓存出现空洞）。&lt;/p&gt;
+
+&lt;p&gt;重复ACK：这个ACK可以表明是哪一个分组没有收到。但因为是用了tcp的seq段，所以一个RTT内只能填补一个空缺。&lt;/p&gt;
+
+&lt;p&gt;立即发送重复ACK是为了让发送端尽早得知有失序报文段，并告知空缺在哪。&lt;/p&gt;
+
+&lt;p&gt;当接收端收到&lt;strong&gt;当前期望序列号的后续分组&lt;/strong&gt;时，当前期望的包可能丢失了，也可能是延迟到达，2者无法区分。&lt;/p&gt;
+
+&lt;p&gt;因此需要等待一定数目的重复ACK（重复ACK阈值，一般为3，也有动态的），才能判断数据是否丢失并快速重传。&lt;/p&gt;
+
+&lt;p&gt;总之，发送端收到至少3个重复ACK后，马上重传&lt;strong&gt;可能丢失的分组&lt;/strong&gt;，而不必等计时器超时。&lt;/p&gt;
+
+&lt;h3&gt;带选择确认的重传SACK&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://packetlife.net/blog/2010/jun/17/tcp-selective-acknowledgments-sack/&quot;&gt;http://packetlife.net/blog/2010/jun/17/tcp-selective-acknowledgments-sack/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;SACK是指已接收的失序报文段，并不是指丢失的报文段。&lt;/p&gt;
+
+&lt;p&gt;SACK会重复发，例如收到连续的2个报文段3和4，返回2个ACK，ACK都为1（duplicate ACK），但第一个包带了SACK=3，第二个包带了SACK=3、4。发送端收到这2个ACK时，就会知道报文段2丢失，那么重传2。&lt;/p&gt;
+
+&lt;p&gt;一个tcp头的SACK最多3块。&lt;/p&gt;
+
+&lt;p&gt;收到SACK并重传了包，也不能清空重传缓存的该包（食言问题）。只有接收端发来的普通tcp ACK号大于发送端最大序列号值才可清除。&lt;/p&gt;
+
+&lt;p&gt;RTT较大，丢包严重时，SACK的优势就能体现出来。因为一个RTT可以填补多个空缺很重要。&lt;/p&gt;
+
+&lt;h3&gt;伪超时与重传&lt;/h3&gt;
+
+&lt;p&gt;GBN：连续发了n个报文段，如果网络突然缓慢，最前面的那个超时了，会触发重传，此时后面的n-1个包也没被确认，那么n个报文段都重传（回退）。&lt;/p&gt;
+
+&lt;p&gt;伪重传：没有丢包也发生了重传，叫伪重传。原因：网络延迟、包失序、包重复、ACK丢失。&lt;/p&gt;
+
+&lt;p&gt;RTT增加，超过当前RTO时，就有可能出现伪超时（重传）。&lt;/p&gt;
+
+&lt;p&gt;重要任务：检测出伪重传，几种方法：D-SACK、F-RTO、Eifel检测&lt;/p&gt;
+
+&lt;p&gt;D-SACK：重复SACK，一个操作系统的选项。&lt;/p&gt;
+
+&lt;p&gt;开启后，可在第一个SACK块中告知接收端收到的重复报文段序列号。&lt;/p&gt;
+
+&lt;p&gt;允许tcp一端开启D-SACK而另一端没有D-SACK，不需要对称，没有开启D-SACK的一端不能使用D-SACK。&lt;/p&gt;
+
+&lt;p&gt;原理是，SACK接收端允许了包含seq&amp;lt;=累计ACK的SACK块。&lt;/p&gt;
+
+&lt;p&gt;和通常的SACK的区别：DSACK只包含在单个ACK中，并且不会在多个SACK中重复。鲁棒性比SACK低。&lt;/p&gt;
+
+&lt;p&gt;Eifel检测算法：发生超时重传时，Eifel算法等待接收下一个ACK，若为针对第一次传输（即原始传输）的ACK（用时间戳判断），则可以知道该重传是伪重传（利用TSOPT来检测伪重传）。&lt;/p&gt;
+
+&lt;p&gt;Forward RTO-recovery（路由转发延迟导致的RTO的恢复机制，简称F-RTO）：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;检测伪重传的标准算法&lt;/li&gt;
+&lt;li&gt;不需要任何tcp选项&lt;/li&gt;
+&lt;li&gt;是发送端自己的算法&lt;/li&gt;
+&lt;li&gt;接收端不支持时间戳选项，也能工作&lt;/li&gt;
+&lt;li&gt;只检测由重传计时器超时引发的伪重传，别的无法判断&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;F-RTO会修改TCP的行为&lt;/strong&gt;。其实就是GBN的问题。在超时重传后收到第一个ACK时，改成发送新数据。等到下一个ACK到达时，如果2个ACK中至少有一个是&lt;strong&gt;重复ACK&lt;/strong&gt;，则认为此次重传没问题（确实发生了丢包，重复ACK指出了丢失的报文段）。如果2个都不是重复ACK，那么就是伪重传。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;用上面的任意检测算法检测到伪重传后，要应用Eifel响应算法：&lt;/p&gt;
+
+&lt;p&gt;说白了就是更新srtt和rttvar。因为伪超时导致临时修改了srtt和rttvar（RTO变了），检测发现伪超时，那就得恢复到正常的srtt、rttvar。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;计时器超时时，记录srtt_prev = srtt+2(G)、rttvar_prev = rttvar。但直到发现有伪超时前，都不会使用它们。&lt;/li&gt;
+&lt;li&gt;执行某种伪超时检测。&lt;/li&gt;
+&lt;li&gt;检测到伪超时，设置&lt;strong&gt;伪恢复&lt;/strong&gt;为SPUR_TO（spurious timeout)&lt;/li&gt;
+&lt;li&gt;若伪恢复为SPUR_TO，把下一个要发送的报文段的序列号改为最新的未发送过的报文段。就可以避免GBN。&lt;/li&gt;
+&lt;li&gt;更新srtt、rttvar、RTO：srtt = max(srtt_prev，m)，rttvar = max(rttvar_prev, m/2)，RTO = srtt + max(G, 4(rttvar))。为了抛弃RTT历史值。另外，RTO更新方式不变。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3&gt;包失序与包重复&lt;/h3&gt;
+
+&lt;p&gt;包的问题有三种：丢失、失序、重复。tcp需要区分。&lt;/p&gt;
+
+&lt;p&gt;失序：&lt;/p&gt;
+</description>
+        <pubDate>Sat, 24 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/tcpip-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/tcpip-1/</guid>
+      </item>
+    
+      <item>
         <title>碰撞检测算法(二)：原始GJK详解</title>
         <description>&lt;p&gt;GJK，全称&lt;a href=&quot;https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm&quot;&gt;Gilbert–Johnson–Keerthi distance algorithm&lt;/a&gt;，是非常常用的碰撞检测算法。&lt;/p&gt;
 
@@ -3129,178 +3512,6 @@ Minkowski difference&lt;/a&gt;&lt;/p&gt;
         <pubDate>Thu, 28 Sep 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/ssao/</link>
         <guid isPermaLink="true">http://localhost:4000/ssao/</guid>
-      </item>
-    
-      <item>
-        <title>PBR渲染原理</title>
-        <description>&lt;p&gt;基于PBR做渲染，需要涉及到很多物理学、几何学、热辐射学概念，本文将逐一介绍每个关键概念，并给出相关重要公式。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;微平面(microfacets)理论&lt;/h2&gt;
-
-&lt;p&gt;微观尺度下的任意一个平面(surface)都可以用多个微小的、完美反射的镜面来描述，这些微小镜面被称为&lt;strong&gt;微平面&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h3&gt;粗糙度(roughness)&lt;/h3&gt;
-
-&lt;p&gt;平面的&lt;strong&gt;粗糙度&lt;/strong&gt;决定了它的各个微平面的镜面反射情况：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.9/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;粗糙度可以用0.0到1.0来近似。&lt;/p&gt;
-
-&lt;h3&gt;中间方向矢量(halfway vector)&lt;/h3&gt;
-
-&lt;p&gt;halfway vector(简称h)等于光线方向矢量l加上视角方向矢量v并单位化（即处于l和v的中间）：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf h = \frac { \mathbf l + \mathbf v}{ \parallel \mathbf l + \mathbf v \parallel } \]&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.9/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;h的特性是：h与平面法线越靠近，那么镜面光越强。&lt;/p&gt;
-
-&lt;p&gt;在这个微平面理论下，可以推出：&lt;strong&gt;越多的微平面的法线与h对齐，这个平面的镜面反射就会越强&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h2&gt;能量守恒(energy conservation)&lt;/h2&gt;
-
-&lt;p&gt;不考虑自发光的平面，所有平面的出射光能量总和不能高于入射光能量总和。&lt;/p&gt;
-
-&lt;p&gt;观察下图，可以发现一个规律，粗糙度越高、镜面反射区域越大、镜面反射区域亮度越低。如果反射区域变大，然而亮度不变，那说明能量不守恒了。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.9/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;在渲染里，简单地说，要做到能量守恒，就是要遵守一个原则：&lt;strong&gt;平面接收到的光能量要么被反射，要么被吸收&lt;/strong&gt;，也就是说，吸收和反射，是互斥关系。&lt;/p&gt;
-
-&lt;p&gt;直接反射出去的光能量，也叫镜面光、反射光；吸收的光能量，大部分也会变成光发射出去（真正被吸收的就变成热能了），叫漫反射光、折射光。&lt;/p&gt;
-
-&lt;p&gt;镜面/反射光、漫反射/折射光的能量可以用2个系数kS、kD控制，两者满足关系式kD + kS = 1、kD &amp;gt; 0、kS &amp;gt; 0，从而确保发射的光能量不超过接收的光能量。&lt;/p&gt;
-
-&lt;h2&gt;渲染方程&lt;/h2&gt;
-
-&lt;p&gt;渲染方程的详细讨论已经写在&lt;a href=&quot;http://www.qiujiawei.com/rendering-equation/&quot;&gt;渲染基础理论的介绍&lt;/a&gt;一文。&lt;/p&gt;
-
-&lt;h2&gt;双向反射分布函数BRDF&lt;/h2&gt;
-
-&lt;p&gt;在&lt;a href=&quot;http://www.qiujiawei.com/rendering-equation/&quot;&gt;渲染基础理论的介绍&lt;/a&gt;一文里，没有详细讨论到的是brdf这个东西。简单地说，brdf是个控制系数，这个系数并不是常量，需要根据平面属性、光线属性计算得到，是个动态属性。基于PBR渲染，关键点就是选择合理的brdf函数。brdf函数将囊括上文提到的各个概念。&lt;/p&gt;
-
-&lt;p&gt;brdf很多种，最主流的是cook-Torrance BRDF，其基本框架公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ f_{r} = k_{d}f_{lambert} + k_{s}f_{cook−torrance} \]&lt;/p&gt;
-
-&lt;p&gt;其中：&lt;/p&gt;
-
-&lt;p&gt;\[ f_{lambert} = \frac {c}{\pi } \]&lt;/p&gt;
-
-&lt;p&gt;这里的c是指平面自身的颜色值，一般就是指采样纹理贴图出来的颜色。&lt;/p&gt;
-
-&lt;p&gt;右边的镜面光部分才是最复杂的：&lt;/p&gt;
-
-&lt;p&gt;\[ f_{cook−torrance} = \frac { DFG }{ 4 (\omega _{o} \cdot \mathbf n)(\omega _{i} \cdot \mathbf n) } \]&lt;/p&gt;
-
-&lt;p&gt;这条公式怎么来的，改天再写一篇数学推导文。现在需要重点关注右边的分子部分：DFG。DFG其实是3个函数，每个函数算出一个标量因子，3个因子得到后相乘。D、F、G有很多公式可以选择，下面会介绍几个常用的DFG函数。&lt;/p&gt;
-
-&lt;h3&gt;D， Normal Distribution Function，法线分布函数&lt;/h3&gt;
-
-&lt;p&gt;这个函数其实不是正态分布函数，不要被normal这个单词搞懵了。在渲染一个mesh的一个fragment时，就是在渲染一个平面，这个平面又是由一堆更加小的&lt;strong&gt;微平面&lt;/strong&gt;组成。这些微平面有自己的&lt;strong&gt;微法线&lt;/strong&gt;，D函数就是用来近似算出究竟有多少微法线和h向量对齐。&lt;/p&gt;
-
-&lt;h4&gt;Trowbridge-Reitz GGX&lt;/h4&gt;
-
-&lt;p&gt;\[ D(n, h, \alpha ) = \frac { \alpha ^{2} } { \pi ( (n\cdot h)^{2}(\alpha ^{2} - 1) + 1 )^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;输入参数：平面法线n、h向量、粗糙度\( \alpha \)。&lt;/p&gt;
-
-&lt;p&gt;shader：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;DistributionGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt;     &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotH&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotH2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotH2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;        &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;F，Fresnel equation，菲涅尔方程&lt;/h3&gt;
-
-&lt;p&gt;对于真实的物理材质，光照向量、视角向量不同，平面的反射情况就会不同。F函数能算出不同角度时的反射光情况，也是用一个比值(也叫做平面的真实的反射率）表示。这个比值能反应出有多少百分比的光被反射和被吸收(记住反射和吸收是互斥关系)。&lt;/p&gt;
-
-&lt;h4&gt;Fresnel-Schlick approximation&lt;/h4&gt;
-
-&lt;p&gt;\[ F_{Schlick}(n, v, F_{0}) = F_{0} + (1 - F_{0})( 1- (n\cdot v))^{5} \]&lt;/p&gt;
-
-&lt;p&gt;\( F_{0} \)就是垂直观察平面时的&lt;strong&gt;基本反射率&lt;/strong&gt;，一般要用一个vec3表示。注意，这条公式其实只适用于绝缘体（dielectric），对于金属/导体（metal/conductor）是不适用的。这时就有了些取巧的做法。&lt;/p&gt;
-
-&lt;p&gt;一是先预计算出各种常见材质的基本反射率，汇总成一个表，然后需要的时候查表即可。&lt;/p&gt;
-
-&lt;p&gt;有了表之后就会发现，对于绝缘体，基本反射率基本都在0.17这个水平线以下，且rgb分量一致；而对于导体，基本反射率都在0.5到1.0之间，且rgb分量值不一致（正是这个不一致性，使得不同的金属有显著的颜色差异，如金、铜、银颜色各异）。&lt;/p&gt;
-
-&lt;p&gt;综上,\( F_{0} \)的求取实际上可以做得非常简化，用shader代码可以看出：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.04&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-&lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;surfaceColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;metalness&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;第一行是绝缘体基本反射率，0.04是统计了大部分绝缘体的基本反射率并取平均值得到。&lt;/p&gt;
-
-&lt;p&gt;第二行使用了一个新的参数叫金属性metalness，这是个十分人为的控制变量，范围为0.0到1.0；surfaceColor就是反射颜色值，例如黄金反射颜色为(1.00, 0.71, 0.29)。然后就可以使用mix函数和metalness做插值，metalness越接近0，那么就越接近绝缘体，metalness越接近1，那么就越接近surfaceColor。&lt;/p&gt;
-
-&lt;p&gt;有了\( F_{0} \)后，就可以代入到菲涅尔方程做运算了：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;fresnelSchlick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;5.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;G，Geometry function，几何属性函数&lt;/h3&gt;
-
-&lt;p&gt;微平面的起伏不定，导致微平面之间产生了自阴影（self-shadowing）。G函数模拟计算的就是这个事情. 粗糙度越高，自阴影越多，反射出去的光就越少。G函数输出的是一个比值，0.0表示百分百自阴影（全黑掉），1.0表示没有任何自阴影（全白）。&lt;/p&gt;
-
-&lt;h4&gt;Smith&amp;#39;s Schlick-GGX&lt;/h4&gt;
-
-&lt;p&gt;\[ G(n, v, k) = \frac { n\cdot v }{ (n\cdot v)(1 - k) + k } \]&lt;/p&gt;
-
-&lt;p&gt;输入参数：平面法线n、视角向量v、粗糙度\( \alpha \)的重新映射k。&lt;/p&gt;
-
-&lt;p&gt;k的公式要看情况做选择，例如对于方向光，有:&lt;/p&gt;
-
-&lt;p&gt;\[ k = \frac { (\alpha + 1)^{2} }{ 8 } \]&lt;/p&gt;
-
-&lt;p&gt;为了更加地近似模拟平面几何属性，可以再应用一条公式（Smith&amp;#39;s method）:&lt;/p&gt;
-
-&lt;p&gt;\[ G&amp;#39;(n,v,l,k) = G(n,v,k)G(n,l,k) \]&lt;/p&gt;
-
-&lt;p&gt;Smith&amp;#39;s method同时处理掉了微平面的高低起伏导致的对光线、对视角的障碍问题，如下图。图中左边，视角向量（红色）的路线上有一个微平面突起，导致接收不到左边的光线的反射，这种情况叫&lt;strong&gt;几何障碍（geometry obstruction）&lt;/strong&gt;；图中右边，光线到达微平面后又反射到另一个微平面上（能量衰减了），没有直接反射到眼睛，这种情况叫&lt;strong&gt;几何遮蔽（geometry shadowing）&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.9/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;shader：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GeometrySmith&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NdotL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ggx2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;Cook-Torrance reflectance equation&lt;/h2&gt;
-
-&lt;p&gt;有了brdf函数后，之前的渲染方程就可以变成：&lt;/p&gt;
-
-&lt;p&gt;\[ L_{o}(p, \omega _{o}) = L_{e}(p, \omega _{o})  + \int _{\Omega } (k_{d}\frac {c}{\pi } + k_{s}\frac { DFG }{ 4 (\omega _{o} \cdot \mathbf n)(\omega _{i} \cdot \mathbf n) } ) L_{i}(p, \omega _{i}) |cos \theta _{i}|d\omega _{i} \]&lt;/p&gt;
-</description>
-        <pubDate>Sat, 23 Sep 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/pbr-rendering/</link>
-        <guid isPermaLink="true">http://localhost:4000/pbr-rendering/</guid>
       </item>
     
   </channel>
