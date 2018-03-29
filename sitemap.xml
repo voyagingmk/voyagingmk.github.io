@@ -349,6 +349,10 @@
 <lastmod>2018-03-24T00:00:00+08:00</lastmod>
 </url>
 <url>
+<loc>http://localhost:4000/wynet-1/</loc>
+<lastmod>2018-03-29T00:00:00+08:00</lastmod>
+</url>
+<url>
 <loc>http://localhost:4000/404/</loc>
 </url>
 <url>
@@ -428,6 +432,9 @@
 </url>
 <url>
 <loc>http://localhost:4000/tag/tcp/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/tag/synchronize/</loc>
 </url>
 <url>
 <loc>http://localhost:4000/baidu_verify_0OpfO1OtHA.html</loc>
