@@ -118,6 +118,8 @@
 
 <p>A：wait-free是比lock-free更进一步的东西，当然也得是无锁。</p>
 
+<h2>ABA problem</h2>
+
 <h2>指令重排和thread fence</h2>
 
 <h3>指令重排：</h3>
@@ -202,9 +204,17 @@
 <li>memory_order_acq_rel：</li>
 </ul>
 
-<h2>cache line</h2>
+<h2>cache line 和 cache line bouncing</h2>
 
 <h2>little&#39;s law 律特定律</h2>
+
+<h2>consistent hashing 一致性哈希</h2>
+
+<p>参考代码（python）：<a href="https://github.com/goller/hashring">https://github.com/goller/hashring</a></p>
+
+<p>参考代码（go）：<a href="https://godoc.org/stathat.com/c/consistent#example-New">https://godoc.org/stathat.com/c/consistent#example-New</a></p>
+
+<p><a href="https://github.com/ioriiod0/consistent_hash">https://github.com/ioriiod0/consistent_hash</a></p>
 
   </div>
   <div class="entry">
