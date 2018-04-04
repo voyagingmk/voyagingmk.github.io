@@ -353,6 +353,10 @@
 <lastmod>2018-03-29T00:00:00+08:00</lastmod>
 </url>
 <url>
+<loc>http://localhost:4000/zlib-1/</loc>
+<lastmod>2018-04-02T00:00:00+08:00</lastmod>
+</url>
+<url>
 <loc>http://localhost:4000/404/</loc>
 </url>
 <url>
@@ -435,6 +439,12 @@
 </url>
 <url>
 <loc>http://localhost:4000/tag/synchronize/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/tag/zlib/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/tag/%E6%97%A0%E6%8D%9F%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95:deflate/</loc>
 </url>
 <url>
 <loc>http://localhost:4000/baidu_verify_0OpfO1OtHA.html</loc>

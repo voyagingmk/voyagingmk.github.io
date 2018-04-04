@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>无损压缩算法：deflate – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="" />
+    <meta property="og:description" content="" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="无损压缩算法：deflate" />
+    <meta property="twitter:title" content="无损压缩算法：deflate" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/zlib-1/',
+		  'title': '无损压缩算法：deflate'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>无损压缩算法：deflate</h1>
+  <h3>Tags: <a href="/tag/zlib/" rel="tag">zlib</a>, <a href="/tag/%E6%97%A0%E6%8D%9F%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95%EF%BC%9Adeflate/" rel="tag">无损压缩算法：deflate</a></h3>
+  <div class="entry">
+    <!--more-->
+
+<h2>名词解释</h2>
+
+<p><a href="https://en.wikipedia.org/wiki/DEFLATE">defalte</a>：这个东西是压缩算法关键中的关键。</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Zip_(file_format)">.zip</a>：archive format，使用了deflate压缩算法</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Gzip">.gz</a>(或gzip格式）: single file compress format，也是使用了deflate压缩算法</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Tar_(computing)">.tar.gz</a>或.tgz：archive format，可认为.gz文件的集合，但又不止是多个.gz的集合，因为tgz利用了文件之间的关联信息，提升了压缩率。</p>
+
+<p><a href="https://zlib.net/">zlib</a>：一个通用库，只有源代码，不提供可执行文件，只提供了deflate压缩和解压缩算法代码。linux内核、gzip、7-Zip、libpng、git等等都用了它。</p>
+
+<p><a href="https://www.gnu.org/software/gzip/manual/gzip.html">gzip</a>：GNU Gzip，一个工具，提供了gzip和gunzip可执行文件，直接可以用来压缩、解压缩。</p>
+
+<p>7-Zip：类似gzip，也是工具。</p>
+
+<h2>deflate算法 = Huffman Coding + LZ77</h2>
+
+<h3>Huffman Coding</h3>
+
+<h3>LZ77（Lempel–Ziv Coding）</h3>
+
+<p>LZ77是基于<strong>字典</strong>的算法。思路是，把数据中的重复（冗余）部分，用更短的metadata元信息代替。</p>
+
+<p>wiki：<a href="https://en.wikipedia.org/wiki/LZ77_and_LZ78#LZ77">LZ77 and LZ78</a></p>
+
+<p>根据wiki所说，作者是发明了2个算法LZ77和LZ78。这2个算法是其他LZ算法变种的基础（LZW、LZSS、LZMA）。</p>
+
+<p>下面重点介绍LZ77。</p>
+
+<h4>LZ77关键词：</h4>
+
+<ul>
+<li>input stream：待压缩的字节序列串</li>
+<li>byte：字节，是input stream的基本元素</li>
+<li>coding position：相当于一个指针，指向当前编码位置；也是lookahead buffer的起始位置</li>
+<li>lookahead buffer：就是指coding position为起点，input stream末端为终点的这段字节序列</li>
+<li>window：最大长度为W的滑动窗口，也是以coding position为起点，但是窗口方向是<strong>反向往左</strong>；窗口初始长度为0，随着编码的进行，长度会增长到W，然后就开始往右滑动</li>
+<li>match：当前匹配串</li>
+<li>pointer：当前匹配串的信息，一般用（B，L）表示，B表示Go <strong>B</strong>ack多少个字节（从coding position往左），因为也叫starting offset；L指匹配串从starting offset往右延伸的长度。 pointer为（0，0）时，表示匹配失败。</li>
+</ul>
+
+<h4>LZ77要注意的点：</h4>
+
+<ul>
+<li>pointer的L是可能比B还大的，即匹配串从window区域，延伸进了lookahead buffer区域，又因为匹配串的起点就是lookahead buffer的起点，所以此时出现了<strong>repeat</strong>现象。这个repeat是没问题的，甚至是有用的，可以对不断重复的数据大大压缩。</li>
+<li>pointer有匹配成功和匹配失败2种情况，所以把pointer信息输出时，还得在pointer前用一个bit表示是哪种pointer。</li>
+<li>pointer里2个信息：B和L，它们的位数一般是固定的。位数大小可以是任意的N bits，但显然，位数太少的话，说明最大匹配长度就受限，即对于超长串是无法高度压缩的。</li>
+<li><strong>重点</strong>：有的文章会把pointer表示成（B，L，C）。C就是一个byte数据，这是因为任意一个byte第一次出现时，肯定是找不到匹配串的，所以会输出（0，0，byte）；并且，为了输出缓冲区的结构一致性，当匹配成功时，也得输出（B，L，C），C相当于一个空的占位符，有点浪费，所以有的LZ77算法会再成功匹配后，把下一个byte存到占位符里，因此encoding position要移动L+1。（注意下文讲解的实例占位符是留空的）</li>
+<li>B和L耗用的位数不需要一样。</li>
+<li>既然固定了B和L的位数大小，那么最大窗口大小W也是可以固定的，例如当W为32KB时，那么15 bits就可以表达32KB的任意一个值。</li>
+<li>window的最大长度W影响到压缩比率和压缩效率。显然W越大，匹配得越充分，但也越慢。</li>
+<li>需要定一个<strong>最小匹配长度</strong>，只有当当前匹配串大于最小匹配长度时，这个匹配才成立。例如B用15位，L用8位，差不多就用了3个字节，如果当前匹配串不足3个字节，例如1个字节，那就导致encoding后长度反而更长了。</li>
+<li>显然LZ77的compress做的工作量要比decompress多得多，因为做了大量的匹配查找。所以LZ77特别适合于<strong>一次压缩，多次解压缩</strong>的情景。</li>
+</ul>
+
+<h4>实例：</h4>
+
+<p>这种算法用实例来理解是最快的。微软<a href="https://msdn.microsoft.com/en-us/library/ee916854.aspx">这篇文章</a>就给出了一个例子，这里拿来用一下。</p>
+
+<p>（<a href="https://www.cnblogs.com/junyuhuang/p/4138376.html">另外这篇文章</a>给出了这个例子的示意图，建议同时参照下，本文就不做图了）</p>
+
+<p>待压缩字节串（流）：AABCBBABC</p>
+
+<p>字节串中每个字节记一个位置标记position（上面的encoding position也是指这个），从1开始数，不是从0哦：</p>
+
+<pre>
+
+Position    1    2    3    4    5    6    7    8    9
+
+Byte        A    A    B    C    B    B    A    B    C
+
+</pre>
+
+<p>开始LZ77编码：</p>
+
+<p><img src="../images/2018.4/1.png" alt="1.png"></p>
+
+<p>LZ77编码后，就输出了最右边一列，注意，这里只是方便理解，实际上不会存成文本形式，没有（ ），这些字符。</p>
+
+<p>这里重点要搞懂output这一列是怎么来的，用人话来描述下：</p>
+
+<ol>
+<li>初始时，滑动窗口window是空的：【】</li>
+<li>第1次遇到A，然后在window里match一下，必然找不到A，match失败，于是输出(0,0)A。window更新为【A】</li>
+<li>第2次遇到A，window里match一下，此时要注意，match的方向是右到左（反向）。在window右起第1个位置就找到了A，所以输出(1, 1)，window更新为【AA】</li>
+<li>第1次遇到B，同步骤1，输出(0,0)B，window更新为【AAB】</li>
+<li>同步骤3，输出(0,0)C，window更新为【AABC】</li>
+<li>第2次遇到B，在window第2个位置找到B，于是starting position为2，同时发现下一个字节不匹配（左C和右B），所以长度为1，输出（2，1），window更新为【AABCB】</li>
+<li>第3次遇到B，在window第1个位置就找到B，同时发现下一个字节不匹配（左B和右C），所以长度为1，输出（1，1），window更新为【AABCBB】</li>
+<li>第3次遇到A，在window第5个位置找到A，然后迭代匹配，发现后面的BC也匹配上，所以长度为3，输出（5，3），window更新为【AABCBBABC】</li>
+</ol>
+
+<p>接下来，看看如何把这一列output再解码回原文：</p>
+
+<p><img src="../images/2018.4/2.png" alt="2.png"></p>
+
+<ol>
+<li>输入(0,0)A，表示直接往输出缓冲区push一个A字符。 【A】</li>
+<li>输入(1,1)，只有meta信息，(1,1)意思是它的位置等于1，长度为1，<strong>注意，位置是反向数，长度是正向数</strong>。显然，(1,1)等于缓冲区的字符A，于是push了一个一样的A。【AA】</li>
+<li>(0,0)B，和步骤1一样，直接push一个B。【AAB】</li>
+<li>(0,0)C，同上。【AABC】</li>
+<li>(2,1)，又是meta信息，位置为2，长度为1，倒着数当前缓冲区，发现起点是B字符，长度为1，所以push一个B。【AABCB】</li>
+<li>(1,1)，参考步骤5，也是push一个B。【AABCBB】</li>
+<li>(5,3)，长度终于不为1了，首先在缓冲区倒着数5下，发现是左起第二个A，然后长度3，于是往右再获取2个字符，得到ABC，push到缓冲区，得到【AABCBBABC】</li>
+</ol>
+
+<p>上面的内容搞得懂的话，就差不多了，要继续深入就是看源码。但不急，先看完Huffman Coding。</p>
+
+<h2>zlib</h2>
+
+<h2>adler32 和 CRC32</h2>
+
+<h2>资料</h2>
+
+<p>wiki：<a href="https://en.wikipedia.org/wiki/DEFLATE">https://en.wikipedia.org/wiki/DEFLATE</a></p>
+
+<p>zlib：<a href="https://zlib.net/feldspar.html">https://zlib.net/feldspar.html</a></p>
+
+  </div>
+  <div class="entry">
+  (未经授权禁止转载)
+  </div>
+  <div class="date">
+    Written on April  2, 2018
+  </div>
+  <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+  <img src="../images/dashang1.jpeg" />
+  <img src="../images/dashang2.jpeg" />
+    
+    
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
