@@ -441,9 +441,6 @@
 <loc>http://localhost:4000/tag/synchronize/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/tag/zlib/</loc>
-</url>
-<url>
 <loc>http://localhost:4000/tag/deflate/</loc>
 </url>
 <url>
