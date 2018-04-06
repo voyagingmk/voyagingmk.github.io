@@ -104,7 +104,7 @@
 
 <p>经过了解，gzip的源码相对</p>
 
-<h2>deflate算法 = Huffman Coding + LZ77</h2>
+<h2>Huffman Coding 和 LZ77</h2>
 
 <h3>LZ77（Lempel–Ziv Coding）</h3>
 
@@ -197,6 +197,10 @@ Byte        A    A    B    C    B    B    A    B    C
 
 <h3>Huffman Coding</h3>
 
+<h2>zlib 和 deflate</h2>
+
+<h3>zlib</h3>
+
 <h3>deflate</h3>
 
 <p>先做LZ77，再做Huffman，</p>
@@ -217,7 +221,7 @@ Byte        A    A    B    C    B    B    A    B    C
 
 <p>gzip单个文件时，会给该文件加上.gz后缀。</p>
 
-<p>然后又到了90年代中期，又遇到了版权问题，这次是关于gif格式的。于是又有人站出来开发了替代品：png。这是一种无损压缩图片的技术，同样使用了deflate作为内部格式。为了扩大png的使用范围，就弄出了libpng和zlib两个网站。libpng是用来处理png有关的所有事情，而zlib是作为libpng背后的支撑：提供了压缩和解压缩算法（当然现在也被用于别的软件）。注意，zlib的代码继承自gzip。</p>
+<p>然后又到了90年代中期，又遇到了版权问题，这次是关于gif格式的，gif用了带版权的LZW算法。于是又有人站出来开发了替代品：png。这是一种无损压缩图片的技术，同样使用了deflate作为内部格式。为了扩大png的使用范围，就弄出了libpng和zlib两个网站。libpng是用来处理png有关的所有事情，而zlib是作为libpng背后的支撑：提供了压缩和解压缩算法（当然现在也被用于别的软件）。注意，zlib的代码继承自gzip。</p>
 
 <p>小结2点：<strong>gzip是zlib之父；以上说的版权问题现在都已过期了</strong>。</p>
 
@@ -237,9 +241,13 @@ Byte        A    A    B    C    B    B    A    B    C
 
 <h2>资料</h2>
 
+<p><a href="https://tools.ietf.org/html/rfc1951">RFC1951 : DEFLATE Compressed Data Format Specification version 1.3</a></p>
+
 <p><a href="http://qianwenjie.net/?p=17">http://qianwenjie.net/?p=17</a></p>
 
 <p><a href="http://marknelson.us/1997/01/01/zlib-engine/">http://marknelson.us/1997/01/01/zlib-engine/</a></p>
+
+<p><a href="http://www.zlib.net/feldspar.html">http://www.zlib.net/feldspar.html</a></p>
 
   </div>
   <div class="entry">
