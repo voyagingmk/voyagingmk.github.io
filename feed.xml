@@ -7,24 +7,12 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>epoll原理</title>
-        <description>&lt;p&gt;基于以下四篇文章，并结合linux源码，学习下epoll原理：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://idndx.com/2014/09/01/the-implementation-of-epoll-1/&quot;&gt;The Implementation of epoll (1)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://idndx.com/2014/09/02/the-implementation-of-epoll-2/&quot;&gt;The Implementation of epoll (2)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://idndx.com/2014/09/22/the-implementation-of-epoll-3/&quot;&gt;The Implementation of epoll (3)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://idndx.com/2015/07/08/the-implementation-of-epoll-4/&quot;&gt;The Implementation of epoll (4)&lt;/a&gt;&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://baotiao.github.io/2016/03/06/epoll_implementation/&quot;&gt;http://baotiao.github.io/2016/03/06/epoll_implementation/&lt;/a&gt;&lt;/p&gt;
+        <title>ECC算法</title>
+        <description>&lt;!--more--&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/epoll-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/epoll-1/</guid>
+        <link>http://localhost:4000/crypto-ecc/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-ecc/</guid>
       </item>
     
       <item>
