@@ -146,9 +146,21 @@
 &lt;li&gt;即使单次会话的对称密钥被破解了，也不会影响到别的会话&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;h3&gt;为什么可行&lt;/h3&gt;
+
+&lt;p&gt;关键在于，用于生成会话密钥的“数据”，根本就没通过网络发送出去。而用公钥加密的密钥，本身就是通过网络传输的。&lt;/p&gt;
+
+&lt;p&gt;后者显然更容易被攻击，主要获得私钥并记录了整个会话的数据流，就可以破解了。&lt;/p&gt;
+
+&lt;p&gt;而前者，对称密钥的协商，根本没有用到公钥私钥，经过网络的也不是什么被加密后的密钥，而只是协商信息。攻击者要想破解某次会话的内容，只能从该次会话的加密数据流入手，没有他法。&lt;/p&gt;
+
 &lt;h3&gt;问题&lt;/h3&gt;
 
 &lt;p&gt;要做到perfect，意味着每次会话都要协商密钥，意味着增加了计算开销，不然不能保证密钥的转瞬即逝性质（ephemeral）。&lt;/p&gt;
+
+&lt;h2&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;https://scotthelme.co.uk/perfect-forward-secrecy/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-ecc/</link>
