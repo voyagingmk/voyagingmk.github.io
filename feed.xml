@@ -7,8 +7,77 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>ECC算法</title>
+        <title>漫谈网络通讯加密</title>
         <description>&lt;!--more--&gt;
+
+&lt;h2&gt;几种加密算法&lt;/h2&gt;
+
+&lt;h3&gt;RSA&lt;/h3&gt;
+
+&lt;p&gt;基于大数质因子分解问题。&lt;/p&gt;
+
+&lt;h3&gt;ECC&lt;/h3&gt;
+
+&lt;p&gt;基于在椭圆曲线上的离散对数的求取问题。&lt;/p&gt;
+
+&lt;h3&gt;DH（Diffie-Hellman）&lt;/h3&gt;
+
+&lt;p&gt;基于离散对数问题。&lt;/p&gt;
+
+&lt;h2&gt;&lt;strong&gt;完全前向保密&lt;/strong&gt; PFS(Perfect Forward Secrecy)&lt;/h2&gt;
+
+&lt;h3&gt;没有PFS之前：&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果攻击者曾经窥探并保存了用户和服务器的加密数据流，且包括被公钥加密的对称密钥&lt;/li&gt;
+&lt;li&gt;如果有一天攻击者通过某种办法获得了服务器私钥&lt;/li&gt;
+&lt;li&gt;攻击者同时拥有了：“用公钥加密的对称密钥”、“私钥”&lt;/li&gt;
+&lt;li&gt;攻击者用“私钥”对“用公钥加密的对称密钥”解密，获得了对称密钥&lt;/li&gt;
+&lt;li&gt;攻击者此时就可以用破解出来的对称密钥对已存的历史加密数据做解密&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;基于DH的PFS：&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;不再使用公钥加密对称密钥的方案&lt;/li&gt;
+&lt;li&gt;改为用DH密钥交换算法（key exchange），协商对称密钥，可以直接明文传输协商时需要的信息（并不怕这些信息被窃取）&lt;/li&gt;
+&lt;li&gt;每次会话都协商新的对称密钥&lt;/li&gt;
+&lt;li&gt;因为公钥私钥没有用来加密对称密钥了，所以即使服务器私钥被盗了也不会导致历史对称密钥被破解&lt;/li&gt;
+&lt;li&gt;即使单次会话的对称密钥被破解了，也不会影响到别的会话&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Alice和Bob首先线下商量好，使用&lt;strong&gt;质数p = 23、基数g = 5&lt;/strong&gt;作为通讯基础&lt;/li&gt;
+&lt;li&gt;每次Alice和Bob想要建立通讯(连接)时，Alice自己随机选择一个数字：a = 6；Bob自己随机选择一个数字：b = 15&lt;/li&gt;
+&lt;li&gt;Alice计算： \( A = ( g^{a} ) \% p = ( 5^{6} ) \% 23 =  15625 \% 23 = 8 \)，把A发给Bob&lt;/li&gt;
+&lt;li&gt;Bob计算： \( B = ( g^{b} ) \% p = ( 5^{15} ) \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice&lt;/li&gt;
+&lt;li&gt;Alice收到B后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Alice} = ( B^{a} ) \% p = ( 19^{6} ) \% 23 = 47045881 \% 23 = 2 \)&lt;/li&gt;
+&lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} = ( A^{b} ) \% p = ( 8^{15} ) \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;其中，用到了&lt;strong&gt;模幂运算&lt;/strong&gt;的基本定理，对于任意自然数a、b、n，有：&lt;/p&gt;
+
+&lt;p&gt;\[ ab\  \%\  n =  ( ab\ \%\  n) \  \%\  n =  ( (a\ \%\  n)  (b\ \%\  n) ) \ \%\  n \]&lt;/p&gt;
+
+&lt;p&gt;应用到幂运算：&lt;/p&gt;
+
+&lt;p&gt;\[ a^{b}\  \%\  n =  ( a \cdots  a ) \  \%\  n =  ( (a\ \%\  n) \cdots  (a\ \%\  n) ) \  \%\  n =  ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n \]&lt;/p&gt;
+
+&lt;p&gt;于是有：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{Alice} = ( B^{a} ) \% p =  (\  (\  g^{b} ) \% p\  ) ^{a}\   ) \% p =   (  \ g \% p\  ) ^{ab} \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
+
+&lt;p&gt;同理：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{Bob} = ( A^{b} ) \% p =  (\  (\  g^{a} ) \% p\  ) ^{b}\   ) \% p =   (  \ g \% p\  ) ^{ab} \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
+
+&lt;p&gt;显然：&lt;/p&gt;
+
+&lt;p&gt;\[  s_{Alice} = s_{Bob}  \]&lt;/p&gt;
+
+&lt;p&gt;这样就协商出了对称的密钥。&lt;/p&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-ecc/</link>
