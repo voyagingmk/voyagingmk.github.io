@@ -99,6 +99,8 @@
 
 &lt;p&gt;关键在于&lt;strong&gt;p这个素数要足够大&lt;/strong&gt;，那么以现在的计算机计算速度，就很难通过A（或B）、g、p这3个参数算出a，这被称为&lt;a href=&quot;https://en.wikipedia.org/wiki/Discrete_logarithm&quot;&gt;离散对数难题&lt;/a&gt;。&lt;/p&gt;
 
+&lt;p&gt;这里需要注意，难的是&lt;strong&gt;离散对数&lt;/strong&gt;，即有log和mod运算并且参数是整数；若单单只有log运算，是不难的。&lt;/p&gt;
+
 &lt;h3&gt;p、g的选取问题&lt;/h3&gt;
 
 &lt;p&gt;涉及到了一些数论的概念：&lt;/p&gt;
@@ -158,13 +160,65 @@
 
 &lt;p&gt;要做到perfect，意味着每次会话都要协商密钥，意味着增加了计算开销，不然不能保证密钥的转瞬即逝性质（ephemeral）。&lt;/p&gt;
 
+&lt;h2&gt;通讯的认证&lt;/h2&gt;
+
+&lt;p&gt;认证问题是指，如何确定和自己通讯的对方不是其他假冒者？&lt;/p&gt;
+
+&lt;p&gt;目前有2个主要的解决方案：消息验证码（message authentication code，MAC）和数字签名（digital signature）。&lt;/p&gt;
+
+&lt;h3&gt;消息验证码&lt;/h3&gt;
+
+&lt;p&gt;前提：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;通讯双方需要先约定好一个密钥，称为&lt;strong&gt;共享密钥&lt;/strong&gt;，双方都把它安全地存起来&lt;/li&gt;
+&lt;li&gt;对任意长度的消息数据，用共享密钥可以计算出对应的固定长度的MAC&lt;/li&gt;
+&lt;li&gt;计算MAC必须用到共享密钥，除非密钥泄露，否则第三者无法计算出MAC值&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;流程：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;协商密钥&lt;/li&gt;
+&lt;li&gt;发送方对消息计算MAC值&lt;/li&gt;
+&lt;li&gt;发送方把消息和MAC值都发给对方&lt;/li&gt;
+&lt;li&gt;对方收到消息后，也用共享密钥计算MAC值，并与收到的MAC值比对&lt;/li&gt;
+&lt;li&gt;如果2个MAC值一致，那么消息确实来自于发送方&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;问题：&lt;/p&gt;
+
+&lt;h4&gt;各种问题：&lt;/h4&gt;
+
+&lt;p&gt;一，密钥协商问题（上面已提过）。&lt;/p&gt;
+
+&lt;p&gt;二，重放攻击(replay attack)：攻击者窃听通讯双方（例如2个银行）的数据，把汇款消息保存了下来（带有MAC值），然后重复发送这个汇款消息，接收方就会重复地向发送方发起汇款。其中，攻击者并不需要破解消息。&lt;/p&gt;
+
+&lt;p&gt;解决方法：每条消息都加序号，序号必须保证递增，从而每条消息的序号唯一；消息加时间戳，但时钟同步和时钟精度又是新的问题；每个消息加nonce，一个只能用一次随机数。&lt;/p&gt;
+
+&lt;p&gt;三，密钥推测攻击：应确保攻击者不能通过MAC值逆向出共享密钥，否则攻击者就可以伪造发包了。&lt;/p&gt;
+
+&lt;p&gt;四，对第三方证明问题：共享密钥只能保证2个人之间的通讯认证，但是如果多于2个人时，理论上共享密钥无法解决认证问题。&lt;/p&gt;
+
+&lt;p&gt;例子：用户A向银行B用共享密钥传输了一个取款消息，如果B取款前需要告知C“A申请取款”，C是否可以相信A真的发出了取款消息，还是说消息是B杜撰的？答案是C没有办法知道。&lt;/p&gt;
+
+&lt;p&gt;五，防止否则问题：就上面的取款例子，如果A真的发起了取款消息，但是事后又矢口否认，A认为是B杜撰了这个消息，此时事实就说不清了，A和B都有共享密钥，无法知道消息是A说的还是B说的。&lt;/p&gt;
+
+&lt;h3&gt;数字签名&lt;/h3&gt;
+
+&lt;h2&gt;完整的网络安全通讯设计&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
 &lt;h2&gt;参考资料&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;https://scotthelme.co.uk/perfect-forward-secrecy/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/crypto-ecc/</link>
-        <guid isPermaLink="true">http://localhost:4000/crypto-ecc/</guid>
+        <link>http://localhost:4000/crypto-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-1/</guid>
       </item>
     
       <item>
