@@ -154,7 +154,7 @@
 &lt;li&gt;其实就是指消息验证码MAC。加了MAC后，解密时，验证MAC，防止密文被篡改（tamper），保持完整。&lt;/li&gt;
 &lt;li&gt;CCM模式，等于CTR加上CBC-MAC，不过做了2重加密，速度慢。&lt;/li&gt;
 &lt;li&gt;OCB，有版权问题据说。&lt;/li&gt;
-&lt;li&gt;GCM，等于CTR加上GHASH。这个是NIST官方标准了，绝对靠谱，性能据说很可以。&lt;/li&gt;
+&lt;li&gt;GCM，等于CTR加上GHASH。这个是NIST官方标准了，绝对靠谱，性能据说很可以，openssl里面有一堆GASH的汇编代码，硬件级别上也有相应支持。&lt;/li&gt;
 &lt;li&gt;这2个性质不一定要由分组加密完成。也可以外部套一个非对称加密，用数字签名来保证完整性。&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
