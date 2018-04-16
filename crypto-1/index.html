@@ -85,25 +85,29 @@
     <div class="entry">
         <!--more-->
 
-<h2>几种加密算法</h2>
+<h1>常见加密算法</h1>
 
-<h3><a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">RSA</a> （Rivest–Shamir–Adleman)（1977年）</h3>
+<h2><a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">RSA</a> （Rivest–Shamir–Adleman)（1977年）</h2>
 
-<p>基于大数质因子分解问题。</p>
+<p>基于大数（1024bits以上)的质因数分解问题。</p>
 
-<h3><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DH</a>（Diffie-Hellman key exchange）（1976年）</h3>
+<h2><a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a>（Elliptic-curve cryptography） （1985年）</h2>
+
+<p>基于在椭圆曲线上的离散对数的求取问题。</p>
+
+<h2><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES（Rijndael）</a> （2001年）</h2>
+
+<p>AES的意思是高级加密标准（Advanced Encryption Standard），使用的算法是Rijndael，Rijndael是当时加密算法竞赛的top 1。</p>
+
+<h2><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DH</a>（Diffie-Hellman key exchange）（1976年）</h2>
 
 <p>密钥交换算法。</p>
 
 <p>基于离散对数问题。</p>
 
-<h3><a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a>（Elliptic-curve cryptography） （1985年）</h3>
+<h1>DH算法</h1>
 
-<p>基于在椭圆曲线上的离散对数的求取问题。</p>
-
-<h2>DH算法</h2>
-
-<h3>key exchange例子（ <a href="https://scotthelme.co.uk/perfect-forward-secrecy/">from here</a> )：</h3>
+<h2>key exchange例子（ <a href="https://scotthelme.co.uk/perfect-forward-secrecy/">from here</a> )：</h2>
 
 <ol>
 <li>Alice和Bob首先线下商量好，使用<strong>p (prime, 质数) = 23、g (generator, 生成器) = 5</strong>作为通讯基础（p和g不需要绝对的保密，泄露了也没事）</li>
@@ -115,7 +119,7 @@
 <li>Bob收到A后，可计算出<strong>对称密钥</strong>：\( s_{Bob} = ( A^{b} ) \% p = ( 8^{15} ) \% 23 = 35184372088832 \% 23 = 2 \)</li>
 </ol>
 
-<h3>数学原理</h3>
+<h2>数学原理</h2>
 
 <p>其中，用到了<strong>模幂运算</strong>的基本定理，对于任意自然数a、b、n，有：</p>
 
@@ -139,7 +143,7 @@
 
 <p>这样就协商出了对称的密钥。</p>
 
-<h3>为什么可行</h3>
+<h2>为什么可行</h2>
 
 <p>从攻击者角度看，攻击者最多只能获得以下信息：</p>
 
@@ -176,7 +180,7 @@
 
 <p>这里需要注意，难的是<strong>离散对数</strong>，即有log和mod运算并且参数是整数；若单单只有log运算，是不难的。</p>
 
-<h3>p、g的选取问题</h3>
+<h2>p、g的选取问题</h2>
 
 <p>涉及到了一些数论的概念：</p>
 
@@ -201,9 +205,48 @@
 
 <p>再讲下去就是深入密码学、数论了，按住不表。</p>
 
-<h2><strong>完全前向保密</strong> PFS(Perfect Forward Secrecy)</h2>
+<h1>分组加密算法的模式</h1>
 
-<h3>没有PFS之前：</h3>
+<p>分组加密算法，都需要考虑wrap模式（【Block Cipher Modes（<a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation%EF%BC%89%EF%BC%89%E3%80%82">https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation））。</a></p>
+
+<p>模式多种多样，也很容易查到介绍资料。选择模式时主要考察几个点：</p>
+
+<ul>
+<li>并发性：
+
+<ul>
+<li>如CTR、GCM计数器模式</li>
+</ul></li>
+<li>安全性：
+
+<ul>
+<li>如ECB模式对重复出现的明文分组加密后结果是一样的，容易被猜出</li>
+<li>如CBC模式，会遇到<a href="https://en.wikipedia.org/wiki/Padding_oracle_attack">padding oracle attacks</a>，这篇写得很详细：<a href="https://blog.csdn.net/qq_35078631/article/details/78484980">https://blog.csdn.net/qq_35078631/article/details/78484980</a></li>
+</ul></li>
+<li>完整性(integrity)和可验证性(authenticity)：
+
+<ul>
+<li>其实就是指消息验证码MAC。加了MAC后，解密时，验证MAC，防止密文被篡改（tamper），保持完整。</li>
+<li>CCM模式，等于CTR加上CBC-MAC，不过做了2重加密，速度慢。</li>
+<li>OCB，有版权问题据说。</li>
+<li>GCM，等于CTR加上GHASH。这个是NIST官方标准了，绝对靠谱，性能据说很可以。</li>
+<li>这2个性质不一定要由分组加密完成。也可以外部套一个非对称加密，用数字签名来保证完整性。</li>
+</ul></li>
+</ul>
+
+<p>AES各种模式的选择问题，参考:</p>
+
+<p><a href="https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb">https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb</a></p>
+
+<p>此回答近300赞，在stackoverflow上算很多了。</p>
+
+<p>如果没耐心看，就看作者的最后总结：</p>
+
+<p><strong>如果数据已经在外部做了非对称加密数字签名以支持验证，那么用CBC即可，否则用GCM</strong>。</p>
+
+<h1><strong>完全前向保密</strong> PFS(Perfect Forward Secrecy)</h1>
+
+<h2>没有PFS之前：</h2>
 
 <ul>
 <li>如果攻击者曾经窥探并保存了用户和服务器的加密数据流，且包括被公钥加密的对称密钥</li>
@@ -213,7 +256,7 @@
 <li>攻击者此时就可以用破解出来的对称密钥对已存的历史加密数据做解密</li>
 </ul>
 
-<h3>基于DH的PFS：</h3>
+<h2>基于DH的PFS：</h2>
 
 <ul>
 <li>不再使用公钥加密对称密钥的方案</li>
@@ -223,7 +266,7 @@
 <li>即使单次会话的对称密钥被破解了，也不会影响到别的会话</li>
 </ul>
 
-<h3>为什么可行</h3>
+<h2>为什么可行</h2>
 
 <p>关键在于，用于生成会话密钥的“数据”，根本就没通过网络发送出去。而用公钥加密的密钥，本身就是通过网络传输的。</p>
 
@@ -231,17 +274,17 @@
 
 <p>而前者，对称密钥的协商，根本没有用到公钥私钥，经过网络的也不是什么被加密后的密钥，而只是协商信息。攻击者要想破解某次会话的内容，只能从该次会话的加密数据流入手，没有他法。</p>
 
-<h3>问题</h3>
+<h2>问题</h2>
 
 <p>要做到perfect，意味着每次会话都要协商密钥，意味着增加了计算开销，不然不能保证密钥的转瞬即逝性质（ephemeral）。</p>
 
-<h2>通讯的认证</h2>
+<h1>通讯的认证</h1>
 
 <p>认证问题是指，如何确定和自己通讯的对方不是其他假冒者？</p>
 
 <p>目前有2个主要的解决方案：消息验证码（message authentication code，MAC）和数字签名（digital signature）。</p>
 
-<h3>消息验证码</h3>
+<h2>消息验证码</h2>
 
 <p>前提：</p>
 
@@ -261,7 +304,7 @@
 <li>如果2个MAC值一致，那么消息确实来自于发送方</li>
 </ol>
 
-<h4>各种问题：</h4>
+<h3>各种问题：</h3>
 
 <p>一，密钥协商问题（上面已提过）。</p>
 
@@ -277,7 +320,7 @@
 
 <p>五，防止否认问题：就上面的取款例子，如果A真的发起了取款消息，但是事后又矢口否认，A认为是B杜撰了这个消息，此时事实就说不清了，A和B都有共享密钥，无法知道消息是A说的还是B说的。</p>
 
-<h3>数字签名</h3>
+<h2>数字签名</h2>
 
 <p>简单来说，数字签名是公钥加密的逆向过程。</p>
 
@@ -304,7 +347,7 @@
 
 <p>其中还有一个关键点是由公钥的数学原理保证的：用私钥加密的消息，只能用配套的公钥才能解密。</p>
 
-<p>数字签名使用方法：</p>
+<h3>数字签名使用方法：</h3>
 
 <ol>
 <li>发送方计算消息的摘要（MD5，SHA-1）</li>
@@ -316,7 +359,7 @@
 
 <p>注意，上面说的消息，可以是明文也可以是密文，也就是说数字签名支持对明文做签名。</p>
 
-<p>公钥证书：</p>
+<h3>公钥证书：</h3>
 
 <p>对签名用到的公钥私钥对中的公钥也进行签名，就得到了公钥证书。（是不是有一种递归的感觉。）</p>
 
@@ -326,7 +369,7 @@
 
 <p>一般公钥证书会简称证书。</p>
 
-<p>数字签名的主要问题：</p>
+<h3>数字签名的主要问题：</h3>
 
 <p>抛开一些攻击问题不讲，最主要的问题就是上面刚提到的中间人攻击。</p>
 
@@ -340,13 +383,56 @@
 
 <p>链条的末端，就是所谓的根证书了。</p>
 
-<h2>完整的网络安全通讯设计</h2>
+<h3>公钥基础设施：PKI（Public-Key Infrasture）</h3>
+
+<p>PKI的组成结构：</p>
+
+<ul>
+<li>用户，使用PKI的人</li>
+<li>认证机构（CA，Certification Authority），颁发证书的实体</li>
+<li>仓库（Repo），也叫证书目录，保存证书的数据库</li>
+</ul>
+
+<p>PKI可以有无数个。</p>
+
+<p>重点要理解CA是怎么回事。</p>
+
+<p>CA主要做三件事：</p>
+
+<ol>
+<li>生成公钥密钥对。其实是可选的，如果由CA生成，那么需要安全地把私钥发给用户；如果是PKI用户生成，就简单多了。</li>
+<li>生成颁发证书。需要用到CA自己的私钥来对第一步的公钥进行数字签名，<strong>同时还需要对用户身份进行认证</strong>。</li>
+<li>作废（revoke）证书。作废比较复杂，因为用户会在本地缓存证书副本。于是就有了CRL，证书作废清单，（Certification Revocation List）。相当于是一个作废证书的公示榜单。其中每个证书有一个序列号可以作为id对应。用户通过查看CRL就可以知道证书有没作废。</li>
+</ol>
+
+<p>CA可以形成层级关系，最顶层的叫根CA。验证某个公钥证书时，需要从根CA开始，一层层往下验证，确保整条链上的证书都是合法的。</p>
+
+<h3>对证书的攻击</h3>
+
+<p>有社会学的攻击也有非社会学的，具体建议看《图解密码技术》的第十章。</p>
+
+<h3>为什么要搞得这么复杂</h3>
+
+<ul>
+<li>如果用户有办法能够取得可信的公钥，则不需要CA</li>
+<li>当持有可信的CA公钥，并相信这个CA，则可以相信该CA颁发的证书，从而获得可信的公钥。</li>
+</ul>
+
+<p>我的理解是，目前的技术瓶颈导致只能如此，没有更靠谱的方法。</p>
+
+<p>不过存在替代CA模式的其他解决方案：信任网络（web of trust），这个概念来源于PGP。</p>
+
+<p>信任网络就好像人与人之间的关系网（六度分隔理论），通过<strong>熟人推荐</strong>，就可以建立起信任链，从而解决公钥认证问题。</p>
+
+<p>PGP就是建立在信任网络的协议和软件。鉴于PGP的设计，PGP特别适合用于电子邮件传输，当然电子邮件又不仅限用PGP，还可以用基于CA的S/MIME。</p>
+
+<h1>完整的网络安全通讯设计</h1>
 
 <ol>
 <li></li>
 </ol>
 
-<h2>参考资料</h2>
+<h1>参考资料</h1>
 
 <p><a href="https://scotthelme.co.uk/perfect-forward-secrecy/">https://scotthelme.co.uk/perfect-forward-secrecy/</a></p>
 

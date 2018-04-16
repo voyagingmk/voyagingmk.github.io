@@ -10,25 +10,29 @@
         <title>漫谈网络通讯加密</title>
         <description>&lt;!--more--&gt;
 
-&lt;h2&gt;几种加密算法&lt;/h2&gt;
+&lt;h1&gt;常见加密算法&lt;/h1&gt;
 
-&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/RSA_(cryptosystem)&quot;&gt;RSA&lt;/a&gt; （Rivest–Shamir–Adleman)（1977年）&lt;/h3&gt;
+&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/RSA_(cryptosystem)&quot;&gt;RSA&lt;/a&gt; （Rivest–Shamir–Adleman)（1977年）&lt;/h2&gt;
 
-&lt;p&gt;基于大数质因子分解问题。&lt;/p&gt;
+&lt;p&gt;基于大数（1024bits以上)的质因数分解问题。&lt;/p&gt;
 
-&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange&quot;&gt;DH&lt;/a&gt;（Diffie-Hellman key exchange）（1976年）&lt;/h3&gt;
+&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_cryptography&quot;&gt;ECC&lt;/a&gt;（Elliptic-curve cryptography） （1985年）&lt;/h2&gt;
+
+&lt;p&gt;基于在椭圆曲线上的离散对数的求取问题。&lt;/p&gt;
+
+&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Advanced_Encryption_Standard&quot;&gt;AES（Rijndael）&lt;/a&gt; （2001年）&lt;/h2&gt;
+
+&lt;p&gt;AES的意思是高级加密标准（Advanced Encryption Standard），使用的算法是Rijndael，Rijndael是当时加密算法竞赛的top 1。&lt;/p&gt;
+
+&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange&quot;&gt;DH&lt;/a&gt;（Diffie-Hellman key exchange）（1976年）&lt;/h2&gt;
 
 &lt;p&gt;密钥交换算法。&lt;/p&gt;
 
 &lt;p&gt;基于离散对数问题。&lt;/p&gt;
 
-&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_cryptography&quot;&gt;ECC&lt;/a&gt;（Elliptic-curve cryptography） （1985年）&lt;/h3&gt;
+&lt;h1&gt;DH算法&lt;/h1&gt;
 
-&lt;p&gt;基于在椭圆曲线上的离散对数的求取问题。&lt;/p&gt;
-
-&lt;h2&gt;DH算法&lt;/h2&gt;
-
-&lt;h3&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h3&gt;
+&lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;
 
 &lt;ol&gt;
 &lt;li&gt;Alice和Bob首先线下商量好，使用&lt;strong&gt;p (prime, 质数) = 23、g (generator, 生成器) = 5&lt;/strong&gt;作为通讯基础（p和g不需要绝对的保密，泄露了也没事）&lt;/li&gt;
@@ -40,7 +44,7 @@
 &lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} = ( A^{b} ) \% p = ( 8^{15} ) \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3&gt;数学原理&lt;/h3&gt;
+&lt;h2&gt;数学原理&lt;/h2&gt;
 
 &lt;p&gt;其中，用到了&lt;strong&gt;模幂运算&lt;/strong&gt;的基本定理，对于任意自然数a、b、n，有：&lt;/p&gt;
 
@@ -64,7 +68,7 @@
 
 &lt;p&gt;这样就协商出了对称的密钥。&lt;/p&gt;
 
-&lt;h3&gt;为什么可行&lt;/h3&gt;
+&lt;h2&gt;为什么可行&lt;/h2&gt;
 
 &lt;p&gt;从攻击者角度看，攻击者最多只能获得以下信息：&lt;/p&gt;
 
@@ -101,7 +105,7 @@
 
 &lt;p&gt;这里需要注意，难的是&lt;strong&gt;离散对数&lt;/strong&gt;，即有log和mod运算并且参数是整数；若单单只有log运算，是不难的。&lt;/p&gt;
 
-&lt;h3&gt;p、g的选取问题&lt;/h3&gt;
+&lt;h2&gt;p、g的选取问题&lt;/h2&gt;
 
 &lt;p&gt;涉及到了一些数论的概念：&lt;/p&gt;
 
@@ -126,9 +130,48 @@
 
 &lt;p&gt;再讲下去就是深入密码学、数论了，按住不表。&lt;/p&gt;
 
-&lt;h2&gt;&lt;strong&gt;完全前向保密&lt;/strong&gt; PFS(Perfect Forward Secrecy)&lt;/h2&gt;
+&lt;h1&gt;分组加密算法的模式&lt;/h1&gt;
 
-&lt;h3&gt;没有PFS之前：&lt;/h3&gt;
+&lt;p&gt;分组加密算法，都需要考虑wrap模式（【Block Cipher Modes（&lt;a href=&quot;https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation%EF%BC%89%EF%BC%89%E3%80%82&quot;&gt;https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation））。&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;模式多种多样，也很容易查到介绍资料。选择模式时主要考察几个点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;并发性：
+
+&lt;ul&gt;
+&lt;li&gt;如CTR、GCM计数器模式&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;安全性：
+
+&lt;ul&gt;
+&lt;li&gt;如ECB模式对重复出现的明文分组加密后结果是一样的，容易被猜出&lt;/li&gt;
+&lt;li&gt;如CBC模式，会遇到&lt;a href=&quot;https://en.wikipedia.org/wiki/Padding_oracle_attack&quot;&gt;padding oracle attacks&lt;/a&gt;，这篇写得很详细：&lt;a href=&quot;https://blog.csdn.net/qq_35078631/article/details/78484980&quot;&gt;https://blog.csdn.net/qq_35078631/article/details/78484980&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;完整性(integrity)和可验证性(authenticity)：
+
+&lt;ul&gt;
+&lt;li&gt;其实就是指消息验证码MAC。加了MAC后，解密时，验证MAC，防止密文被篡改（tamper），保持完整。&lt;/li&gt;
+&lt;li&gt;CCM模式，等于CTR加上CBC-MAC，不过做了2重加密，速度慢。&lt;/li&gt;
+&lt;li&gt;OCB，有版权问题据说。&lt;/li&gt;
+&lt;li&gt;GCM，等于CTR加上GHASH。这个是NIST官方标准了，绝对靠谱，性能据说很可以。&lt;/li&gt;
+&lt;li&gt;这2个性质不一定要由分组加密完成。也可以外部套一个非对称加密，用数字签名来保证完整性。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;AES各种模式的选择问题，参考:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb&quot;&gt;https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;此回答近300赞，在stackoverflow上算很多了。&lt;/p&gt;
+
+&lt;p&gt;如果没耐心看，就看作者的最后总结：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;如果数据已经在外部做了非对称加密数字签名以支持验证，那么用CBC即可，否则用GCM&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h1&gt;&lt;strong&gt;完全前向保密&lt;/strong&gt; PFS(Perfect Forward Secrecy)&lt;/h1&gt;
+
+&lt;h2&gt;没有PFS之前：&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;如果攻击者曾经窥探并保存了用户和服务器的加密数据流，且包括被公钥加密的对称密钥&lt;/li&gt;
@@ -138,7 +181,7 @@
 &lt;li&gt;攻击者此时就可以用破解出来的对称密钥对已存的历史加密数据做解密&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3&gt;基于DH的PFS：&lt;/h3&gt;
+&lt;h2&gt;基于DH的PFS：&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;不再使用公钥加密对称密钥的方案&lt;/li&gt;
@@ -148,7 +191,7 @@
 &lt;li&gt;即使单次会话的对称密钥被破解了，也不会影响到别的会话&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3&gt;为什么可行&lt;/h3&gt;
+&lt;h2&gt;为什么可行&lt;/h2&gt;
 
 &lt;p&gt;关键在于，用于生成会话密钥的“数据”，根本就没通过网络发送出去。而用公钥加密的密钥，本身就是通过网络传输的。&lt;/p&gt;
 
@@ -156,17 +199,17 @@
 
 &lt;p&gt;而前者，对称密钥的协商，根本没有用到公钥私钥，经过网络的也不是什么被加密后的密钥，而只是协商信息。攻击者要想破解某次会话的内容，只能从该次会话的加密数据流入手，没有他法。&lt;/p&gt;
 
-&lt;h3&gt;问题&lt;/h3&gt;
+&lt;h2&gt;问题&lt;/h2&gt;
 
 &lt;p&gt;要做到perfect，意味着每次会话都要协商密钥，意味着增加了计算开销，不然不能保证密钥的转瞬即逝性质（ephemeral）。&lt;/p&gt;
 
-&lt;h2&gt;通讯的认证&lt;/h2&gt;
+&lt;h1&gt;通讯的认证&lt;/h1&gt;
 
 &lt;p&gt;认证问题是指，如何确定和自己通讯的对方不是其他假冒者？&lt;/p&gt;
 
 &lt;p&gt;目前有2个主要的解决方案：消息验证码（message authentication code，MAC）和数字签名（digital signature）。&lt;/p&gt;
 
-&lt;h3&gt;消息验证码&lt;/h3&gt;
+&lt;h2&gt;消息验证码&lt;/h2&gt;
 
 &lt;p&gt;前提：&lt;/p&gt;
 
@@ -186,7 +229,7 @@
 &lt;li&gt;如果2个MAC值一致，那么消息确实来自于发送方&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h4&gt;各种问题：&lt;/h4&gt;
+&lt;h3&gt;各种问题：&lt;/h3&gt;
 
 &lt;p&gt;一，密钥协商问题（上面已提过）。&lt;/p&gt;
 
@@ -202,7 +245,7 @@
 
 &lt;p&gt;五，防止否认问题：就上面的取款例子，如果A真的发起了取款消息，但是事后又矢口否认，A认为是B杜撰了这个消息，此时事实就说不清了，A和B都有共享密钥，无法知道消息是A说的还是B说的。&lt;/p&gt;
 
-&lt;h3&gt;数字签名&lt;/h3&gt;
+&lt;h2&gt;数字签名&lt;/h2&gt;
 
 &lt;p&gt;简单来说，数字签名是公钥加密的逆向过程。&lt;/p&gt;
 
@@ -229,7 +272,7 @@
 
 &lt;p&gt;其中还有一个关键点是由公钥的数学原理保证的：用私钥加密的消息，只能用配套的公钥才能解密。&lt;/p&gt;
 
-&lt;p&gt;数字签名使用方法：&lt;/p&gt;
+&lt;h3&gt;数字签名使用方法：&lt;/h3&gt;
 
 &lt;ol&gt;
 &lt;li&gt;发送方计算消息的摘要（MD5，SHA-1）&lt;/li&gt;
@@ -241,7 +284,7 @@
 
 &lt;p&gt;注意，上面说的消息，可以是明文也可以是密文，也就是说数字签名支持对明文做签名。&lt;/p&gt;
 
-&lt;p&gt;公钥证书：&lt;/p&gt;
+&lt;h3&gt;公钥证书：&lt;/h3&gt;
 
 &lt;p&gt;对签名用到的公钥私钥对中的公钥也进行签名，就得到了公钥证书。（是不是有一种递归的感觉。）&lt;/p&gt;
 
@@ -251,7 +294,7 @@
 
 &lt;p&gt;一般公钥证书会简称证书。&lt;/p&gt;
 
-&lt;p&gt;数字签名的主要问题：&lt;/p&gt;
+&lt;h3&gt;数字签名的主要问题：&lt;/h3&gt;
 
 &lt;p&gt;抛开一些攻击问题不讲，最主要的问题就是上面刚提到的中间人攻击。&lt;/p&gt;
 
@@ -265,13 +308,56 @@
 
 &lt;p&gt;链条的末端，就是所谓的根证书了。&lt;/p&gt;
 
-&lt;h2&gt;完整的网络安全通讯设计&lt;/h2&gt;
+&lt;h3&gt;公钥基础设施：PKI（Public-Key Infrasture）&lt;/h3&gt;
+
+&lt;p&gt;PKI的组成结构：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;用户，使用PKI的人&lt;/li&gt;
+&lt;li&gt;认证机构（CA，Certification Authority），颁发证书的实体&lt;/li&gt;
+&lt;li&gt;仓库（Repo），也叫证书目录，保存证书的数据库&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;PKI可以有无数个。&lt;/p&gt;
+
+&lt;p&gt;重点要理解CA是怎么回事。&lt;/p&gt;
+
+&lt;p&gt;CA主要做三件事：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;生成公钥密钥对。其实是可选的，如果由CA生成，那么需要安全地把私钥发给用户；如果是PKI用户生成，就简单多了。&lt;/li&gt;
+&lt;li&gt;生成颁发证书。需要用到CA自己的私钥来对第一步的公钥进行数字签名，&lt;strong&gt;同时还需要对用户身份进行认证&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;作废（revoke）证书。作废比较复杂，因为用户会在本地缓存证书副本。于是就有了CRL，证书作废清单，（Certification Revocation List）。相当于是一个作废证书的公示榜单。其中每个证书有一个序列号可以作为id对应。用户通过查看CRL就可以知道证书有没作废。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;CA可以形成层级关系，最顶层的叫根CA。验证某个公钥证书时，需要从根CA开始，一层层往下验证，确保整条链上的证书都是合法的。&lt;/p&gt;
+
+&lt;h3&gt;对证书的攻击&lt;/h3&gt;
+
+&lt;p&gt;有社会学的攻击也有非社会学的，具体建议看《图解密码技术》的第十章。&lt;/p&gt;
+
+&lt;h3&gt;为什么要搞得这么复杂&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果用户有办法能够取得可信的公钥，则不需要CA&lt;/li&gt;
+&lt;li&gt;当持有可信的CA公钥，并相信这个CA，则可以相信该CA颁发的证书，从而获得可信的公钥。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我的理解是，目前的技术瓶颈导致只能如此，没有更靠谱的方法。&lt;/p&gt;
+
+&lt;p&gt;不过存在替代CA模式的其他解决方案：信任网络（web of trust），这个概念来源于PGP。&lt;/p&gt;
+
+&lt;p&gt;信任网络就好像人与人之间的关系网（六度分隔理论），通过&lt;strong&gt;熟人推荐&lt;/strong&gt;，就可以建立起信任链，从而解决公钥认证问题。&lt;/p&gt;
+
+&lt;p&gt;PGP就是建立在信任网络的协议和软件。鉴于PGP的设计，PGP特别适合用于电子邮件传输，当然电子邮件又不仅限用PGP，还可以用基于CA的S/MIME。&lt;/p&gt;
+
+&lt;h1&gt;完整的网络安全通讯设计&lt;/h1&gt;
 
 &lt;ol&gt;
 &lt;li&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2&gt;参考资料&lt;/h2&gt;
+&lt;h1&gt;参考资料&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;https://scotthelme.co.uk/perfect-forward-secrecy/&lt;/a&gt;&lt;/p&gt;
 </description>
