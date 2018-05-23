@@ -689,6 +689,28 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
 
+&lt;h2&gt;self connect 自连接问题&lt;/h2&gt;
+
+&lt;p&gt;资料：&lt;a href=&quot;http://sgros.blogspot.jp/2013/08/tcp-client-self-connect.html&quot;&gt;http://sgros.blogspot.jp/2013/08/tcp-client-self-connect.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;就是客户端socket连接成功后，发现两端ip和port一模一样。&lt;/p&gt;
+
+&lt;p&gt;解释：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端发起连接时，只知道对端的ip和port，以及自己的ip（localhost），但自己的port是操作系统随机分配的。&lt;/li&gt;
+&lt;li&gt;每一个tcp连接都是由四元组(source IP, source port, destination IP, destination port)唯一标识的。&lt;/li&gt;
+&lt;li&gt;source port可以认为是随机分配，但linux可能会先顺序地分配用户有方法自己决定port，用bind，但一般很少这样做。&lt;/li&gt;
+&lt;li&gt;这个source port也叫Ephemeral port（转瞬即逝的端口），这些port是在某个范围段里选的，linux下调用cat /proc/sys/net/ipv4/ip_local_port_range可以查这个范围，会返回2个数字，例如 32768 60999&lt;/li&gt;
+&lt;li&gt;self connect只出现在本机客户端连本机服务器的情景下，这是因为source IP和destination IP要一致。&lt;/li&gt;
+&lt;li&gt;复现self connect的方法是，客户端connect本机ip_local_port_range里的某个端口，因为该端口并没有socket服务器在监听，所以一般情况下会返回RST。随着不断发起这些不可能成功的连接，可能会出现操作系统分配了一个和dest port一样的source port，于是self connect出现。&lt;/li&gt;
+&lt;li&gt;之所以允许这种情况，是因为tcp标准里有&lt;strong&gt;同时打开&lt;/strong&gt;这个概念。&lt;/li&gt;
+&lt;li&gt;self connect可以成功，意味着“两端”之间完成了三次握手，进入了ESTABLISHED状态。&lt;/li&gt;
+&lt;li&gt;self connect只可能发生在握手阶段，所以对于一个已经ESTABLISHED的socket，也无法利用self connect做什么坏事的。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;总结：避免self connect是最佳做法，也就是不要选择Ephemeral port作为server端的监听端口，就没事了。&lt;/p&gt;
+
 &lt;h2&gt;wait-free V.S. lock-free&lt;/h2&gt;
 
 &lt;p&gt;在wiki上这2个东西都是指&lt;a href=&quot;https://en.wikipedia.org/wiki/Non-blocking_algorithm&quot;&gt;Non-blocking algorithm&lt;/a&gt;。&lt;/p&gt;
