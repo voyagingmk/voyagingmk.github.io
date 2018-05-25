@@ -689,6 +689,27 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
 
+&lt;h2&gt;shared_ptr与多线程安全&lt;/h2&gt;
+
+&lt;p&gt;线程安全要点：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;因为shared_ptr内部维护了2个指针，1个指向真实的对象，一个指向control block，所以修改shared_ptr时需要两步操作，于是就有了race condition问题。&lt;/li&gt;
+&lt;li&gt;在两步操作中，shared_ptr修改control block是保证线程安全的，即ref count不会出问题，但修改对象指针则不是。&lt;/li&gt;
+&lt;li&gt;多线程&lt;strong&gt;只读&lt;/strong&gt;shared_ptr仍然是安全的。&lt;/li&gt;
+&lt;li&gt;多线程&lt;strong&gt;读写&lt;/strong&gt;shared_ptr不安全，其中不安全表现之一是出现&lt;strong&gt;空悬指针&lt;/strong&gt;。在这种情况下， 读写shared_ptr必须用mutex保护。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;shared_ptr细节特点：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;shared_ptr有ptr指针，control block里还有一个ptr指针：这是为了让shared_ptr无需虚析构函数(virtual destructor)，第一次构造shared_ptr时，就把目标对象的指针放进了control block的ptr里，从而记住类型，而shared_ptr的ptr则可以是对象类型也可以是父类型，并不影响计数降为0时的自动析构。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;基于特点1，于是可以实现更粗暴的多态，即任意shared_ptr&lt;T&gt;都可以转成shared_ptr&lt;void&gt;。可以用来防止对象过早析构，或者做泛型编程。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;应尽量用make_shared，可以节约一次new操作&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;weak_ptr：weak_ptr可以提升为shared_ptr，提升操作lock()据说是线程安全的。&lt;/p&gt;
+
 &lt;h2&gt;self connect 自连接问题&lt;/h2&gt;
 
 &lt;p&gt;资料：&lt;a href=&quot;http://sgros.blogspot.jp/2013/08/tcp-client-self-connect.html&quot;&gt;http://sgros.blogspot.jp/2013/08/tcp-client-self-connect.html&lt;/a&gt;&lt;/p&gt;
