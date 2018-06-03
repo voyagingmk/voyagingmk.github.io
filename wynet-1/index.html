@@ -82,6 +82,109 @@
   <div class="entry">
     <!--more-->
 
+<h2>多线程：wait morphing</h2>
+
+<p>以pthread为例，在C++中使用pthread的pthread_mutex_xxx和pthread_cond_xxx，实现RAII的mutex guard类以及阻塞队列(BlockingQueue)时，会遇到wait morphing的需求。</p>
+
+<p>例如，一般会先实现2个类：MutexLock，和MutexLockGuard：</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">MutexLock</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">MutexLockGuard</span> <span class="p">{</span>
+    <span class="n">MutexLock</span> <span class="o">&amp;</span><span class="n">m_mutex</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">MutexLockGuard</span><span class="p">(</span><span class="n">MutexLock</span> <span class="o">&amp;</span><span class="n">mutex</span><span class="p">)</span> <span class="o">:</span> <span class="n">m_mutex</span><span class="p">(</span><span class="n">mutex</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">m_mutex</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="o">~</span><span class="n">MutexLockGuard</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">m_mutex</span><span class="p">.</span><span class="n">unlock</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>然后是BlockingQueue：</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">BlockingQueue</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="kt">void</span> <span class="n">put</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">MutexLockGuard</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="n">m_queue</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+        <span class="n">m_notEmpty</span><span class="p">.</span><span class="n">notify</span><span class="p">();</span> <span class="c1">// wait morphing</span>
+        <span class="c1">// 注意，lock是在退出本函数时才销毁，所以顺序是：cond signal -&gt; unlock</span>
+    <span class="p">}</span>
+
+    <span class="n">T</span> <span class="n">pop</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">MutexLockGuard</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">m_queue</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="n">m_notEmpty</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">T</span> <span class="n">front</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">m_queue</span><span class="p">.</span><span class="n">front</span><span class="p">()));</span>
+        <span class="n">m_queue</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+        <span class="k">return</span> <span class="n">front</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>调用BlockingQueue的put函数，做了几个事情：</p>
+
+<ol>
+<li>lock了mutex</li>
+<li>put一个对象到队列</li>
+<li>发射条件变量信号</li>
+<li>函数退出，unlock了mutex</li>
+</ol>
+
+<p>MutexLockGuard对mutex lock/unlock的封装，是非常符合RAII的，只需要在函数开头声明一个栈变量，就可以保证成对的lock、unlock。</p>
+
+<p>然而，这个特性遇到条件变量时，就不是很好了。首先，因为unlock和notify是2个单独的操作，谁先谁后，效果并不一样。以上面的put函数为例，put完一个对象后，做2种情景假设。</p>
+
+<p>情景1：</p>
+
+<ol>
+<li>线程1先unlock了mutex</li>
+<li>线程1调用notify，唤醒等待线程2</li>
+<li>等待线程2被唤醒，因为mutex已经unlock，于是立即就lock到了mutex</li>
+</ol>
+
+<p>情景2：</p>
+
+<ol>
+<li>线程1先调用notify，唤醒等待线程2</li>
+<li>等待线程2被唤醒，试图锁住mutex，但mutex还未解锁，于是又进入睡眠。</li>
+<li>线程1unlock了mutex</li>
+<li>线程2因为在第2步中试图锁住mutex，所以会被第3步的unlock唤醒，尝试第2次加锁，lock到了mutex</li>
+</ol>
+
+<p>分析可见，情景2中，线程2被唤醒了2次才锁到了mutex，有多余的性能开销。</p>
+
+<p>而我们的C++ RAII MutexLockGuard和BlockingQueue就是情景2.</p>
+
+<p>linux系统有专门针对这个问题的优化技术：wait morphing。</p>
+
+<p>wait morphing含义是，系统可以知道情景2的第2步的该次唤醒并不能锁住mutex，那么把挂在该condvar的所有等待线程，转移(morphing)到mutex的等待线程队列，并不去唤醒它们，从而免去多余的上下文切换。</p>
+
+<p>当然这个优化是内核的，需要先了解你的linux有没实现这个优化。</p>
+
+<h2>tcp连接管理问题</h2>
+
+<h3>Mac下意外的RST：</h3>
+
+<p>出现情景：</p>
+
+<ol>
+<li>客户端发送了一些数据包后，调用close或者shutdown(SHUT_WR)，此时客户端会发送FIN</li>
+<li>服务端收到FIN，如果没有待发送的数据，那么返回FIN+ACK，如果还有数据要发送，那么只返回ACK</li>
+<li>客户端收到自己发出的FIN的ACK</li>
+<li>服务端如果仅返回了对客户端FIN的ACK，然后继续发送剩下的数据，并会在最后发一个FIN</li>
+<li><strong>重点</strong>，如果客户端没有接收完服务端剩下的数据，就结束进程（会彻底关闭socket），那么客户端协议栈收到服务端余下的数据包时，只能返回RST，因为socket已经不见了</li>
+</ol>
+
+<p>结论：在Mac下，客户端进程需要稍微延时关闭，例如在main最后一行加sleep(1)。</p>
+
 <h2>shared_ptr与多线程安全</h2>
 
 <p>线程安全要点：</p>
@@ -98,7 +201,7 @@
 <ol>
 <li><p>shared_ptr有ptr指针，control block里还有一个ptr指针：这是为了让shared_ptr无需虚析构函数(virtual destructor)，第一次构造shared_ptr时，就把目标对象的指针放进了control block的ptr里，从而记住类型，而shared_ptr的ptr则可以是对象类型也可以是父类型，并不影响计数降为0时的自动析构。</p></li>
 <li><p>基于特点1，于是可以实现更粗暴的多态，即任意shared_ptr<T>都可以转成shared_ptr<void>。可以用来防止对象过早析构，或者做泛型编程。</p></li>
-<li><p>应尽量用make_shared，可以节约一次new操作</p></li>
+<li><p>应尽量用make_shared，可以节约一次new操作，不过需要看构造函数的访问性，不一定可以替代new T。</p></li>
 </ol>
 
 <p>weak_ptr：weak_ptr可以提升为shared_ptr，提升操作lock()据说是线程安全的。</p>

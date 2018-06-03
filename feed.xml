@@ -689,6 +689,109 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
 
+&lt;h2&gt;多线程：wait morphing&lt;/h2&gt;
+
+&lt;p&gt;以pthread为例，在C++中使用pthread的pthread_mutex_xxx和pthread_cond_xxx，实现RAII的mutex guard类以及阻塞队列(BlockingQueue)时，会遇到wait morphing的需求。&lt;/p&gt;
+
+&lt;p&gt;例如，一般会先实现2个类：MutexLock，和MutexLockGuard：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MutexLock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MutexLockGuard&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;MutexLock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MutexLock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unlock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后是BlockingQueue：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;BlockingQueue&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;push_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;m_notEmpty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// wait morphing&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// 注意，lock是在退出本函数时才销毁，所以顺序是：cond signal -&amp;gt; unlock&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;m_notEmpty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wait&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()));&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pop_front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;调用BlockingQueue的put函数，做了几个事情：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;lock了mutex&lt;/li&gt;
+&lt;li&gt;put一个对象到队列&lt;/li&gt;
+&lt;li&gt;发射条件变量信号&lt;/li&gt;
+&lt;li&gt;函数退出，unlock了mutex&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;MutexLockGuard对mutex lock/unlock的封装，是非常符合RAII的，只需要在函数开头声明一个栈变量，就可以保证成对的lock、unlock。&lt;/p&gt;
+
+&lt;p&gt;然而，这个特性遇到条件变量时，就不是很好了。首先，因为unlock和notify是2个单独的操作，谁先谁后，效果并不一样。以上面的put函数为例，put完一个对象后，做2种情景假设。&lt;/p&gt;
+
+&lt;p&gt;情景1：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;线程1先unlock了mutex&lt;/li&gt;
+&lt;li&gt;线程1调用notify，唤醒等待线程2&lt;/li&gt;
+&lt;li&gt;等待线程2被唤醒，因为mutex已经unlock，于是立即就lock到了mutex&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;情景2：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;线程1先调用notify，唤醒等待线程2&lt;/li&gt;
+&lt;li&gt;等待线程2被唤醒，试图锁住mutex，但mutex还未解锁，于是又进入睡眠。&lt;/li&gt;
+&lt;li&gt;线程1unlock了mutex&lt;/li&gt;
+&lt;li&gt;线程2因为在第2步中试图锁住mutex，所以会被第3步的unlock唤醒，尝试第2次加锁，lock到了mutex&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;分析可见，情景2中，线程2被唤醒了2次才锁到了mutex，有多余的性能开销。&lt;/p&gt;
+
+&lt;p&gt;而我们的C++ RAII MutexLockGuard和BlockingQueue就是情景2.&lt;/p&gt;
+
+&lt;p&gt;linux系统有专门针对这个问题的优化技术：wait morphing。&lt;/p&gt;
+
+&lt;p&gt;wait morphing含义是，系统可以知道情景2的第2步的该次唤醒并不能锁住mutex，那么把挂在该condvar的所有等待线程，转移(morphing)到mutex的等待线程队列，并不去唤醒它们，从而免去多余的上下文切换。&lt;/p&gt;
+
+&lt;p&gt;当然这个优化是内核的，需要先了解你的linux有没实现这个优化。&lt;/p&gt;
+
+&lt;h2&gt;tcp连接管理问题&lt;/h2&gt;
+
+&lt;h3&gt;Mac下意外的RST：&lt;/h3&gt;
+
+&lt;p&gt;出现情景：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端发送了一些数据包后，调用close或者shutdown(SHUT_WR)，此时客户端会发送FIN&lt;/li&gt;
+&lt;li&gt;服务端收到FIN，如果没有待发送的数据，那么返回FIN+ACK，如果还有数据要发送，那么只返回ACK&lt;/li&gt;
+&lt;li&gt;客户端收到自己发出的FIN的ACK&lt;/li&gt;
+&lt;li&gt;服务端如果仅返回了对客户端FIN的ACK，然后继续发送剩下的数据，并会在最后发一个FIN&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;重点&lt;/strong&gt;，如果客户端没有接收完服务端剩下的数据，就结束进程（会彻底关闭socket），那么客户端协议栈收到服务端余下的数据包时，只能返回RST，因为socket已经不见了&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;结论：在Mac下，客户端进程需要稍微延时关闭，例如在main最后一行加sleep(1)。&lt;/p&gt;
+
 &lt;h2&gt;shared_ptr与多线程安全&lt;/h2&gt;
 
 &lt;p&gt;线程安全要点：&lt;/p&gt;
@@ -705,7 +808,7 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;shared_ptr有ptr指针，control block里还有一个ptr指针：这是为了让shared_ptr无需虚析构函数(virtual destructor)，第一次构造shared_ptr时，就把目标对象的指针放进了control block的ptr里，从而记住类型，而shared_ptr的ptr则可以是对象类型也可以是父类型，并不影响计数降为0时的自动析构。&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;基于特点1，于是可以实现更粗暴的多态，即任意shared_ptr&lt;T&gt;都可以转成shared_ptr&lt;void&gt;。可以用来防止对象过早析构，或者做泛型编程。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;应尽量用make_shared，可以节约一次new操作&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;应尽量用make_shared，可以节约一次new操作，不过需要看构造函数的访问性，不一定可以替代new T。&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;weak_ptr：weak_ptr可以提升为shared_ptr，提升操作lock()据说是线程安全的。&lt;/p&gt;
