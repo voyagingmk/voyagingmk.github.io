@@ -772,7 +772,7 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
 
 &lt;p&gt;linux系统有专门针对这个问题的优化技术：wait morphing。&lt;/p&gt;
 
-&lt;p&gt;wait morphing含义是，系统可以知道情景2的第2步的该次唤醒并不能锁住mutex，那么把挂在该condvar的所有等待线程，转移(morphing)到mutex的等待线程队列，并不去唤醒它们，从而免去多余的上下文切换。&lt;/p&gt;
+&lt;p&gt;wait morphing含义是，&lt;strong&gt;系统可以知道情景2的第2步的该次唤醒并不能锁住mutex，那么把挂在该condvar的所有等待线程，转移(morphing)到mutex的等待线程队列，并不去唤醒它们，从而免去多余的上下文切换&lt;/strong&gt;。&lt;/p&gt;
 
 &lt;p&gt;当然这个优化是内核的，需要先了解你的linux有没实现这个优化。&lt;/p&gt;
 
