@@ -82,6 +82,29 @@
   <div class="entry">
     <!--more-->
 
+<h2>10k和10k+连接问题</h2>
+
+<p>10k数量级的网络连接，是非常容易暴露出自己写的网络代码的问题的。</p>
+
+<p>局域网下有2种测试方法：</p>
+
+<ol>
+<li><p>server和clients同主机（走回环，不需要经过网卡）</p></li>
+<li><p>server和clients不同主机，clients可以分散到多台主机（需要经过网卡）</p></li>
+</ol>
+
+<p>我现在做的第一种，本地开2个进程，一个进程跑server，另一个进程发起10k+个客户端连接，pingpong发消息，可以测吞吐量并且也可以测下承载能力。</p>
+
+<p>目前遇到很多问题，逐个列举下：</p>
+
+<ul>
+<li><p>打开文件描述符数量限制。可以用ulimit -n修改。Mac下有些特殊。</p></li>
+<li><p>客户端的port不够用。</p></li>
+</ul>
+
+<p>先查看系统上限：cat /proc/sys/net/ipv4/ip_local_port_range，可能会输出32768   60999，只有28231个端口可用。
+但由于port是双字节，理论上撑死只有3万个port可以用。改大这个范围的意义不大。此时要考虑多主机来测试30k+连接了。</p>
+
 <h2>多线程：wait morphing</h2>
 
 <p>以pthread为例，在C++中使用pthread的pthread_mutex_xxx和pthread_cond_xxx，实现RAII的mutex guard类以及阻塞队列(BlockingQueue)时，会遇到wait morphing的需求。</p>

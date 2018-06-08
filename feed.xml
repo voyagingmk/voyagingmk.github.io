@@ -7,6 +7,73 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>C++ STL的一些笔记</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;set和multiset&lt;/h2&gt;
+
+&lt;p&gt;set有去重；multiset无去重。&lt;/p&gt;
+
+&lt;p&gt;multiset可以用来做计时器容器，因为计时器需要按时间排序，而时间戳可能会出现相同的，即同一时刻添加了2个定时任务。&lt;/p&gt;
+
+&lt;p&gt;使用set和multiset的易错点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;存储的元素需要是const含义的，即添加到容器后，原则上是不能修改的。原因是排序需要。如果添加到容器后用户还能修改容器元素，那么应触发某种全排序，否则容器有序性就丢失了。&lt;/li&gt;
+&lt;li&gt;然而容器没有办法保证用户不可修改元素，所以容易用错。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个易错点，只能好好记住了，不然迟早酿成bug。如果一定要在添加元素后，对这个元素做修改，那么需要先erase然后再insert回去。&lt;/p&gt;
+
+&lt;p&gt;另外的问题是，容器和智能指针结合使用时的易错点。&lt;/p&gt;
+
+&lt;p&gt;当元素为shared_ptr&lt;T&gt;包装的类实例时，直接放进(multi)set就有2个潜在问题，一是容器排序的依据是shared_ptr，而不是T，这是很容易误解的，解决这个问题的办法是声明容器时添加一个Comparator参数，例如：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rhs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Compare&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;multiset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shared_ptr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Compare&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;my_set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这样子写才会真正地按照T的定义去排序。&lt;/p&gt;
+
+&lt;p&gt;然而还有个细节问题：用于容器的Compare或者说operator&amp;lt;，必须满足&lt;strong&gt;strict weak ordering&lt;/strong&gt;。这个概念会贯穿整个STL。&lt;/p&gt;
+
+&lt;p&gt;这个东西简单理解就是说，类T必须实现operator&amp;lt;，从而容器sort元素的时候，可以用这个operator&amp;lt;实现==、&amp;gt;比较。&lt;/p&gt;
+
+&lt;p&gt;为什么一个&amp;lt;就能实现==呢？这是用了一个有趣的技巧： a==b 可认为等价于 !(a &amp;lt; b) &amp;amp;&amp;amp; !(b &amp;lt; a)。&lt;/p&gt;
+
+&lt;p&gt;对于只有单个属性的T来说，实现strict weak ordering很简单，只要operator&amp;lt;里写一行a.x &amp;lt; a.x就行了。&lt;/p&gt;
+
+&lt;p&gt;对于一个有复合属性的类T，operator&amp;lt;需要小心一点，但也是大同小异。例如：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeEvent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rhs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rhs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ms&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rhs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rhs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;逆序排序的话，&amp;lt;的结果取反即可。所以总之遇到(multi)set排序，重载operator&amp;lt;就对了。&lt;/p&gt;
+</description>
+        <pubDate>Fri, 08 Jun 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/cpp-8/</link>
+        <guid isPermaLink="true">http://localhost:4000/cpp-8/</guid>
+      </item>
+    
+      <item>
         <title>漫谈网络通讯加密</title>
         <description>&lt;!--more--&gt;
 
@@ -688,6 +755,29 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
       <item>
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
+
+&lt;h2&gt;10k和10k+连接问题&lt;/h2&gt;
+
+&lt;p&gt;10k数量级的网络连接，是非常容易暴露出自己写的网络代码的问题的。&lt;/p&gt;
+
+&lt;p&gt;局域网下有2种测试方法：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;server和clients同主机（走回环，不需要经过网卡）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;server和clients不同主机，clients可以分散到多台主机（需要经过网卡）&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我现在做的第一种，本地开2个进程，一个进程跑server，另一个进程发起10k+个客户端连接，pingpong发消息，可以测吞吐量并且也可以测下承载能力。&lt;/p&gt;
+
+&lt;p&gt;目前遇到很多问题，逐个列举下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;打开文件描述符数量限制。可以用ulimit -n修改。Mac下有些特殊。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;客户端的port不够用。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;先查看系统上限：cat /proc/sys/net/ipv4/ip_local_port_range，可能会输出32768   60999，只有28231个端口可用。
+但由于port是双字节，理论上撑死只有3万个port可以用。改大这个范围的意义不大。此时要考虑多主机来测试30k+连接了。&lt;/p&gt;
 
 &lt;h2&gt;多线程：wait morphing&lt;/h2&gt;
 
@@ -3766,423 +3856,6 @@ Minkowski difference&lt;/a&gt;&lt;/p&gt;
         <pubDate>Wed, 20 Dec 2017 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/bvh-1/</link>
         <guid isPermaLink="true">http://localhost:4000/bvh-1/</guid>
-      </item>
-    
-      <item>
-        <title>方差阴影贴图与切比雪夫不等式</title>
-        <description>&lt;p&gt;要理解方差阴影贴图的来龙去脉，必须先深刻理解概率论中的几个概念：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;矩(Moment)&lt;/li&gt;
-&lt;li&gt;数学期望(Mean)&lt;/li&gt;
-&lt;li&gt;方差(Variance)&lt;/li&gt;
-&lt;li&gt;马可夫不等式 (Markov&amp;#39;s Inequality)&lt;/li&gt;
-&lt;li&gt;切比雪夫不等式 (Chebyshev&amp;#39;s inequality)&lt;/li&gt;
-&lt;li&gt;切比雪夫不等式的one-tailed版本 (one-tailed version of Chebyshev&amp;#39;s inequality)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;矩(Moment)&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Moment_(mathematics)&quot;&gt;https://en.wikipedia.org/wiki/Moment_(mathematics)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;给定关于实变量x、常数c的实值连续函数f(x)，它的n阶矩（n-th moment)的公式是：&lt;/p&gt;
-
-&lt;p&gt;\[ \mu ^{n} = \int _{-\infty }^{ +\infty  } (x - c)^{n} f(x) dx \] &lt;/p&gt;
-
-&lt;h2&gt;数学期望(Mean)&lt;/h2&gt;
-
-&lt;p&gt;当c = 0，n = 1时，上述公式变成：&lt;/p&gt;
-
-&lt;p&gt;\[ \mu = \int _{-\infty }^{ +\infty  } x f(x) dx \] &lt;/p&gt;
-
-&lt;p&gt;这也就是数学期望(Mean)的积分公式。&lt;/p&gt;
-
-&lt;h2&gt;方差(Variance)&lt;/h2&gt;
-
-&lt;p&gt;当\(c = \mu\)时，n阶矩可称为&lt;strong&gt;n阶中心矩&lt;/strong&gt;；当\(c = \mu，n = 2\)时，2阶中心矩的公式为：&lt;/p&gt;
-
-&lt;p&gt;\[ \mu ^{2} =  \int _{-\infty }^{ +\infty  } (x - \mu )^{ 2 } f(x) dx \] &lt;/p&gt;
-
-&lt;p&gt;这其实就是方差(Variance)的积分公式。下面作简单推导。&lt;/p&gt;
-
-&lt;p&gt;方差的定义式为：&lt;/p&gt;
-
-&lt;p&gt;\[ Var(X) = E[(X - \mu)^{2}] =  E[(X - E[X])^{2}] = \sigma ^{2}  \]&lt;/p&gt;
-
-&lt;p&gt;可以推出：&lt;/p&gt;
-
-&lt;p&gt;\[ Var(X) = E[X^{2} - 2 X E[X] + E[X]^{2} ] \]&lt;/p&gt;
-
-&lt;p&gt;\[ = E[X^{2}] - 2 E[X] E[X] + E[X]^{2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ = E[X^{2}] -  E[X]^{2} \]&lt;/p&gt;
-
-&lt;p&gt;而2阶中心矩公式可以推出：&lt;/p&gt;
-
-&lt;p&gt;\[ \int (x - \mu )^{ 2 } f(x) dx \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \int x^{ 2 } f(x) dx - 2\mu \int x f(x) dx + \int \mu ^{ 2 } f(x) dx \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \int x^{ 2 } f(x) dx - 2\mu \cdot \mu + \mu ^{ 2 } \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \int x^{ 2 } f(x) dx - \mu ^{ 2 } \] &lt;/p&gt;
-
-&lt;p&gt;\[ =E[X^{ 2 }] - E[X] ^{ 2 } \] &lt;/p&gt;
-
-&lt;h2&gt;马可夫不等式 (Markov&amp;#39;s Inequality)&lt;/h2&gt;
-
-&lt;p&gt;设X是非负的随机变量，且有a &amp;gt; 0，那么X大于等于a的概率不超过X的数学期望除以a：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ X \geq a } \leq \frac { E[X] }{ a } \]&lt;/p&gt;
-
-&lt;p&gt;（Note：这里的P是指概率）&lt;/p&gt;
-
-&lt;h3&gt;证明：&lt;/h3&gt;
-
-&lt;p&gt;证明前需要先理解一个概念：示性函数（Indicator）。对于任意事件e，当e发生时，\( I _{e}  = 1\)， 当E没发生时，\( I _{e} = 0\)。&lt;/p&gt;
-
-&lt;p&gt;那么把\( X \geq a \)当作一个事件e，当e发生时，有：&lt;/p&gt;
-
-&lt;p&gt;\[  I _{ X \geq a }  = 1  \]&lt;/p&gt;
-
-&lt;p&gt;\[   a I _{ X \geq a } \leq X   \]&lt;/p&gt;
-
-&lt;p&gt;两边同时变成数学期望，不等式依然成立：&lt;/p&gt;
-
-&lt;p&gt;\[   E[a I _{ X \geq a }] \leq E[X]   \]&lt;/p&gt;
-
-&lt;p&gt;又因为数学期望的线性关系，有：&lt;/p&gt;
-
-&lt;p&gt;\[  E[a I _{ X \geq a }] = a \cdot E[I _{ X \geq a }]   \]&lt;/p&gt;
-
-&lt;p&gt;又因为函数\( I _{ X \geq a } \)的取值只有2种，所以可直接得到：&lt;/p&gt;
-
-&lt;p&gt;\[  a \cdot E[I _{ X \geq a }] = a \cdot ( 1\cdot P _{ X \geq a } + 0\cdot P _{ X \lt a }   ) \]&lt;/p&gt;
-
-&lt;p&gt;\[  = a \cdot P _{ X \geq a } \]&lt;/p&gt;
-
-&lt;p&gt;综上，就得到了：&lt;/p&gt;
-
-&lt;p&gt;\[   a \cdot P _{ X \geq a } \leq E[X]   \]&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ X \geq a } \leq \frac { E[X] }{ a } \]&lt;/p&gt;
-
-&lt;h2&gt;切比雪夫不等式 (Chebyshev&amp;#39;s inequality)&lt;/h2&gt;
-
-&lt;p&gt;设有随机变量X以及它的数学期望\(\mu \) 、有限且不等于0的方差\( \sigma ^{2} \)，对于任意&amp;gt;0的实数k，以下不等式成立：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ | X - \mu | \geq k\sigma } \leq \frac { 1 }{ k^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;（Note：这里的P是指概率）&lt;/p&gt;
-
-&lt;p&gt;这就是切比雪夫不等式。其中，因为概率P永远小于等于1，所以k值要大于1这个不等式才有意义。&lt;/p&gt;
-
-&lt;h3&gt;证明：&lt;/h3&gt;
-
-&lt;p&gt;设有随机变量\( Y = (X - \mu )^{2} \) 以及 \( a = (k\sigma )^{2} \)，代入马可夫不等式后：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ Y \geq a } \leq \frac { E[Y] }{ a } \]&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ (X - \mu )^{2} \geq (k\sigma )^{2} } \leq \frac { E[(X - \mu )^{2}] }{ (k\sigma )^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;回顾下方差公式：&lt;/p&gt;
-
-&lt;p&gt;\[ Var(X) = E[(X - \mu)^{2}] = \sigma ^{2} \]&lt;/p&gt;
-
-&lt;p&gt;显然有：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ (X - \mu )^{2} \geq (k\sigma )^{2} } \leq \frac { E[(X - \mu )^{2}] }{ (k\sigma )^{2} } = \frac { \sigma ^{2} }{ (k\sigma )^{2} } = \frac { 1 }{ k^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;左边的式子可以进一步简化：&lt;/p&gt;
-
-&lt;p&gt;\[ (X - \mu )^{2} \geq (k\sigma )^{2}  \]&lt;/p&gt;
-
-&lt;p&gt;\[ |X - \mu | \geq k\sigma  \]&lt;/p&gt;
-
-&lt;p&gt;（右边没有绝对值是因为有前提条件k&amp;gt;0，即使标准差\(\sigma &amp;lt; 0 \)该等式依然成立 )&lt;/p&gt;
-
-&lt;p&gt;于是切比雪夫不等式成立：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{ | X - \mu | \geq k\sigma } \leq \frac { 1 }{ k^{2} } \]&lt;/p&gt;
-
-&lt;h2&gt;切比雪夫不等式的one-tailed版本&lt;/h2&gt;
-
-&lt;p&gt;切比雪夫不等式的one-tailed版本其实就是&lt;strong&gt;坎泰利不等式&lt;/strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Cantelli%27s_inequality&quot;&gt;Cantelli&amp;#39;s inequality&lt;/a&gt;。坎泰利不等式公式如下：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.11/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;(from wiki，Pr等价于上文的P）&lt;/p&gt;
-
-&lt;p&gt;而切比雪夫不等式的one-tailed版本如下：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{  X - \mu  \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + t ^{2} } ，t  &amp;gt; 0 \] &lt;/p&gt;
-
-&lt;p&gt;一模一样的。&lt;/p&gt;
-
-&lt;h3&gt;证明：&lt;/h3&gt;
-
-&lt;p&gt;要证明one-tailed公式，要用到马可夫不等式。首先定义\(Y = X - \mu \)，那么就有\(E[Y] = E[X - \mu ] = E[X]- E[\mu ] = \mu - \mu = 0\)，以及：\( Var[Y] = Var[X - \mu ] = Var[X] - Var[\mu ] = Var[X]  - 0 = Var[X] \)。&lt;/p&gt;
-
-&lt;p&gt;于是：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{  Y \geq t } = P _{  Y + \mu \geq t + \mu } \leq P _{  (Y + \mu)^{2} \geq (t + \mu)^{2}  }  \]&lt;/p&gt;
-
-&lt;p&gt;这时候用上马可夫不等式 \( P _{ X \geq a } \leq \frac { E[X] }{ a } \)，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{  (Y + \mu)^{2} \geq (t + \mu)^{2}  } \leq \frac { E[(Y + \mu)^{2}] }{ (t + \mu)^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;再用上方差公式：&lt;/p&gt;
-
-&lt;p&gt;\[ E[(Y + \mu)^{2}] = Var[Y + \mu] + E[Y + \mu]^{2}   \]&lt;/p&gt;
-
-&lt;p&gt;\[ = Var[Y] + Var[\mu] + E[Y + \mu]^{2}   \]&lt;/p&gt;
-
-&lt;p&gt;\[ = \sigma ^{2} + 0 + (E[Y] + E[\mu])^{2}   \]&lt;/p&gt;
-
-&lt;p&gt;\[ = \sigma ^{2} + (0 + E[\mu])^{2}   \]&lt;/p&gt;
-
-&lt;p&gt;\[ = \sigma ^{2} + \mu ^{2}   \]&lt;/p&gt;
-
-&lt;p&gt;所以有：&lt;/p&gt;
-
-&lt;p&gt;\[  P _{  Y \geq t } \leq \frac { \sigma ^{2} + \mu ^{2} }{ (t + \mu)^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;接着令 \( \phi(\mu ) = \frac { \sigma ^{2} + \mu ^{2} }{ (t + \mu)^{2} } \)，求导\( \phi &amp;#39;(\mu ) = 0\)时的\( \mu \)值。这个导数算起来比较复杂，我找了个在线导数计算工具来辅助下（这不是广告）。&lt;/p&gt;
-
-&lt;p&gt;先进入&lt;a href=&quot;http://zh.numberempire.com/derivativecalculator.php&quot;&gt;http://zh.numberempire.com/derivativecalculator.php&lt;/a&gt;，输入： (a^2+x^2)/((b+x)^2)，得到导数公式： (2*b*x-2*a^2)/(x^3+3*b*x^2+3*b^2*x+b^3)。&lt;/p&gt;
-
-&lt;p&gt;a就是\( \sigma \)，b就是t，x就是\(\mu \)，把这个式子弄成latex：&lt;/p&gt;
-
-&lt;p&gt;\[ \phi &amp;#39;(\mu ) = \frac { 2bx - 2a^{2} }{ x^{3} + 3bx^{2} + 3b^{2}x + b^{3} } = 0 \]&lt;/p&gt;
-
-&lt;p&gt;这个方程也是复杂，继续用工具来算就好了。&lt;/p&gt;
-
-&lt;p&gt;进入&lt;a href=&quot;http://zh.numberempire.com/equationsolver.php&quot;&gt;http://zh.numberempire.com/equationsolver.php&lt;/a&gt;，&lt;/p&gt;
-
-&lt;p&gt;输入：(2*b*x-2*a^2)/(x^3+3*b*x^2+3*b^2*x+b^3) = 0，&lt;/p&gt;
-
-&lt;p&gt;得到：\( x = \frac { a^{2} } { b } \) ，即：&lt;/p&gt;
-
-&lt;p&gt;\[ \mu = \frac { \sigma ^{2} } { t }  \]&lt;/p&gt;
-
-&lt;p&gt;也就是说当\( \mu = \frac { \sigma ^{2} } { t }  \)时，\(  \phi(\mu ) \)取得最小值。而又因为对任意的\( \mu \)，概率\( P _{  Y \geq t } \) 都不超过\(  \phi(\mu ) \)，所以原先的不等式可以进一步简化成：&lt;/p&gt;
-
-&lt;p&gt;\[  P _{  Y \geq t } \leq \frac { \sigma ^{2} + \mu_{ * } ^{2} }{ (t + \mu _{ * } )^{2} }  = \frac { \sigma ^{2} + (\frac { \sigma ^{2} } { t }) ^{2} }{ (t + \frac { \sigma ^{2} } { t } )^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;右边的式子继续简化；&lt;/p&gt;
-
-&lt;p&gt;\[ \frac { \sigma ^{2} + (\frac { \sigma ^{2} } { t }) ^{2} }{ (t + \frac { \sigma ^{2} } { t } )^{2} }  = \frac {  \frac { \sigma ^{2}t^{2} +\sigma ^{4} } { t^{2} }         } {  \frac { (t^{2} + \sigma ^{2})^{2}  } { t^{2} }     }  = \frac { \sigma ^{2}t^{2} +\sigma ^{4} } { (t^{2} + \sigma ^{2})^{2} } =   \frac { \sigma ^{2} } { t^{2} + \sigma ^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;所以：&lt;/p&gt;
-
-&lt;p&gt;\[  P _{  Y \geq t } =  P _{  X - \mu \geq t } \leq  \frac { \sigma ^{2} } { t^{2} + \sigma ^{2} } \]&lt;/p&gt;
-
-&lt;p&gt;得证。&lt;/p&gt;
-
-&lt;h1&gt;方差阴影贴图(VSM)&lt;/h1&gt;
-
-&lt;p&gt;生成VSM，相比SSM(Standard Shadow Map)，除了把深度d存到深度图，还要多存一个d*d。似乎看起来有点蠢，明明有d了，要用d平方不就是运算的时候d*d就行了嘛。其实VSM的原理还得结合一些硬件知识来理解。相比SSM是单通道贴图，VSM则是双通道贴图，并且VSM在用于光照计算前，&lt;strong&gt;可以做纹理过滤或抗锯齿处理&lt;/strong&gt;，纹理过滤，相当于纹理被模糊化（VSM能实现软阴影的关键之处）。&lt;/p&gt;
-
-&lt;p&gt;SSM并不能被模糊，而VSM能模糊化的好处就先不说了。模糊化后，d和d平方的值就在一定范围内做了偏移。那么我们可以设：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;模糊前的深度d和d平方分别为x和\( x^{2} \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;模糊后的深度d和d平方分别为一阶矩M1（x的数学期望）和一阶矩M2（\( x^{2} \)的数学期望）&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;再用上前面给出的方差公式：&lt;/p&gt;
-
-&lt;p&gt;\[ Var(X) = E[X^{2}] -  E[X]^{2} \]&lt;/p&gt;
-
-&lt;p&gt;所以对于模糊前的x（真实深度），我们可以求出它的数学期望和方差：&lt;/p&gt;
-
-&lt;p&gt;\[ \mu = E(x) = M1 \]&lt;/p&gt;
-
-&lt;p&gt;\[ \sigma ^{2} = Var(x) = E[x^{2}] -  E[x]^{2} = M2 - M1^{2} \]&lt;/p&gt;
-
-&lt;p&gt;到了这里，VSM的原理已经相当清楚了：先是存了原始的深度x和x平方，然后又对x和x平方做了一些坏事（对我们来说是好事）：把x和x平方稍微搅浑了，搅浑了后想恢复原始的x是不可能了，但是我们可以利用搅浑后的x和x平方（一、二阶矩），算出x的&lt;strong&gt;方差&lt;/strong&gt;，再结合搅浑后的x（x的数学期望，一阶矩），就能对原始的x做概率估计。&lt;/p&gt;
-
-&lt;p&gt;（深度值越大就越深，越接近1，即越白，所以靠近摄像机的深度偏白色，远处的偏黑色）&lt;/p&gt;
-
-&lt;p&gt;但还没完，VSM还和切比雪夫不等式的one-tailed版本有关系。首先拿出该公式：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{  X - \mu  \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + t ^{2} } ，t  &amp;gt; 0 \] &lt;/p&gt;
-
-&lt;p&gt;设\( t&amp;#39; = t - \mu ，t &amp;gt; \mu &amp;gt; 0 \)，代入上式：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{  X - \mu  \geq t&amp;#39; } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + t&amp;#39; ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ P _{  X - \mu  \geq t - \mu } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ P _{  X \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;（在&lt;a href=&quot;http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.104.2569&amp;rep=rep1&amp;type=pdf&quot;&gt;Variance Shadow Maps&lt;/a&gt; 论文中就会看到这个不等式）&lt;/p&gt;
-
-&lt;p&gt;下面的就按照论文的思路讲。假定一个3d场景里有一块挡板（Occluder)，产生了阴影（VSM），然后在fragment shader里对某一个fragment做阴影计算，这时候fragment可能被遮挡，也可能没被遮挡（薛定谔的猫？）。&lt;/p&gt;
-
-&lt;p&gt;首先把fragPos转换到light space下，从而取出过过滤后的VSM里的深度，称为\(d_{1}\)。而fragPos当前在light place的深度则称为\(d_{2} \)。 \( P _{  X \geq t } \)里的X则是VSM里未过滤前的深度。&lt;/p&gt;
-
-&lt;p&gt;把t当成\(d_{2} \)，再加上用前面的公式算出来的数学期望\(\mu \)和方差\(\sigma  ^{2} \)，就可以确定，任意X超过\(d_{2} \)的概率，不大于\( \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \)。不过，这个只是我们需要的概率的上界， \( P _{  X \geq t } \)并不能被准确算出来。&lt;/p&gt;
-
-&lt;p&gt;再设这个表示frag没有被挡板遮挡的实际概率\( P_{  X \geq t } \)为p，那么frag的d（即X）的数学期望为：&lt;/p&gt;
-
-&lt;p&gt;\[ \mu = E(x) = p d_{2} + (1 - p)d_{1} \]&lt;/p&gt;
-
-&lt;p&gt;（这里可以这样理解：当p=1时，期望值为\(d_{2}\)，即fragPosLightSpace.z，表示frag在light space深度和在VSM的深度完全无关，即完全没有被遮挡，0%的阴影；当p=0时，期望值为\(d_{1}\)，即在light space深度绝对等于在VSM的深度，表示被完全遮挡，100%的阴影)&lt;/p&gt;
-
-&lt;p&gt;\(d^{2}\)的数学期望为：&lt;/p&gt;
-
-&lt;p&gt;\[  E(x^{2}) = p d_{2}^{2} + (1 - p)d_{1}^{2} \]&lt;/p&gt;
-
-&lt;p&gt;d的方差为：&lt;/p&gt;
-
-&lt;p&gt;\[ \sigma ^{2} = E[x^{2}] -  E[x]^{2}  = p d_{2}^{2} + (1 - p)d_{1}^{2} - (p d_{2} + (1 - p)d_{1} )^{2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ = p d_{2}^{2} + (1 - p)d_{1}^{2} - p^{2} d_{2}^{2} - 2p(1 - p)d_{1} d_{2} - (1 - p)^{2} d_{1} ^{2} \]&lt;/p&gt;
-
-&lt;p&gt;\[ = (p - p^{2}) d_{2}^{2} + (1 - p)(d_{1}^{2} - 2pd_{1} d_{2} - (1 - p)d_{1}^{2} ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = (p - p^{2}) d_{2}^{2} + (1 - p)(d_{1}^{2} - 2pd_{1} d_{2} - d_{1}^{2} + pd_{1}^{2} ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = (p - p^{2}) d_{2}^{2} + (1 - p)( - 2pd_{1} d_{2}  + pd_{1}^{2} ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = (p - p^{2}) d_{2}^{2} + (p - p^{2})( - 2d_{1} d_{2}  + d_{1}^{2} ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = (p - p^{2})(d_{2}^{2}  - 2d_{1} d_{2}  + d_{1}^{2} ) \]&lt;/p&gt;
-
-&lt;p&gt;\[ = (p - p^{2})(d_{2} - d_{1})^{2} \]&lt;/p&gt;
-
-&lt;p&gt;把这些参数都代入到上面的不等式，求出\(p_{max}(d_{2}) \)：&lt;/p&gt;
-
-&lt;p&gt;\[ P _{max}(d_{2}) = \frac { \sigma ^{2} }{ \sigma ^{2} + (d_{2} - \mu) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \frac { (p - p^{2})(d_{2} - d_{1})^{2} }{ (p - p^{2})(d_{2} - d_{1})^{2} + ( p d_{2} + (1 - p)d_{1}  - d_{2} ) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \frac { (p - p^{2})(d_{2} - d_{1})^{2} }{ (p - p^{2})(d_{2} - d_{1})^{2} +(1 - p) ^{2} (d_{2} - d_{1} ) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \frac { p - p^{2} }{ (p - p^{2}) +(1 - p) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \frac { p - p^{2} }{ (p - p^{2}) +(1 - p) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ = \frac { p - p^{2} }{ 1 - p }  \] &lt;/p&gt;
-
-&lt;p&gt;\[ = p \] &lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;也就是说，\( P_{ max }( X \geq d_{2}) \) 这个最大值就刚好是我们想要求的\( P( X \geq d_{2}) \) ！&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;\[ P _{  X \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \] &lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;这里的\( \leq \) 刚好是\( = \)，不等式变成了等式。Amazing！&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;理论到此为止，剩下的就是工程问题了。&lt;/p&gt;
-
-&lt;h1&gt;工程实现&lt;/h1&gt;
-
-&lt;p&gt;如果你的工程里已经实现了Standard Shadow Map，那么只需要几个步骤即可实现基本的VSM：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;把Shadow Map Buffer改为输出depth和depth平方到颜色buffer。可能需要先修改RT的创建代码，下面以OpenGL 4.x为例：&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 32位高精度双通道纹理 用来存moment1和moment2&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;glTexImage2D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GL_TEXTURE_2D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_RG32F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_RG&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GL_FLOAT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;然后修改shadow map着色器：&lt;/p&gt;
-
-&lt;p&gt;vs:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#version 410 core&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;layout&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;uniform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mat4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lightPV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;uniform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mat4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;gl_Position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lightPV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;fs:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#version 410 core&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v_position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;out&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;             
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v_position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v_position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// TO NDC [0, 1]&lt;/span&gt;
-
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moment1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 一阶矩&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moment2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 二阶矩&lt;/span&gt;
-
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dFdx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dFdy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;moment2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.25&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 解决acne问题&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;outColor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;moment1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moment2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;可以渲染下Shadow Map是否正常:&lt;/p&gt;
-
-&lt;p&gt;rg通道一起输出：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.11/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;只有r通道(moment1):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.11/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;只有g通道(moment2):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.11/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;然后是应用的问题，需要修改lighting shader里的阴影计算代码：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 只贴下核心代码：&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;uniform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sampler2D&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shadowMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// 这个函数是用来算出上文说的Pmax&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;chebyshevUpperBound&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sampler2D&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shadowMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;coord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;texture&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shadowMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;coord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// Surface is fully lit. as the current fragment is before the light occluder&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// The fragment is either in shadow or penumbra. We now use chebyshev&amp;#39;s upperBound to check&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// How likely this pixel is to be lit (p_max)&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;variance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;//variance = max(variance, 0.000002);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;variance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;variance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.00002&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d_minus_mean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p_max&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;variance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;variance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d_minus_mean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d_minus_mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p_max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// 返回阴影百分比[0,1], 然后拿去乘以光照颜色即可&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ShadowCalculation_Dir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Light&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;light&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;vec4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fragPosLightSpace&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;light&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lightPV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// perform perspective divide&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;projCoords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fragPosLightSpace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xyz&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fragPosLightSpace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// transform to [0,1] range&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;projCoords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;projCoords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentDepth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;projCoords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;shadow&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chebyshevUpperBound&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shadowMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentDepth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;projCoords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shadow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;最终效果:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2017.11/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;这里可以看到阴影边缘是变模糊了的，不过还是有锯齿。可以进一步对shadow map做blur来实现软化。&lt;/p&gt;
-</description>
-        <pubDate>Fri, 17 Nov 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/shadow-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/shadow-1/</guid>
       </item>
     
   </channel>
