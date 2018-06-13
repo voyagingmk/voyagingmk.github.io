@@ -894,7 +894,7 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;gdb查core文件，发现日志很奇怪，在atomic的load里crash了。&lt;/p&gt;
 
-&lt;p&gt;最终发现是多线程下，访问了一个null的shared_ptr的atomic变量。加if判断即可。&lt;/p&gt;
+&lt;p&gt;最终发现是访问了一个null的shared_ptr的atomic变量。加if判断即可。&lt;/p&gt;
 
 &lt;h2&gt;10k和10k+连接问题&lt;/h2&gt;
 

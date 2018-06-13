@@ -92,7 +92,7 @@
 </code></pre></div>
 <p>gdb查core文件，发现日志很奇怪，在atomic的load里crash了。</p>
 
-<p>最终发现是多线程下，访问了一个null的shared_ptr的atomic变量。加if判断即可。</p>
+<p>最终发现是访问了一个null的shared_ptr的atomic变量。加if判断即可。</p>
 
 <h2>10k和10k+连接问题</h2>
 
