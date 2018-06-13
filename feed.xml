@@ -121,9 +121,9 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;li&gt;当调用epoll_wait检查是否有事件发生时，只需检查eventpoll的rdlist链表中是否有epitem元素即可。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;1、2点已经凸显了epoll_wwit的高效，这是一种基于驱动回调的技术，epoll_wait的成本只是获取这个rdlist而已。&lt;/p&gt;
+&lt;p&gt;1、2点已经凸显了epoll_wait的高效，这是一种基于驱动回调的技术，epoll_wait的成本只是获取这个rdlist而已。&lt;/p&gt;
 
-&lt;p&gt;另外，为了保证不会重复添加同个fd的epitem，只能遍历内核的epitem数组，但这是个O(n)的操作，所以就需要红黑树，可以快速找出某个fd是否已被监听，也可用于快速找到epitem从而修改fd的监听事件。这可是log(n)的复杂度，性能大大提高。&lt;/p&gt;
+&lt;p&gt;另外，为了保证不会重复添加同个fd的epitem，只能遍历内核的epitem数组，但这是个O(n)的操作，所以就需要红黑树，可以快速找出某个fd是否已被监听，并且也用于快速找到epitem从而修改fd的监听事件。这可是log(n)的复杂度，性能大大提高。&lt;/p&gt;
 
 &lt;h3&gt;总结：&lt;/h3&gt;
 
@@ -883,6 +883,18 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
       <item>
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
+
+&lt;h2&gt;atomic变量也会segment fault?&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#0  0x00000000004cb56b in std::atomic&amp;lt;wynet::TcpConnection::State&amp;gt;::load (this=0x58, &lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;_m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;memory_order_seq_cst&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;4.8.2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;atomic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#1  0x00000000004c9a6d in std::atomic&amp;lt;wynet::TcpConnection::State&amp;gt;::operator wynet::TcpConnection::State&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x58&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;4.8.2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;atomic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;176&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#2  0x00000000004f0fa1 in wynet::TcpConnection::shutdown (this=0x0)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;github&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wynet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;cpp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;74&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;gdb查core文件，发现日志很奇怪，在atomic的load里crash了。&lt;/p&gt;
+
+&lt;p&gt;最终发现是多线程下，访问了一个null的shared_ptr的atomic变量。加if判断即可。&lt;/p&gt;
 
 &lt;h2&gt;10k和10k+连接问题&lt;/h2&gt;
 

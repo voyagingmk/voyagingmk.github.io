@@ -82,6 +82,18 @@
   <div class="entry">
     <!--more-->
 
+<h2>atomic变量也会segment fault?</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#0  0x00000000004cb56b in std::atomic&lt;wynet::TcpConnection::State&gt;::load (this=0x58, </span>
+    <span class="n">_m</span><span class="o">=</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_seq_cst</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mf">4.8.2</span><span class="o">/</span><span class="nl">atomic</span><span class="p">:</span><span class="mi">209</span>
+<span class="cp">#1  0x00000000004c9a6d in std::atomic&lt;wynet::TcpConnection::State&gt;::operator wynet::TcpConnection::State</span>
+    <span class="p">(</span><span class="n">this</span><span class="o">=</span><span class="mh">0x58</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mf">4.8.2</span><span class="o">/</span><span class="nl">atomic</span><span class="p">:</span><span class="mi">176</span>
+<span class="cp">#2  0x00000000004f0fa1 in wynet::TcpConnection::shutdown (this=0x0)</span>
+    <span class="n">at</span> <span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">wynet</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">connection</span><span class="p">.</span><span class="nl">cpp</span><span class="p">:</span><span class="mi">74</span>
+</code></pre></div>
+<p>gdb查core文件，发现日志很奇怪，在atomic的load里crash了。</p>
+
+<p>最终发现是多线程下，访问了一个null的shared_ptr的atomic变量。加if判断即可。</p>
+
 <h2>10k和10k+连接问题</h2>
 
 <p>10k数量级的网络连接，是非常容易暴露出自己写的网络代码的问题的。</p>
