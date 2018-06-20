@@ -884,6 +884,12 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
 
+&lt;h2&gt;write无限返回EAGAIN导致的cpu超载和FIN_WAIT1卡死&lt;/h2&gt;
+
+&lt;p&gt;这是因为在错误的时机开启了对可写事件EPOLLOUT的监听，导致epoll_wait频繁返回可写事件，但此时并不可写。&lt;/p&gt;
+
+&lt;p&gt;正确的监听时机是，write返回-1，然后errno为EAGAIN时；收到可写事件时，就删除EPOLLOUT监听并尝试发包。&lt;/p&gt;
+
 &lt;h2&gt;atomic变量也会segment fault?&lt;/h2&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#0  0x00000000004cb56b in std::atomic&amp;lt;wynet::TcpConnection::State&amp;gt;::load (this=0x58, &lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;_m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;memory_order_seq_cst&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;4.8.2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;atomic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;

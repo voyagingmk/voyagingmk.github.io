@@ -82,6 +82,12 @@
   <div class="entry">
     <!--more-->
 
+<h2>write无限返回EAGAIN导致的cpu超载和FIN_WAIT1卡死</h2>
+
+<p>这是因为在错误的时机开启了对可写事件EPOLLOUT的监听，导致epoll_wait频繁返回可写事件，但此时并不可写。</p>
+
+<p>正确的监听时机是，write返回-1，然后errno为EAGAIN时；收到可写事件时，就删除EPOLLOUT监听并尝试发包。</p>
+
 <h2>atomic变量也会segment fault?</h2>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#0  0x00000000004cb56b in std::atomic&lt;wynet::TcpConnection::State&gt;::load (this=0x58, </span>
     <span class="n">_m</span><span class="o">=</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_seq_cst</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mf">4.8.2</span><span class="o">/</span><span class="nl">atomic</span><span class="p">:</span><span class="mi">209</span>
