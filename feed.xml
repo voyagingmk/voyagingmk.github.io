@@ -886,9 +886,11 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
 
 &lt;h2&gt;write无限返回EAGAIN导致的cpu超载和FIN_WAIT1卡死&lt;/h2&gt;
 
-&lt;p&gt;这是因为在错误的时机开启了对可写事件EPOLLOUT的监听，导致epoll_wait频繁返回可写事件，但此时并不可写。&lt;/p&gt;
+&lt;p&gt;最终发现是逻辑上的bug，导致未收到EPOLLOUT事件就调用了onWritable函数，此时并不可写但是却调用了write函数，于是系统会返回EAGAIN，而因为高并发下大量write是无效的，就导致cpu超载和卡死。&lt;/p&gt;
 
-&lt;p&gt;正确的监听时机是，write返回-1，然后errno为EAGAIN时；收到可写事件时，就删除EPOLLOUT监听并尝试发包。&lt;/p&gt;
+&lt;p&gt;题外话：正确的EPOLLOUT监听时机是，一，write返回-1，然后errno为EAGAIN时；二，write的返回值大于0，但小于要邱写入的字节数，即write没有完全把数据写进发送队列。&lt;/p&gt;
+
+&lt;p&gt;另外，收到可写事件时，尝试write剩余字节，如果write能把所有字节都写进发送队列，那么就可以删除EPOLLOUT监听了。&lt;/p&gt;
 
 &lt;h2&gt;atomic变量也会segment fault?&lt;/h2&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#0  0x00000000004cb56b in std::atomic&amp;lt;wynet::TcpConnection::State&amp;gt;::load (this=0x58, &lt;/span&gt;
