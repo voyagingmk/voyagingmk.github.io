@@ -896,6 +896,8 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
 
 &lt;p&gt;参考资料：&lt;a href=&quot;https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full&quot;&gt;https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full&lt;/a&gt;&lt;/p&gt;
 
+&lt;p&gt;&lt;a href=&quot;https://linuxgazette.net/136/pfeiffer.html&quot;&gt;https://linuxgazette.net/136/pfeiffer.html&lt;/a&gt;&lt;/p&gt;
+
 &lt;blockquote&gt;
 &lt;p&gt;EAGAIN/EWOULDBLOCK can also be returned (for TCP sockets) when the number of unacknowledged packets has reached the congestion window.&lt;/p&gt;
 
