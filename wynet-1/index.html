@@ -82,11 +82,51 @@
   <div class="entry">
     <!--more-->
 
+<h2>收到EPOLLOUT事件，但write时返回了EAGAIN？</h2>
+
+<p>这是因为EAGAIN不止是在发送缓冲区满时返回，还可能是<strong>未ACK的包数量已经达到了拥塞窗口的大小</strong>。</p>
+
+<p>而EPOLLOUT并不会检查拥塞窗口的情况，只要发送缓冲区不满，就返回EPOLLOUT了。</p>
+
+<p>用并发压力测试可以测出这种情况：在epoll_wait返回后，检测可写事件的fd是否发送缓冲区不满，不满的话尝试写入一个字节，然后通过write的返回值和错误码就可以知道有没出现<strong>缓冲区不满的EAGAIN</strong>。同时打印出拥塞窗口信息，就可以看出EAGAIN原因：</p>
+
+<p><img src="../images/2018.3/22.png" alt="22.png"></p>
+
+<p>参考资料：<a href="https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full">https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full</a></p>
+
+<blockquote>
+<p>EAGAIN/EWOULDBLOCK can also be returned (for TCP sockets) when the number of unacknowledged packets has reached the congestion window.</p>
+
+<p>To check the status of the socket w.r.t. the congestion window, then try this:</p>
+</blockquote>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#include</span> <span class="cpf">&lt;netinet/tcp.h&gt;</span><span class="cp"></span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">print_tcp_cwnd</span><span class="p">(</span><span class="kt">int</span> <span class="n">socket</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">tcp_info</span> <span class="n">tcp_info</span><span class="p">;</span>
+    <span class="n">uint</span> <span class="n">tcp_info_length</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">tcp_info</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">getsockopt</span><span class="p">(</span> <span class="n">socket</span><span class="p">,</span> <span class="n">SOL_TCP</span><span class="p">,</span> <span class="n">TCP_INFO</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">tcp_info</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tcp_info_length</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> 
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcpi_snd_cwnd: %u, tcpi_unacked: %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="n">tcp_info</span><span class="p">.</span><span class="n">tcpi_snd_cwnd</span><span class="p">,</span>
+            <span class="n">tcp_info</span><span class="p">.</span><span class="n">tcpi_unacked</span>
+           <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>If tcpi_unacked == tcpi_snd_cwnd then send() will return EAGAIN/EWOULDBLOCK for a non-blocking socket.</p>
+</blockquote>
+
 <h2>write无限返回EAGAIN导致的cpu超载和FIN_WAIT1卡死</h2>
 
-<p>最终发现是逻辑上的bug，导致未收到EPOLLOUT事件就调用了onWritable函数，此时并不可写但是却调用了write函数，于是系统会返回EAGAIN，而因为高并发下大量write是无效的，就导致cpu超载和卡死。</p>
+<p>这是只会出现在非阻塞socket的问题。</p>
 
-<p>题外话：正确的EPOLLOUT监听时机是，一，write返回-1，然后errno为EAGAIN时；二，write的返回值大于0，但小于要邱写入的字节数，即write没有完全把数据写进发送队列。</p>
+<p>解决思路：</p>
+
+<ul>
+<li><p>检查是不是意外调用了onWritable接口，即还没有监听可写事件，却调用了可写回调接口</p></li>
+<li><p>尝试用while循环来调用send data，直到send发完数据，或返回-1（EAGAIN）并添加可写监听。</p></li>
+</ul>
 
 <p>另外，收到可写事件时，尝试write剩余字节，如果write能把所有字节都写进发送队列，那么就可以删除EPOLLOUT监听了。</p>
 

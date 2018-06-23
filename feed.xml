@@ -884,11 +884,51 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
         <title>多线程网络库开发笔记</title>
         <description>&lt;!--more--&gt;
 
+&lt;h2&gt;收到EPOLLOUT事件，但write时返回了EAGAIN？&lt;/h2&gt;
+
+&lt;p&gt;这是因为EAGAIN不止是在发送缓冲区满时返回，还可能是&lt;strong&gt;未ACK的包数量已经达到了拥塞窗口的大小&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;而EPOLLOUT并不会检查拥塞窗口的情况，只要发送缓冲区不满，就返回EPOLLOUT了。&lt;/p&gt;
+
+&lt;p&gt;用并发压力测试可以测出这种情况：在epoll_wait返回后，检测可写事件的fd是否发送缓冲区不满，不满的话尝试写入一个字节，然后通过write的返回值和错误码就可以知道有没出现&lt;strong&gt;缓冲区不满的EAGAIN&lt;/strong&gt;。同时打印出拥塞窗口信息，就可以看出EAGAIN原因：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.3/22.png&quot; alt=&quot;22.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;参考资料：&lt;a href=&quot;https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full&quot;&gt;https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;EAGAIN/EWOULDBLOCK can also be returned (for TCP sockets) when the number of unacknowledged packets has reached the congestion window.&lt;/p&gt;
+
+&lt;p&gt;To check the status of the socket w.r.t. the congestion window, then try this:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#include&lt;/span&gt; &lt;span class=&quot;cpf&quot;&gt;&amp;lt;netinet/tcp.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_tcp_cwnd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;uint&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tcp_info_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getsockopt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOL_TCP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TCP_INFO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_info_length&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;tcpi_snd_cwnd: %u, tcpi_unacked: %u&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcpi_snd_cwnd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcpi_unacked&lt;/span&gt;
+           &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If tcpi_unacked == tcpi_snd_cwnd then send() will return EAGAIN/EWOULDBLOCK for a non-blocking socket.&lt;/p&gt;
+&lt;/blockquote&gt;
+
 &lt;h2&gt;write无限返回EAGAIN导致的cpu超载和FIN_WAIT1卡死&lt;/h2&gt;
 
-&lt;p&gt;最终发现是逻辑上的bug，导致未收到EPOLLOUT事件就调用了onWritable函数，此时并不可写但是却调用了write函数，于是系统会返回EAGAIN，而因为高并发下大量write是无效的，就导致cpu超载和卡死。&lt;/p&gt;
+&lt;p&gt;这是只会出现在非阻塞socket的问题。&lt;/p&gt;
 
-&lt;p&gt;题外话：正确的EPOLLOUT监听时机是，一，write返回-1，然后errno为EAGAIN时；二，write的返回值大于0，但小于要邱写入的字节数，即write没有完全把数据写进发送队列。&lt;/p&gt;
+&lt;p&gt;解决思路：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;检查是不是意外调用了onWritable接口，即还没有监听可写事件，却调用了可写回调接口&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;尝试用while循环来调用send data，直到send发完数据，或返回-1（EAGAIN）并添加可写监听。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;另外，收到可写事件时，尝试write剩余字节，如果write能把所有字节都写进发送队列，那么就可以删除EPOLLOUT监听了。&lt;/p&gt;
 
