@@ -428,6 +428,99 @@
 
 <h1>完整的网络安全通讯设计</h1>
 
+<h2>nonce</h2>
+
+<p>nonce本质就是一段随机码，因为不一定是数字，可能是字符，所以不能叫随机数。因此取了个名字叫nonce。</p>
+
+<p>nonce的存在是为了对付<strong>彩虹表(raintable)</strong>、<strong>重放攻击(replay attack)</strong>，或者说为了制造<strong>请求唯一性(request unique)</strong>。</p>
+
+<p>nonce有server nonce、client nonce之分：</p>
+
+<ul>
+<li>需要client nonce的原因：阻止邪恶的客户端做重放攻击。</li>
+<li>需要server nonce的原因：阻止中间人攻击。</li>
+</ul>
+
+<p>nonce的生成策略有讲究：</p>
+
+<ul>
+<li>可以是时间相关变量</li>
+<li>可以是一个通过强随机算法生成的足够长的bits</li>
+</ul>
+
+<h3>例子：登录与登录密码</h3>
+
+<h4>方案1</h4>
+
+<p>直接经过无加密的tcp或者http，发password到服务器进行登录。</p>
+
+<p>问题：登录包一被截取，密码就泄露了，攻击者想怎么搞就怎么搞了。</p>
+
+<h4>方案2</h4>
+
+<p>对password做一个经典的hash：</p>
+
+<p>secret = Hash(password);</p>
+
+<p>客户端只发secret给服务器，服务器也做一次hash得到secret_server即可做校验。</p>
+
+<p>问题：攻击者还是截包，就获得了secret，因为每次登录都是发一样的secret，所使攻击者首先可以做<strong>重放攻击</strong>，直接copy用户的登录包，发给服务器，就可以登录了；其次，因为Hash函数无非md5、SHA256这些，完全可以用raintable暴力查表，获得password。</p>
+
+<h4>方案3</h4>
+
+<p>改进：客户端每次登录前，服务器会生成一个nonce并发给客户端，客户端计算：</p>
+
+<p>secret = Hash(nonce_server, password);</p>
+
+<p>客户端只发username、secret给服务器，服务器在数据库中通过username找到password（这里假设存了密码原文），就可以在服务器上执行：</p>
+
+<p>secrect_server = Hash(nonce_server, password_server)；</p>
+
+<p>然后比较secret和secret_server是否一致即可。</p>
+
+<p>优点：每次登录hash出来的secret都不一样，用户密码比较安全了，要破解密码，得根据secret、nonce_server、Hash，逆向出password，可行，但耗时。</p>
+
+<p>问题：服务端发送的nonce可以被攻击者篡改成固定的nonce，从而导致nonce特性还是被消去了，攻击者就还是可以弄raintable，暴力破解密码。不过因为篡改的nonce和服务器的nonce对不上，客户端发的错误的登录信息，是过不了服务器这一关的。总之，攻击者并不能完美而透明地实现中间人攻击，但可以破解密码。</p>
+
+<h4>基于方案3的方案4</h4>
+
+<p>既然方案3中，客户端接收了攻击者篡改出来的固定nonce，并发送了符合攻击者raintable预期的secret，导致密码容易被破解，那么客户端是否可以做一些保护措施，使得发到网络中的secret是随机的呢？</p>
+
+<p>方法是有的，就是客户端也生成nonce， 称之为client_nonce，secret的计算变成：</p>
+
+<p>secret = nonce_client || Hash(nonce_client, nonce_server, password)</p>
+
+<p>（Note：||表示concat操作）</p>
+
+<p>服务器收到secret后拆出nonce_client和hash值，本地也执行一遍这条公式，就能做登录校验。</p>
+
+<p>这样处理后，攻击者即使篡改了nonce_server，攻击者收到的客户端secret依然是随机的。并不能直接查raintable获得password，而必须根据客户端的nonce_client，即时算出一份新的raintable表（计算量巨大），才能破解密码。</p>
+
+<p>问题：在登录过程中，本质上还是发送了password，就依然有被猜出密码的可能。如果这个密码是用户的常用密码，例如生日，那后果还是很可怕的。</p>
+
+<p>进一步的思路：既然发送加密的密码不妥，那就是用DH密钥交换了，就不会有密钥在网络中传输的问题。当然对于用户输入密码登录的场景，DH应该是用不了了。</p>
+
+<h2>如何正确地建立加密的通讯连接</h2>
+
+<p>首先以一个较为简单的例子来说明：某客户端想和某服务器建立tcp加密通讯。</p>
+
+<p>首先需要一个工具：公钥私钥对（非对称加密技术）。</p>
+
+<ol>
+<li>服务器长期地在本机存放了用于和任意客户端建立通讯的公钥私钥对。</li>
+<li>客户端想和服务器通讯时，服务器发送公钥给客户端。客户端确信用这个公钥加密的数据只有这个服务器能解密。（暂时不考虑中间人攻击问题）</li>
+<li>客户端计算一个pre-master key，这个key可能真的是本地算出来的，也可能用DH算法和服务器交换出来的。总之，pre-master key是客户端服务器都得持有。</li>
+<li>客户端服务器各自生成nonce，互发给对方。此时双方都持有pre-master key、cnonce、snonce。</li>
+<li>客户端服务器各自本地计算Hash(pre-master key，cnonce，snonce)获得真正用于通讯的对称密钥encrypt key。</li>
+<li>另外的，客户端服务器还可以计算Hash2(pre-master key，cnonce，snonce)，获得用于别的用途的key，例如integrity protection key，验证消息用的key。</li>
+</ol>
+
+<p>其中，pre-master key后的步骤其实不是必须的，因为pre-master key是用安全的非对称加密信道协商了，没有泄露key的问题。</p>
+
+<p>然而，如果每次建立通讯都要走1-3步骤的话，开销会比较大，所以pre-master key其实是要复用的。例如客户端可以缓存在本机，服务器就缓存到数据库，设个过期时间。</p>
+
+<p>之后如果客户端想再次发起通讯，那么就可以跳过1-3步，直接执行4-6步，算出用于本次通讯的加密密钥。</p>
+
 <h1>参考资料</h1>
 
 <p><a href="https://scotthelme.co.uk/perfect-forward-secrecy/">https://scotthelme.co.uk/perfect-forward-secrecy/</a></p>
