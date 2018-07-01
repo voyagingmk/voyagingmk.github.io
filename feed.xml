@@ -137,6 +137,24 @@
 
 &lt;p&gt;然而很可惜的是，非对称加密算法，性能一般都差强人意，远不如&lt;strong&gt;对称加密算法&lt;/strong&gt;。所有用户要发送大量隐私数据给服务器，只用非对称加密的话，先不说客户端耗能，服务器的CPU首先就炸了。&lt;/p&gt;
 
+&lt;p&gt;用指令openssl speed xxx，可以认识到各种算法的性能：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;                        sign        verify          sign/s    verify/s
+rsa 2048 bits 0.000738s 0.000022s   1354.2  45918.7
+
+因为rsa是按次的，这里得换算成k bytes才能和aes比较，即乘以256再除以1000：
+rsa 2048 bits 0.000738s 0.000022s   346.7k 11755.2k
+
+
+type             16 bytes     64 bytes    256 bytes   1024 bytes   8192 bytes
+aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
+
+                              op      op/s
+ 256 bit ecdh (nistp256)   0.0001s  14937.4
+ 384 bit ecdh (nistp384)   0.0008s   1265.2
+ 521 bit ecdh (nistp521)   0.0009s   1148.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;显然可以看出rsa和aes根本不是同个数量级的，rsa私钥运算大约比aes慢1000倍。&lt;/p&gt;
+
 &lt;p&gt;性能是关键，接下来的步骤，都得归咎于非对称加密算法的性能。&lt;/p&gt;
 
 &lt;h3&gt;三，有时效限制的通讯密令：master key&lt;/h3&gt;
@@ -150,6 +168,8 @@
 &lt;p&gt;master key，用非对称加密信道协商，可以本机随机生成，也可以用DH算法和服务器交换。&lt;/p&gt;
 
 &lt;p&gt;然后是时效性问题，一般master key要设个过期时间，一天、一个星期、一个月，加了限时，就保证了要定期更换，一定程度降低了master key泄露的风险。一般是服务器设置过期时间，客户端只缓存，如果用了过期的master key，那服务器应有反馈，并重新协商新的master key。&lt;/p&gt;
+
+&lt;p&gt;P.S. master key也被叫做session id或者ticket。&lt;/p&gt;
 
 &lt;h3&gt;四，基于master key，得到对称加密密钥，建立对称加密通讯&lt;/h3&gt;
 
