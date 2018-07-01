@@ -916,7 +916,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;li&gt;pre-master key：randomBytes() 或者 DH&lt;/li&gt;
 &lt;li&gt;对称加密：AES&lt;/li&gt;
 &lt;li&gt;encrypt key：MD5 或者 SHA256&lt;/li&gt;
-&lt;li&gt;integrity key：MD5 或者 SHA256&lt;/li&gt;
+&lt;li&gt;integrity key：MD5 或者 SHA256 with salt&lt;/li&gt;
 &lt;li&gt;消息验证码生成函数：HMAC with integrity key&lt;/li&gt;
 &lt;/ul&gt;
 
