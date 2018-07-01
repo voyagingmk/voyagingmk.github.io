@@ -821,15 +821,15 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;ol&gt;
 &lt;li&gt;服务器在本地或数据库中存放了用于和任意客户端建立通讯的公钥私钥对。&lt;/li&gt;
 &lt;li&gt;客户端想和服务器通讯时，服务器发送公钥给客户端。客户端确信用这个公钥加密的数据只有这个服务器能解密。（暂时不考虑中间人攻击问题）&lt;/li&gt;
-&lt;li&gt;客户端计算一个pre-master key，这个key可能真的是本地算出来的，也可能用DH算法和服务器交换出来的。如果是本地算出来的，那就必须用刚刚的非对称加密通讯信道，发给服务器。总之，pre-master key是客户端服务器都得持有。&lt;/li&gt;
-&lt;li&gt;客户端服务器各自生成nonce，互发给对方。此时双方都持有pre-master key、cnonce、snonce。&lt;/li&gt;
-&lt;li&gt;客户端服务器各自本地计算Hash(pre-master key，cnonce，snonce)获得真正用于通讯的对称密钥encrypt key。&lt;/li&gt;
-&lt;li&gt;另外的，客户端服务器还可以计算Hash2(pre-master key，cnonce，snonce)，获得用于别的用途的key，例如integrity protection key，验证消息用的key。&lt;/li&gt;
+&lt;li&gt;客户端计算一个master key，这个key可能真的是本地算出来的，也可能用DH算法和服务器交换出来的。如果是本地算出来的，那就必须用刚刚的非对称加密通讯信道，发给服务器。总之，master key是客户端服务器都得持有。&lt;/li&gt;
+&lt;li&gt;客户端服务器各自生成nonce，互发给对方。此时双方都持有master key、cnonce、snonce。&lt;/li&gt;
+&lt;li&gt;客户端服务器各自本地计算Hash(master key，cnonce，snonce)获得真正用于通讯的对称密钥encrypt key。&lt;/li&gt;
+&lt;li&gt;另外的，客户端服务器还可以计算Hash2(master key，cnonce，snonce)，获得用于别的用途的key，例如integrity protection key，验证消息用的key。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;其中，pre-master key后的步骤其实不是必须的，因为pre-master key是用安全的非对称加密信道协商了，没有泄露key的问题。&lt;/p&gt;
+&lt;p&gt;其中，master key后的步骤其实不是必须的，因为master key是用安全的非对称加密信道协商了，没有泄露key的问题。&lt;/p&gt;
 
-&lt;p&gt;然而，如果每次建立通讯都要走1-3步骤的话，开销会比较大，所以pre-master key其实是要复用的。例如客户端可以缓存在本机，服务器就缓存到数据库，设个过期时间。&lt;/p&gt;
+&lt;p&gt;然而，如果每次建立通讯都要走1-3步骤的话，开销会比较大，所以master key其实是要复用的。例如客户端可以缓存在本机，服务器就缓存到数据库，设个过期时间。&lt;/p&gt;
 
 &lt;p&gt;之后如果客户端想再次发起通讯，那么就可以跳过1-3步，直接执行4-6步，算出用于本次通讯的加密密钥。&lt;/p&gt;
 
@@ -863,19 +863,19 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;性能是关键，接下来的步骤，都得归咎于非对称加密算法的性能。&lt;/p&gt;
 
-&lt;h3&gt;三，有时效限制的通讯密令：pre-master key&lt;/h3&gt;
+&lt;h3&gt;三，有时效限制的通讯密令：master key&lt;/h3&gt;
 
 &lt;p&gt;因为性能问题，我们希望尽可能不使用非对称加密通讯信道，甚至不去建立非对称加密通讯。&lt;/p&gt;
 
-&lt;p&gt;最终的，非对称加密通讯所要负责的事情，被精简成一件事：协商一个pre-master key。&lt;/p&gt;
+&lt;p&gt;最终的，非对称加密通讯所要负责的事情，被精简成一件事：协商一个master key。&lt;/p&gt;
 
-&lt;p&gt;pre-master key前文也介绍过了，说白了就是一段password，pre-master key只能是通讯的两端持有，不能告诉其他人，否则就不安全了。&lt;/p&gt;
+&lt;p&gt;master key前文也介绍过了，说白了就是一段password，master key只能是通讯的两端持有，不能告诉其他人，否则就不安全了。&lt;/p&gt;
 
-&lt;p&gt;pre-master key，用非对称加密信道协商，可以本机随机生成，也可以用DH算法和服务器交换。&lt;/p&gt;
+&lt;p&gt;master key，用非对称加密信道协商，可以本机随机生成，也可以用DH算法和服务器交换。&lt;/p&gt;
 
-&lt;p&gt;然后是时效性问题，一般pre-master key要设个过期时间，一天、一个星期、一个月，加了限时，就保证了要定期更换，一定程度降低了pre-master key泄露的风险。一般是服务器设置过期时间，客户端只缓存，如果用了过期的pre-master key，那服务器应有反馈，并重新协商新的pre-master key。&lt;/p&gt;
+&lt;p&gt;然后是时效性问题，一般master key要设个过期时间，一天、一个星期、一个月，加了限时，就保证了要定期更换，一定程度降低了master key泄露的风险。一般是服务器设置过期时间，客户端只缓存，如果用了过期的master key，那服务器应有反馈，并重新协商新的master key。&lt;/p&gt;
 
-&lt;h3&gt;四，基于pre-master key，得到对称加密密钥，建立对称加密通讯&lt;/h3&gt;
+&lt;h3&gt;四，基于master key，得到对称加密密钥，建立对称加密通讯&lt;/h3&gt;
 
 &lt;p&gt;刚才的简化例子有一点没有说清楚的，就是nonce怎么发送。&lt;/p&gt;
 
@@ -883,13 +883,13 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;因为需要的对称加密密钥基于三个参数：&lt;/p&gt;
 
-&lt;p&gt;encrypt key = Hash(pre-master key，nonce_client, nonce_server)&lt;/p&gt;
+&lt;p&gt;encrypt key = Hash(master key，nonce_client, nonce_server)&lt;/p&gt;
 
-&lt;p&gt;我们不怕泄露后2个，因为第一个pre-master key已经保证保密了。这样子hash出来的encrypt key也依然是保密的。&lt;/p&gt;
+&lt;p&gt;我们不怕泄露后2个，因为第一个master key已经保证保密了。这样子hash出来的encrypt key也依然是保密的。&lt;/p&gt;
 
 &lt;p&gt;有了双方一致的encrypt key，就可以拿出各种对称加密算法，来建立加密通讯了。&lt;/p&gt;
 
-&lt;p&gt;哦还有个要注意的点，nonce_client, nonce_server存在的意义前文也说过了，主要是防止重放攻击、中间人攻击，所以每次想要用pre-master key建立加密通讯，都是即时地重新协商nonce。&lt;/p&gt;
+&lt;p&gt;哦还有个要注意的点，nonce_client, nonce_server存在的意义前文也说过了，主要是防止重放攻击、中间人攻击，所以每次想要用master key建立加密通讯，都是即时地重新协商nonce。&lt;/p&gt;
 
 &lt;h3&gt;五，加密数据的完整性保证&lt;/h3&gt;
 
@@ -897,13 +897,17 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;例如A用encrypt key加密了原文a得到密文b，用tcp把b发出去，b被攻击者截取，攻击者可能用各种奇奇怪怪的方法尝试篡改这个密文b变成密文c，亦或者替换了b变成密文d（很可能是通讯早期截获的包！），然后继续发向服务器，那么就还是不安全，因为客户端想要发给服务器的密文b并没有真正送到，服务器还处理了别的密文！&lt;/p&gt;
 
+&lt;p&gt;还有一种情况是，客户端和服务器的对称密钥因为某种原因不同步了，这样会导致服务器用错误的对称密钥解密数据得到了“乱码”，但服务器是完全感知不到用了错误的密钥，服务器无法知道乱码是不是乱码。&lt;/p&gt;
+
 &lt;p&gt;那怎么办呢？答案是再给密文b加一层&lt;strong&gt;认证&lt;/strong&gt;。&lt;/p&gt;
 
 &lt;p&gt;简单理解就是，客户端给密文b做个hash，得到消息验证码MAC（前文介绍过的)，把密文b和MAC一起发给服务器，服务器也对收到的密文做一样的hash，如果服务器得到的MAC值和客户端的MAC值不一致，那就说明数据不是客户端发来的。&lt;/p&gt;
 
-&lt;p&gt;hash函数刚才也提到过了，需要一个integrity key，也是基于pre-master key的。攻击者没有办法获得一样的hash函数。&lt;/p&gt;
+&lt;p&gt;hash函数刚才也提到过了，需要一个integrity key，也是基于master key的。攻击者没有办法获得一样的hash函数。&lt;/p&gt;
 
 &lt;p&gt;MAC的安全隐患前文也说到过了。最经典的是重放攻击，就是攻击者并不篡改密文和MAC，而只是原样地保存下来，并伺机重复发送给服务器。这个问题的解决办法就是对每条消息加一个递增的序号。同样的消息就不可能收到两次。&lt;/p&gt;
+
+&lt;p&gt;P.S. 用一个额外的MAC（其实应该叫做MtE，EtM，E&amp;amp;M）来保证完整性已经是一种过时的思路，有安全缺陷。取而代之的是AEAD。所谓AEAD，含义是在对称加密算法里添加了完整性验证的功能，例如AES-128-GCM、ChaCha20-IETF-Poly1305。所以AEAD并不是一种算法，而只是方案的代名词。&lt;/p&gt;
 
 &lt;h3&gt;六，算法选取&lt;/h3&gt;
 
@@ -911,11 +915,31 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;ul&gt;
 &lt;li&gt;非对称加密：RSA 或 ECC&lt;/li&gt;
-&lt;li&gt;pre-master key：randomBytes() 或者 DH&lt;/li&gt;
+&lt;li&gt;master key：randomBytes() 或者 DH&lt;/li&gt;
 &lt;li&gt;对称加密：AES&lt;/li&gt;
 &lt;li&gt;encrypt key：MD5 或者 SHA256&lt;/li&gt;
 &lt;li&gt;integrity key：MD5 或者 SHA256 with salt&lt;/li&gt;
 &lt;li&gt;消息验证码生成函数：HMAC with integrity key&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这些东西的选取，已经有规范了，叫做cipherSuite，例如可以执行openssl ciphers -V | column -t，看到系统支持的cipherSuites：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/4.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;第一列2个十六进制值相当于ID。&lt;/p&gt;
+
+&lt;p&gt;以其中最常见的0xC0,0x2F为例：&lt;/p&gt;
+
+&lt;p&gt;0xC0,0x2F  -  ECDHE-RSA-AES128-GCM-SHA256    TLSv1.2  Kx=ECDH        Au=RSA    Enc=AESGCM(128)    Mac=AEAD&lt;/p&gt;
+
+&lt;p&gt;含义：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;用于TLSv1.2版本&lt;/li&gt;
+&lt;li&gt;kx = key exchange，使用ECDHE做秘钥交换（就是上文说的DH的变种）&lt;/li&gt;
+&lt;li&gt;Au = authenticity，使用RSA做认证&lt;/li&gt;
+&lt;li&gt;Enc = encryption，使用AES-128-GCM做对称加密。GCM意味着加密算法支持认证功能。&lt;/li&gt;
+&lt;li&gt;MAC = AEAD（authenticated encryption with associated data），一种同时具备保密性(confidentiality)，完整性(integrity)和可认证性(authenticity assurances)的加密形式。 MAC=AEAD意思是说“把这些认证问题交给对称加密算法就行了，不需要MAC”。&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h1&gt;参考资料&lt;/h1&gt;
