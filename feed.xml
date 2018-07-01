@@ -195,7 +195,7 @@
       </item>
     
       <item>
-        <title>各种多路复用API用法总结</title>
+        <title>select和epoll多路复用用法总结</title>
         <description>&lt;!--more--&gt;
 
 &lt;h2&gt;select&lt;/h2&gt;
@@ -241,8 +241,6 @@
 &lt;p&gt;总结：&lt;/p&gt;
 
 &lt;p&gt;select是基于位掩码的设计，所以fd_set有固定长度。长度由FD_SETSIZE确定，FD_SETSIZE可以用户自己定。默认只有1024。&lt;/p&gt;
-
-&lt;h2&gt;poll&lt;/h2&gt;
 
 &lt;h2&gt;epoll&lt;/h2&gt;
 
@@ -912,7 +910,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;上面的五大步骤，其实都没有谈到具体用什么算法。据我了解，可以这么弄：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;非对称加密：RSA&lt;/li&gt;
+&lt;li&gt;非对称加密：RSA 或 ECC&lt;/li&gt;
 &lt;li&gt;pre-master key：randomBytes() 或者 DH&lt;/li&gt;
 &lt;li&gt;对称加密：AES&lt;/li&gt;
 &lt;li&gt;encrypt key：MD5 或者 SHA256&lt;/li&gt;

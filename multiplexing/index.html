@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>各种多路复用API用法总结 – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
+    <title>select和epoll多路复用用法总结 – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="各种多路复用API用法总结" />
-    <meta property="twitter:title" content="各种多路复用API用法总结" />
+    <meta property="og:title" content="select和epoll多路复用用法总结" />
+    <meta property="twitter:title" content="select和epoll多路复用用法总结" />
     
 
     <!--[if lt IE 9]>
@@ -37,7 +37,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/multiplexing/',
-		  'title': '各种多路复用API用法总结'
+		  'title': 'select和epoll多路复用用法总结'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -77,7 +77,7 @@
 
     <div id="main" role="main" class="container">
       <article class="post">
-  <h1>各种多路复用API用法总结</h1>
+  <h1>select和epoll多路复用用法总结</h1>
   <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
   <div class="entry">
     <!--more-->
@@ -125,8 +125,6 @@
 <p>总结：</p>
 
 <p>select是基于位掩码的设计，所以fd_set有固定长度。长度由FD_SETSIZE确定，FD_SETSIZE可以用户自己定。默认只有1024。</p>
-
-<h2>poll</h2>
 
 <h2>epoll</h2>
 
