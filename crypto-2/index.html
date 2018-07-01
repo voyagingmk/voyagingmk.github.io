@@ -229,7 +229,7 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 
 <p>性能是关键，接下来的步骤，都得归咎于非对称加密算法的性能。</p>
 
-<h3>三，有时效限制的通讯密令：master key</h3>
+<h3>三，通讯密令：master key</h3>
 
 <p>因为性能问题，我们希望尽可能不使用非对称加密通讯信道，甚至不去建立非对称加密通讯。</p>
 
@@ -237,11 +237,18 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 
 <p>master key前文也介绍过了，说白了就是一段password，master key只能是通讯的两端持有，不能告诉其他人，否则就不安全了。</p>
 
-<p>master key，用非对称加密信道协商，可以本机随机生成，也可以用DH算法和服务器交换。</p>
+<p>master key，用非对称加密信道协商，一般是用ECDH算法。</p>
+
+<p>master key难得，成本很高，所以需要有缓存机制。免得经常去生成新的master key。有2种套路，一个是session id，本质是服务器做缓存；另一个是session ticket，是客户端做缓存。</p>
+
+<ul>
+<li>session id：在之前的密钥协商后，服务器会分配一个session id，并在数据库中存入以session id为键的会话信息如master key。下次做密钥协商时，客户端发现已经缓存了一个session id，那么发id给服务器，如果服务器能在数据库找出这个id对应的master key，那么就不需要去协商master key了。不过缺点是很难维护一个这样子的数据库。</li>
+<li>session ticket：新的会话建立时，服务器用一个只有自己知道的密钥（ticket key）对master key做加密，把密文ticket发给客户端，客户端单纯地只把ticket缓存起来。下次要建立会话时，把缓存的ticket发给服务器，服务器解密，就拿到之前的master key。因为ticket key必须所有服务器一致，且不可变，也有一定安全风险，现在一般是采用轮转的方式，定时地渐进式地淘汰旧的ticket key（新的会话用旧的ticket key尝试解密，用新的ticket key加密）。</li>
+</ul>
+
+<p>这两种方案中，共同点都是客户端依然得自己缓存好master key。</p>
 
 <p>然后是时效性问题，一般master key要设个过期时间，一天、一个星期、一个月，加了限时，就保证了要定期更换，一定程度降低了master key泄露的风险。一般是服务器设置过期时间，客户端只缓存，如果用了过期的master key，那服务器应有反馈，并重新协商新的master key。</p>
-
-<p>P.S. master key也被叫做session id或者ticket。</p>
 
 <h3>四，基于master key，得到对称加密密钥，建立对称加密通讯</h3>
 
@@ -282,15 +289,15 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 
 <p>P.S. 用一个额外的MAC（其实应该叫做MtE，EtM，E&amp;M）来保证完整性已经是一种过时的思路，有安全缺陷。其中只有EtM(encrypt then MAC)是安全的，是一个大坑。让程序员搞懂这三者区别也是痛苦。所以现在并不提倡EtM之类的做法了。</p>
 
-<p>取而代之的是AEAD。所谓AEAD，含义是在对称加密算法里添加了完整性验证的功能，例如AES-128-GCM、ChaCha20-IETF-Poly1305。所以AEAD并不是一种算法，而只是方案的代名词。</p>
+<p>取而代之的是AEAD。所谓AEAD，含义是在对称加密算法里添加了完整性验证的功能，例如AES-128-GCM、ChaCha20-IETF-Poly1305。所以AEAD并不是一种算法，而只是方案的代名词。在即将到来的TLSv1.3中，已经彻底干掉MAC，而统一用AEAD了。</p>
 
 <h3>六，算法选取</h3>
 
-<p>上面的五大步骤，其实都没有谈到具体用什么算法。据我了解，可以这么弄：</p>
+<p>上面的五大步骤，其实都没有谈到具体用什么算法。据我了解，如果不用ssl库，而是自己DIY，那么可以这么弄：</p>
 
 <ul>
 <li>非对称加密：RSA 或 ECC</li>
-<li>master key：randomBytes() 或者 DH</li>
+<li>master key：ECDH</li>
 <li>对称加密：AES</li>
 <li>encrypt key：SHA256</li>
 <li>integrity key：SHA256 with salt</li>
@@ -319,13 +326,35 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 <li>MAC = AEAD（authenticated encryption with associated data），一种同时具备保密性(confidentiality)，完整性(integrity)和可认证性(authenticity assurances)的加密形式。 MAC=AEAD意思是说“把这些认证问题交给对称加密算法就行了，不需要MAC”。</li>
 </ul>
 
-<p>所以撇除掉MAC，那么CipherSuite其实只有3个东西：</p>
+<p>所以撇除掉融合到加密算法里的MAC，那么CipherSuite其实只有3个东西：</p>
 
 <ul>
 <li>1个authentication 认证算法</li>
 <li>1个encryption 加密算法</li>
 <li>1个key exchange 密钥交换算法</li>
 </ul>
+
+<h1>补充</h1>
+
+<h2>0-rtt，1-rtt？</h2>
+
+<p>搞通讯偶尔会看到什么0-rtt，1-rtt，其实都指的是基于TLS连接，和tcp的三次握手没关系。</p>
+
+<p>TLS连接握手，是发生tcp三次握手后的事情，即三次握手后，还要经过多少个rtt回合，才能建立TLS连接？</p>
+
+<p>用1-rtt搞定TLS连接，那么这一个rtt必然是用来协商对称加密密钥的。比如说，你的程序可以强制客户端和服务端只用DH算法协商密钥，并且这个rtt里也发送各自的nonce，那么1-rtt后，通讯两端就都拥有了master key、cnonce、snonce。</p>
+
+<p>至于0-rtt，必然是有损安全性的。0-rtt意味着第一个数据包就得支持发送用户数据，那必然是用某种缓存的key来加密用户数据。这个key叫做半静态ECDH公钥。原理有点像前面说的，游戏客户端硬编码了服务器公钥。</p>
+
+<p>缺陷在于：</p>
+
+<ol>
+<li>0-RTT发送的应用数据没有前向安全性</li>
+<li>跨连接可以重放0-RTT里的应用数据（任何服务器端无共享状态的协议，都无法做到跨连接防重放）</li>
+<li>如果服务器端 半静态 ECDH公钥对应的私钥泄露了，攻击者就可以伪装成客户端随意篡改数据了。</li>
+</ol>
+
+<p>这简直就是性能和安全的博弈。google的QUIC就很好地实现了0-rtt。</p>
 
 <h1>总结</h1>
 
