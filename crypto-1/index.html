@@ -260,7 +260,7 @@
 
 <p>但X、x公钥私钥对并不能直接用于加密数据。这个事情后面再说。</p>
 
-<h3>谁才是主人公？持有私钥证明</h3>
+<h3>谁才是主人公？持有私钥证明 part1</h3>
 
 <p>Bob持有私钥x，是事实，但Bob怎么向别人证明自己持有X对应的私钥x呢？</p>
 
@@ -281,13 +281,33 @@
 
 <p>\[ ( y^{2} ) \% p = ( x^{3} + ax + b ) \% p\]</p>
 
-<h3>ECC的应用：加密货币</h3>
+<p>p是一个大质数，例如在secp256k1椭圆曲线中，p的取值是【0, \( 2^{256} \) 】范围内的最大质数。</p>
+
+<p>这么一转换后，椭圆曲线就变成大概这样子的东西：</p>
+
+<p><img src="../images/2018.4/12.png" alt="8.png"></p>
+
+<p>离散的点集，但仍然有关于x轴的对称性。</p>
+
+<p>而且，前面讨论的东西仍然是有效的。</p>
+
+<h3>谁才是主人公？持有私钥证明 part2</h3>
+
+<h3>ECC的应用：比特币</h3>
 
 <p>简单来说，要生成一个新的比特币钱包，需要先随机生成一个256bits的私钥x，然后根据比特币所用的椭圆曲线参数（secp256k1），计算X = xP，X就是这个钱包的公钥。</p>
 
 <p>然后呢，X大有所为，X可以随便公开，X相当于钱包的银行账号，例如比特币转入这个钱包，就需要用到X。</p>
 
 <p>转入问题是解决了，但怎么证明你是这个钱包的主人，并转出（消费）比特币呢？答案就是用上一节的方法，做一个持有私钥声明，转出事物广播开后，每个人都可以简单地验证这个持有声明的真伪性。</p>
+
+<h3>ECC的应用：加密数据</h3>
+
+<p>关键词：<a href="https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme">ECIES</a></p>
+
+<p>资料： </p>
+
+<p><a href="https://crypto.stackexchange.com/questions/31602/how-does-encryption-work-in-elliptic-curve-cryptography">https://crypto.stackexchange.com/questions/31602/how-does-encryption-work-in-elliptic-curve-cryptography</a></p>
 
 <h1>DH算法</h1>
 
@@ -622,11 +642,15 @@
 
 <h1>参考资料</h1>
 
+<p><a href="https://zhuanlan.zhihu.com/p/38920372">https://zhuanlan.zhihu.com/p/38920372</a></p>
+
 <p><a href="https://scotthelme.co.uk/perfect-forward-secrecy/">https://scotthelme.co.uk/perfect-forward-secrecy/</a></p>
 
 <p><a href="https://hackernoon.com/eliptic-curve-crypto-the-basics-e8eb1e934dc5">Elliptic Curve Crypto , The Basics</a></p>
 
 <p><a href="https://hackernoon.com/what-is-the-math-behind-elliptic-curve-cryptography-f61b25253da3">What is the math behind elliptic curve cryptography?</a></p>
+
+<p><a href="https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html">https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html</a></p>
 
     </div>
     <div class="entry">

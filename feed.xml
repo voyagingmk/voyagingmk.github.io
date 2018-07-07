@@ -1207,7 +1207,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;但X、x公钥私钥对并不能直接用于加密数据。这个事情后面再说。&lt;/p&gt;
 
-&lt;h3&gt;谁才是主人公？持有私钥证明&lt;/h3&gt;
+&lt;h3&gt;谁才是主人公？持有私钥证明 part1&lt;/h3&gt;
 
 &lt;p&gt;Bob持有私钥x，是事实，但Bob怎么向别人证明自己持有X对应的私钥x呢？&lt;/p&gt;
 
@@ -1228,13 +1228,33 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;\[ ( y^{2} ) \% p = ( x^{3} + ax + b ) \% p\]&lt;/p&gt;
 
-&lt;h3&gt;ECC的应用：加密货币&lt;/h3&gt;
+&lt;p&gt;p是一个大质数，例如在secp256k1椭圆曲线中，p的取值是【0, \( 2^{256} \) 】范围内的最大质数。&lt;/p&gt;
+
+&lt;p&gt;这么一转换后，椭圆曲线就变成大概这样子的东西：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/12.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;离散的点集，但仍然有关于x轴的对称性。&lt;/p&gt;
+
+&lt;p&gt;而且，前面讨论的东西仍然是有效的。&lt;/p&gt;
+
+&lt;h3&gt;谁才是主人公？持有私钥证明 part2&lt;/h3&gt;
+
+&lt;h3&gt;ECC的应用：比特币&lt;/h3&gt;
 
 &lt;p&gt;简单来说，要生成一个新的比特币钱包，需要先随机生成一个256bits的私钥x，然后根据比特币所用的椭圆曲线参数（secp256k1），计算X = xP，X就是这个钱包的公钥。&lt;/p&gt;
 
 &lt;p&gt;然后呢，X大有所为，X可以随便公开，X相当于钱包的银行账号，例如比特币转入这个钱包，就需要用到X。&lt;/p&gt;
 
 &lt;p&gt;转入问题是解决了，但怎么证明你是这个钱包的主人，并转出（消费）比特币呢？答案就是用上一节的方法，做一个持有私钥声明，转出事物广播开后，每个人都可以简单地验证这个持有声明的真伪性。&lt;/p&gt;
+
+&lt;h3&gt;ECC的应用：加密数据&lt;/h3&gt;
+
+&lt;p&gt;关键词：&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;资料： &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://crypto.stackexchange.com/questions/31602/how-does-encryption-work-in-elliptic-curve-cryptography&quot;&gt;https://crypto.stackexchange.com/questions/31602/how-does-encryption-work-in-elliptic-curve-cryptography&lt;/a&gt;&lt;/p&gt;
 
 &lt;h1&gt;DH算法&lt;/h1&gt;
 
@@ -1569,11 +1589,15 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;h1&gt;参考资料&lt;/h1&gt;
 
+&lt;p&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/38920372&quot;&gt;https://zhuanlan.zhihu.com/p/38920372&lt;/a&gt;&lt;/p&gt;
+
 &lt;p&gt;&lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;https://scotthelme.co.uk/perfect-forward-secrecy/&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://hackernoon.com/eliptic-curve-crypto-the-basics-e8eb1e934dc5&quot;&gt;Elliptic Curve Crypto , The Basics&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://hackernoon.com/what-is-the-math-behind-elliptic-curve-cryptography-f61b25253da3&quot;&gt;What is the math behind elliptic curve cryptography?&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html&quot;&gt;https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1/</link>
