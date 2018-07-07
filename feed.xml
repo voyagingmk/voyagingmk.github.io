@@ -1194,6 +1194,17 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;x落在[0, 2&lt;sup&gt;256&lt;/sup&gt; - 1]，平均值为2&lt;sup&gt;128。因此平均需要暴力地做2&lt;sup&gt;128次群加法。&lt;/sup&gt;&lt;/sup&gt;&lt;/p&gt;
 
+&lt;h3&gt;公钥私钥&lt;/h3&gt;
+
+&lt;p&gt;基于上一节的讨论，x和X适合用来做非对称加密的私钥公钥：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;私钥：大数x&lt;/li&gt;
+&lt;li&gt;公钥：椭圆曲线上的坐标X&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;非对称加密的公钥私钥必然要满足一个性质：给定一个公钥，很难去推导出它对应私钥。可见，x和X满足这个性质。&lt;/p&gt;
+
 &lt;h1&gt;DH算法&lt;/h1&gt;
 
 &lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;

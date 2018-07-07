@@ -247,6 +247,17 @@
 
 <p>x落在[0, 2<sup>256</sup> - 1]，平均值为2<sup>128。因此平均需要暴力地做2<sup>128次群加法。</sup></sup></p>
 
+<h3>公钥私钥</h3>
+
+<p>基于上一节的讨论，x和X适合用来做非对称加密的私钥公钥：</p>
+
+<ul>
+<li>私钥：大数x</li>
+<li>公钥：椭圆曲线上的坐标X</li>
+</ul>
+
+<p>非对称加密的公钥私钥必然要满足一个性质：给定一个公钥，很难去推导出它对应私钥。可见，x和X满足这个性质。</p>
+
 <h1>DH算法</h1>
 
 <h2>key exchange例子（ <a href="https://scotthelme.co.uk/perfect-forward-secrecy/">from here</a> )：</h2>
