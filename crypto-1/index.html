@@ -103,6 +103,92 @@
 
 <p>基于离散对数问题。</p>
 
+<h2><a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH</a> (21世纪)</h2>
+
+<p>DH的变种，基于椭圆曲线算法的DH算法。</p>
+
+<h1>ECC算法</h1>
+
+<p>椭圆曲线，指的是满足这个<strong>维尔斯特拉斯通用式</strong>的曲线：</p>
+
+<p>\[ y^{2} = x^{3} + ax + b , 且 4a^{3} + 27 b^{2} ≠ 0 \]</p>
+
+<p>判别式(<a href="https://en.wikipedia.org/wiki/Discriminant">discriminant</a> )不为0时，曲线才没有奇异点，才能用于加密。</p>
+
+<p><img src="../images/2018.4/6.png" alt="3.png"></p>
+
+<p>到这里就能发现椭圆曲线第一个特点：<strong>整个曲线是关于x轴对称的</strong>。</p>
+
+<p>各类加密货币使用的椭圆曲线代号是secp256k1，长这样子：</p>
+
+<p><img src="../images/2018.4/5.png" alt="5.png"></p>
+
+<p>用这个<a href="https://hub.mybinder.org/user/ipython-ipython-in-depth-qhl9ondm/notebooks/binder/Untitled1.ipynb?kernel_name=python3">在线工具</a>可以打印椭圆曲线：</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">pl</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span>  <span class="c1"># 替换掉这个方程，然后重新run</span>
+
+<span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">100j</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">100j</span><span class="p">]</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<p><img src="../images/2018.4/7.png" alt="7.png"></p>
+
+<h2>椭圆曲线相关的数学背景</h2>
+
+<h3>曲线基本特点</h3>
+
+<ul>
+<li>如果一条（不垂直于x轴的）直线与椭圆曲线相交（有2个相交点），那么必然存在第三个相交点。（证明过程？）</li>
+<li>第三个点相当于公钥</li>
+<li>椭圆曲线关于x轴镜像对称</li>
+</ul>
+
+<h3>无穷远点：0</h3>
+
+<p>无穷远点，或理想点，指理想化地认为一条直线在无穷远处有一个终点，一般以0表示。</p>
+
+<h3>椭圆曲线上的点的取反操作</h3>
+
+<p>因为椭圆曲线关于x轴对称，所以可定义：</p>
+
+<p>对于任意椭圆曲线上的点P，对P取反后得到-P，-P为P关于x轴镜像对称点。</p>
+
+<h3>P + Q = R</h3>
+
+<p>前面已经提到，任意直线与椭圆曲线如果相交，那么必然有3个相交点。（记得相交线不能和x轴垂直）</p>
+
+<p>在椭圆曲线加密算法中，定义了一个阿贝尔群，该群的的加法操作定义如下：</p>
+
+<p>对于任意相交点P、Q、-R（这里取反是有意义的），若P!=-Q，有等式 P + Q + (-R) = 0 成立，即 P + Q = R。</p>
+
+<ul>
+<li>首先要注意，这个加法并不是欧氏几何加法，例如看下图， P + Q在欧氏几何中的结果是（-2.45，-1.024），而不是（3.89，5.62）</li>
+<li>该定义中，要求P!=-Q，也是有深意的：如果P=-Q，说明P和Q是关于x轴对称的2个点，那么P和Q应是R和-R，所以P!=-Q这个前提条件保证了P和Q不是那个特殊的R</li>
+</ul>
+
+<p><img src="../images/2018.4/8.png" alt="8.png"></p>
+
+<h3>base point P</h3>
+
+<p>在椭圆曲线加密算法中，第一步是定一个基准点P。</p>
+
+<p>第二步是，找出从P到P的直线方程。此时会疑惑2个一样的点怎么构成直线，当然是可以的，这个直线是<strong>经过P点的和椭圆曲线相切的切线</strong>：</p>
+
+<p><img src="../images/2018.4/9.png" alt="8.png"></p>
+
+<p>根据前面小节的说明，这条切线必然会与椭圆曲线相交于另外一点-R，又因为P + Q = R（-R的镜像点），所以有 P + P = 2P = R：</p>
+
+<p><img src="../images/2018.4/10.png" alt="8.png"></p>
+
+<p>这一个过程还可以迭代下去：因此此时已有P和2P两个点，如果让它们相加，即 P + 2P，那么又会得到新的一个镜像点3P：</p>
+
+<p><img src="../images/2018.4/11.png" alt="8.png"></p>
+
+<p>继续迭代这个过程，就能得到4P、5P、6P······</p>
+
 <h1>DH算法</h1>
 
 <h2>key exchange例子（ <a href="https://scotthelme.co.uk/perfect-forward-secrecy/">from here</a> )：</h2>
@@ -111,10 +197,10 @@
 <li>Alice和Bob首先线下商量好，使用<strong>p (prime, 质数) = 23、g (generator, 生成器) = 5</strong>作为通讯基础（p和g不需要绝对的保密，泄露了也没事）</li>
 <li>每次Alice和Bob想要建立通讯(连接)时，Alice自己随机生成一个在范围[1, p - 1]的数：a = 6</li>
 <li>同样，Bob自己也随机一个：b = 15</li>
-<li>Alice计算： \( A = ( g^{a} ) \% p = ( 5^{6} ) \% 23 =  15625 \% 23 = 8 \)，把A发给Bob</li>
-<li>Bob计算： \( B = ( g^{b} ) \% p = ( 5^{15} ) \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice</li>
-<li>Alice收到B后，可计算出<strong>对称密钥</strong>：\( s_{Alice} = ( B^{a} ) \% p = ( 19^{6} ) \% 23 = 47045881 \% 23 = 2 \)</li>
-<li>Bob收到A后，可计算出<strong>对称密钥</strong>：\( s_{Bob} = ( A^{b} ) \% p = ( 8^{15} ) \% 23 = 35184372088832 \% 23 = 2 \)</li>
+<li>Alice计算： \( A =  g^{a}  \% p =  5^{6}  \% 23 =  15625 \% 23 = 8 \)，把A发给Bob</li>
+<li>Bob计算： \( B =  g^{b}  \% p =  5^{15}  \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice</li>
+<li>Alice收到B后，可计算出<strong>对称密钥</strong>：\( s_{Alice} =  B^{a}  \% p =  19^{6}  \% 23 = 47045881 \% 23 = 2 \)</li>
+<li>Bob收到A后，可计算出<strong>对称密钥</strong>：\( s_{Bob} =  A^{b}  \% p =  8^{15}  \% 23 = 35184372088832 \% 23 = 2 \)</li>
 </ol>
 
 <h2>数学原理</h2>
@@ -127,19 +213,29 @@
 
 <p>\[ a^{b}\  \%\  n =  ( a \cdots  a ) \  \%\  n =  ( (a\ \%\  n) \cdots  (a\ \%\  n) ) \  \%\  n =  ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n \]</p>
 
-<p>于是有：</p>
+<p>\[ a^{b}\  \%\  n =  ( a^{b}\ \%\  n) \  \%\  n \]</p>
 
-<p>\[ s_{Alice} = ( B^{a} ) \% p =  (\  (\  g^{b} ) \% p\  ) ^{a}\   ) \% p =   (  \ g \% p\  ) ^{ab} \  ) \% p =  \ g ^{ab} \% p \]</p>
+<p>观察这2个式子最右边，发现b的位置是可以移动的：</p>
+
+<p>\[ ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n  =  ( a^{b}\ \%\  n) \  \%\  n \]</p>
+
+<p>套进上一节的例子里的推导公式，得到：</p>
+
+<p>\[ s_{Alice} = B^{a} \% p = (\  (\  g^{b} \% p\  ) ^{a}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p =  \ g ^{ab} \% p \]</p>
 
 <p>同理：</p>
 
-<p>\[ s_{Bob} = ( A^{b} ) \% p =  (\  (\  g^{a} ) \% p\  ) ^{b}\   ) \% p =   (  \ g \% p\  ) ^{ab} \  ) \% p =  \ g ^{ab} \% p \]</p>
+<p>\[ s_{Bob} = A^{b} \% p = (\  (\  g^{a}  \% p\  ) ^{b}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p  =  \ g ^{ab} \% p \]</p>
 
-<p>显然：</p>
+<p>显然有：</p>
 
 <p>\[  s_{Alice} = s_{Bob}  \]</p>
 
-<p>这样就协商出了对称的密钥。</p>
+<p>这样就协商出了对称的密钥，密钥实质等于：</p>
+
+<p>\[ g ^{ab} \% p \]</p>
+
+<p>其中，g、p可公开、a、b保密。</p>
 
 <h2>为什么可行</h2>
 
@@ -427,6 +523,10 @@
 <h1>参考资料</h1>
 
 <p><a href="https://scotthelme.co.uk/perfect-forward-secrecy/">https://scotthelme.co.uk/perfect-forward-secrecy/</a></p>
+
+<p><a href="https://hackernoon.com/eliptic-curve-crypto-the-basics-e8eb1e934dc5">Elliptic Curve Crypto , The Basics</a></p>
+
+<p><a href="https://hackernoon.com/what-is-the-math-behind-elliptic-curve-cryptography-f61b25253da3">What is the math behind elliptic curve cryptography?</a></p>
 
     </div>
     <div class="entry">

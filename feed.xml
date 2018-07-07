@@ -1050,6 +1050,92 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;基于离散对数问题。&lt;/p&gt;
 
+&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman&quot;&gt;ECDH&lt;/a&gt; (21世纪)&lt;/h2&gt;
+
+&lt;p&gt;DH的变种，基于椭圆曲线算法的DH算法。&lt;/p&gt;
+
+&lt;h1&gt;ECC算法&lt;/h1&gt;
+
+&lt;p&gt;椭圆曲线，指的是满足这个&lt;strong&gt;维尔斯特拉斯通用式&lt;/strong&gt;的曲线：&lt;/p&gt;
+
+&lt;p&gt;\[ y^{2} = x^{3} + ax + b , 且 4a^{3} + 27 b^{2} ≠ 0 \]&lt;/p&gt;
+
+&lt;p&gt;判别式(&lt;a href=&quot;https://en.wikipedia.org/wiki/Discriminant&quot;&gt;discriminant&lt;/a&gt; )不为0时，曲线才没有奇异点，才能用于加密。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/6.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;到这里就能发现椭圆曲线第一个特点：&lt;strong&gt;整个曲线是关于x轴对称的&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;各类加密货币使用的椭圆曲线代号是secp256k1，长这样子：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;用这个&lt;a href=&quot;https://hub.mybinder.org/user/ipython-ipython-in-depth-qhl9ondm/notebooks/binder/Untitled1.ipynb?kernel_name=python3&quot;&gt;在线工具&lt;/a&gt;可以打印椭圆曲线：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pylab&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pl&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# 替换掉这个方程，然后重新run&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mgrid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;contour&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;levels&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/7.png&quot; alt=&quot;7.png&quot;&gt;&lt;/p&gt;
+
+&lt;h2&gt;椭圆曲线相关的数学背景&lt;/h2&gt;
+
+&lt;h3&gt;曲线基本特点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果一条（不垂直于x轴的）直线与椭圆曲线相交（有2个相交点），那么必然存在第三个相交点。（证明过程？）&lt;/li&gt;
+&lt;li&gt;第三个点相当于公钥&lt;/li&gt;
+&lt;li&gt;椭圆曲线关于x轴镜像对称&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;无穷远点：0&lt;/h3&gt;
+
+&lt;p&gt;无穷远点，或理想点，指理想化地认为一条直线在无穷远处有一个终点，一般以0表示。&lt;/p&gt;
+
+&lt;h3&gt;椭圆曲线上的点的取反操作&lt;/h3&gt;
+
+&lt;p&gt;因为椭圆曲线关于x轴对称，所以可定义：&lt;/p&gt;
+
+&lt;p&gt;对于任意椭圆曲线上的点P，对P取反后得到-P，-P为P关于x轴镜像对称点。&lt;/p&gt;
+
+&lt;h3&gt;P + Q = R&lt;/h3&gt;
+
+&lt;p&gt;前面已经提到，任意直线与椭圆曲线如果相交，那么必然有3个相交点。（记得相交线不能和x轴垂直）&lt;/p&gt;
+
+&lt;p&gt;在椭圆曲线加密算法中，定义了一个阿贝尔群，该群的的加法操作定义如下：&lt;/p&gt;
+
+&lt;p&gt;对于任意相交点P、Q、-R（这里取反是有意义的），若P!=-Q，有等式 P + Q + (-R) = 0 成立，即 P + Q = R。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;首先要注意，这个加法并不是欧氏几何加法，例如看下图， P + Q在欧氏几何中的结果是（-2.45，-1.024），而不是（3.89，5.62）&lt;/li&gt;
+&lt;li&gt;该定义中，要求P!=-Q，也是有深意的：如果P=-Q，说明P和Q是关于x轴对称的2个点，那么P和Q应是R和-R，所以P!=-Q这个前提条件保证了P和Q不是那个特殊的R&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;h3&gt;base point P&lt;/h3&gt;
+
+&lt;p&gt;在椭圆曲线加密算法中，第一步是定一个基准点P。&lt;/p&gt;
+
+&lt;p&gt;第二步是，找出从P到P的直线方程。此时会疑惑2个一样的点怎么构成直线，当然是可以的，这个直线是&lt;strong&gt;经过P点的和椭圆曲线相切的切线&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/9.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;根据前面小节的说明，这条切线必然会与椭圆曲线相交于另外一点-R，又因为P + Q = R（-R的镜像点），所以有 P + P = 2P = R：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/10.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;这一个过程还可以迭代下去：因此此时已有P和2P两个点，如果让它们相加，即 P + 2P，那么又会得到新的一个镜像点3P：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/11.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;继续迭代这个过程，就能得到4P、5P、6P······&lt;/p&gt;
+
 &lt;h1&gt;DH算法&lt;/h1&gt;
 
 &lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;
@@ -1058,10 +1144,10 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;li&gt;Alice和Bob首先线下商量好，使用&lt;strong&gt;p (prime, 质数) = 23、g (generator, 生成器) = 5&lt;/strong&gt;作为通讯基础（p和g不需要绝对的保密，泄露了也没事）&lt;/li&gt;
 &lt;li&gt;每次Alice和Bob想要建立通讯(连接)时，Alice自己随机生成一个在范围[1, p - 1]的数：a = 6&lt;/li&gt;
 &lt;li&gt;同样，Bob自己也随机一个：b = 15&lt;/li&gt;
-&lt;li&gt;Alice计算： \( A = ( g^{a} ) \% p = ( 5^{6} ) \% 23 =  15625 \% 23 = 8 \)，把A发给Bob&lt;/li&gt;
-&lt;li&gt;Bob计算： \( B = ( g^{b} ) \% p = ( 5^{15} ) \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice&lt;/li&gt;
-&lt;li&gt;Alice收到B后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Alice} = ( B^{a} ) \% p = ( 19^{6} ) \% 23 = 47045881 \% 23 = 2 \)&lt;/li&gt;
-&lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} = ( A^{b} ) \% p = ( 8^{15} ) \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
+&lt;li&gt;Alice计算： \( A =  g^{a}  \% p =  5^{6}  \% 23 =  15625 \% 23 = 8 \)，把A发给Bob&lt;/li&gt;
+&lt;li&gt;Bob计算： \( B =  g^{b}  \% p =  5^{15}  \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice&lt;/li&gt;
+&lt;li&gt;Alice收到B后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Alice} =  B^{a}  \% p =  19^{6}  \% 23 = 47045881 \% 23 = 2 \)&lt;/li&gt;
+&lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} =  A^{b}  \% p =  8^{15}  \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h2&gt;数学原理&lt;/h2&gt;
@@ -1074,19 +1160,29 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;\[ a^{b}\  \%\  n =  ( a \cdots  a ) \  \%\  n =  ( (a\ \%\  n) \cdots  (a\ \%\  n) ) \  \%\  n =  ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n \]&lt;/p&gt;
 
-&lt;p&gt;于是有：&lt;/p&gt;
+&lt;p&gt;\[ a^{b}\  \%\  n =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
 
-&lt;p&gt;\[ s_{Alice} = ( B^{a} ) \% p =  (\  (\  g^{b} ) \% p\  ) ^{a}\   ) \% p =   (  \ g \% p\  ) ^{ab} \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
+&lt;p&gt;观察这2个式子最右边，发现b的位置是可以移动的：&lt;/p&gt;
+
+&lt;p&gt;\[ ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n  =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
+
+&lt;p&gt;套进上一节的例子里的推导公式，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{Alice} = B^{a} \% p = (\  (\  g^{b} \% p\  ) ^{a}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
 
 &lt;p&gt;同理：&lt;/p&gt;
 
-&lt;p&gt;\[ s_{Bob} = ( A^{b} ) \% p =  (\  (\  g^{a} ) \% p\  ) ^{b}\   ) \% p =   (  \ g \% p\  ) ^{ab} \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
+&lt;p&gt;\[ s_{Bob} = A^{b} \% p = (\  (\  g^{a}  \% p\  ) ^{b}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p  =  \ g ^{ab} \% p \]&lt;/p&gt;
 
-&lt;p&gt;显然：&lt;/p&gt;
+&lt;p&gt;显然有：&lt;/p&gt;
 
 &lt;p&gt;\[  s_{Alice} = s_{Bob}  \]&lt;/p&gt;
 
-&lt;p&gt;这样就协商出了对称的密钥。&lt;/p&gt;
+&lt;p&gt;这样就协商出了对称的密钥，密钥实质等于：&lt;/p&gt;
+
+&lt;p&gt;\[ g ^{ab} \% p \]&lt;/p&gt;
+
+&lt;p&gt;其中，g、p可公开、a、b保密。&lt;/p&gt;
 
 &lt;h2&gt;为什么可行&lt;/h2&gt;
 
@@ -1374,6 +1470,10 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;h1&gt;参考资料&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;https://scotthelme.co.uk/perfect-forward-secrecy/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://hackernoon.com/eliptic-curve-crypto-the-basics-e8eb1e934dc5&quot;&gt;Elliptic Curve Crypto , The Basics&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://hackernoon.com/what-is-the-math-behind-elliptic-curve-cryptography-f61b25253da3&quot;&gt;What is the math behind elliptic curve cryptography?&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1/</link>
