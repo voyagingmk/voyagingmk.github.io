@@ -1095,7 +1095,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;li&gt;椭圆曲线关于x轴镜像对称&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3&gt;无穷远点：0&lt;/h3&gt;
+&lt;h3&gt;无穷远点0 &lt;a href=&quot;https://en.wikipedia.org/wiki/Point_at_infinity&quot;&gt;Point at infinity&lt;/a&gt;&lt;/h3&gt;
 
 &lt;p&gt;无穷远点，或理想点，指理想化地认为一条直线在无穷远处有一个终点，一般以0表示。&lt;/p&gt;
 
@@ -1305,7 +1305,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;然后下一步是，解出一个m，使得hash(m, R) = h成立。然而，如果选择了一个优质的&lt;a href=&quot;https://en.wikipedia.org/wiki/Cryptographic_hash_function&quot;&gt;cryptographic hash functions&lt;/a&gt;，是很难办到的。这也被称为原像攻击（&lt;a href=&quot;https://en.wikipedia.org/wiki/Preimage_attack&quot;&gt;Preimage attack&lt;/a&gt; )，即给定hash值，找出能hash出这个值得输入。&lt;/p&gt;
 
-&lt;h3&gt;ECC的应用：数字签名&lt;/h3&gt;
+&lt;h3&gt;ECC的应用：数字签名（ECDSA）&lt;/h3&gt;
 
 &lt;p&gt;前面已经论证了只有私钥持有者能给出m、R、s三元组，那么当m是一段有意义的消息(依然是一段字节序），而与这个m匹配的R、s，就成为这个消息m的&lt;strong&gt;签名&lt;/strong&gt;了。&lt;/p&gt;
 
@@ -1321,9 +1321,45 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;如果去观察比特币的事务消息，就会发现他它的数字签名部分就是一个椭圆曲线上的某坐标R和一个随机的256bits的s的组合。&lt;/p&gt;
 
-&lt;h3&gt;ECC的应用：加密数据&lt;/h3&gt;
+&lt;h3&gt;ECC的应用：加密通讯&lt;/h3&gt;
 
-&lt;p&gt;关键词：&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;要用ECC来加密数据，那么就要用到&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;这个。&lt;/p&gt;
+
+&lt;p&gt;ECIES，即基于椭圆曲线的整合加密方案，与其类似的还有基于离散对数的整合加密方案 (DLIES)。&lt;/p&gt;
+
+&lt;p&gt;ECIES，也被称为Elliptic Curve Augmented Encryption Scheme（基于椭圆曲线的增强加密方案） 或简单地叫 Elliptic Curve Encryption Scheme（基于椭圆曲线的加密方案）。&lt;/p&gt;
+
+&lt;p&gt;Anyway，先以一个例子介绍下ECIES。首先，纠正下前面介绍ECC相关参数的命名。&lt;/p&gt;
+
+&lt;p&gt;椭圆曲线算法有很多常数，被称为Elliptic Curve Domain Parameters：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;a：椭圆曲线方程\( y^{2}  = x^{3} + ax + b \) 里的a&lt;/li&gt;
+&lt;li&gt;b：椭圆曲线方程\( y^{2}  = x^{3} + ax + b \) 里的b&lt;/li&gt;
+&lt;li&gt;G：即上文说的P，椭圆曲线上任意取得基准点坐标&lt;/li&gt;
+&lt;li&gt;p：质数p，用来控制值域范围的&lt;/li&gt;
+&lt;li&gt;n：基准点G的阶(order)，即使得nG=0(无穷远点)的最小正整数。&lt;/li&gt;
+&lt;li&gt;h：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;可以这样理解n：nP = iP + jP = 0, 即椭圆曲线上某2个点iP、jP，它们的和nP为无穷远点，即经过iP、jP的直线垂直于x轴，当i+j=n取到最小值时，即为G点的阶。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/13.jpg&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;（观察此图，发现5P + P = 6P = 0，P点的阶为6。&lt;a href=&quot;https://math.stackexchange.com/questions/704202/order-of-a-point-on-an-elliptic-curve&quot;&gt;进一步阅读&lt;/a&gt; ）&lt;/p&gt;
+
+&lt;p&gt;Alice和Bob要进行加密通讯，&lt;/p&gt;
+
+&lt;p&gt;加密流程；&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;生成随机数r，计算R = rP&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;解密流程：&lt;/p&gt;
+
+&lt;p&gt;1.&lt;/p&gt;
 
 &lt;p&gt;资料： &lt;/p&gt;
 
@@ -1671,6 +1707,8 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;&lt;a href=&quot;https://hackernoon.com/what-is-the-math-behind-elliptic-curve-cryptography-f61b25253da3&quot;&gt;What is the math behind elliptic curve cryptography?&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html&quot;&gt;https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.cnblogs.com/block2016/p/5623902.html&quot;&gt;https://www.cnblogs.com/block2016/p/5623902.html&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1/</link>
