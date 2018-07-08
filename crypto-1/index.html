@@ -245,7 +245,7 @@
 
 <p>也有同样复杂度的逆算法：不断对X减P，直到减完时刚好就是P，此时统计减的次数，就是x了。</p>
 
-<p>x落在[0, 2<sup>256</sup> - 1]，平均值为2<sup>128。因此平均需要暴力地做2<sup>128次群加法。</sup></sup></p>
+<p>x落在\( [0, 2^{256} - 1] \)，平均值为\( 2^{128} \)。因此平均需要暴力地做2<sup>128次群加法。</sup></p>
 
 <h3>公钥私钥</h3>
 
@@ -292,6 +292,44 @@
 <p>而且，前面讨论的东西仍然是有效的。</p>
 
 <h3>谁才是主人公？持有私钥证明 part2</h3>
+
+<p>如何才能在不暴露x的前提下告诉别人“我”持有私钥呢？</p>
+
+<p>首先拿出前面提到的加法结合律：</p>
+
+<p>\[ n \cdot P + r \cdot P = ( n + r ) \cdot P \]</p>
+
+<p>然后把n替换为这个东西：</p>
+
+<p>\[ hash(m, \ r \cdot P) \cdot n \]</p>
+
+<p>得到：</p>
+
+<p>\[ hash(m, r \cdot P) \cdot n \cdot P + r \cdot P = ( hash(m, r \cdot P) \cdot n + r ) \cdot P \]</p>
+
+<p>引入了一个新的m，以及关于m和rP的hash函数。</p>
+
+<p>假设\(n \cdot P = X \)（X就是公钥X），代入上式，得到：</p>
+
+<p>\[ hash(m, r \cdot P) \cdot X + r \cdot P = ( hash(m, r \cdot P) \cdot n + r ) \cdot P \]</p>
+
+<p>又因为\(n \cdot P = X \)，所以有n = x（x就是私钥x），继续代入，得到：</p>
+
+<p>\[ hash(m, r \cdot P) \cdot X + r \cdot P = ( hash(m, r \cdot P) \cdot x + r ) \cdot P \]</p>
+
+<p>此时再设2个新的对象R和s：</p>
+
+<p>\[ R = r\cdot P \]</p>
+
+<p>\[ s = hash(m, R)\cdot x + r \]</p>
+
+<p>把R代入上面的方程，变成：</p>
+
+<p>\[ hash(m, R) \cdot X + R = ( hash(m, R) \cdot x + r ) \cdot P \]</p>
+
+<p>然后再代入s，最终得到：</p>
+
+<p>\[ hash(m, R) \cdot X + R = s \cdot P \]</p>
 
 <h3>ECC的应用：比特币</h3>
 

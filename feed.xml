@@ -1192,7 +1192,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;也有同样复杂度的逆算法：不断对X减P，直到减完时刚好就是P，此时统计减的次数，就是x了。&lt;/p&gt;
 
-&lt;p&gt;x落在[0, 2&lt;sup&gt;256&lt;/sup&gt; - 1]，平均值为2&lt;sup&gt;128。因此平均需要暴力地做2&lt;sup&gt;128次群加法。&lt;/sup&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;x落在\( [0, 2^{256} - 1] \)，平均值为\( 2^{128} \)。因此平均需要暴力地做2&lt;sup&gt;128次群加法。&lt;/sup&gt;&lt;/p&gt;
 
 &lt;h3&gt;公钥私钥&lt;/h3&gt;
 
@@ -1239,6 +1239,44 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;而且，前面讨论的东西仍然是有效的。&lt;/p&gt;
 
 &lt;h3&gt;谁才是主人公？持有私钥证明 part2&lt;/h3&gt;
+
+&lt;p&gt;如何才能在不暴露x的前提下告诉别人“我”持有私钥呢？&lt;/p&gt;
+
+&lt;p&gt;首先拿出前面提到的加法结合律：&lt;/p&gt;
+
+&lt;p&gt;\[ n \cdot P + r \cdot P = ( n + r ) \cdot P \]&lt;/p&gt;
+
+&lt;p&gt;然后把n替换为这个东西：&lt;/p&gt;
+
+&lt;p&gt;\[ hash(m, \ r \cdot P) \cdot n \]&lt;/p&gt;
+
+&lt;p&gt;得到：&lt;/p&gt;
+
+&lt;p&gt;\[ hash(m, r \cdot P) \cdot n \cdot P + r \cdot P = ( hash(m, r \cdot P) \cdot n + r ) \cdot P \]&lt;/p&gt;
+
+&lt;p&gt;引入了一个新的m，以及关于m和rP的hash函数。&lt;/p&gt;
+
+&lt;p&gt;假设\(n \cdot P = X \)（X就是公钥X），代入上式，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ hash(m, r \cdot P) \cdot X + r \cdot P = ( hash(m, r \cdot P) \cdot n + r ) \cdot P \]&lt;/p&gt;
+
+&lt;p&gt;又因为\(n \cdot P = X \)，所以有n = x（x就是私钥x），继续代入，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ hash(m, r \cdot P) \cdot X + r \cdot P = ( hash(m, r \cdot P) \cdot x + r ) \cdot P \]&lt;/p&gt;
+
+&lt;p&gt;此时再设2个新的对象R和s：&lt;/p&gt;
+
+&lt;p&gt;\[ R = r\cdot P \]&lt;/p&gt;
+
+&lt;p&gt;\[ s = hash(m, R)\cdot x + r \]&lt;/p&gt;
+
+&lt;p&gt;把R代入上面的方程，变成：&lt;/p&gt;
+
+&lt;p&gt;\[ hash(m, R) \cdot X + R = ( hash(m, R) \cdot x + r ) \cdot P \]&lt;/p&gt;
+
+&lt;p&gt;然后再代入s，最终得到：&lt;/p&gt;
+
+&lt;p&gt;\[ hash(m, R) \cdot X + R = s \cdot P \]&lt;/p&gt;
 
 &lt;h3&gt;ECC的应用：比特币&lt;/h3&gt;
 
