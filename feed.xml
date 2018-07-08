@@ -1392,6 +1392,76 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;&lt;a href=&quot;https://crypto.stackexchange.com/questions/31602/how-does-encryption-work-in-elliptic-curve-cryptography&quot;&gt;https://crypto.stackexchange.com/questions/31602/how-does-encryption-work-in-elliptic-curve-cryptography&lt;/a&gt;&lt;/p&gt;
 
+&lt;h3&gt;补充：已知P、Q，怎么求R&lt;/h3&gt;
+
+&lt;p&gt;这个问题其实是解方程组问题，一个是直线的方程: \(y = kx + c\)，一个是椭圆曲线的方程：\( y^{2} = x^{3} + ax + b  \)。&lt;/p&gt;
+
+&lt;p&gt;以这幅图为例：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;假设已知的只有：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;椭圆曲线方程：\( y^{2} = x^{3} - 7x \)&lt;/li&gt;
+&lt;li&gt;P(-2.35089, -1.86107)&lt;/li&gt;
+&lt;li&gt;Q(-0.0999884, 0.836014)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;现在目标是求，直线与曲线的第三个交点R(应该叫-R）的坐标。&lt;/p&gt;
+
+&lt;p&gt;第一步，化解方程组:&lt;/p&gt;
+
+&lt;p&gt;\[ y = kx + m， y^{2} = ax^{3} + bx^{2} + cx + d \]&lt;/p&gt;
+
+&lt;p&gt;\[ (kx + m)^{2} = ax^{3} + bx^{2} + cx + d \]&lt;/p&gt;
+
+&lt;p&gt;\[ 0 = ax^{3} + (b - k^{2}) x^{2} + (c - 2km)x + d -  m^{2}\]&lt;/p&gt;
+
+&lt;p&gt;本例的椭圆方程的系数为：&lt;/p&gt;
+
+&lt;p&gt;\[ a = 1, b = 0, c = -7, d = 0\]&lt;/p&gt;
+
+&lt;p&gt;代入上式，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ 0 = x^{3} - k^{2}x^{2} - (7 + 2km)x - m^{2}\]&lt;/p&gt;
+
+&lt;p&gt;第二步，搬出&lt;a href=&quot;https://en.wikipedia.org/wiki/Vieta%27s_formulas&quot;&gt;韦达公式&lt;/a&gt;，对于一元三次方程，它的根之间有如下关系式：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/14.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;用到我们这里，就是：&lt;/p&gt;
+
+&lt;p&gt;\[ x_{1} + x_{2} + x_{3} = -\frac {b}{a} =  -\frac { -k^{2} }{1} = k^{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ x_{1} * x_{2} * x_{3} = -\frac {d}{a}  = -\frac { -m^{2} }{1} = m^{2} \]&lt;/p&gt;
+
+&lt;p&gt;\[ x_{1}x_{2} + x_{2}x_{3} + x_{1}x_{3} = \frac {c}{a} = \frac {- (7 + 2km)}{1} = - (7 + 2km) \]&lt;/p&gt;
+
+&lt;p&gt;又因为\(x_{1}、x_{2}、x_{3}\)其实就是\( P_{x}、Q_{x}、R_{x} \) ，所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x} =  k^{2} - (P_{x} + Q_{x}) \]&lt;/p&gt;
+
+&lt;p&gt;这样就求出了\(R_{x} \)。而R的y分量可以用斜率公式推出：&lt;/p&gt;
+
+&lt;p&gt;\[ \frac { R_{y} - P_{y} } {  R_{x} - P_{x} } = k \]&lt;/p&gt;
+
+&lt;p&gt;\[ R_{y} = k (R_{x} - P_{x} ) + P_{y} \]&lt;/p&gt;
+
+&lt;p&gt;这里面还有个未知数斜率k，也是用斜率公式求出：&lt;/p&gt;
+
+&lt;p&gt;\[ k = \frac { Q_{y} - P_{y} } {  Q_{x} - P_{x} } = 1.19822222 \]&lt;/p&gt;
+
+&lt;p&gt;最终的：&lt;/p&gt;
+
+&lt;p&gt;\[ R_{x} =  (1.19822222)^{2} - ((-2.35089) + (-0.0999884)) = 3.8866148938271605 \approx 3.89 \]&lt;/p&gt;
+
+&lt;p&gt;\[ R_{y} = (1.19822222) (3.8866148938271605 - (-2.35089) ) + (-1.86107) = 5.6128469750035 \approx 5.61 \]&lt;/p&gt;
+
+&lt;p&gt;\[ -R = (3.89, 5.61)，R = (3.89, -5.61) \]&lt;/p&gt;
+
+&lt;p&gt;和图片里的数值一样。&lt;/p&gt;
+
 &lt;h1&gt;DH算法&lt;/h1&gt;
 
 &lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;
