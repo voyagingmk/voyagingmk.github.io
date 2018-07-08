@@ -1305,13 +1305,19 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;然后下一步是，解出一个m，使得hash(m, R) = h成立。然而，如果选择了一个优质的&lt;a href=&quot;https://en.wikipedia.org/wiki/Cryptographic_hash_function&quot;&gt;cryptographic hash functions&lt;/a&gt;，是很难办到的。这也被称为原像攻击（&lt;a href=&quot;https://en.wikipedia.org/wiki/Preimage_attack&quot;&gt;Preimage attack&lt;/a&gt; )，即给定hash值，找出能hash出这个值得输入。&lt;/p&gt;
 
+&lt;h3&gt;ECC的应用：数字签名&lt;/h3&gt;
+
+&lt;p&gt;前面已经论证了只有私钥持有者能给出m、R、s三元组，那么当m是一段有意义的消息(依然是一段字节序），而与这个m匹配的R、s，就成为这个消息m的&lt;strong&gt;签名&lt;/strong&gt;了。&lt;/p&gt;
+
+&lt;p&gt;因为攻击者理论上并不能用自己随意篡改的m&amp;#39;，使得m&amp;#39;、R、s能成功代入持有私钥证明方程。&lt;/p&gt;
+
 &lt;h3&gt;ECC的应用：比特币&lt;/h3&gt;
 
 &lt;p&gt;简单来说，要生成一个新的比特币钱包，需要先随机生成一个256bits的私钥x，然后根据比特币所用的椭圆曲线参数（secp256k1），计算X = xP，X就是这个钱包的公钥。&lt;/p&gt;
 
 &lt;p&gt;然后呢，X大有所为，X可以随便公开，X相当于钱包的银行账号，例如比特币转入这个钱包，就需要用到X。&lt;/p&gt;
 
-&lt;p&gt;转入问题是解决了，但怎么证明你是这个钱包的主人，并转出（消费）比特币呢？答案就是用上一节的方法，做一个持有私钥声明，转出事物广播开后，每个人都可以简单地验证这个持有声明的真伪性。&lt;/p&gt;
+&lt;p&gt;转入问题是解决了，但怎么证明你是这个钱包的主人，并转出（消费）比特币呢？答案就是用上一节的方法，做一个持有私钥声明（即数字签名），转出事务广播开后，每个人都可以简单地验证这个持有声明的真伪性。&lt;/p&gt;
 
 &lt;h3&gt;ECC的应用：加密数据&lt;/h3&gt;
 
