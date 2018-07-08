@@ -1396,6 +1396,8 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;这个问题其实是解方程组问题，一个是直线的方程: \(y = kx + c\)，一个是椭圆曲线的方程：\( y^{2} = x^{3} + ax + b  \)。&lt;/p&gt;
 
+&lt;p&gt;（推荐一个在线解方程组的工具：&lt;a href=&quot;http://www.wolframalpha.com/&quot;&gt;wolframalpha&lt;/a&gt; )&lt;/p&gt;
+
 &lt;p&gt;以这幅图为例：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;../images/2018.4/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
