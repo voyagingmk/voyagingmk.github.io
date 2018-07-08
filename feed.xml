@@ -1319,6 +1319,8 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;转入问题是解决了，但怎么证明你是这个钱包的主人，并转出（消费）比特币呢？答案就是用上一节的方法，做一个持有私钥声明（即数字签名），转出事务广播开后，每个人都可以简单地验证这个持有声明的真伪性。&lt;/p&gt;
 
+&lt;p&gt;如果去观察比特币的事务消息，就会发现他它的数字签名部分就是一个椭圆曲线上的某坐标R和一个随机的256bits的s的组合。&lt;/p&gt;
+
 &lt;h3&gt;ECC的应用：加密数据&lt;/h3&gt;
 
 &lt;p&gt;关键词：&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;&lt;/p&gt;
