@@ -105,7 +105,7 @@
 
 <h2><a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH</a> (21世纪)</h2>
 
-<p>DH的变种，基于椭圆曲线算法的DH算法。</p>
+<p>DH标准算法的变种，是基于椭圆曲线算法的DH密钥交换算法。</p>
 
 <h1>ECC算法</h1>
 
@@ -401,7 +401,7 @@
 
 <p><a href="https://en.wikipedia.org/wiki/Hasse%27s_theorem_on_elliptic_curves">https://en.wikipedia.org/wiki/Hasse%27s_theorem_on_elliptic_curves</a></p>
 
-<h3>ECC的应用：加密通讯</h3>
+<h3>ECC的应用：加密通讯 <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH</a></h3>
 
 <p>要仅仅用ECC来加密数据，那么就要用到<a href="https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme">ECIES</a>这个。</p>
 
@@ -415,7 +415,7 @@
 
 <ul>
 <li>一个椭圆曲线和参数集合(p,a,b,G,n,h)</li>
-<li>Bob的公钥\( K_{B} \)。\( K_{B} = k_{B}G , k_{B} \in [1, n - 1] \), \( k_{B} \)是Bob自己随机生成的私钥。注意，Bob公钥也是一个椭圆曲线上的点。</li>
+<li>Bob的公钥\( K_{B} \)。\( K_{B} = k_{B}G , k_{B} \in [1, n - 1] \), \( k_{B} \)是Bob自己随机生成的私钥。注意，\( k_{B} \)是值, 而\( K_{B} \)是一个椭圆曲线上的点。</li>
 <li>双方共享信息： \( S_{1} ，S_{2}\) （nonce）</li>
 </ul>
 
@@ -433,11 +433,13 @@
 <p>解密流程： （ Bob已收到\(R || c || d\) ）</p>
 
 <ol>
-<li>Bob先求出Alice也在使用的共享密钥\(P_{x}\), \(P = (P_{x}, P_{y}) = rK_{B} = rk_{B}G = k_{B}R \)</li>
+<li>Bob先求出Alice也在使用的共享密钥\(P_{x}\), \(P = (P_{x}, P_{y}) = rK_{B} = rk_{B}G = k_{B}R \)，R是Alice发来的，\( k_{B} \)是本地的。</li>
 <li>Bob也用一样的方法求出2个密钥，\( k_{E} || k_{M} = KDF(S || S_{1}) \)</li>
 <li>检查收到的d和自己算的d‘是否一致，不一致的话说明c被中间人篡改了：\( d&#39; = MAC(k_{M}, c|| S_{2}) \) </li>
-<li>此时就可以用对称加密密钥，解出消息m：\( m = E^{-1}(k_{E}, c) \) ，E代表Decrypt函数（一般等同于Encrypt函数）。</li>
+<li>此时就可以用对称加密密钥，解出消息m：\( m = E^{-1}(k_{E}, c) \) ，\(E^{-1}\)代表Decrypt函数（一般等同于Encrypt函数）。</li>
 </ol>
+
+<p>其实这个流程就是非常著名的<strong>ECDH算法</strong>了。Alice和Bob利用ECC算法，进行了<strong>密钥交换</strong>，得到了\( P_{x} \)。</p>
 
 <p>资料： </p>
 

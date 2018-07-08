@@ -1052,7 +1052,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman&quot;&gt;ECDH&lt;/a&gt; (21世纪)&lt;/h2&gt;
 
-&lt;p&gt;DH的变种，基于椭圆曲线算法的DH算法。&lt;/p&gt;
+&lt;p&gt;DH标准算法的变种，是基于椭圆曲线算法的DH密钥交换算法。&lt;/p&gt;
 
 &lt;h1&gt;ECC算法&lt;/h1&gt;
 
@@ -1348,7 +1348,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Hasse%27s_theorem_on_elliptic_curves&quot;&gt;https://en.wikipedia.org/wiki/Hasse%27s_theorem_on_elliptic_curves&lt;/a&gt;&lt;/p&gt;
 
-&lt;h3&gt;ECC的应用：加密通讯&lt;/h3&gt;
+&lt;h3&gt;ECC的应用：加密通讯 &lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman&quot;&gt;ECDH&lt;/a&gt;&lt;/h3&gt;
 
 &lt;p&gt;要仅仅用ECC来加密数据，那么就要用到&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;这个。&lt;/p&gt;
 
@@ -1362,7 +1362,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;ul&gt;
 &lt;li&gt;一个椭圆曲线和参数集合(p,a,b,G,n,h)&lt;/li&gt;
-&lt;li&gt;Bob的公钥\( K_{B} \)。\( K_{B} = k_{B}G , k_{B} \in [1, n - 1] \), \( k_{B} \)是Bob自己随机生成的私钥。注意，Bob公钥也是一个椭圆曲线上的点。&lt;/li&gt;
+&lt;li&gt;Bob的公钥\( K_{B} \)。\( K_{B} = k_{B}G , k_{B} \in [1, n - 1] \), \( k_{B} \)是Bob自己随机生成的私钥。注意，\( k_{B} \)是值, 而\( K_{B} \)是一个椭圆曲线上的点。&lt;/li&gt;
 &lt;li&gt;双方共享信息： \( S_{1} ，S_{2}\) （nonce）&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -1380,11 +1380,13 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;解密流程： （ Bob已收到\(R || c || d\) ）&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;Bob先求出Alice也在使用的共享密钥\(P_{x}\), \(P = (P_{x}, P_{y}) = rK_{B} = rk_{B}G = k_{B}R \)&lt;/li&gt;
+&lt;li&gt;Bob先求出Alice也在使用的共享密钥\(P_{x}\), \(P = (P_{x}, P_{y}) = rK_{B} = rk_{B}G = k_{B}R \)，R是Alice发来的，\( k_{B} \)是本地的。&lt;/li&gt;
 &lt;li&gt;Bob也用一样的方法求出2个密钥，\( k_{E} || k_{M} = KDF(S || S_{1}) \)&lt;/li&gt;
 &lt;li&gt;检查收到的d和自己算的d‘是否一致，不一致的话说明c被中间人篡改了：\( d&amp;#39; = MAC(k_{M}, c|| S_{2}) \) &lt;/li&gt;
-&lt;li&gt;此时就可以用对称加密密钥，解出消息m：\( m = E^{-1}(k_{E}, c) \) ，E代表Decrypt函数（一般等同于Encrypt函数）。&lt;/li&gt;
+&lt;li&gt;此时就可以用对称加密密钥，解出消息m：\( m = E^{-1}(k_{E}, c) \) ，\(E^{-1}\)代表Decrypt函数（一般等同于Encrypt函数）。&lt;/li&gt;
 &lt;/ol&gt;
+
+&lt;p&gt;其实这个流程就是非常著名的&lt;strong&gt;ECDH算法&lt;/strong&gt;了。Alice和Bob利用ECC算法，进行了&lt;strong&gt;密钥交换&lt;/strong&gt;，得到了\( P_{x} \)。&lt;/p&gt;
 
 &lt;p&gt;资料： &lt;/p&gt;
 
