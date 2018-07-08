@@ -1321,17 +1321,11 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;如果去观察比特币的事务消息，就会发现他它的数字签名部分就是一个椭圆曲线上的某坐标R和一个随机的256bits的s的组合。&lt;/p&gt;
 
-&lt;h3&gt;ECC的应用：加密通讯&lt;/h3&gt;
+&lt;h3&gt;ECC的参数集合（Elliptic Curve Domain Parameters）&lt;/h3&gt;
 
-&lt;p&gt;要用ECC来加密数据，那么就要用到&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;这个。&lt;/p&gt;
+&lt;p&gt;纠正下前面介绍ECC相关参数的命名。&lt;/p&gt;
 
-&lt;p&gt;ECIES，即基于椭圆曲线的整合加密方案，与其类似的还有基于离散对数的整合加密方案 (DLIES)。&lt;/p&gt;
-
-&lt;p&gt;ECIES，也被称为Elliptic Curve Augmented Encryption Scheme（基于椭圆曲线的增强加密方案） 或简单地叫 Elliptic Curve Encryption Scheme（基于椭圆曲线的加密方案）。&lt;/p&gt;
-
-&lt;p&gt;Anyway，先以一个例子介绍下ECIES。首先，纠正下前面介绍ECC相关参数的命名。&lt;/p&gt;
-
-&lt;p&gt;椭圆曲线算法有很多常数，被称为Elliptic Curve Domain Parameters：&lt;/p&gt;
+&lt;p&gt;椭圆曲线算法有很多参数，被称为Elliptic Curve Domain Parameters：&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;a：椭圆曲线方程\( y^{2}  = x^{3} + ax + b \) 里的a&lt;/li&gt;
@@ -1339,7 +1333,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;li&gt;G：即上文说的P，椭圆曲线上任意取得基准点坐标&lt;/li&gt;
 &lt;li&gt;p：质数p，用来控制值域范围的&lt;/li&gt;
 &lt;li&gt;n：基准点G的阶(order)，即使得nG=0(无穷远点)的最小正整数。&lt;/li&gt;
-&lt;li&gt;h：辅因子(cofactor)，最理想的h为1，h等于\( \frac {1}{n} | E(F_{p}) | \)&lt;/li&gt;
+&lt;li&gt;h：辅因子(cofactor)，h等于\( \frac {1}{n} | E(F_{p}) | \)。当h为最理想的1时，整个点群#E都可以被使用，否则，可用的点群大小只有#E/h。&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;可以这样理解n：nP = iP + jP = 0, 即椭圆曲线上某2个点iP、jP，它们的和nP为无穷远点，即经过iP、jP的直线垂直于x轴，当i+j=n取到最小值时，即为G点的阶。&lt;/p&gt;
@@ -1348,18 +1342,46 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;（观察此图，发现5P + P = 6P = 0，P点的阶为6。&lt;a href=&quot;https://math.stackexchange.com/questions/704202/order-of-a-point-on-an-elliptic-curve&quot;&gt;进一步阅读&lt;/a&gt; ）&lt;/p&gt;
 
-&lt;p&gt;Alice和Bob要进行加密通讯，&lt;/p&gt;
+&lt;p&gt;当阶数n和#E一样大时，h取到最佳值1。h的计算，必然要先理解透彻群论的知识，这里不做展开，可以阅读这2个链接：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://math.stackexchange.com/questions/1394251/calculating-elliptic-curve-cofactor-h&quot;&gt;https://math.stackexchange.com/questions/1394251/calculating-elliptic-curve-cofactor-h&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Hasse%27s_theorem_on_elliptic_curves&quot;&gt;https://en.wikipedia.org/wiki/Hasse%27s_theorem_on_elliptic_curves&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;ECC的应用：加密通讯&lt;/h3&gt;
+
+&lt;p&gt;要用ECC来加密数据，那么就要用到&lt;a href=&quot;https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme&quot;&gt;ECIES&lt;/a&gt;这个。&lt;/p&gt;
+
+&lt;p&gt;ECIES，即基于椭圆曲线的整合加密方案，与其类似的还有基于离散对数的整合加密方案 (DLIES)。&lt;/p&gt;
+
+&lt;p&gt;ECIES，也被称为Elliptic Curve Augmented Encryption Scheme（基于椭圆曲线的增强加密方案） 或简单地叫 Elliptic Curve Encryption Scheme（基于椭圆曲线的加密方案）。&lt;/p&gt;
+
+&lt;p&gt;Anyway，先以一个例子介绍下ECIES：Alice和Bob进行加密通讯。&lt;/p&gt;
+
+&lt;p&gt;通讯前准备：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;一个椭圆曲线和参数集合(p,a,b,G,n,h)&lt;/li&gt;
+&lt;li&gt;Bob的公钥\( K_{B} \)。\( K_{B} = k_{B}G , k_{B} \in [1, n - 1] \), \( k_{B} \)是Bob自己随机生成的私钥。注意，Bob公钥也是一个椭圆曲线上的点。&lt;/li&gt;
+&lt;li&gt;双方共享信息： \( S_{1} ，S_{2}\) （nonce）&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;加密流程；&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;生成随机数r，计算R = rP&lt;/li&gt;
-&lt;li&gt;&lt;/li&gt;
+&lt;li&gt;生成随机数r，计算R = rG&lt;/li&gt;
+&lt;li&gt;计算\(P = (P_{x}, P_{y}) = rK_{B} \)，取P的x分量\(P_{x}\)作为共享密钥S。&lt;/li&gt;
+&lt;li&gt;用KDF密钥导出函数，导出定长的对称加密密钥\(k_{E} \)和MAC密钥\(k_{M} \)，\( k_{E} || k_{M} = KDF(S || S_{1}) \)&lt;/li&gt;
+&lt;li&gt;加密消息：\( c = Encrypt( k_{E}, m) \)&lt;/li&gt;
+&lt;li&gt;计算MAC：\( d = MAC(k_{M}, c|| S_{2}) \)&lt;/li&gt;
+&lt;li&gt;输出\(R || c || d\)&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;解密流程：&lt;/p&gt;
+&lt;p&gt;解密流程： （ Bob已收到\(R || c || d\) ）&lt;/p&gt;
 
-&lt;p&gt;1.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Bob先求出Alice也在使用的共享密钥\(P_{x}\), \(P = (P_{x}, P_{y}) = rK_{B} = rK_{b}G = K_{b}R \)&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;p&gt;资料： &lt;/p&gt;
 
