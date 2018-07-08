@@ -348,11 +348,15 @@
 
 <p>\[ x =  \frac { s - r } { hash(m, R) } \]</p>
 
-<p>所以r必须是用完就丢的。因为持有者只需要给出R。</p>
+<p>所以r必须是用完就丢的。因为持有者只需要给出R就足够用予持有私钥证明。</p>
 
 <p>另一个是暴力破解问题：</p>
 
 <p>第三者是否可以暴力地找到合适的m、R、s代入持有私钥证明方程，使得方程成立？</p>
+
+<p>假设可行，那么第一步应是先任意找出一组合适的参数：h( h = hash(m, R) )、R、s，使得\( hash(m, R) \cdot X + R = s \cdot P \) 成立，这肯定是办得到的。</p>
+
+<p>然后下一步是，解出一个m，使得hash(m, R) = h成立。然而，如果选择了一个优质的<a href="https://en.wikipedia.org/wiki/Cryptographic_hash_function">cryptographic hash functions</a>，是很难办到的。这也被称为原像攻击（<a href="https://en.wikipedia.org/wiki/Preimage_attack">Preimage attack</a> )，即给定hash值，找出能hash出这个值得输入。</p>
 
 <h3>ECC的应用：比特币</h3>
 
