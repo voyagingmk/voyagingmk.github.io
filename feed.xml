@@ -7,6 +7,522 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>分布式杂谈</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h3&gt;分布式中心化/去中心化&lt;/h3&gt;
+
+&lt;p&gt;既然分布式了为什么还有中心化？其中关键是简化了中心节点的任务，中心节点是作为任务派发者、网络管理者存在的，类似领导和员工的关系。&lt;/p&gt;
+
+&lt;p&gt;领导节点可能是所有节点一起选举出来的，而不是固定的。从而避免领导节点故障导致整个网络崩溃。&lt;/p&gt;
+
+&lt;p&gt;例子是raft算法。&lt;/p&gt;
+
+&lt;h3&gt;分布式一致性&lt;/h3&gt;
+
+&lt;p&gt;一致性是指所有节点的数据状态一致。一般是用来做大型数据库的多机备份和海量服务。多机备份使得单个数据库节点坏了，还有别的数据库可用，数据不易丢失；海量服务是指，既然可以保证多个数据库节点是一致的，那么数据库节点越多，能服务于用户的能力越强，因为用户可以任意选择一个节点存取数据。&lt;/p&gt;
+
+&lt;p&gt;一致性算法：paxos、raft。&lt;/p&gt;
+
+&lt;p&gt;因为节点之间的同步存在网络延迟，故一致性要分强弱：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;强一致：强调读操作读到的肯定是最新的值，即写操作同步到整个网络前，读操作是要阻塞的。&lt;/li&gt;
+&lt;li&gt;弱一致：单机写入后，不保证其他节点可以立即读到最新的值，也不保证多久之后数据能够达到一致，只是尽可能保证某个时间级别后（秒），能够一致。&lt;/li&gt;
+&lt;li&gt;最终一致：弱一致的特例，保证会在一定时间内，能够达到一致。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;分布式缓存&lt;/h3&gt;
+
+&lt;h4&gt;LFU&lt;/h4&gt;
+
+&lt;p&gt;Least Frequently Used（LFU），如果一个数据在最近一段时间内使用&lt;strong&gt;次数&lt;/strong&gt;很少，那么在将来一段时间内被使用的可能性也很小。&lt;/p&gt;
+
+&lt;h4&gt;LRU&lt;/h4&gt;
+
+&lt;p&gt;Least Recently Used（LRU），如果一个数据在最近一段时间&lt;strong&gt;没有被访问到&lt;/strong&gt;，那么在将来它被访问的可能性也很小。&lt;/p&gt;
+
+&lt;h3&gt;分布式锁&lt;/h3&gt;
+
+&lt;h3&gt;节点互访：RPC&lt;/h3&gt;
+
+&lt;p&gt;功能：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;远程调用&lt;/li&gt;
+&lt;li&gt;服务注册&lt;/li&gt;
+&lt;li&gt;服务发现&lt;/li&gt;
+&lt;li&gt;服务监控&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;最基础的：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;稳定&lt;/li&gt;
+&lt;li&gt;高性能&lt;/li&gt;
+&lt;li&gt;多语言&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;微服务&lt;/h3&gt;
+
+&lt;h3&gt;对象序列化技术&lt;/h3&gt;
+
+&lt;p&gt;最普通的：JSON&lt;/p&gt;
+
+&lt;p&gt;更高级的：MessagePack、Protocol Buffers、FlatBuffers。&lt;/p&gt;
+
+&lt;h3&gt;消息队列&lt;/h3&gt;
+
+&lt;h3&gt;分布式数据库拆分&lt;/h3&gt;
+
+&lt;p&gt;先垂直拆分：不同服务的数据(库)要相互隔离，不要放一起。&lt;/p&gt;
+
+&lt;p&gt;后水平拆分：隔离后，单机数据库如果遇到瓶颈，就拆成多机（分片）。&lt;/p&gt;
+
+&lt;p&gt;水平拆分会遇到问题：没有一个唯一的入口，来操作数据库。&lt;/p&gt;
+
+&lt;p&gt;解决方案：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;客户端来实现数据路由：客户端自己决定连接哪个数据库节点，存什么数据。缺点是&lt;/li&gt;
+&lt;li&gt;中间件：把多机数据库封装成单机的使用方法，客户端操作起来和单机一样，简单很多&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Fri, 13 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/distributed-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/distributed-1/</guid>
+      </item>
+    
+      <item>
+        <title>《现代操作系统》17年第四版 阅读笔记</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;系统调用&lt;/h2&gt;
+
+&lt;h3&gt;fork&lt;/h3&gt;
+
+&lt;p&gt;创建一个原有进程的精确副本。&lt;/p&gt;
+
+&lt;p&gt;被复制的东西：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;所有的文件描述符&lt;/li&gt;
+&lt;li&gt;所有的寄存器&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;没被复制的东西：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;程序正文&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在fork后，原有的进程和其副本（父与子）就分开了。&lt;/p&gt;
+
+&lt;p&gt;返回值，用来在进程里区分谁是父谁是子：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;在子进程中该值为0&lt;/li&gt;
+&lt;li&gt;在父进程中等于子进程的PID&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;shell为例：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;while(true) {
+    type_prompt();
+    read_command(cmd, params);
+    if(fork()!=0) {
+        // 父
+        waitpid(-1, &amp;amp;status, 0);
+    } else {
+        // 子
+        execve(command, params, 0);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;waitpid&lt;/h3&gt;
+
+&lt;p&gt;参数：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;子进程PID，填-1就是任意一个子进程PID&lt;/li&gt;
+&lt;li&gt;status（statloc）子进程的返回状态码&lt;/li&gt;
+&lt;li&gt;一般为0&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;exec&lt;/h3&gt;
+
+&lt;p&gt;使得整个核心映像（core image）被一个文件所替代。&lt;/p&gt;
+
+&lt;p&gt;参数：将要执行的文件名、一个指向变量数组的指针、一个指向环境数组的指针（通常为0）&lt;/p&gt;
+
+&lt;p&gt;例子：&lt;/p&gt;
+
+&lt;p&gt;cp file1 file2&lt;/p&gt;
+
+&lt;p&gt;execve(cp, [file1, file2], 0)&lt;/p&gt;
+
+&lt;p&gt;main(argc, argv, envp)&lt;/p&gt;
+
+&lt;p&gt;argc为3，argv[0]为cp，argv[1]为file1，argv[2]为file2；没有envp。&lt;/p&gt;
+
+&lt;h3&gt;exit(status)&lt;/h3&gt;
+
+&lt;p&gt;status是用户指定的，status其实就是waitpid的staloc，子进程设定的status最终可以告诉父进程。&lt;/p&gt;
+
+&lt;h3&gt;link&lt;/h3&gt;
+
+&lt;p&gt;在unix中，每个文件都有唯一的编号（i-node）。&lt;/p&gt;
+
+&lt;p&gt;每个目录有一个i-node到文件名的表。&lt;/p&gt;
+
+&lt;p&gt;link时，是在指向目录里面创建一个新条目，i-node为原文件的i-node，文件名都link参数里指定的文件名。&lt;/p&gt;
+
+&lt;p&gt;目录和i-node是双向指向的，i-node也存有一个表，记录了指向该i-node的目录项。&lt;/p&gt;
+
+&lt;h1&gt;进程和线程&lt;/h1&gt;
+
+&lt;h2&gt;进程模型&lt;/h2&gt;
+
+&lt;h3&gt;CPU利用率&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;t1, 一个进程等待I/O操作的时间&lt;/li&gt;
+&lt;li&gt;t, 一个进程停留在内存中时间&lt;/li&gt;
+&lt;li&gt;p, 一个进程等待I/O操作的时间与其停留在内存中时间的比。&lt;/li&gt;
+&lt;li&gt;n为同时存在的进程数量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;利用率 = \( 1 - p^{n}\)&lt;/p&gt;
+
+&lt;p&gt;这是简单模型，只适用于进程之间互相独立。例如对于单CPU，即使进程就绪，但已有一个进程正在被CPU处理，那么还是会等待。&lt;/p&gt;
+
+&lt;h3&gt;用户空间线程&lt;/h3&gt;
+
+&lt;p&gt;优缺点：&lt;/p&gt;
+
+&lt;h3&gt;内核空间线程&lt;/h3&gt;
+
+&lt;h3&gt;调度程序激活机制 和 上行调用（upcall)&lt;/h3&gt;
+
+&lt;h3&gt;IPC：信号量&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;创建信号量：sem_t *sem_open(const char *name, int oflag, 权限, 初始值)。返回值：返回一个信号量对象，若失败，则返回SEM_FAILED，并设置errno。&lt;a href=&quot;https://linux.die.net/man/3/sem_open&quot;&gt;man page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;P(down)操作，即int sem_wait(sem_t *sem)，检查信号量的值是不是大于0，若大于0，则减1并返回；若等于0，则进程睡眠，sem_wait阻塞不返回；非阻塞版本是sem_trywait，用返回值EAGAIN代替阻塞；限时的down操作是sem_timedwait，使得阻塞不是永久的。返回值：0代表成功，-1代表失败，并设置errno。&lt;/li&gt;
+&lt;li&gt;V(up)操作，即int sem_post(sem_t *sem),对信号量加1，若是从0变1，那么那些阻塞在这个信号量的进程或线程会被唤醒。返回值同P。V操作是怎么都不会阻塞的。&lt;/li&gt;
+&lt;li&gt;本进程关闭信号量：int sem_close(sem_t *sem)。没什么特别的。&lt;/li&gt;
+&lt;li&gt;真·销毁信号量：sem_unlink，前提是open了信号量的进程已经调用了close或者已经结束了进程（调用了exit或者main函数返回），如果还没close就调用，那么没效果。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/tomasbruckner/minimalSemaphoreDemo/blob/master/semaphore_synchronization/semaphore_synchronization.c&quot;&gt;github代码实例&lt;/a&gt;，双信号量实现父进程和子进程的同步。&lt;/p&gt;
+
+&lt;p&gt;信号量2个能力：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;实现互斥量&lt;/li&gt;
+&lt;li&gt;实现计数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;IPC：futex 快速用户空间互斥&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;linux特有&lt;/li&gt;
+&lt;li&gt;实现了基本的锁（很像互斥锁），但避免了陷入内核&lt;/li&gt;
+&lt;li&gt;内核服务：提供一个等待队列，它允许多个进程在一个锁上等待。把进程放到等待队列代价很大（系统调用）。&lt;/li&gt;
+&lt;li&gt;避免锁争用：没有争用时，futex完全在用户空间工作；加锁时，如果锁没有被锁，那么直接加锁成功，不需要陷入内核；如果已经被锁了，执行系统调用把线程放到等待队列（不自旋）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;IPC：管程 montior&lt;/h3&gt;
+
+&lt;p&gt;原因：为了更易于编写正确的程序。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;管程是编程语言的组成部分，能不能用管程得看是什么语言，例如java&lt;/li&gt;
+&lt;li&gt;任一时刻管程中只能有一个活跃进程&lt;/li&gt;
+&lt;li&gt;进程可在任何需要的时候调用管程中的过程（procdeure)&lt;/li&gt;
+&lt;li&gt;进入管程是的互斥由编译器负责，出错的可能性要小得多&lt;/li&gt;
+&lt;li&gt;写管程的人无需关心编译器是如何实现互斥的，只需知道将所有临界区转换成管程即可&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;IPC：消息传递&lt;/h3&gt;
+
+&lt;p&gt;其实就是用socket来实现IPC。&lt;/p&gt;
+
+&lt;h3&gt;IPC：屏障 barrier&lt;/h3&gt;
+
+&lt;p&gt;概念上像是gpu渲染一帧，n个gpu核都在计算它负责的像素点，有的快有的慢，但必须全部核的任务都处理完毕，才能进入下一个阶段。&lt;/p&gt;
+
+&lt;h3&gt;IPC：无锁化，RCU（读取-复制-更新）&lt;/h3&gt;
+
+&lt;h2&gt;调度&lt;/h2&gt;
+
+&lt;h3&gt;何时进行调度&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;创建一个新进程后，需要决定是运行父进程还是运行子进程。可以任意决定。&lt;/li&gt;
+&lt;li&gt;一个进程退出时必须做出调度决策。必须从就绪进程集合选择另外某个进程。&lt;/li&gt;
+&lt;li&gt;当一个进程阻塞在I/O和信号量上或由于其他原因阻塞是，必须选择其他进程运行。&lt;strong&gt;阻塞原因会成为选择的因素，然而调度程序并不拥有做出这种相关考虑的必要信息&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;在一个I/O中断发生时，必须做出调度决策。可能等待I/O的进程变成就绪了，有三种可能，让新就绪进程运行；继续当前进程的运行；让别的进程运行。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;根据如何处理时钟中断，可以把调度算法分2类：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;非抢占式：进程自己释放CPU时/阻塞时，才会切换到别的进程。即时钟中断不会进行调度。&lt;/li&gt;
+&lt;li&gt;抢占式：让进程运行某个固定时段的最大值，然后挂起它，调度别的进程继续运行。前提是有时钟，不然就得用非抢占式的调度算法。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;根据环境选择算法：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;批处理。适合用非抢占式调度。一个进程需要运行长时间。也就减少了进程切换，优化了性能。&lt;/li&gt;
+&lt;li&gt;交互式。适合抢占式。&lt;/li&gt;
+&lt;li&gt;服务器。适合抢占式。&lt;/li&gt;
+&lt;li&gt;实时系统。一般是非抢占式。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;调度算法目标&lt;/h3&gt;
+
+&lt;p&gt;适用所有环境的目标：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;公平&lt;/li&gt;
+&lt;li&gt;策略强制执行。即调度进程有一些优先级策略&lt;/li&gt;
+&lt;li&gt;平衡。保证系统的所有部分都忙碌&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;批处理系统的测量指标：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;吞吐量：每小时完成的作业数量&lt;/li&gt;
+&lt;li&gt;周转时间：一个作业从提交到完成的统计平均时间&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;能够使吞吐量最大化的调度算法不一定就有最小的周转时间。例如，系统优先处理大量小作业导致长作业无法被处理，这样有做大的吞吐量但平均周转时间无限长。&lt;/p&gt;
+
+&lt;p&gt;交互式系统：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;最小响应时间。能够让所有的交互式请求首先运行的则是好服务。&lt;/li&gt;
+&lt;li&gt;均衡性。满足用户的期望（这个概念比较模糊）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;交互式系统的调度&lt;/h3&gt;
+
+&lt;h4&gt;轮转调度(round robin)&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;每个进程被分配一个时间片（quantum)。注意，进程可在时间片花完前提前结束运行，例如阻塞了。&lt;/li&gt;
+&lt;li&gt;时间片过小，容易发生抢占，过多的切换进程，降低CPU效率；&lt;/li&gt;
+&lt;li&gt;时间片太长，则引起对短的交互请求的响应时间变长。&lt;/li&gt;
+&lt;li&gt;一般为20~50ms&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;优先级调度&lt;/h4&gt;
+
+&lt;p&gt;每个进程加一个优先级属性，优先级大的先执行完，再执行次优先的。&lt;/p&gt;
+
+&lt;p&gt;问题：只按优先级来执行进程的话，低优先级进程可能永远都不会被执行。&lt;/p&gt;
+
+&lt;p&gt;解决方法：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;被执行的进程的优先级每个时钟滴答减1，直到低于次优先级进程时切换。&lt;/li&gt;
+&lt;li&gt;最大时间片法，用完时间片就轮到次优先的进程&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;优先级的赋予：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;静态：人工分配，例如商业计算中心，高优先级的任务价格高&lt;/li&gt;
+&lt;li&gt;动态：根据 1/f公式分配优先级。例如在50ms的时间片中只使用2ms就挂起的进程，优先级为1/(2/50) = 25。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;变种：按优先级分类，然后用轮转调度，高优先级的进程组里的进程集合轮转调度，优先执行，都执行完时切换到次优先级组。&lt;/p&gt;
+
+&lt;h4&gt;多级队列&lt;/h4&gt;
+
+&lt;p&gt;基于上面的优先级分类，设计了多级队列调度。&lt;/p&gt;
+
+&lt;p&gt;原理是：属于最高优先级类的进程运行一个时间片，属于次高优先级类的进程运行2个时间片，再次一级运行4个时间片；当进程用完分配的时间片后，它被移送到下一类。&lt;/p&gt;
+
+&lt;p&gt;例子：假设一个进程要完成计算任务总共需要100个时间片。一开始被分配1个时间片，然后就被换出，下次到它时获得2个时间片，又被换出。总共经历了1、2、4、8、16、32、64个优先级类。在64优先级类的第37个时间片就完成了工作。总共用了7次进程上下文切换。要比轮转算法轮转100次要高效。&lt;/p&gt;
+
+&lt;h4&gt;最短进程优先&lt;/h4&gt;
+
+&lt;p&gt;最短路程含义是进入运行到挂起的时间间隔最短，这种进程优先处理，对实时系统挺友好。例如交互式进程，每条用户命令相当于一次短作业。&lt;/p&gt;
+
+&lt;p&gt;但如何知道这个作业将执行多久呢？方法是用过去的数据来做预测，\( T = aT_{0} + (1 - a)T_{1} \)。&lt;/p&gt;
+
+&lt;h4&gt;保证调度&lt;/h4&gt;
+
+&lt;p&gt;也是绝对公平的调度。有两种情况：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;多用户同时登录工作。每个用户可获得CPU的1/n的处理能力。&lt;/li&gt;
+&lt;li&gt;n个进程在运行的单用户系统。每个进程获得CPU的1/n的处理能力。不过这种情况需要记录每个进程从创建以来已累积获得的CPU时间。因为没有时间片的概念，所以进程实际获得的运行时间和理应获得的时间可能会不一致，此时可以算一个比值（优先级），使得较亏的进程可以先运行。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;彩票调度&lt;/h4&gt;
+
+&lt;p&gt;即给每个进程发一些彩票。调度时，随机抽一张彩票，哪个进程持有这张彩票就被执行。&lt;/p&gt;
+
+&lt;p&gt;可以给某个进程赋予比别人多的彩票数量，来提高优先级(中奖几率)。&lt;/p&gt;
+
+&lt;h4&gt;公平分享调度&lt;/h4&gt;
+
+&lt;p&gt;这个是对于多用户环境而言的。每个用户的所有进程占x%的时间。有点像上面的保证调度。&lt;/p&gt;
+
+&lt;h3&gt;调度策略参数化&lt;/h3&gt;
+
+&lt;p&gt;例如一个数据库父进程下面有多个子进程，父进程才知道怎么调度子进程才是最优。那么就可以设计一种参数化调度机制，让父进程向内核设置参数，如子进程优先级，更好地做调度。&lt;/p&gt;
+
+&lt;h3&gt;线程调度&lt;/h3&gt;
+
+&lt;p&gt;要分用户级线程和内核级线程两种情况。&lt;/p&gt;
+
+&lt;h3&gt;经典IPC问题&lt;/h3&gt;
+
+&lt;h3&gt;页面置换算法&lt;/h3&gt;
+
+&lt;h4&gt;最优页面置换算法&lt;/h4&gt;
+
+&lt;p&gt;基于2点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;当缺页中断(page fault)发生时，有些页面在内存中，其中有一个页面（包含紧接着的下一条指令的那个页面）将很快被访问，其他页面则可能要10、100、1000条指令后才会访问，这个指令数就是标记&lt;/li&gt;
+&lt;li&gt;最优页面置换，就是置换掉标记最大的页面&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;然而无法实现，因为操作系统无法知道各个页面下一次将在什么时候被访问。&lt;/p&gt;
+
+&lt;p&gt;不过可以作为性能对比工具，例如弄个仿真程序，先跟踪一遍所有页面的访问情况，然后第二次运行则可以用第一次的数据来跑出最优页面置换算法。之后再用其他算法也跑一下，从而做对比。不过此方案问题在于是针对某个特定程序而言的。&lt;/p&gt;
+
+&lt;h4&gt;最近未使用页面置换算法（NRU，not recently used）&lt;/h4&gt;
+
+&lt;p&gt;首先每个页面设置2个状态位:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;R位，被访问时设置&lt;/li&gt;
+&lt;li&gt;W位，被写入时设置&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;算法：&lt;/p&gt;
+
+&lt;p&gt;当启动一个进程时，它的所有页面的两个位都由操作系统设置成0，R位被定期地清零（比如每次时钟中断时）以区别最近没有被访问的页面和被访问的页面。&lt;/p&gt;
+
+&lt;p&gt;当发生缺页中断时，操作系统检查所有的页面并根据它们当前的R位和M位的值，把它们分为4类：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;没有被访问，没有被修改&lt;/li&gt;
+&lt;li&gt;没有被访问，被修改&lt;/li&gt;
+&lt;li&gt;被访问，没有被修改&lt;/li&gt;
+&lt;li&gt;被访问，被修改&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;本算法随机地从类编号最小的非空类中挑选一个页面淘汰。&lt;/p&gt;
+
+&lt;h4&gt;先进先出置换算法 FIFO&lt;/h4&gt;
+
+&lt;p&gt;页面按照访问时间顺序组成链表，每次发生缺页中断时直接从表头的页面干掉，并把新页面放到表尾。&lt;/p&gt;
+
+&lt;p&gt;问题在于常用页面也可能会被淘汰，&lt;/p&gt;
+
+&lt;h4&gt;第二次机会页面置换算法&lt;/h4&gt;
+
+&lt;p&gt;这个是 FIFO的改进：要淘汰时，检查最老页面的R位，如果是0，那么可以置换掉；如果是1，那么就是最近访问过的，把R位设0，并移动到链表末端。&lt;/p&gt;
+
+&lt;p&gt;如果所有页面都被访问过了，那么退化为普通的FIFO。&lt;/p&gt;
+
+&lt;h4&gt;时钟页面置换算法&lt;/h4&gt;
+
+&lt;p&gt;上面的算法的问题在于要经常在链表移动页面。改进方法：改成环形链表，一个指针指向最老的页面。&lt;/p&gt;
+
+&lt;p&gt;当发生缺页中断时：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;检查指针指向的页面，若R位为0，则淘汰该页面，把新页面放入这个位置，指针移动到下一个位置；&lt;/li&gt;
+&lt;li&gt;若R为1，则清除R位，指针还是++，重复这个过程直到找到一个R为0的页面。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;最近最少使用算法（LRU）&lt;/h4&gt;
+
+&lt;p&gt;在缺页中断发生时，置换未使用时间最长的页面。&lt;/p&gt;
+
+&lt;p&gt;假设还是用链表，要达到LRU，需要每次访问内存都更新链表：在链表中找到这个页面，删除它，然后把它移动到表头。&lt;/p&gt;
+
+&lt;p&gt;不用链表，有别的方案：&lt;/p&gt;
+
+&lt;p&gt;每个页表存一个属性：指令计数器，每条指令执行完后加1；当发生缺页中断时，检查所有页表项的计数器值，找到值最小的页面，就是最近最少使用的页面了。这是基于硬件的方案。&lt;/p&gt;
+
+&lt;h4&gt;软件实现的LRU&lt;/h4&gt;
+
+&lt;p&gt;NFU（Not Frequently Used，最不常用）算法：&lt;/p&gt;
+
+&lt;p&gt;内存里做一个表，把每个页面和一个软件计数器相关联，初值为0，每次时钟中断时，操作系统扫描内存中&lt;strong&gt;所有的页面&lt;/strong&gt;，把每个页面的R位的值加到计数器上，这个计数器大体跟踪了各个页面被访问的频繁程度。发生缺页中断时，淘汰计数器值最小的页面。&lt;/p&gt;
+
+&lt;p&gt;改进的NFU——Aging老化算法：&lt;/p&gt;
+
+&lt;p&gt;因为NFU对旧状态记忆得太深，不能应对快速变化的程序状态，有可能根据计数器淘汰了最经常访问的页面。可以修改一下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;在R位被加进计数器前，计数器右移一位（除2）；&lt;/li&gt;
+&lt;li&gt;将R位加到计数器最左端的位而不是最右端的位；&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;发生缺页中断还是淘汰计数器值最小的页面。老化算法的问题在于计数器只有有限位，限制了它对过往状态的记忆能力。&lt;/p&gt;
+
+&lt;h4&gt;基本工作集页面置换算法&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;工作集：一个进程当前正在使用的页面的集合称为它的工作集。&lt;/li&gt;
+&lt;li&gt;颠簸：如果内存太小不足以容纳整个工作集，那么每执行几条指令就会发生一次缺页中断&lt;/li&gt;
+&lt;li&gt;预先调页：在进程运行前预先装入其工作集页面&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;工作集的严格定义：在任一时刻t，都存在一个集合，它包含所有最近k次内存访问所访问过的页面，称为w(k,t)&lt;/p&gt;
+
+&lt;p&gt;w是k的单调非递减函数，且会收敛到一个稳定的范围。预先调页原理就是基于以下推测：程序上次结束时w有一个稳定范围，可预先装下这个范围的工作集。&lt;/p&gt;
+
+&lt;p&gt;实现条件：操作系统必须跟踪哪些页面在工作集中。&lt;/p&gt;
+
+&lt;p&gt;基于工作集的页面置换算法：当发生缺页中断时，淘汰一个不在工作集的页面。精确地统计工作集，就是确定一个k值。&lt;/p&gt;
+
+&lt;p&gt;问题：工作集的计算不容易。2种方案：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;按使用频率计。成本比较高。k还是按次数的k。&lt;/li&gt;
+&lt;li&gt;按执行时间计。k变成秒数r，工作集变成在过去的r秒实际运行时间(使用了CPU的时间)中进程所访问页面的集合。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;缺页中断时，需要扫描整个页表，找出适合的页面来淘汰。&lt;/p&gt;
+
+&lt;h4&gt;工作集时钟页面置换算法&lt;/h4&gt;
+
+&lt;p&gt;上面的算法问题在于需要扫描整个页表来淘汰页面。&lt;/p&gt;
+
+&lt;p&gt;改进（类似前面的时钟页面置换算法）:&lt;/p&gt;
+
+&lt;p&gt;建立一个以页框为元素的循环表。每次缺页中断时，首先检查指针指向的页面，如果R为1，则把R改为0，并把指针++，重复这个逻辑；R为0时，如果指针当前页面的生存时间大于r，并且页面是干净的（M=0），它就不在工作集中且磁盘上有一个有效的副本，置换替换掉此页框即可，如果M为1，为了避免写磁盘操作引起进程切换，指针继续++，检查下一个页。&lt;/p&gt;
+
+&lt;h4&gt;总结&lt;/h4&gt;
+
+&lt;p&gt;最好的算法是：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;老化算法（LRU）&lt;/li&gt;
+&lt;li&gt;工作集时钟算法&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;分页系统的设计问题&lt;/h3&gt;
+
+&lt;h4&gt;进程之间的内存竞争&lt;/h4&gt;
+</description>
+        <pubDate>Tue, 10 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/os-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/os-1/</guid>
+      </item>
+    
+      <item>
         <title>漫谈网络通讯加密（2）流程设计</title>
         <description>&lt;!--more--&gt;
 
@@ -3389,1106 +3905,6 @@ cwnd会相应更新。&lt;/p&gt;
         <pubDate>Sat, 24 Mar 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/tcpip-1/</link>
         <guid isPermaLink="true">http://localhost:4000/tcpip-1/</guid>
-      </item>
-    
-      <item>
-        <title>碰撞检测算法(二)：原始GJK详解</title>
-        <description>&lt;p&gt;GJK，全称&lt;a href=&quot;https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm&quot;&gt;Gilbert–Johnson–Keerthi distance algorithm&lt;/a&gt;，是非常常用的碰撞检测算法。&lt;/p&gt;
-
-&lt;p&gt;原始GJK的功能：准确地告诉调用者2个几何体&lt;strong&gt;是否&lt;/strong&gt;碰撞。&lt;/p&gt;
-
-&lt;p&gt;GJK的主要特性：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;只适用于凸体&lt;/li&gt;
-&lt;li&gt;GJK算法与维度无关，2D、3D都可以用&lt;/li&gt;
-&lt;li&gt;不要求对顶点数组做排序&lt;/li&gt;
-&lt;li&gt;存在一些技巧可以大大优化GJK的性能&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;本文将详解原始GJK的来龙去脉。&lt;/p&gt;
-
-&lt;h3&gt;目录：&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;#1&quot;&gt;数学知识点&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;#1.1&quot;&gt;闵可夫斯基数学 Minkowski Math&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#1.2&quot;&gt;单纯形 Simplex&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#1.3&quot;&gt;向量混合积 Vector Triple Product&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#2&quot;&gt;GJK算法原理&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;#2.1&quot;&gt;GJK伪代码&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#2.2&quot;&gt;Support函数&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#2.3&quot;&gt;NearestSimplex函数&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3&quot;&gt;二维平面的GJK算法实现&lt;/a&gt; 
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;#3.1&quot;&gt;b2Distance核心逻辑&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3.2&quot;&gt;b2Simplex::GetSearchDirection&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3.3&quot;&gt;b2Simplex::Solve2&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3.4&quot;&gt;b2Simplex::Solve3&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3.5&quot;&gt;b2DistanceProxy::GetSupport&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#4&quot;&gt;其他细节&lt;/a&gt; &lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#5&quot;&gt;参考资料&lt;/a&gt; 
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;#5.1&quot;&gt;GJK各种实现&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!--more--&gt;
-
-&lt;h1&gt;&lt;div id=&quot;1&quot;&gt;数学知识点&lt;/div&gt;&lt;/h1&gt;
-
-&lt;p&gt;原始GJK包含的知识点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;闵可夫斯基和 Minkowski sum&lt;/li&gt;
-&lt;li&gt;向量混合积 vector triple product&lt;/li&gt;
-&lt;li&gt;2D叉积公式&lt;/li&gt;
-&lt;li&gt;质心坐标公式&lt;/li&gt;
-&lt;li&gt;k阶单纯形 k-Simplex&lt;/li&gt;
-&lt;li&gt;supporting point和Support函数&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;其中有几个点放到后面的算法实现一节再介绍。&lt;/p&gt;
-
-&lt;h2&gt;&lt;div id=&quot;1.1&quot;&gt;闵可夫斯基数学 Minkowski Math&lt;/div&gt;&lt;/h2&gt;
-
-&lt;h3&gt;Minkowski扩大运算  &lt;a href=&quot;https://en.wikipedia.org/wiki/Minkowski_addition&quot;&gt;Minkowski Sum&lt;/a&gt;&lt;/h3&gt;
-
-&lt;p&gt;\[ A \oplus B = \bigcup _{b \in B} A^{b}  \]&lt;/p&gt;
-
-&lt;p&gt;其中，\(A^{b} = \{ a + b | a \in A\}  = A + b \)，代表集合A整体移动b&lt;/p&gt;
-
-&lt;p&gt;（可以理解为几何形状的Union并集运算）&lt;/p&gt;
-
-&lt;h3&gt;Minkowski收缩运算&lt;/h3&gt;
-
-&lt;p&gt;\[ A \ominus B = \bigcap _{b \in B} A^{-b}  \]&lt;/p&gt;
-
-&lt;p&gt;其中，\(A^{-b} = \{ a - b | a \in A\}  = A - b \)，代表集合A整体移动-b&lt;/p&gt;
-
-&lt;p&gt;（可以理解为几何形状的Intersect交集运算）&lt;/p&gt;
-
-&lt;h3&gt;Minkowski减法运算（Minkowski差)&lt;/h3&gt;
-
-&lt;p&gt;\[ A - B =  A \oplus (-B)  \]&lt;/p&gt;
-
-&lt;p&gt;这条公式才是真正应用到GJK算法里的公式。&lt;/p&gt;
-
-&lt;p&gt;可以理解为B先做了一次镜像，然后再和A做并集运算。&lt;/p&gt;
-
-&lt;p&gt;所以，说到GJK的Minkowski运算时，可以叫Minkowski和，也可以叫Minkowski差。anyway。&lt;/p&gt;
-
-&lt;h2&gt;向量混合积 Vector Triple Product&lt;/h2&gt;
-
-&lt;p&gt;曾经，我在我的&lt;a href=&quot;http://127.0.0.1:4000/triangle-intersect/&quot;&gt;用线性代数知识解决光线和三角形的交点问题&lt;/a&gt;一文中提到了一个数学公式，叫&lt;strong&gt;标量混合积(Scalar Triple Product)&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;而在GJK中，需要用到相似的另一个东西——&lt;strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Triple_product&quot;&gt;向量混合积(Vector Triple Product)&lt;/a&gt;&lt;/strong&gt;, 同时也被称为&lt;strong&gt;BAC-CAB特性&lt;/strong&gt;:&lt;/p&gt;
-
-&lt;p&gt;\[ A\times (B\times C) = B(A\cdot C) - C(A\cdot B) \]&lt;/p&gt;
-
-&lt;p&gt;\[ (A\times B)\times C = -C\times (A\times B) \]&lt;/p&gt;
-
-&lt;p&gt;\[ (A\times B)\times C = B(A\cdot C) - A(B\cdot C)  \]&lt;/p&gt;
-
-&lt;p&gt;Proof: &lt;a href=&quot;https://en.wikipedia.org/wiki/Triple_product#Proof&quot;&gt;https://en.wikipedia.org/wiki/Triple_product#Proof&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;GJK使用的第三条公式。&lt;/p&gt;
-
-&lt;h2&gt;&lt;div id=&quot;1.2&quot;&gt;单纯形 &lt;a href=&quot;https://en.wikipedia.org/wiki/Simplex&quot;&gt;Simplex&lt;/a&gt;&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;按照wiki的解释，k阶单纯形，指的是k维空间中的多胞形，且多胞形是k+1个顶点组成的凸包。根据这个定义出发，就可以理解GJK算法中会提到的各种Simplex是什么东西：&lt;/p&gt;
-
-&lt;h3&gt;0阶单纯形 0-Simplex&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;根据前面的定义，0阶单纯形是0维空间下的0+1=1个顶点组成的凸包，显然只能是一个点。&lt;/p&gt;
-
-&lt;h3&gt;1阶单纯形 1-Simplex&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/4.png&quot; alt=&quot;4.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;1阶单纯形，1维空间，1+1=2个顶点，所以就是一条直线（1维空间）上的一个线段。&lt;/p&gt;
-
-&lt;h3&gt;2阶单纯形 2-Simplex&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/5.png&quot; alt=&quot;5.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;2阶单纯形，2维空间，2+1=3个顶点，所以就是一个平面（2维空间）上的一个三角形，三角形我们就熟悉了，显然是一个凸包无误。&lt;/p&gt;
-
-&lt;h3&gt;3阶单纯形 3-Simplex&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/6.png&quot; alt=&quot;6.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;3阶单纯形，3维空间，3+1=4个顶点，所以就是3维立体空间里的一个四面体(tetrahedron)，显然也是一个凸包。&lt;/p&gt;
-
-&lt;h3&gt;k&amp;gt;3阶单纯形&lt;/h3&gt;
-
-&lt;p&gt;我想读者做的都是2D或3D的项目，2D项目最多用到2-Simplex，3D项目最多用到3-Simplex。k&amp;gt;3的Simplex，忽略吧。&lt;/p&gt;
-
-&lt;h1&gt;&lt;div id=&quot;2&quot;&gt;GJK算法原理&lt;/div&gt;&lt;/h1&gt;
-
-&lt;p&gt;GJK算法，本质就是利用Minkowski差来判断2个几何体有没碰撞。&lt;/p&gt;
-
-&lt;p&gt;因为如果碰撞了，那么2个几何体至少包含了同一个点，也就意味着它们的Minkowski差必然包含原点。&lt;/p&gt;
-
-&lt;p&gt;明白这一点后，GJK其实就已经学到大半了。&lt;/p&gt;
-
-&lt;h2&gt;&lt;div id=&quot;2.1&quot;&gt;划重点：来自wiki的GJK伪代码&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;经过查阅大量资料，发现还是wiki对GJK的解释一语中的，所以下面介绍下wiki给出的GJK伪代码：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;GJK_intersection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;shape&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;shape&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vector&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;vector&lt;/span&gt;  &lt;span class=&quot;nx&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;simplex&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;A&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;loop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;nx&quot;&gt;reject&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;∪&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;A&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;contains_origin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NearestSimplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;contains_origin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;nx&quot;&gt;accept&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;这份代码准确描述了&lt;strong&gt;原始&lt;/strong&gt;GJK的核心逻辑：&lt;strong&gt;只需要输入2个shape和一个初始方向，就能告诉你这2个shape有没碰撞&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;分别沿着初始方向D和反方向-D，求出p和q的supporting point，并计算Minkowski差，得到向量A。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;把A输入单纯形s，此时单纯形为0-simplex (如果你不知道是什么，说明没看上文)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;D重新设置为-A (这一步操作不是很关键，可以不深究为什么)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;进入循环:&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;同步骤1类似，计算下一个Minkowski差，并依然赋值给A（这里要注意到，A永远是最新计算得到的Minkowski差向量）&lt;/li&gt;
-&lt;li&gt;判断A和D的点积是否小于0，实际上就是判断A和D的夹角是不是大于90度。或者换句话说，A在D方向上的投影距离，是否小于0，小于0说明投影在了D的反方向上。所以，如果点积小于0，说明不能在DO方向上找到离原点Origin更近的Minkowski差顶点，这个A被reject，GJK返回false，2个shape没有碰撞。&lt;/li&gt;
-&lt;li&gt;到了这里，说明新的A离原点更近了，那么把A加进单纯形，此时单纯形含有2个顶点，所以是1-simplex&lt;/li&gt;
-&lt;li&gt;经过NearestSimplex过滤，得到新的单纯形s，以及更新了方向向量D，contains_origin表示这个单纯形是否包含原点。&lt;/li&gt;
-&lt;li&gt;如果contains_origin为true，那么说明2个shape里分别存在2个点，坐标相同，使得Minkowski差为0（原点），也就意味着2个shape发生了碰撞，GJK返回true。&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;下面章节继续介绍伪代码里出现的&lt;strong&gt;Support和NearestSimplex函数&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h2&gt;&lt;div id=&quot;2.2&quot;&gt;Support函数&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;在不同的资料中，Support函数可能有不同的定义，函数声明如下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Point support(Shape&amp;amp; shape, Vector&amp;amp; d)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Point support(Shape&amp;amp; shape1, Shape&amp;amp; shape2, Vector&amp;amp; d)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;可以把上面的第二个support改名为supprot2，方便区分。supprot2其实是对supprot的一层封装。&lt;/p&gt;
-
-&lt;p&gt;先介绍support。用伪代码表示：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// wiki：returns the point on shape which has the highest dot product with d&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// 即找出shape里的一个点，把这个点投影到d方向向量上，它离原点的距离最大（要区分正负）&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Shape&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// 具体实现可以自行设计，这里展示的是暴力遍历算法，brute-force&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;VertexID&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FirstVertex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;REAL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;REAL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxv&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;maxv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;maxp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;support的返回值，就是所谓的supporting point。&lt;/p&gt;
-
-&lt;p&gt;有了support，就可以实现supprot2了：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 给定2个静态几何形状和一个方向向量，求出经过Minkowski减法运算得到的点（唯一）&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;support2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Shape&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Shape&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// 沿着d方向找出shape1中最远的点p1&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// 沿着-d方向找出shape2中最远的点p2&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// Minkowski减法运算（其实只是普通的向量运算）&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// p3刚好就落在shape1、shape2闵可夫斯基差的凸包的边上&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;&lt;div id=&quot;2.3&quot;&gt;NearestSimplex函数&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;wiki:&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;takes a simplex &lt;strong&gt;s&lt;/strong&gt; and returns the simplex on &lt;strong&gt;s&lt;/strong&gt; closest to the origin, and a direction toward the origin normal to the new simplex. If &lt;strong&gt;s&lt;/strong&gt; itself contains the origin, &lt;strong&gt;NearestSimplex&lt;/strong&gt; accepts &lt;strong&gt;s&lt;/strong&gt; and the two shapes are determined to intersect.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;NearestSimplex很不凡，做了很多事情。一是NearestSimplex可以判定2个shape是否碰撞；二是更新单纯形s；三是给出新的迭代方向d。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;要判定2个shape是否碰撞，有前提条件：&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;ul&gt;
-&lt;li&gt;对于2D空间，单纯形s需是2-simplex，即s要含有3个顶点，才能判断s是否包含原点origin；&lt;/li&gt;
-&lt;li&gt;对于3D空间，单纯形s需是3-simplex，即s要含有4个顶点，构成一个4面体，才能判断s是否包含原点origin。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;所以执行到NearestSimplex时，如果s里只有不到3个顶点的话，肯定不算碰撞。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;更新单纯形，目的是保证s满足k-simplex的定义。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;例如在2D空间，四边形并不是2-simplex，三角形才是2-simplex。假设s包含4个顶点的时候，就需要去掉1个顶点，才能构成2-simplex。&lt;/p&gt;
-
-&lt;p&gt;对于NearestSimplex函数，它有一些小动作。以2D空间为例：&lt;/p&gt;
-
-&lt;p&gt;因为构成2-simplex仅需要3个顶点，如果最新push进s的点，构成的2-simplex并没有包含原点，那么可以直接丢弃s里的上上个顶点，使得s退化到1-simplex，即s是一条线段。&lt;/p&gt;
-
-&lt;p&gt;而如果构成的2-simplex包含了原点，GJK_intersection就可以直接返回true了。所以就是说，&lt;strong&gt;s变成2-simplex的时候，就是GJK_intersection返回true的时候&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;而因为算法的流程设计，执行到NearestSimplex的时候，s必然起码含有2个顶点。综上，NearestSimplex返回的s必然是2-simplex或1-simplex，而不可能是0-simplex。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;新的迭代方向d&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;根据第二点，如果s不能构成2-simplex（没有碰撞），就还需要继续迭代。&lt;/p&gt;
-
-&lt;p&gt;新的迭代方向是1-simplex里的2个顶点构成的线段的法向量。&lt;/p&gt;
-
-&lt;p&gt;法向量方向有2个，需要选择朝向origin的那一侧的法向。&lt;/p&gt;
-
-&lt;h1&gt;&lt;div id=&quot;3&quot;&gt;二维平面的GJK算法实现&lt;/div&gt;&lt;/h1&gt;
-
-&lt;p&gt;为了学到真正靠谱的GJK算法，所以下面使用Box2D的b2Distance函数，作为学习对象。（找到的其他GJK代码都觉得奇奇怪怪的）&lt;/p&gt;
-
-&lt;p&gt;b2Distance不仅实现了GJK算法，还实现了Simplex Cache机制，即支持时间相干性，从而提升计算效率。&lt;/p&gt;
-
-&lt;p&gt;不过有个问题是，b2Distance不一定能直接改成支持3D，因为用到了一些2D几何公式，例如b2Cross。&lt;/p&gt;
-
-&lt;p&gt;下面将精简b2Distance代码（去掉了Simplex Cache、input-&amp;gt;useRadii等），只保留和GJK相关的，来方便读者理解b2Distance。&lt;/p&gt;
-
-&lt;h2&gt;&lt;div id=&quot;3.1&quot;&gt;b2Distance核心逻辑&lt;/div&gt;&lt;/h2&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Distance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2DistanceOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;b2SimplexCache&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2DistanceInput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2DistanceProxy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;proxyA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proxyA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2DistanceProxy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;proxyB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proxyB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;b2Transform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transformA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transformA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Transform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transformB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transformB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-  &lt;span class=&quot;c1&quot;&gt;// 单纯形类实例！&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Simplex&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;b2SimplexVertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k_maxIters&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-  &lt;span class=&quot;c1&quot;&gt;// saveA、saveB、saveCount保存上一轮迭代的结果，用来防止进入死循环&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveCount&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 这就是传说中的GJK迭代loop了&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k_maxIters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;saveCount&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveCount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;saveA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;saveB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 根据当前的单纯形拥有的顶点数量，选择不同的处理流程&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;b2Assert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;// 单纯形已经有3个顶点，说明原点已经在单纯形里面了&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 根据s计算新的搜索方向d&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetSearchDirection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-
-
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LengthSquared&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2_epsilon&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2_epsilon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;// d的长度几乎等于0，说明当前的单纯形很可能已经包含原点了&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;// 可能是s的一条边压到，也可能是三角形区域包含了原点&lt;/span&gt;
-
-      &lt;span class=&quot;c1&quot;&gt;// 尽管很可能几何体重叠了，但不能认为几何体之间的距离为0&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;// 因为simplex仅包含1或2个顶点，这时候会遇到浮点数精度问题，&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;// 很难判断这2个几何体是碰撞了还是距离非常近&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 计算下一个Minkowski差vertex&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// simplex里的要被写入的顶点&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;b2SimplexVertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// 分别对2个几何体调用support函数&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;proxyA&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetSupport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2MulT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transformA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Mul&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transformA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;proxyA&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetVertex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;proxyB&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetSupport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2MulT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transformB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Mul&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transformB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;proxyB&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetVertex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// Minkowski差 &lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
-
-        &lt;span class=&quot;c1&quot;&gt;// iter的值等同于被计算出来的support point数量&lt;/span&gt;
-        &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 判断是否重复，也是退出这个循环的主要条件&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;duplicate&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveCount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexB&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saveB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;duplicate&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;duplicate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 到了这里说明新的vertex符合期望&lt;/span&gt;
-        &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 计算witness point，下一篇GJK文章再介绍&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// 总之pointA pointB是距离原点最近的Minkowski差(一个顶点)对应的2个点&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetWitnessPoints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pointA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pointB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// 这里调用的是重载函数&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// distance存储了pointA pointB之间的差值（&amp;gt;=0)&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// distance小于一个预期阈值时，就认为这2个几何体发生碰撞&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;distance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Distance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pointA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pointB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-    &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 缓存&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;simplex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WriteCache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;下面继续介绍这段代码里出现的GetSearchDirection、Solve2、Solve3、GetSupport函数。&lt;/p&gt;
-
-&lt;h2&gt;&lt;div id=&quot;3.2&quot;&gt;b2Simplex::GetSearchDirection&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;根据算法上下文，执行到GetSearchDirection时，单纯形顶点数只能是1或2。&lt;/p&gt;
-
-&lt;p&gt;如果顶点数为1，下个搜索方向就是该顶点向量的反方向。so easy。&lt;/p&gt;
-
-&lt;p&gt;如果顶点数为2，需要判断原点在\( e_{12} \)的哪一侧，并计算朝向那一侧的垂直于w1w2的向量。&lt;/p&gt;
-
-&lt;p&gt;这个问题的解决，需要用到2D叉积公式。读者可能不清楚这是什么但没关系。现先从3D叉积公式说起。&lt;/p&gt;
-
-&lt;p&gt;叉积(&lt;a href=&quot;https://en.wikipedia.org/wiki/Cross_product&quot;&gt;cross product&lt;/a&gt;)运算\( \times \)，本是3D空间特有的一种向量二元运算。执行\( \mathbf a \times \mathbf b \)，会得到一个同时和\( \mathbf a 、 \mathbf b \)正交的向量\( \mathbf c\)，\( \mathbf c\)的方向可以按右手规则推知：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;可把\( \mathbf a 、 \mathbf b \)用标准基&lt;a href=&quot;https://en.wikipedia.org/wiki/Standard_basis&quot;&gt;Standard basis&lt;/a&gt; \( \mathbf i、  \mathbf j 、 \mathbf k\)表示：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf a = u_1 \mathbf i + u_2 \mathbf j + u_3 \mathbf k \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf b = v_1 \mathbf i + v_2 \mathbf j + v_3 \mathbf k \]&lt;/p&gt;
-
-&lt;p&gt;此时，\( \mathbf a 、 \mathbf b \)的叉积可以用矩阵秩(determinant)表示：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf a \times \mathbf b =    \left| \begin{matrix} \mathbf i \  \mathbf j \  \mathbf k \\  u_1 \   u_2 \  u_3 \\  v_1 \  v_2 \  v_3\\ \end{matrix} \right|  \]&lt;/p&gt;
-
-&lt;p&gt;展开这个式子，得到向量形式的公式：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf a \times \mathbf b =    \left| \begin{matrix} u_2 \  u_3 \\  v_2 \  v_3\\ \end{matrix} \right|  \mathbf i -    \left| \begin{matrix} u_1 \  u_3 \\  v_1 \  v_3\\ \end{matrix} \right|  \mathbf j +    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right|  \mathbf k  \]&lt;/p&gt;
-
-&lt;p&gt;对于2D空间下的\( \mathbf a 、 \mathbf b \)，可认为它们是z分部为0的3D向量，从而可以套进上述公式：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf a = u_1 \mathbf i + u_2 \mathbf j + 0 \mathbf k \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf b = v_1 \mathbf i + v_2 \mathbf j + 0 \mathbf k \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf a \times \mathbf b =    \left| \begin{matrix} u_2 \  u_3 \\  v_2 \  v_3\\ \end{matrix} \right|  \mathbf i -    \left| \begin{matrix} u_1 \  u_3 \\  v_1 \  v_3\\ \end{matrix} \right|  \mathbf j +    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right|  \mathbf k  \]&lt;/p&gt;
-
-&lt;p&gt;\[ = 0\mathbf i - 0\mathbf j +    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right|  \mathbf k \]&lt;/p&gt;
-
-&lt;p&gt;\[ =    \left| \begin{matrix} u_1 \  u_2 \\  v_1 \  v_2\\ \end{matrix} \right| \]&lt;/p&gt;
-
-&lt;p&gt;\[ = u_1 v_2 - u_2 v_1 \]&lt;/p&gt;
-
-&lt;p&gt;最后一步用到了2阶的determinant公式(&lt;a href=&quot;https://en.wikipedia.org/wiki/Determinant&quot;&gt;from wiki&lt;/a&gt;) ：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/9.png&quot; alt=&quot;9.png&quot;&gt;  &lt;/p&gt;
-
-&lt;p&gt;这就是所谓的2D叉积公式了，其实只是3D叉积的一种特殊情况。&lt;/p&gt;
-
-&lt;p&gt;2D叉积公式有什么用呢？请注意，2D叉积后得到的是一个标量s。这个标量的正负号，就告诉了我们\( \mathbf a \times \mathbf b \)得到的向量( \( 0\mathbf i - 0\mathbf j + s\mathbf k \) )在z轴上的朝向。&lt;/p&gt;
-
-&lt;p&gt;但知道朝向后又有什么意义呢？这时，要结合右手坐标系来理解（可回顾下上面的手势图）：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;当标量s符号为正时，根据右手坐标系规则，可知\( \mathbf b \)在\( \mathbf a \)的左侧（记住观察视角是从+z到-z）&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;当标量s符号为负时，根据右手坐标系规则，可知\( \mathbf b \)在\( \mathbf a \)的右侧&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;理解2D叉积后，GetSearchDirection理解起来就轻松了：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 2D叉积公式&lt;/span&gt;
-&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// 这2条公式其实是为了得到和a正交的向量，s的值一般为1&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// b2Cross(a, 1.0)返回一个在a右侧的正交向量&lt;/span&gt;
-&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// b2Cross(1.0, a)返回一个在a左侧的正交向量&lt;/span&gt;
-&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetSearchDirection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// 直接取w1的反方向就行了&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;// 计算2D叉积&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sgn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sgn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
-        &lt;span class=&quot;c1&quot;&gt;// -m_v1.w在e12左侧，即原点也在左侧&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// -m_v1.w在e12右侧，即原点也在右侧&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Assert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2_zero&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;&lt;div id=&quot;3.3&quot;&gt;b2Simplex::Solve2&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;Solve2主要目的：找出原点在当前这个1-simplex的哪个区域。&lt;/p&gt;
-
-&lt;p&gt;以下图为例，区域总共有3个，w1、w2、w12：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/8.png&quot; alt=&quot;8.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;w12就是w1和w2两个顶点夹住的那片黄色。&lt;/p&gt;
-
-&lt;p&gt;solve2的原理是，通过求原点在w1w2的投影点p（最近点），从而知道原点和线段w1w2的关系。&lt;/p&gt;
-
-&lt;p&gt;投影点p既然在w1w2上，那么可用&lt;a href=&quot;https://en.wikipedia.org/wiki/Barycentric_coordinate_system&quot;&gt;质心坐标公式&lt;/a&gt;表示：&lt;/p&gt;
-
-&lt;p&gt;\[ (a_{1} + a_{2})\mathbf p = a_{1} \mathbf w_{1} + a_{2} \mathbf w_{2}  \]&lt;/p&gt;
-
-&lt;p&gt;为了唯一确定这个点p，再加入限制条件：&lt;/p&gt;
-
-&lt;p&gt;\[ a_{1} + a_{2} = 1   \]&lt;/p&gt;
-
-&lt;p&gt;上式简化：&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf p = a_{1} \mathbf w_{1} + a_{2} \mathbf w_{2}  \]&lt;/p&gt;
-
-&lt;p&gt;op（即向量\(\mathbf p\)）必然垂直于w1w2，所以有：&lt;/p&gt;
-
-&lt;p&gt;\[  \mathbf e_{12} = \mathbf w_{2} - \mathbf  w_{1} \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf p \cdot \mathbf e_{12} = 0\]&lt;/p&gt;
-
-&lt;p&gt;把上面的\(\mathbf p\)代入，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ (a_{1} \mathbf w_{1} + a_{2} \mathbf w_{2}) \cdot \mathbf e_{12} = 0\]&lt;/p&gt;
-
-&lt;p&gt;\[ a_{1} (\mathbf w_{1} \cdot \mathbf e_{12}) + a_{2} (\mathbf w_{2} \cdot \mathbf e_{12}) = 0\]&lt;/p&gt;
-
-&lt;p&gt;解得：&lt;/p&gt;
-
-&lt;p&gt;\[ a_{1} = \frac { \mathbf w_{2} \cdot \mathbf e_{12} } { -\mathbf w_{1} \cdot \mathbf e_{12}  + \mathbf w_{2} \cdot \mathbf e_{12} } \]&lt;/p&gt;
-
-&lt;p&gt;\[ a_{2} = \frac { -\mathbf w_{1} \cdot \mathbf e_{12} } { -\mathbf w_{1} \cdot \mathbf e_{12} + \mathbf w_{2} \cdot \mathbf e_{12} } \]&lt;/p&gt;
-
-&lt;p&gt;设:&lt;/p&gt;
-
-&lt;p&gt;\[ d12\_2 = -\mathbf w_{1} \cdot \mathbf e_{12} \]&lt;/p&gt;
-
-&lt;p&gt;\[ d12\_1 = \mathbf w_{2} \cdot \mathbf e_{12} \]&lt;/p&gt;
-
-&lt;p&gt;\( a_{1} 、 a_{2} \) 就可以表示成:&lt;/p&gt;
-
-&lt;p&gt;\[ a_1 = \frac { d12\_1 } { d12\_2  + d12\_1 } \]&lt;/p&gt;
-
-&lt;p&gt;\[ a_2 = \frac { d12\_2 } { d12\_2 + d12\_1 } \]&lt;/p&gt;
-
-&lt;p&gt;因为\( a_1 、a_2 \)之和等于1，所以\( a_1 、a_2 \)不可能同时小于0，可列出所有情况：&lt;/p&gt;
-
-&lt;p&gt;\(a_1 、a_2  \)都大于0时，p点在线段w1w2里面；&lt;/p&gt;
-
-&lt;p&gt;\(a_1 \) 小于0时，p在w2区域里面；&lt;/p&gt;
-
-&lt;p&gt;\(a_2 \) 小于0时，p在w1区域里面。&lt;/p&gt;
-
-&lt;p&gt;（后面2个，不好解释，最好自己画图理解下）&lt;/p&gt;
-
-&lt;p&gt;这里可能会有个担忧：如果d12_1、d12_2都小于0的话，分母会小于0，结果会如何？&lt;/p&gt;
-
-&lt;p&gt;实际上是不可能的，可以反证下：&lt;/p&gt;
-
-&lt;p&gt;\[ d12\_2 + d12\_1 &amp;lt; 0 \]&lt;/p&gt;
-
-&lt;p&gt;\[ -\mathbf w_{1} \cdot \mathbf e_{12} +  \mathbf w_{2} \cdot \mathbf e_{12}  &amp;lt; 0 \]&lt;/p&gt;
-
-&lt;p&gt;\[ ( \mathbf w_{2} - \mathbf w_{1} ) \cdot \mathbf e_{12}  &amp;lt; 0 \]&lt;/p&gt;
-
-&lt;p&gt;\[ \mathbf e_{12} \cdot \mathbf e_{12}  &amp;lt; 0 \]&lt;/p&gt;
-
-&lt;p&gt;\[ | \mathbf e_{12} |^{2} &amp;lt; 0 \]&lt;/p&gt;
-
-&lt;p&gt;显然不成立。&lt;/p&gt;
-
-&lt;p&gt;下面展示的Box2D的Solve2，就用到了说到的这些数学知识。其中，Solve2用d12_2、d12_1的正负来等价表示\( a_1 、a_2 \)的正负。&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Simplex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// w1 region&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// 根据上面的公式，可知此时a2也是&amp;lt;=0&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// 所以p在w1区域&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// 保留w1，干掉w2，单纯形退化成0-simplex&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// w2 region&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// p在w2区域，那么保留w2，干掉w1，单纯形退化成0-simplex&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// p在w2区域&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 保留下来的顶点需要放到数组第一个位置&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// p必然在w1w2中间了，求出a1、a2，并分别保存进m_v1 m_v2里&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;&lt;div id=&quot;3.4&quot;&gt;b2Simplex::Solve3&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;Solve3大同小异，也是各种找原点在simplex的哪个区域，用一个图来表示：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/11.png&quot; alt=&quot;11.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;如果原点落在w1、w2、w3区域，会导致simplex退化成0-simplex；&lt;/p&gt;
-
-&lt;p&gt;如果原点落在e12、e13、e23区域，会导致simplex退化成1-simplex；&lt;/p&gt;
-
-&lt;p&gt;否则，原点必然落在三角形内部，simplex仍然是2-simplex。&lt;/p&gt;
-
-&lt;p&gt;还有就是，因为现在有3个顶点了，质心坐标公式会需要3个参数\( a_1 、a_2 、a_3\)。可以参考Solve2小节的方法，解出3个参数。&lt;/p&gt;
-
-&lt;p&gt;（有空再更新解法）&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Simplex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solve3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1e12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2e12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e13&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1e13&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3e13&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3e13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1e13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e23&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2e23&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e23&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3e23&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e23&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3e23&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2e23&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 这里的n123、d123_1、d123_2、d123_3都和质心坐标公式有关&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// Triangle123&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n123&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n123&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n123&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n123&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Cross&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// w1 region&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// e12&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d12_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// e13&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d13_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d13&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d13_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d13_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// w2 region&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d12_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// w3 region&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d13_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// e23&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d23_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d23&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d23_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d23&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d23_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d23&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// Must be in triangle123&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d123&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d123_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_v1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d123&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_v2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d123&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_v3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d123_3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inv_d123&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;&lt;div id=&quot;3.5&quot;&gt;b2DistanceProxy::GetSupport&lt;/div&gt;&lt;/h2&gt;
-
-&lt;p&gt;b2DistanceProxy的GetSupport和上面章节给出的support伪代码，几乎是一样的：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c++&quot; data-lang=&quot;c++&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;inline&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2DistanceProxy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetSupport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Vec2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bestIndex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bestValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2Dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bestValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bestIndex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bestValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bestIndex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h1&gt;&lt;div id=&quot;4&quot;&gt;GJK的其他细节&lt;/div&gt;&lt;/h1&gt;
-
-&lt;h2&gt;2D/3D泛化实现&lt;/h2&gt;
-
-&lt;p&gt;虽然说GJK原理没有对维度有什么限制，但2D版本的GJK代码还是很难直接泛化成2D+3D的。因为其中有一些细节，很难用维数参数化。具体有什么坑，等我踩一遍再回来更新。&lt;/p&gt;
-
-&lt;h2&gt;几何体的定义：连续or离散&lt;/h2&gt;
-
-&lt;p&gt;从GJK用到的数学知识来看，GJK并不要求输入的2个几何体必须是离散顶点定义的几何体。&lt;/p&gt;
-
-&lt;p&gt;所以GJK的一个优点是，GJK是支持非离散几何体的碰撞检测的，例如参数方程\(x^{2} + y^{2} = r^{2} \)定义的圆，或者样条曲线、NURBS曲线定义的曲面几何体。&lt;/p&gt;
-
-&lt;p&gt;至于如何抽象，切入点就是GJK的support函数。只有support函数使用到了输入参数Shape p和q，所以，可以针对非离散Shape设计特殊的support函数，从而泛化GJK算法。&lt;/p&gt;
-
-&lt;h2&gt;GJK的时间复杂度问题&lt;/h2&gt;
-
-&lt;p&gt;GJK中的方向向量\(d\)，\(d\)如何选取，基本就决定了GJK的收敛速度。&lt;/p&gt;
-
-&lt;h1&gt;&lt;div id=&quot;5&quot;&gt;参考资料&lt;/div&gt;&lt;/h1&gt;
-
-&lt;h2&gt;文字资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm&quot;&gt;Gilbert–Johnson–Keerthi distance algorithm&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;file:///Users/wyman/Downloads/Tomiczkova.pdf&quot;&gt;Algorithms for the computation of the
-Minkowski difference&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.dyn4j.org/2010/04/gjk-gilbert-johnson-keerthi/&quot;&gt;http://www.dyn4j.org/2010/04/gjk-gilbert-johnson-keerthi/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.haroldserrano.com/blog/visualizing-the-gjk-collision-algorithm&quot;&gt;Visualizing the GJK Collision detection algorithm&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;PPT：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://slideplayer.com/slide/689954/&quot;&gt;http://slideplayer.com/slide/689954/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2&gt;Youtube视频资料&lt;/h2&gt;
-
-&lt;p&gt;1个小时的课程：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://caseymuratori.com/blog_0003&quot;&gt;https://caseymuratori.com/blog_0003&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1&gt;&lt;div id=&quot;5.1&quot;&gt;GJK各种实现&lt;/div&gt;&lt;/h1&gt;
-
-&lt;p&gt;(Warning: 如果不能先参透GJK的原理，看下面这些代码的时候是非常折磨人的)&lt;/p&gt;
-
-&lt;h2&gt;2D&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;一份来自2000年左右的代码，巨复杂，阅读起来很有心理障碍：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.cs.ox.ac.uk/people/stephen.cameron/distances/&quot;&gt;Computing the Distance between Objects&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.cs.ox.ac.uk/people/stephen.cameron/distances/gjk2.4/&quot;&gt;http://www.cs.ox.ac.uk/people/stephen.cameron/distances/gjk2.4/&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Box2D：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/erincatto/Box2D/blob/master/Box2D/Box2D/Collision/b2Distance.cpp&quot;&gt;https://github.com/erincatto/Box2D/blob/master/Box2D/Box2D/Collision/b2Distance.cpp&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;gjk.c，200多行纯C代码实现GJK：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/kroitor/gjk.c&quot;&gt;https://github.com/kroitor/gjk.c&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;dyn4j，一个java写的物理引擎：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/dyn4j/dyn4j/blob/master/src/main/java/org/dyn4j/collision/narrowphase/Gjk.java&quot;&gt;https://github.com/dyn4j/dyn4j/blob/master/src/main/java/org/dyn4j/collision/narrowphase/Gjk.java&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;js实现，这个自带演示程序，很厉害：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/juhl/collision-detection-2d&quot;&gt;https://github.com/juhl/collision-detection-2d&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2&gt;3D&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Bullet，重量级引擎，全局搜btGjkPairDetector可找到GJK代码&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/bulletphysics/bullet3&quot;&gt;https://github.com/bulletphysics/bullet3&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;reactphysics3d，非产品级的轻量物理引擎，适合学习用：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/DanielChappuis/reactphysics3d&quot;&gt;https://github.com/DanielChappuis/reactphysics3d&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Tue, 20 Mar 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/collision-detection-2/</link>
-        <guid isPermaLink="true">http://localhost:4000/collision-detection-2/</guid>
-      </item>
-    
-      <item>
-        <title>Canvas的transform函数与2D仿射变换矩阵分解</title>
-        <description>&lt;p&gt;最近偶然接触了一下canvas的2D仿射变换。和3D一样，canvas有scale、translate、rotate操作，本质上这3个函数也是矩阵乘法。&lt;/p&gt;
-
-&lt;p&gt;canvas应该内置了一套矩阵运算系统，并且canvas内含有一个仿射变换矩阵（大概认为是3x3=9个浮点数变量即可，2D是3x3矩阵，3D是4x4矩阵）。每次调用scale、translate、rotate就是对这个矩阵做矩阵乘法。&lt;/p&gt;
-
-&lt;p&gt;另外还有3个函数可以控制canvas的仿射变换：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;resetTransform 重置为单位矩阵&lt;/li&gt;
-&lt;li&gt;transform(a,b,c,d,e,f) 以a,b,c,d,e,f构造一个仿射变换矩阵并乘到当前canvas的仿射变换矩阵&lt;/li&gt;
-&lt;li&gt;setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;我遇到的需求是，&lt;strong&gt;如果canvas没有提供transform函数，怎么用scale、translate、rotate三个函数的组合，来模拟transform函数？&lt;/strong&gt;&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;自定义的transform函数实现&lt;/h2&gt;
-
-&lt;p&gt;先抛出答案：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;180&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;45&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 旋转度数&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// x 轴缩放倍数&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// y 轴缩放倍数&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;180&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 斜切度数 &lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// x轴平移&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ty&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// y轴平移&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;args&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;tx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;transform&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;angle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;atan2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;denom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;skewX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;atan2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;denom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;skewY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;angle&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;angle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;180&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;skewX&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;skewX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;scale&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;translate&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    Outout:&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    angle 45&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    skewX 0&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    scale 0.5 2&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    translate 200 100&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    */&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;translate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;translateX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;translateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rotate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;angle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scaleX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scaleY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;canvas&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;test2&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;canvas&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getContext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;2d&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fillRect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;font&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;30px Verdana&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fillText&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;Hello, World&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;90&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;上面代码大意是，用户输入任意degree，sx， sy，t，tx，ty，并计算出它们的a,b,c,d,e,f，然后调用这个自定义transform函数，就能得到和内置的transform一样的变换效果。&lt;/p&gt;
-
-&lt;p&gt;下面将逐步讲解transform函数怎么得来。&lt;/p&gt;
-
-&lt;h2&gt;2D仿射变换矩阵的分解&lt;/h2&gt;
-
-&lt;p&gt;transform的参数a, b, c, d, e, f组成了一个3x3仿射变换矩阵A：&lt;/p&gt;
-
-&lt;p&gt;\( A =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;e\\ b&amp;amp;d&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;设有2维向量\(\mathbf p=(x, y, 1)\)，让它左乘A，就会得到经过A变换后的向量\(\mathbf p&amp;#39;=(x&amp;#39;, y&amp;#39;, 1)\)。&lt;/p&gt;
-
-&lt;p&gt;\( \mathbf p =  \left[ \begin{matrix} x\\ y\\ 1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;\( \mathbf p&amp;#39; = A\mathbf p  =  \left[ \begin{matrix} x&amp;#39;\\ y&amp;#39;\\ 1\\ \end{matrix} \right] =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;e\\ b&amp;amp;d&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} x\\ y\\ 1\\ \end{matrix} \right] =  \left[ \begin{matrix} ax+cy+e\\ bx+dy+f\\ 1\\ \end{matrix} \right] \)&lt;/p&gt;
-
-&lt;p&gt;现在问题是，怎么把A分解成T(translate)、R(rotate)、S(scale)三个矩阵。&lt;/p&gt;
-
-&lt;h3&gt;提取T&lt;/h3&gt;
-
-&lt;p&gt;首先先把translate矩阵提取出来：&lt;/p&gt;
-
-&lt;p&gt;\( T =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;e\\ 0&amp;amp;1&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;显然这是正确的，可以试一下：&lt;/p&gt;
-
-&lt;p&gt;\( \mathbf p&amp;#39; = T\mathbf p =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;e\\ 0&amp;amp;1&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} x\\ y\\ 1\\ \end{matrix} \right] =  \left[ \begin{matrix} x+e\\ y+f\\ 1\\ \end{matrix} \right] \)&lt;/p&gt;
-
-&lt;p&gt;x偏移了e，y偏移了f。&lt;/p&gt;
-
-&lt;p&gt;再设等式：A = TQ。Q是未知矩阵，且Q包含了scale、rotate变换。&lt;/p&gt;
-
-&lt;p&gt;Q可以用参数a, b, c, d, e, f表示：&lt;/p&gt;
-
-&lt;p&gt;\( Q =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;0\\ b&amp;amp;d&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;验证下：&lt;/p&gt;
-
-&lt;p&gt;\( TQ =  \left[ \begin{matrix} 1&amp;amp;0&amp;amp;e\\ 0&amp;amp;1&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} a&amp;amp;c&amp;amp;0\\ b&amp;amp;d&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] \)&lt;/p&gt;
-
-&lt;p&gt;\( =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;e\\ b&amp;amp;d&amp;amp;f\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right] = A \)&lt;/p&gt;
-
-&lt;h3&gt;分解Q&lt;/h3&gt;
-
-&lt;p&gt;设 Q = RS，S是scale，R是rotate。2D的R、S矩阵分别为：&lt;/p&gt;
-
-&lt;p&gt;\( R =  \left[ \begin{matrix} cosθ&amp;amp; -sinθ&amp;amp; 0\\  sinθ&amp;amp; cosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;\( S =  \left[ \begin{matrix} x&amp;amp; 0&amp;amp; 0\\  0&amp;amp; y&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;其实，Q还可能包含了shear斜切变换。一般来说斜切是比较少见到的一种变换，且canvas并没有单独的shear函数。所以本文开头的目标，自定义custom，怎么弄都不能实现shear变换（只有scale、translate、rotate可用）。&lt;/p&gt;
-
-&lt;p&gt;现在要分解Q，可以把shear也一并考虑。shear矩阵形式如下；&lt;/p&gt;
-
-&lt;p&gt;\( Shear =  \left[ \begin{matrix} 1&amp;amp; s&amp;amp; 0\\  t&amp;amp; 1&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;如果没有shear变换，那么s=t=0。&lt;/p&gt;
-
-&lt;p&gt;同时用s和t是不对的，其中一个必需为0。下面推导的前提是s != 0，t = 0。&lt;/p&gt;
-
-&lt;p&gt;综上，得到Q&amp;#39; = Rotate * Scale * Shear&lt;/p&gt;
-
-&lt;p&gt;\( Q&amp;#39; = \left[ \begin{matrix} cosθ&amp;amp; -sinθ&amp;amp; 0\\  sinθ&amp;amp; cosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \left[ \begin{matrix} x&amp;amp; 0&amp;amp; 0\\  0&amp;amp; y&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \left[ \begin{matrix} 1&amp;amp; s&amp;amp; 0\\  t&amp;amp; 1&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]   \)&lt;/p&gt;
-
-&lt;p&gt;\( =   \left[ \begin{matrix} xcosθ&amp;amp; -ysinθ&amp;amp; 0\\  xsinθ&amp;amp; ycosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]   \left[ \begin{matrix} 1&amp;amp; s&amp;amp; 0\\  t&amp;amp; 1&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right] \)&lt;/p&gt;
-
-&lt;p&gt;\( =  \left[ \begin{matrix} xcosθ - tysinθ&amp;amp; sxcosθ - ysinθ&amp;amp; 0\\  xsinθ + tycosθ&amp;amp; sxsinθ + ycosθ&amp;amp; 0\\  0&amp;amp; 0&amp;amp; 1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;再回顾上一小节的Q：&lt;/p&gt;
-
-&lt;p&gt;\( Q =  \left[ \begin{matrix} a&amp;amp;c&amp;amp;0\\ b&amp;amp;d&amp;amp;0\\ 0&amp;amp;0&amp;amp;1\\ \end{matrix} \right]  \)&lt;/p&gt;
-
-&lt;p&gt;对比Q和Q&amp;#39;，可以得到方程组：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;\( a =  x cosθ - t y sinθ = x cosθ  \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( b = x sinθ + t y cosθ = x sinθ  \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( c = s x cosθ - y sinθ = sa - y sinθ = sa - y(b/x) \)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;\( d = s x sinθ + y cosθ = sb + y cosθ = sb + y(a/x) \)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;看起来有点乱，慢慢拆解下吧:&lt;/p&gt;
-
-&lt;p&gt;一二等式相除解出θ：&lt;/p&gt;
-
-&lt;p&gt;\( tanθ = \frac { b } { a } \)&lt;/p&gt;
-
-&lt;p&gt;\( θ = atan2(b, a) \)&lt;/p&gt;
-
-&lt;p&gt;一二等式分别平方后相加，解出x：&lt;/p&gt;
-
-&lt;p&gt;\( a^{2} + b^{2} = x^{2} \)&lt;/p&gt;
-
-&lt;p&gt;\( x = \sqrt { a^{2} + b^{2} } \)&lt;/p&gt;
-
-&lt;p&gt;三四等式消去s：&lt;/p&gt;
-
-&lt;p&gt;\( c = sa - y(b/x) \)&lt;/p&gt;
-
-&lt;p&gt;\( s = (c + y(b/x))/a \)&lt;/p&gt;
-
-&lt;p&gt;\( d = sb + y(a/x) =  b(c + y(b/x))/a + y(a/x)  \)&lt;/p&gt;
-
-&lt;p&gt;对上式两边乘a：&lt;/p&gt;
-
-&lt;p&gt;\( ad =  b(c + y(b/x)) + ay(a/x)  \)&lt;/p&gt;
-
-&lt;p&gt;\( ad =  bc + by(b/x) + ay(a/x)  \)&lt;/p&gt;
-
-&lt;p&gt;\( ad -  bc = by(b/x) + ay(a/x)  \)&lt;/p&gt;
-
-&lt;p&gt;\( ad -  bc = y(b^{2}/x + a^{2}/x)  \)&lt;/p&gt;
-
-&lt;p&gt;\( ad -  bc = y(a^{2} + b^{2})/ \sqrt { a^{2} + b^{2} }    \)&lt;/p&gt;
-
-&lt;p&gt;\( ad -  bc = y \sqrt { a^{2} + b^{2} }    \)&lt;/p&gt;
-
-&lt;p&gt;\( y = \frac { ad -  bc } {  \sqrt { a^{2} + b^{2} }  } \)&lt;/p&gt;
-
-&lt;p&gt;然后可以求s了：&lt;/p&gt;
-
-&lt;p&gt;\( s = (c + y(b/x))/a \)&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { c } { a } + \frac { yb } { xa } \)&lt;/p&gt;
-
-&lt;p&gt;y/x上面已经有了，代入：&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { c } { a } + \frac { (ad -  bc)b } { (a^{2} + b^{2})a } \)&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { c(a^{2} + b^{2}) + (ad -  bc)b } { (a^{2} + b^{2})a } \)&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { ca^{2} + cb^{2} + adb -  cb^{2} } { (a^{2} + b^{2})a } \)&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { ca^{2} + adb } { (a^{2} + b^{2})a } \)&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { a(ca + bd) } { (a^{2} + b^{2})a } \)&lt;/p&gt;
-
-&lt;p&gt;\( s = \frac { ca + bd } { a^{2} + b^{2} } \)&lt;/p&gt;
-
-&lt;p&gt;逆向思维一下，现在已经求出未知数x,y,sx,sy,s,θ，它们都可以用a,b,c,d,e,f来表示。&lt;/p&gt;
-
-&lt;p&gt;那么反过来，用户自己提供了x,y,sx,sy,s,θ，那么就可以求出a,b,c,d,e,f，从而调用这个自定义函数。&lt;/p&gt;
-
-&lt;p&gt;回去上面再比对下代码和公式就清楚了。&lt;/p&gt;
-
-&lt;h2&gt;总结&lt;/h2&gt;
-
-&lt;p&gt;用这个自定义函数就能几乎满足需求了。只不过这个自定义函数是不能实现斜切效果的，&lt;/p&gt;
-
-&lt;p&gt;对于符合标准的web js，一般是用transform函数来做斜切，TRS就分别用translate、rotate、scale函数来做。&lt;/p&gt;
-
-&lt;p&gt;如果canvas再提供一个单独的skew函数就完美了。&lt;/p&gt;
-
-&lt;h2&gt;参考资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/5107134/find-the-rotation-and-skew-of-a-matrix-transformation/32125700#32125700&quot;&gt;stackoverflow - Find the Rotation and Skew of a Matrix transformation
-&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/matthewmueller/unmatrix/blob/master/index.js&quot;&gt;unmatrix - parse(str) &lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://hg.mozilla.org/mozilla-central/file/7cb3e9795d04/layout/style/nsStyleAnimation.cpp&quot;&gt;DecomposeMatrix 此代码最原始出处（有注释）&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;《GRAPHICS GEMS II edited by JAMES ARVO》&lt;/p&gt;
-</description>
-        <pubDate>Wed, 07 Feb 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/linear-algebra-20/</link>
-        <guid isPermaLink="true">http://localhost:4000/linear-algebra-20/</guid>
       </item>
     
   </channel>
