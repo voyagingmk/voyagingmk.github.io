@@ -240,7 +240,7 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 
 <p>在说master key时，需要搞清楚pre-master key和master key分别是什么，有什么区别：</p>
 
-<p>pre-master key：是服务器和客户端<strong>直接协商</strong>出来的产物（key exchange）。例如用DH或ECDH密钥协商算法算出来的东西。唯一要提的点是，pre-master key是<strong>不定长</strong>的，取决于选择了什么样的密钥协商算法，一般算法越强，长度越长。</p>
+<p>pre-master key：是服务器和客户端<strong>直接协商</strong>出来的产物（key exchange）。例如用ECDH密钥协商算法算出来的东西。唯一要提的点是，pre-master key是<strong>不定长</strong>的，取决于选择了什么样的密钥协商算法，一般算法越强，长度越长。</p>
 
 <p>master key：正因为pre-master key不定长的问题，导致出现了master key这个东西，master key是<strong>定长</strong>的。master key从pre-master key派生，是它的亲儿子。</p>
 
@@ -255,6 +255,8 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
                           <span class="p">[</span><span class="mf">0..47</span><span class="p">];</span>
 </code></pre></div>
 <p>PRF（Pseudo-random function），是<strong>伪随机导出函数</strong>。这段代码意思是，根据pre-master key、nonce_client、nonce_server三个参数，伪随机地，导出了一个master key，定长48字节。</p>
+
+<p>PRF的简单实现是hash(key || msg)或hash(msg || key)或hash(key || msg || key)，三种情况的问题不太一样，但都是naive的，例如可能会遇到<a href="https://en.wikipedia.org/wiki/Length_extension_attack">Length extension attack</a>。严格的PRF实现是HKDF，下篇文章再介绍。</p>
 
 <p>RFC里补充说，一旦得到了master key，即可从内存干掉pre-master key。对待生父是如此的残忍啊，不过也是必要的，免得给恶意程序可乘之机。（nonce_client、nonce_server并不能删除，之后还要用到）</p>
 
@@ -331,19 +333,18 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 
 <p>这个问题很有意思，因为我们的加密通讯已经建立了，认证机制也有了。<strong>这时候反而可以回过头来认证下算法选取过程</strong>。</p>
 
-<p>客户端和服务器在tcp三次握手后直到建立SSL连接，中间n次交流的内容（有对称性），都记录下来，然后在连接建立完成后，互相在本地对这些内容做一次HMAC计算，并MAC值发给对方校验，如果不一致，说明有中间人篡改了某次交流，那么关闭本次连接。</p>
+<p>客户端和服务器在tcp三次握手后直到建立SSL连接，中间n次交流的内容（有对称性），都记录下来，然后在连接建立完成后，互相在本地对这些内容做一次HMAC计算，并把MAC值发给对方校验，如果不一致，说明有中间人篡改了某次交流，那么关闭本次连接。</p>
 
 <h2>六，加密算法选取</h2>
 
-<p>上面的五大步骤，其实都没有谈到具体用什么算法。据我了解，如果不用openSSL之类的库，而是自己手动组合，那么可以这么弄：</p>
+<p>上面的五大步骤，其实都没有限定具体用什么算法。据我了解，如果不用openSSL之类的库，而是自己手动组合，那么可以这么弄：</p>
 
 <ul>
-<li>非对称加密：RSA 或 ECC</li>
 <li>master key：ECDH</li>
 <li>对称加密：AES</li>
-<li>encrypt key：SHA256</li>
-<li>integrity key：SHA256 with salt</li>
-<li>消息验证码生成函数：HMAC with integrity key</li>
+<li>生成encrypt key：SHA256</li>
+<li>生成integrity key：SHA256 with salt</li>
+<li>生成消息验证码：HMAC with integrity key</li>
 </ul>
 
 <p>这对程序员的要求比较高，需要了解各种算法的优缺点和如何组合，是否适合配对。</p>
@@ -373,9 +374,9 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 <p>所以撇除掉融合到加密算法里的MAC，那么CipherSuite其实只有3个东西：</p>
 
 <ul>
-<li>1个authentication 认证算法</li>
-<li>1个encryption 加密算法</li>
 <li>1个key exchange 密钥交换算法</li>
+<li>1个authentication 认证算法</li>
+<li>1个encryption 对称加密算法</li>
 </ul>
 
 <p>引入CipherSuite，说明算法的选取不是完全定死的，而是可以根据需要协商的。</p>
@@ -420,6 +421,31 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 </ol>
 
 <p>这简直就是性能和安全的博弈。google的QUIC就很好地实现了0-rtt。</p>
+
+<h1>微信mmtls对比</h1>
+
+<p><a href="http://www.52im.net/thread-310-1-1.html">mmtls介绍</a></p>
+
+<p>mmtls是微信自己设计的&quot;TLS1.3&quot;协议。</p>
+
+<p>mmtls分为3个部分：</p>
+
+<ul>
+<li>handshake协议：tcp连接建立后的密钥协商。</li>
+<li>alert协议：handshake失败时需要显式告诉对端。微信是服务端告诉客户端，让客户端来关闭连接，避免服务端过多的TIME_WAIT状态。</li>
+<li>record协议：负责上层数据的加密传输</li>
+</ul>
+
+<p>算法组成：ECDH + ECDSA + AES-GCM（AEAD）</p>
+
+<p>几个关键点：</p>
+
+<ul>
+<li>去掉了CA公钥证书这个环节，取而代之的是把认证公钥（verify_key）直接嵌入到客户端里，只要保证客户端来自官方渠道，就保证了verify_key不是中间人伪造的。</li>
+<li>把verify_key固定在客户端后，如果认证私钥（sign_key）泄露，怎么撤掉verify_key。方法是强制更新客户端，同时服务端加强对认证私钥的存放管理，怎么管理原文没有细说。</li>
+</ul>
+
+<p>mmtls是对TLS1.3草案的精简，觉得与其分析mmtls还不如先好好看一遍TLS1.3，而且openSSL1.1.1已经发布了，支持TLS1.3。</p>
 
 <h1>参考资料</h1>
 
