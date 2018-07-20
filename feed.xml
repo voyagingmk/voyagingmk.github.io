@@ -2277,32 +2277,127 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
       </item>
     
       <item>
-        <title>漫谈网络通讯加密（1）算法基础</title>
+        <title>漫谈网络通讯加密（1）加密学算法之DH</title>
         <description>&lt;!--more--&gt;
 
-&lt;h1&gt;常见加密算法&lt;/h1&gt;
+&lt;h1&gt;DH算法&lt;/h1&gt;
 
-&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/RSA_(cryptosystem)&quot;&gt;RSA&lt;/a&gt; （Rivest–Shamir–Adleman)（1977年）&lt;/h2&gt;
+&lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;
 
-&lt;p&gt;基于大数（1024bits以上)的质因数分解问题。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Alice和Bob首先线下商量好，使用&lt;strong&gt;p (prime, 质数) = 23、g (generator, 生成器) = 5&lt;/strong&gt;作为通讯基础（p和g不需要绝对的保密，泄露了也没事）&lt;/li&gt;
+&lt;li&gt;每次Alice和Bob想要建立通讯(连接)时，Alice自己随机生成一个在范围[1, p - 1]的数：a = 6&lt;/li&gt;
+&lt;li&gt;同样，Bob自己也随机一个：b = 15&lt;/li&gt;
+&lt;li&gt;Alice计算： \( A =  g^{a}  \% p =  5^{6}  \% 23 =  15625 \% 23 = 8 \)，把A发给Bob&lt;/li&gt;
+&lt;li&gt;Bob计算： \( B =  g^{b}  \% p =  5^{15}  \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice&lt;/li&gt;
+&lt;li&gt;Alice收到B后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Alice} =  B^{a}  \% p =  19^{6}  \% 23 = 47045881 \% 23 = 2 \)&lt;/li&gt;
+&lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} =  A^{b}  \% p =  8^{15}  \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
+&lt;/ol&gt;
 
-&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_cryptography&quot;&gt;ECC&lt;/a&gt;（Elliptic-curve cryptography） （1985年）&lt;/h2&gt;
+&lt;h2&gt;数学原理&lt;/h2&gt;
 
-&lt;p&gt;基于在椭圆曲线上的离散对数的求取问题。&lt;/p&gt;
+&lt;p&gt;其中，用到了&lt;strong&gt;模幂运算&lt;/strong&gt;的基本定理，对于任意自然数a、b、n，有：&lt;/p&gt;
 
-&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Advanced_Encryption_Standard&quot;&gt;AES（Rijndael）&lt;/a&gt; （2001年）&lt;/h2&gt;
+&lt;p&gt;\[ ab\  \%\  n =  ( ab\ \%\  n) \  \%\  n =  ( (a\ \%\  n)  (b\ \%\  n) ) \ \%\  n \]&lt;/p&gt;
 
-&lt;p&gt;AES的意思是高级加密标准（Advanced Encryption Standard），使用的算法是Rijndael，Rijndael是当时加密算法竞赛的top 1。&lt;/p&gt;
+&lt;p&gt;应用到幂运算：&lt;/p&gt;
 
-&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange&quot;&gt;DH&lt;/a&gt;（Diffie-Hellman key exchange）（1976年）&lt;/h2&gt;
+&lt;p&gt;\[ a^{b}\  \%\  n =  ( a \cdots  a ) \  \%\  n =  ( (a\ \%\  n) \cdots  (a\ \%\  n) ) \  \%\  n =  ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n \]&lt;/p&gt;
 
-&lt;p&gt;密钥交换算法。&lt;/p&gt;
+&lt;p&gt;\[ a^{b}\  \%\  n =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
 
-&lt;p&gt;基于离散对数问题。&lt;/p&gt;
+&lt;p&gt;观察这2个式子最右边，发现b的位置是可以移动的：&lt;/p&gt;
 
-&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman&quot;&gt;ECDH&lt;/a&gt; (21世纪)&lt;/h2&gt;
+&lt;p&gt;\[ ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n  =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
 
-&lt;p&gt;DH标准算法的变种，是基于椭圆曲线算法的DH密钥交换算法。&lt;/p&gt;
+&lt;p&gt;套进上一节的例子里的推导公式，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{Alice} = B^{a} \% p = (\  (\  g^{b} \% p\  ) ^{a}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
+
+&lt;p&gt;同理：&lt;/p&gt;
+
+&lt;p&gt;\[ s_{Bob} = A^{b} \% p = (\  (\  g^{a}  \% p\  ) ^{b}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p  =  \ g ^{ab} \% p \]&lt;/p&gt;
+
+&lt;p&gt;显然有：&lt;/p&gt;
+
+&lt;p&gt;\[  s_{Alice} = s_{Bob}  \]&lt;/p&gt;
+
+&lt;p&gt;这样就协商出了对称的密钥，密钥实质等于：&lt;/p&gt;
+
+&lt;p&gt;\[ g ^{ab} \% p \]&lt;/p&gt;
+
+&lt;p&gt;其中，g、p可公开、a、b保密。&lt;/p&gt;
+
+&lt;h2&gt;为什么可行&lt;/h2&gt;
+
+&lt;p&gt;从攻击者角度看，攻击者最多只能获得以下信息：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;p：23&lt;/li&gt;
+&lt;li&gt;g：5&lt;/li&gt;
+&lt;li&gt;A：8&lt;/li&gt;
+&lt;li&gt;B：19&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;攻击者目标是获得s（serect）。要计算s，就是算2条式子：&lt;/p&gt;
+
+&lt;p&gt;\[ s = ( B^{a} ) \% p \]&lt;/p&gt;
+
+&lt;p&gt;\[ s = ( A^{b} ) \% p \]&lt;/p&gt;
+
+&lt;p&gt;显然，攻击者只需要破解出a或b，就能得到s。&lt;/p&gt;
+
+&lt;p&gt;又因为有：&lt;/p&gt;
+
+&lt;p&gt;\[ A = ( g^{a} ) \% p \]&lt;/p&gt;
+
+&lt;p&gt;\[ B = ( g^{b} ) \% p \]&lt;/p&gt;
+
+&lt;p&gt;所以破解a或b的方法是：&lt;/p&gt;
+
+&lt;p&gt;\[ a = log_{g}^{A} \% p \]&lt;/p&gt;
+
+&lt;p&gt;\[ b = log_{g}^{B} \% p \]&lt;/p&gt;
+
+&lt;p&gt;这看似很简单的算术（对数运算和取模运算），其实是很难算的。目前为止没有找到一个快速计算对数的算法。&lt;/p&gt;
+
+&lt;p&gt;关键在于&lt;strong&gt;p这个素数要足够大&lt;/strong&gt;，那么以现在的计算机计算速度，就很难通过A（或B）、g、p这3个参数算出a，这被称为&lt;a href=&quot;https://en.wikipedia.org/wiki/Discrete_logarithm&quot;&gt;离散对数难题&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;这里需要注意，难的是&lt;strong&gt;离散对数&lt;/strong&gt;，即有log和mod运算并且参数是整数；若单单只有log运算，是不难的。&lt;/p&gt;
+
+&lt;h2&gt;p、g的选取问题&lt;/h2&gt;
+
+&lt;p&gt;涉及到了一些数论的概念：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Greatest_common_divisor&quot;&gt;最大公约数gcd&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Multiplicative_order&quot;&gt;数论阶&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Primitive_root_modulo_n&quot;&gt;原根&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;首先明确下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;p必须是素数，且必须是大数(1024-2048bits)，算法才安全&lt;/li&gt;
+&lt;li&gt;g不需要是素数，且不需要很大&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;p、g不需要自己挑选，可以直接用&lt;a href=&quot;https://tools.ietf.org/html/rfc5114&quot;&gt;rfc5114&lt;/a&gt;给定的值。&lt;/p&gt;
+
+&lt;p&gt;例如&lt;a href=&quot;https://tools.ietf.org/html/rfc5114#section-2.1&quot;&gt;1024-bit MODP Group with 160-bit Prime Order Subgroup&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;再讲下去就是深入密码学、数论了，按住不表。&lt;/p&gt;
+</description>
+        <pubDate>Thu, 05 Apr 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/crypto-1-dh/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-1-dh/</guid>
+      </item>
+    
+      <item>
+        <title>漫谈网络通讯加密（1）加密学算法之ECC</title>
+        <description>&lt;!--more--&gt;
 
 &lt;h1&gt;ECC算法&lt;/h1&gt;
 
@@ -2713,674 +2808,10 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;\[ -R = (3.89, 5.61)，R = (3.89, -5.61) \]&lt;/p&gt;
 
 &lt;p&gt;和图片里的数值一样。&lt;/p&gt;
-
-&lt;h1&gt;DH算法&lt;/h1&gt;
-
-&lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Alice和Bob首先线下商量好，使用&lt;strong&gt;p (prime, 质数) = 23、g (generator, 生成器) = 5&lt;/strong&gt;作为通讯基础（p和g不需要绝对的保密，泄露了也没事）&lt;/li&gt;
-&lt;li&gt;每次Alice和Bob想要建立通讯(连接)时，Alice自己随机生成一个在范围[1, p - 1]的数：a = 6&lt;/li&gt;
-&lt;li&gt;同样，Bob自己也随机一个：b = 15&lt;/li&gt;
-&lt;li&gt;Alice计算： \( A =  g^{a}  \% p =  5^{6}  \% 23 =  15625 \% 23 = 8 \)，把A发给Bob&lt;/li&gt;
-&lt;li&gt;Bob计算： \( B =  g^{b}  \% p =  5^{15}  \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice&lt;/li&gt;
-&lt;li&gt;Alice收到B后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Alice} =  B^{a}  \% p =  19^{6}  \% 23 = 47045881 \% 23 = 2 \)&lt;/li&gt;
-&lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} =  A^{b}  \% p =  8^{15}  \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;数学原理&lt;/h2&gt;
-
-&lt;p&gt;其中，用到了&lt;strong&gt;模幂运算&lt;/strong&gt;的基本定理，对于任意自然数a、b、n，有：&lt;/p&gt;
-
-&lt;p&gt;\[ ab\  \%\  n =  ( ab\ \%\  n) \  \%\  n =  ( (a\ \%\  n)  (b\ \%\  n) ) \ \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;应用到幂运算：&lt;/p&gt;
-
-&lt;p&gt;\[ a^{b}\  \%\  n =  ( a \cdots  a ) \  \%\  n =  ( (a\ \%\  n) \cdots  (a\ \%\  n) ) \  \%\  n =  ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;\[ a^{b}\  \%\  n =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;观察这2个式子最右边，发现b的位置是可以移动的：&lt;/p&gt;
-
-&lt;p&gt;\[ ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n  =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;套进上一节的例子里的推导公式，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ s_{Alice} = B^{a} \% p = (\  (\  g^{b} \% p\  ) ^{a}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
-
-&lt;p&gt;同理：&lt;/p&gt;
-
-&lt;p&gt;\[ s_{Bob} = A^{b} \% p = (\  (\  g^{a}  \% p\  ) ^{b}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p  =  \ g ^{ab} \% p \]&lt;/p&gt;
-
-&lt;p&gt;显然有：&lt;/p&gt;
-
-&lt;p&gt;\[  s_{Alice} = s_{Bob}  \]&lt;/p&gt;
-
-&lt;p&gt;这样就协商出了对称的密钥，密钥实质等于：&lt;/p&gt;
-
-&lt;p&gt;\[ g ^{ab} \% p \]&lt;/p&gt;
-
-&lt;p&gt;其中，g、p可公开、a、b保密。&lt;/p&gt;
-
-&lt;h2&gt;为什么可行&lt;/h2&gt;
-
-&lt;p&gt;从攻击者角度看，攻击者最多只能获得以下信息：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;p：23&lt;/li&gt;
-&lt;li&gt;g：5&lt;/li&gt;
-&lt;li&gt;A：8&lt;/li&gt;
-&lt;li&gt;B：19&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;攻击者目标是获得s（serect）。要计算s，就是算2条式子：&lt;/p&gt;
-
-&lt;p&gt;\[ s = ( B^{a} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;\[ s = ( A^{b} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;显然，攻击者只需要破解出a或b，就能得到s。&lt;/p&gt;
-
-&lt;p&gt;又因为有：&lt;/p&gt;
-
-&lt;p&gt;\[ A = ( g^{a} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;\[ B = ( g^{b} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;所以破解a或b的方法是：&lt;/p&gt;
-
-&lt;p&gt;\[ a = log_{g}^{A} \% p \]&lt;/p&gt;
-
-&lt;p&gt;\[ b = log_{g}^{B} \% p \]&lt;/p&gt;
-
-&lt;p&gt;这看似很简单的算术（对数运算和取模运算），其实是很难算的。目前为止没有找到一个快速计算对数的算法。&lt;/p&gt;
-
-&lt;p&gt;关键在于&lt;strong&gt;p这个素数要足够大&lt;/strong&gt;，那么以现在的计算机计算速度，就很难通过A（或B）、g、p这3个参数算出a，这被称为&lt;a href=&quot;https://en.wikipedia.org/wiki/Discrete_logarithm&quot;&gt;离散对数难题&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;这里需要注意，难的是&lt;strong&gt;离散对数&lt;/strong&gt;，即有log和mod运算并且参数是整数；若单单只有log运算，是不难的。&lt;/p&gt;
-
-&lt;h2&gt;p、g的选取问题&lt;/h2&gt;
-
-&lt;p&gt;涉及到了一些数论的概念：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Greatest_common_divisor&quot;&gt;最大公约数gcd&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Multiplicative_order&quot;&gt;数论阶&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Primitive_root_modulo_n&quot;&gt;原根&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;首先明确下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;p必须是素数，且必须是大数(1024-2048bits)，算法才安全&lt;/li&gt;
-&lt;li&gt;g不需要是素数，且不需要很大&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;p、g不需要自己挑选，可以直接用&lt;a href=&quot;https://tools.ietf.org/html/rfc5114&quot;&gt;rfc5114&lt;/a&gt;给定的值。&lt;/p&gt;
-
-&lt;p&gt;例如&lt;a href=&quot;https://tools.ietf.org/html/rfc5114#section-2.1&quot;&gt;1024-bit MODP Group with 160-bit Prime Order Subgroup&lt;/a&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.4/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;再讲下去就是深入密码学、数论了，按住不表。&lt;/p&gt;
-
-&lt;h1&gt;分组加密算法的模式&lt;/h1&gt;
-
-&lt;p&gt;分组加密算法，都需要考虑wrap模式（【Block Cipher Modes（&lt;a href=&quot;https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation%EF%BC%89%EF%BC%89%E3%80%82&quot;&gt;https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation））。&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;模式多种多样，也很容易查到介绍资料。选择模式时主要考察几个点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;并发性：
-
-&lt;ul&gt;
-&lt;li&gt;如CTR、GCM计数器模式&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;安全性：
-
-&lt;ul&gt;
-&lt;li&gt;如ECB模式对重复出现的明文分组加密后结果是一样的，容易被猜出&lt;/li&gt;
-&lt;li&gt;如CBC模式，会遇到&lt;a href=&quot;https://en.wikipedia.org/wiki/Padding_oracle_attack&quot;&gt;padding oracle attacks&lt;/a&gt;，这篇写得很详细：&lt;a href=&quot;https://blog.csdn.net/qq_35078631/article/details/78484980&quot;&gt;https://blog.csdn.net/qq_35078631/article/details/78484980&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;完整性(integrity)和可验证性(authenticity)：
-
-&lt;ul&gt;
-&lt;li&gt;其实就是指消息验证码MAC。加了MAC后，解密时，验证MAC，防止密文被篡改（tamper），保持完整。&lt;/li&gt;
-&lt;li&gt;CCM模式，等于CTR加上CBC-MAC，不过做了2重加密，速度慢。&lt;/li&gt;
-&lt;li&gt;OCB，有版权问题据说。&lt;/li&gt;
-&lt;li&gt;GCM，等于CTR加上GHASH。这个是NIST官方标准了，绝对靠谱，性能据说很可以，openssl里面有一堆GASH的汇编代码，硬件级别上也有相应支持。&lt;/li&gt;
-&lt;li&gt;这2个性质不一定要由分组加密完成。也可以外部套一个非对称加密，用数字签名来保证完整性。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;AES各种模式的选择问题，参考:&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb&quot;&gt;https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;此回答近300赞，在stackoverflow上算很多了。&lt;/p&gt;
-
-&lt;p&gt;如果没耐心看，就看作者的最后总结：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;如果数据已经在外部做了非对称加密数字签名以支持验证，那么用CBC即可，否则用GCM&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h1&gt;&lt;strong&gt;完全前向保密&lt;/strong&gt; PFS(Perfect Forward Secrecy)&lt;/h1&gt;
-
-&lt;h2&gt;没有PFS之前：&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;如果攻击者曾经窥探并保存了用户和服务器的加密数据流，且包括被公钥加密的对称密钥&lt;/li&gt;
-&lt;li&gt;如果有一天攻击者通过某种办法获得了服务器私钥&lt;/li&gt;
-&lt;li&gt;攻击者同时拥有了：“用公钥加密的对称密钥”、“私钥”&lt;/li&gt;
-&lt;li&gt;攻击者用“私钥”对“用公钥加密的对称密钥”解密，获得了对称密钥&lt;/li&gt;
-&lt;li&gt;攻击者此时就可以用破解出来的对称密钥对已存的历史加密数据做解密&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;基于DH的PFS：&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;不再使用公钥加密对称密钥的方案&lt;/li&gt;
-&lt;li&gt;改为用DH密钥交换算法（key exchange），协商对称密钥，可以直接明文传输协商时需要的信息（并不怕这些信息被窃取）&lt;/li&gt;
-&lt;li&gt;每次会话都协商新的对称密钥&lt;/li&gt;
-&lt;li&gt;因为公钥私钥没有用来加密对称密钥了，所以即使服务器私钥被盗了也不会导致历史对称密钥被破解&lt;/li&gt;
-&lt;li&gt;即使单次会话的对称密钥被破解了，也不会影响到别的会话&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;为什么可行&lt;/h2&gt;
-
-&lt;p&gt;关键在于，用于生成会话密钥的“数据”，根本就没通过网络发送出去。而用公钥加密的密钥，本身就是通过网络传输的。&lt;/p&gt;
-
-&lt;p&gt;后者显然更容易被攻击，主要获得私钥并记录了整个会话的数据流，就可以破解了。&lt;/p&gt;
-
-&lt;p&gt;而前者，对称密钥的协商，根本没有用到公钥私钥，经过网络的也不是什么被加密后的密钥，而只是协商信息。攻击者要想破解某次会话的内容，只能从该次会话的加密数据流入手，没有他法。&lt;/p&gt;
-
-&lt;h2&gt;问题&lt;/h2&gt;
-
-&lt;p&gt;要做到perfect，意味着每次会话都要协商密钥，意味着增加了计算开销，不然不能保证密钥的转瞬即逝性质（ephemeral）。&lt;/p&gt;
-
-&lt;h1&gt;通讯的认证&lt;/h1&gt;
-
-&lt;p&gt;认证问题是指，如何确定和自己通讯的对方不是其他假冒者？&lt;/p&gt;
-
-&lt;p&gt;目前有2个主要的解决方案：消息验证码（message authentication code，MAC）和数字签名（digital signature）。&lt;/p&gt;
-
-&lt;h2&gt;消息验证码&lt;/h2&gt;
-
-&lt;p&gt;前提：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;通讯双方需要先约定好一个密钥，称为&lt;strong&gt;共享密钥&lt;/strong&gt;，双方都把它安全地存起来&lt;/li&gt;
-&lt;li&gt;对任意长度的消息数据，用共享密钥可以计算出对应的固定长度的MAC&lt;/li&gt;
-&lt;li&gt;计算MAC必须用到共享密钥，除非密钥泄露，否则第三者无法计算出MAC值&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;流程：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;协商密钥&lt;/li&gt;
-&lt;li&gt;发送方对消息计算MAC值&lt;/li&gt;
-&lt;li&gt;发送方把消息和MAC值都发给对方&lt;/li&gt;
-&lt;li&gt;对方收到消息后，也用共享密钥计算MAC值，并与收到的MAC值比对&lt;/li&gt;
-&lt;li&gt;如果2个MAC值一致，那么消息确实来自于发送方&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;各种问题：&lt;/h3&gt;
-
-&lt;p&gt;一，密钥协商问题（上面已提过）。&lt;/p&gt;
-
-&lt;p&gt;二，重放攻击(replay attack)：攻击者窃听通讯双方（例如2个银行）的数据，把汇款消息保存了下来（带有MAC值），然后重复发送这个汇款消息，接收方就会重复地向发送方发起汇款。其中，攻击者并不需要破解消息。&lt;/p&gt;
-
-&lt;p&gt;解决方法：每条消息都加序号，序号必须保证递增，从而每条消息的序号唯一；消息加时间戳，但时钟同步和时钟精度又是新的问题；每个消息加nonce，一个只能用一次的随机数。&lt;/p&gt;
-
-&lt;p&gt;三，密钥推测攻击：应确保攻击者不能通过MAC值逆向出共享密钥，否则攻击者就可以伪造发包了。&lt;/p&gt;
-
-&lt;p&gt;四，对第三方证明问题：共享密钥只能保证2个人之间的通讯认证，但是如果多于2个人时，理论上共享密钥无法解决认证问题。&lt;/p&gt;
-
-&lt;p&gt;例子：用户A向银行B用共享密钥传输了一个取款消息，如果B取款前需要告知C“A申请取款”，C是否可以相信A真的发出了取款消息，还是说消息是B杜撰的？答案是C没有办法知道。&lt;/p&gt;
-
-&lt;p&gt;五，防止否认问题：就上面的取款例子，如果A真的发起了取款消息，但是事后又矢口否认，A认为是B杜撰了这个消息，此时事实就说不清了，A和B都有共享密钥，无法知道消息是A说的还是B说的。&lt;/p&gt;
-
-&lt;h2&gt;数字签名&lt;/h2&gt;
-
-&lt;p&gt;简单来说，数字签名是公钥加密的逆向过程。&lt;/p&gt;
-
-&lt;p&gt;对比一下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;公钥加密&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;公钥：发送者加密时使用&lt;/li&gt;
-&lt;li&gt;私钥：接收者解密时使用&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;数字签名&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;公钥：验证者验证签名时使用&lt;/li&gt;
-&lt;li&gt;私钥：签名者生成签名时使用&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这里面的公钥私钥是一样的东西，只是用法不一样。私钥依然需要保密地持有，而公钥依然可以任意地公开。&lt;/p&gt;
-
-&lt;p&gt;为什么公钥加密反过来就是数字签名，而不是反方向的加密呢？用心琢磨下就知道了：用私钥去加密消息，而谁都能拿到公钥去解密，有什么保密意义可言？&lt;/p&gt;
-
-&lt;p&gt;其中还有一个关键点是由公钥的数学原理保证的：用私钥加密的消息，只能用配套的公钥才能解密。&lt;/p&gt;
-
-&lt;h3&gt;数字签名使用方法：&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;发送方计算消息的摘要（MD5，SHA-1）&lt;/li&gt;
-&lt;li&gt;发送方对摘要用自己的私钥加密，生成数字签名&lt;/li&gt;
-&lt;li&gt;发送方把消息和数字签名同时发出&lt;/li&gt;
-&lt;li&gt;任何人都可以用发送方公布的公钥对数字签名解密&lt;/li&gt;
-&lt;li&gt;通过对比解出来的摘要和自己算出来的摘要，就可以知道消息是不是来自发送方（识别修改）&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;注意，上面说的消息，可以是明文也可以是密文，也就是说数字签名支持对明文做签名。&lt;/p&gt;
-
-&lt;h3&gt;公钥证书：&lt;/h3&gt;
-
-&lt;p&gt;对签名用到的公钥私钥对中的公钥也进行签名，就得到了公钥证书。（是不是有一种递归的感觉。）&lt;/p&gt;
-
-&lt;p&gt;公钥证书可以用来判断收到的公钥是不是发送方的公钥。因为有可能收到假的公钥（中间人攻击）。&lt;/p&gt;
-
-&lt;p&gt;签名公钥时，用到的公钥密钥对，本身又要认证。这就产生了CA的概念。&lt;/p&gt;
-
-&lt;p&gt;一般公钥证书会简称证书。&lt;/p&gt;
-
-&lt;h3&gt;数字签名的主要问题：&lt;/h3&gt;
-
-&lt;p&gt;抛开一些攻击问题不讲，最主要的问题就是上面刚提到的中间人攻击。&lt;/p&gt;
-
-&lt;p&gt;因为要正确地使用数字签名，有一个大前提：&lt;strong&gt;用于验证签名的公钥必须属于真正的发送者&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;这就陷入了死循环：数字签名是用来&lt;strong&gt;防止伪冒&lt;/strong&gt;，但同时又必须从非伪冒的发送者拿到没有被篡改的公钥。&lt;/p&gt;
-
-&lt;p&gt;所以就得用上刚刚提过的&lt;strong&gt;公钥证书&lt;/strong&gt;，给公钥附加一个第三方的签名，这样就把问题转移到了第三方。&lt;/p&gt;
-
-&lt;p&gt;第三方的背后也可以存在别的第三方，于是需要构造一个&lt;strong&gt;数字签名链条&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;链条的末端，就是所谓的根证书了。&lt;/p&gt;
-
-&lt;h3&gt;公钥基础设施：PKI（Public-Key Infrasture）&lt;/h3&gt;
-
-&lt;p&gt;PKI的组成结构：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;用户，使用PKI的人&lt;/li&gt;
-&lt;li&gt;认证机构（CA，Certification Authority），颁发证书的实体&lt;/li&gt;
-&lt;li&gt;仓库（Repo），也叫证书目录，保存证书的数据库&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;PKI可以有无数个。&lt;/p&gt;
-
-&lt;p&gt;重点要理解CA是怎么回事。&lt;/p&gt;
-
-&lt;p&gt;CA主要做三件事：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;生成公钥密钥对。其实是可选的，如果由CA生成，那么需要安全地把私钥发给用户；如果是PKI用户生成，就简单多了。&lt;/li&gt;
-&lt;li&gt;生成颁发证书。需要用到CA自己的私钥来对第一步的公钥进行数字签名，&lt;strong&gt;同时还需要对用户身份进行认证&lt;/strong&gt;。&lt;/li&gt;
-&lt;li&gt;作废（revoke）证书。作废比较复杂，因为用户会在本地缓存证书副本。于是就有了CRL，证书作废清单，（Certification Revocation List）。相当于是一个作废证书的公示榜单。其中每个证书有一个序列号可以作为id对应。用户通过查看CRL就可以知道证书有没作废。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;CA可以形成层级关系，最顶层的叫根CA。验证某个公钥证书时，需要从根CA开始，一层层往下验证，确保整条链上的证书都是合法的。&lt;/p&gt;
-
-&lt;h3&gt;对证书的攻击&lt;/h3&gt;
-
-&lt;p&gt;有社会学的攻击也有非社会学的，具体建议看《图解密码技术》的第十章。&lt;/p&gt;
-
-&lt;h3&gt;为什么要搞得这么复杂&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;如果用户有办法能够取得可信的公钥，则不需要CA&lt;/li&gt;
-&lt;li&gt;当持有可信的CA公钥，并相信这个CA，则可以相信该CA颁发的证书，从而获得可信的公钥。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;我的理解是，目前的技术瓶颈导致只能如此，没有更靠谱的方法。&lt;/p&gt;
-
-&lt;p&gt;不过存在替代CA模式的其他解决方案：信任网络（web of trust），这个概念来源于PGP。&lt;/p&gt;
-
-&lt;p&gt;信任网络就好像人与人之间的关系网（六度分隔理论），通过&lt;strong&gt;熟人推荐&lt;/strong&gt;，就可以建立起信任链，从而解决公钥认证问题。&lt;/p&gt;
-
-&lt;p&gt;PGP就是建立在信任网络的协议和软件。鉴于PGP的设计，PGP特别适合用于电子邮件传输，当然电子邮件又不仅限用PGP，还可以用基于CA的S/MIME。&lt;/p&gt;
-
-&lt;h1&gt;参考资料&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/38920372&quot;&gt;https://zhuanlan.zhihu.com/p/38920372&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;https://scotthelme.co.uk/perfect-forward-secrecy/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://hackernoon.com/eliptic-curve-crypto-the-basics-e8eb1e934dc5&quot;&gt;Elliptic Curve Crypto , The Basics&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://hackernoon.com/what-is-the-math-behind-elliptic-curve-cryptography-f61b25253da3&quot;&gt;What is the math behind elliptic curve cryptography?&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html&quot;&gt;https://www.certicom.com/content/certicom/en/21-elliptic-curve-addition-a-geometric-approach.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.cnblogs.com/block2016/p/5623902.html&quot;&gt;https://www.cnblogs.com/block2016/p/5623902.html&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/crypto-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/crypto-1/</guid>
-      </item>
-    
-      <item>
-        <title>无损压缩算法：deflate</title>
-        <description>&lt;p&gt;本文目标是搞清楚zlib库的deflate算法实现。&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2&gt;名词解释&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/DEFLATE&quot;&gt;deflate&lt;/a&gt;：最常见的无损压缩算法，非常关键。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Zip_(file_format)&quot;&gt;.zip&lt;/a&gt;：archive format，使用了deflate压缩算法&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Gzip&quot;&gt;.gz&lt;/a&gt;(或gzip格式）: single file compress format，也是使用了deflate压缩算法&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Tar_(computing)&quot;&gt;.tar.gz&lt;/a&gt;或.tgz：archive format，可认为.gz文件的集合，但又不止是多个.gz的集合，因为tgz利用了文件之间的关联信息，提升了压缩率。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://zlib.net/&quot;&gt;zlib&lt;/a&gt;：一个通用库，只有源代码，不提供可执行文件，支持gzip。linux内核、libpng、git等等都用了它。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.gnu.org/software/gzip/manual/gzip.html&quot;&gt;gzip&lt;/a&gt;：GNU Gzip，开源，提供了gzip和gunzip可执行文件，直接可以用来压缩、解压缩。内部也是实现了deflate算法。&lt;/p&gt;
-
-&lt;p&gt;7-Zip：类似gzip，也是工具。&lt;/p&gt;
-
-&lt;p&gt;经过了解，gzip的源码相对&lt;/p&gt;
-
-&lt;h2&gt;Huffman Coding 和 LZ77&lt;/h2&gt;
-
-&lt;h3&gt;LZ77（Lempel–Ziv Coding）&lt;/h3&gt;
-
-&lt;p&gt;LZ77是基于&lt;strong&gt;字典&lt;/strong&gt;的算法。思路是，把数据中的重复（冗余）部分，用更短的metadata元信息代替。&lt;/p&gt;
-
-&lt;p&gt;wiki：&lt;a href=&quot;https://en.wikipedia.org/wiki/LZ77_and_LZ78#LZ77&quot;&gt;LZ77 and LZ78&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;根据wiki所说，作者是发明了2个算法LZ77和LZ78。这2个算法是其他LZ算法变种的基础（LZW、LZSS、LZMA）。&lt;/p&gt;
-
-&lt;p&gt;下面重点介绍LZ77。&lt;/p&gt;
-
-&lt;h4&gt;LZ77关键词：&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;input stream：待压缩的字节序列串&lt;/li&gt;
-&lt;li&gt;byte：字节，是input stream的基本元素&lt;/li&gt;
-&lt;li&gt;coding position：相当于一个指针，指向当前编码位置；也是lookahead buffer的起始位置&lt;/li&gt;
-&lt;li&gt;lookahead buffer：就是指coding position为起点，input stream末端为终点的这段字节序列&lt;/li&gt;
-&lt;li&gt;window：最大长度为W的滑动窗口，也是以coding position为起点，但是窗口方向是&lt;strong&gt;反向往左&lt;/strong&gt;；窗口初始长度为0，随着编码的进行，长度会增长到W，然后就开始往右滑动&lt;/li&gt;
-&lt;li&gt;match：当前匹配串&lt;/li&gt;
-&lt;li&gt;pointer：当前匹配串的信息，一般用（B，L）表示，B表示Go &lt;strong&gt;B&lt;/strong&gt;ack多少个字节（从coding position往左），因为也叫starting offset；L指匹配串从starting offset往右延伸的长度。 pointer为（0，0）时，表示匹配失败。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;LZ77要注意的点：&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;pointer的L是可能比B还大的，即匹配串从window区域，延伸进了lookahead buffer区域，又因为匹配串的起点就是lookahead buffer的起点，所以此时出现了&lt;strong&gt;repeat&lt;/strong&gt;现象。这个repeat是没问题的，甚至是有用的，可以对不断重复的数据大大压缩。&lt;/li&gt;
-&lt;li&gt;pointer有匹配成功和匹配失败2种情况，所以把pointer信息输出时，还得在pointer前用一个bit表示是哪种pointer。&lt;/li&gt;
-&lt;li&gt;pointer里2个信息：B和L，它们的位数一般是固定的。位数大小可以是任意的N bits，但显然，位数太少的话，说明最大匹配长度就受限，即对于超长串是无法高度压缩的。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;重点&lt;/strong&gt;：有的文章会把pointer表示成（B，L，C）。C就是一个byte数据，这是因为任意一个byte第一次出现时，肯定是找不到匹配串的，所以会输出（0，0，byte）；并且，为了输出缓冲区的结构一致性，当匹配成功时，也得输出（B，L，C），C相当于一个空的占位符，有点浪费，所以有的LZ77算法会再成功匹配后，把下一个byte存到占位符里，因此encoding position要移动L+1。（注意下文讲解的实例占位符是留空的）&lt;/li&gt;
-&lt;li&gt;B和L耗用的位数不需要一样。&lt;/li&gt;
-&lt;li&gt;既然固定了B和L的位数大小，那么最大窗口大小W也是可以固定的，例如当W为32KB时，那么15 bits就可以表达32KB的任意一个值。&lt;/li&gt;
-&lt;li&gt;window的最大长度W影响到压缩比率和压缩效率。显然W越大，匹配得越充分，但也越慢。&lt;/li&gt;
-&lt;li&gt;需要定一个&lt;strong&gt;最小匹配长度&lt;/strong&gt;，只有当当前匹配串大于最小匹配长度时，这个匹配才成立。例如B用15位，L用8位，差不多就用了3个字节，如果当前匹配串不足3个字节，例如1个字节，那就导致encoding后长度反而更长了。&lt;/li&gt;
-&lt;li&gt;显然LZ77的compress做的工作量要比decompress多得多，因为做了大量的匹配查找。所以LZ77特别适合于&lt;strong&gt;一次压缩，多次解压缩&lt;/strong&gt;的情景。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;实例：&lt;/h4&gt;
-
-&lt;p&gt;这种算法用实例来理解是最快的。微软&lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ee916854.aspx&quot;&gt;这篇文章&lt;/a&gt;就给出了一个例子，这里拿来用一下。&lt;/p&gt;
-
-&lt;p&gt;（&lt;a href=&quot;https://www.cnblogs.com/junyuhuang/p/4138376.html&quot;&gt;另外这篇文章&lt;/a&gt;给出了这个例子的示意图，建议同时参照下，本文就不做图了）&lt;/p&gt;
-
-&lt;p&gt;待压缩字节串（流）：AABCBBABC&lt;/p&gt;
-
-&lt;p&gt;字节串中每个字节记一个位置标记position（上面的encoding position也是指这个），从1开始数，不是从0哦：&lt;/p&gt;
-
-&lt;pre&gt;
-
-Position    1    2    3    4    5    6    7    8    9
-
-Byte        A    A    B    C    B    B    A    B    C
-
-&lt;/pre&gt;
-
-&lt;p&gt;开始LZ77编码：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.4/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;LZ77编码后，就输出了最右边一列，注意，这里只是方便理解，实际上不会存成文本形式，没有（ ），这些字符。&lt;/p&gt;
-
-&lt;p&gt;这里重点要搞懂output这一列是怎么来的，用人话来描述下：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;初始时，滑动窗口window是空的：【】&lt;/li&gt;
-&lt;li&gt;第1次遇到A，然后在window里match一下，必然找不到A，match失败，于是输出(0,0)A。window更新为【A】&lt;/li&gt;
-&lt;li&gt;第2次遇到A，window里match一下，此时要注意，match的方向是右到左（反向）。在window右起第1个位置就找到了A，所以输出(1, 1)，window更新为【AA】&lt;/li&gt;
-&lt;li&gt;第1次遇到B，同步骤1，输出(0,0)B，window更新为【AAB】&lt;/li&gt;
-&lt;li&gt;同步骤3，输出(0,0)C，window更新为【AABC】&lt;/li&gt;
-&lt;li&gt;第2次遇到B，在window第2个位置找到B，于是starting position为2，同时发现下一个字节不匹配（左C和右B），所以长度为1，输出（2，1），window更新为【AABCB】&lt;/li&gt;
-&lt;li&gt;第3次遇到B，在window第1个位置就找到B，同时发现下一个字节不匹配（左B和右C），所以长度为1，输出（1，1），window更新为【AABCBB】&lt;/li&gt;
-&lt;li&gt;第3次遇到A，在window第5个位置找到A，然后迭代匹配，发现后面的BC也匹配上，所以长度为3，输出（5，3），window更新为【AABCBBABC】&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;接下来，看看如何把这一列output再解码回原文：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.4/2.png&quot; alt=&quot;2.png&quot;&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;输入(0,0)A，表示直接往输出缓冲区push一个A字符。 【A】&lt;/li&gt;
-&lt;li&gt;输入(1,1)，只有meta信息，(1,1)意思是它的位置等于1，长度为1，&lt;strong&gt;注意，位置是反向数，长度是正向数&lt;/strong&gt;。显然，(1,1)等于缓冲区的字符A，于是push了一个一样的A。【AA】&lt;/li&gt;
-&lt;li&gt;(0,0)B，和步骤1一样，直接push一个B。【AAB】&lt;/li&gt;
-&lt;li&gt;(0,0)C，同上。【AABC】&lt;/li&gt;
-&lt;li&gt;(2,1)，又是meta信息，位置为2，长度为1，倒着数当前缓冲区，发现起点是B字符，长度为1，所以push一个B。【AABCB】&lt;/li&gt;
-&lt;li&gt;(1,1)，参考步骤5，也是push一个B。【AABCBB】&lt;/li&gt;
-&lt;li&gt;(5,3)，长度终于不为1了，首先在缓冲区倒着数5下，发现是左起第二个A，然后长度3，于是往右再获取2个字符，得到ABC，push到缓冲区，得到【AABCBBABC】&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;上面的内容搞得懂的话，就差不多了，要继续深入就是看源码。但不急，先看完Huffman Coding。&lt;/p&gt;
-
-&lt;h3&gt;Huffman Coding&lt;/h3&gt;
-
-&lt;p&gt;待续。&lt;/p&gt;
-
-&lt;h2&gt;zlib 和 deflate&lt;/h2&gt;
-
-&lt;h3&gt;zlib&lt;/h3&gt;
-
-&lt;p&gt;zlib自带CMakeLists.txt，在Mac上可以直接生成一个Xcode project，不仅可以方便地编译zlib，还可以用来学习zlib（本文的重心）：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;cd build/
-cmake .. -G &amp;#39;Xcode&amp;#39;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;然后打开zlib.xcodeproj，构建All，并选择运行example。能运行成功的话打开example.c，会发现有完整的zlib使用教程。&lt;/p&gt;
-
-&lt;p&gt;我们重点放在deflate的最简单的使用实例：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test_deflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;test_inflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncomprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;第1行压缩，第2行解压。看懂了这两个函数代码，是理解deflate算法的第一步。&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 该函数用到的外部代码片段，我搬运到这里，方便浏览&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// 压缩强度级别&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#define Z_NO_COMPRESSION         0&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#define Z_BEST_SPEED             1&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#define Z_BEST_COMPRESSION       9&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#define Z_DEFAULT_COMPRESSION  (-1)&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// 这个结构大概相当于一个压缩控制器&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;z_stream_s&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;z_const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Bytef&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next_in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;     &lt;span class=&quot;cm&quot;&gt;/* 指向待压缩数据的第一个字节 */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uInt&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;avail_in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* 待压缩数据next_in的长度 */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;total_in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* 当前已读取多少输入字节 */&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;Bytef&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next_out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 指向输出缓冲区，只需要在一开始赋值一次 */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uInt&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;avail_out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 输出缓冲区next_out的剩余空间 */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;total_out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 当前已输出多少输入字节*/&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;z_const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* 错误信息 */&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;internal_state&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FAR&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 暂时不用管这个 */&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;alloc_func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zalloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* 压缩过程会分配新内存（internal state），用户可以设置自己的alloc函数给z_stream */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;free_func&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;   &lt;span class=&quot;cm&quot;&gt;/* 释放内存 */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;voidpf&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;opaque&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* zalloc、zfree的第一个参数，默认设0即可 */&lt;/span&gt;
-
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;data_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* 数据的类型的猜测：Z_BINARY 或者 Z_TEXT，即保存了detect_data_type的返回值 */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;adler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;      &lt;span class=&quot;cm&quot;&gt;/* 未压缩数据的检验和 （Adler-32 or CRC-32) */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;reserved&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;z_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;//待压缩的字节串&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;z_const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;hello, hello!&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;test_deflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Byte&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;z_stream&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 待压缩数据大小&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zalloc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zalloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;opaque&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;voidpf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deflateInit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z_DEFAULT_COMPRESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;deflateInit&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next_in&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z_const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// 如果不使用1字节buffer模式的话，要执行这2行&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// c_stream.avail_in = len;&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// c_stream.avail_out = comprLen;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 开始压缩&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 每次只处理1个字节，故意的*/&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z_NO_FLUSH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;deflate&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// 压缩末端的处理&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(;;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 依然每次只输出一个字节&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z_FINISH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z_STREAM_END&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 结束标记&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;deflate&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deflateEnd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;deflateEnd&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;纵观整个压缩流程，其实就是1个变量和3个函数：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;定义z_stream局部变量c_stream&lt;/li&gt;
-&lt;li&gt;deflateInit(&amp;amp;c_stream, Z_DEFAULT_COMPRESSION)，初始化c_stream&lt;/li&gt;
-&lt;li&gt;deflate(&amp;amp;c_stream, Z_NO_FLUSH)和deflate(&amp;amp;c_stream, Z_FINISH)，压缩数据&lt;/li&gt;
-&lt;li&gt;deflateEnd(&amp;amp;c_stream)，结束&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这个example故意让缓冲区每次迭代都只有1个字节可用，可以去掉那2行代码，并在开始压缩之前执行：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;接下来是解压缩：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;test_inflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncomprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Byte&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uLong&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncomprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;z_stream&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;strcpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;garbage&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zalloc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zalloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;opaque&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;voidpf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next_in&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;compr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// 如果不使用1字节buffer模式的话，要执行这2行&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// d_stream.avail_in = (uInt)comprLen;&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// d_stream.avail_out = (uInt)uncomprLen;&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inflateInit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;inflateInit&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uncomprLen&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comprLen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avail_out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inflate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z_NO_FLUSH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z_STREAM_END&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;inflate&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inflateEnd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;CHECK_ERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;inflateEnd&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strcmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mytest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;fprintf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stderr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;bad inflate&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;inflate(): %s&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uncompr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;deflate和inflate函数的源码，非常恐怖，单个函数几百行。这里就不贴出来分析了。&lt;/p&gt;
-
-&lt;h3&gt;deflate&lt;/h3&gt;
-
-&lt;p&gt;待续。&lt;/p&gt;
-
-&lt;h2&gt;adler32 和 CRC32&lt;/h2&gt;
-
-&lt;p&gt;待续。&lt;/p&gt;
-
-&lt;h2&gt;历史&lt;/h2&gt;
-
-&lt;p&gt;一位答主写了压缩算法的演变史，很值得一看：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/20762094/how-are-zlib-gzip-and-zip-related-what-do-they-have-in-common-and-how-are-they&quot;&gt;https://stackoverflow.com/questions/20762094/how-are-zlib-gzip-and-zip-related-what-do-they-have-in-common-and-how-are-they&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;简单来说，就是早期unix系统上面只有compress指令，compress使用了一个有版权的LZW算法，作者Phil Katz对LZW的免费使用有所争议。&lt;/p&gt;
-
-&lt;p&gt;并且，zip format也是这个作者设计的，但庆幸zip format是无版权的，于是就有个叫Info-ZIP group的组织开发了同样可以压缩&amp;amp;解压缩zip的程序，开源免费跨平台，这个东西导致zip format被大范围使用。&lt;/p&gt;
-
-&lt;p&gt;然后到了90年代早期，出现了新的压缩格式：gzip format（或.gz）以及对应的程序gzip。gzip的代码继承自Info-ZIP，gzip是打算用来取代unix的compress的。&lt;/p&gt;
-
-&lt;p&gt;gzip单个文件时，会给该文件加上.gz后缀。&lt;/p&gt;
-
-&lt;p&gt;然后又到了90年代中期，又遇到了版权问题，这次是关于gif格式的，gif用了带版权的LZW算法。于是又有人站出来开发了替代品：png。这是一种无损压缩图片的技术，同样使用了deflate作为内部格式。为了扩大png的使用范围，就弄出了libpng和zlib两个网站。libpng是用来处理png有关的所有事情，而zlib是作为libpng背后的支撑：提供了压缩和解压缩算法（当然现在也被用于别的软件）。注意，zlib的代码继承自gzip。&lt;/p&gt;
-
-&lt;p&gt;小结2点：&lt;strong&gt;gzip是zlib之父；以上说的版权问题现在都已过期了&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;zlib兼容gzip，且提供了比gzip更多的功能选项。一是wrapping模式可选：无wrapping、zlib wrapping、gzip wrapping。无wrapping就是仅使用deflate内部格式；png使用的就是zlib wrapping。&lt;/p&gt;
-
-&lt;p&gt;zlib wrapping和gzip wrapping的主要区别是：zlib wrapping更紧凑并且新增了Adler-32算法，比gzip用的CRC32更快。&lt;/p&gt;
-
-&lt;p&gt;所以zlib源码会显得比较复杂，需要兼容gzip格式和CRC32，且新增了zlib格式和Adler32；gzip就显得比较原始，只有deflate和CRC32代码。&lt;/p&gt;
-
-&lt;p&gt;zlib是目前最广泛使用的压缩库。&lt;/p&gt;
-
-&lt;p&gt;再后来，就出现了新的基于deflate压缩库：7-Zip和google的zopfli。zopfli的压缩率比zlib的最高压缩率还高，压榨了最后的一些空间，但也花费了更多的CPU时间。当然这个最高压缩level是可选的。注意，zopfli只提供了压缩功能，解压缩依然得用zlib或gzip（大概是因为解压缩本来就足够优秀了）；zopfli虽然有3-8%的压缩率提升，但耗时增长得更厉害，觉得zopfli还是显得鸡肋。&lt;/p&gt;
-
-&lt;p&gt;以上说的都是基于deflate算法的压缩库。实际上还存在别的算法：bzip2、LZMA等，他们有的甚至是完胜deflate。但很可惜，在互联网中要更替一种标准是非常困难的。deflate已经广泛运用到web的方方面面，难以取代。&lt;/p&gt;
-
-&lt;p&gt;所以还是学习deflate先吧。并且，阅读zlib库最佳。&lt;/p&gt;
-
-&lt;h2&gt;资料&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://tools.ietf.org/html/rfc1951&quot;&gt;RFC1951 : DEFLATE Compressed Data Format Specification version 1.3&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://qianwenjie.net/?p=17&quot;&gt;http://qianwenjie.net/?p=17&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://marknelson.us/1997/01/01/zlib-engine/&quot;&gt;http://marknelson.us/1997/01/01/zlib-engine/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.zlib.net/feldspar.html&quot;&gt;http://www.zlib.net/feldspar.html&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Mon, 02 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/zlib-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/zlib-1/</guid>
+        <pubDate>Wed, 04 Apr 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/crypto-1-ecc/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-1-ecc/</guid>
       </item>
     
   </channel>
