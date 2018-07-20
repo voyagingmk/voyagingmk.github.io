@@ -7,6 +7,414 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>漫谈网络通讯加密（4）用openSSL学习TLS1.3</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2&gt;编译&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://wiki.openssl.org/index.php/Compilation_and_Installation?&quot;&gt;官方教程&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;1, 先下载openssl-1.1.1-pre8, 解压，进目录&lt;/p&gt;
+
+&lt;p&gt;2, 配置编译参数：./config ， 我用的参数： enable-ssl-trace no-ssl no-dtls no-tls1 no-tls1_1 no-tls1_2，在INSTALL文件里有说明这些参数&lt;/p&gt;
+
+&lt;p&gt;3, 执行make，等生成libcrypto.a、libssl.a；&lt;/p&gt;
+
+&lt;p&gt;4, 创建一个my_demo目录，并创建一个test.c文件，代码如下：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#include&lt;/span&gt; &lt;span class=&quot;cpf&quot;&gt;&amp;lt;openssl/ssl.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;OPENSSL_init_ssl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;OPENSSL_INIT_ENGINE_ALL_BUILTIN&lt;/span&gt;
+                          &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;OPENSSL_INIT_LOAD_CONFIG&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;init success&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;5, 编译：clang（或gcc) test.c -I../include  -L../ -lcrypto -lssl&lt;/p&gt;
+
+&lt;p&gt;6, 运行：./a.out，输出init success即正常。&lt;/p&gt;
+
+&lt;p&gt;7, 为了使用openssl命令行工具，执行make install&lt;/p&gt;
+
+&lt;h2&gt;用openSSL测试TLS连接&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.openssl.org/docs/manmaster/man1/s_server.html&quot;&gt;s_server&lt;/a&gt;和&lt;a href=&quot;https://www.openssl.org/docs/manmaster/man1/s_client.html&quot;&gt;s_client&lt;/a&gt; 是openssl提供的测试工具，教程在&lt;a href=&quot;https://blog.jorisvisscher.com/2015/07/22/create-a-simple-https-server-with-openssl-s_server/&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;因为本机Mac不好更新openSSL，所以我是在docker里测试TLS1.3。&lt;/p&gt;
+
+&lt;p&gt;先搞定安装了openSSL 1.1.1的container，跑起来，然后执行：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj &amp;#39;/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland&amp;#39; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;生成了自签名的公钥证书cert.pem和对应的私钥key.pem，然后启动简易服务器：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;openssl s_server -key key.pem -cert cert.pem -www  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后在浏览器打开以下地址：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://127.0.0.1:14433/&quot;&gt;https://127.0.0.1:14433/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;chrome的话会提示不是安全连接，这是因为自签名公钥证书的问题。点继续，强行打开这个地址，就能访问到docker里的s_server了：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;s_server -key key.pem -cert cert.pem -www 
+Secure Renegotiation IS supported
+Ciphers supported in s_server binary
+TLSv1.3    :TLS_AES_256_GCM_SHA384    TLSv1.3    :TLS_CHACHA20_POLY1305_SHA256 
+TLSv1.3    :TLS_AES_128_GCM_SHA256    TLSv1.2    :ECDHE-ECDSA-AES256-GCM-SHA384 
+TLSv1.2    :ECDHE-RSA-AES256-GCM-SHA384 TLSv1.2    :DHE-RSA-AES256-GCM-SHA384 
+TLSv1.2    :ECDHE-ECDSA-CHACHA20-POLY1305 TLSv1.2    :ECDHE-RSA-CHACHA20-POLY1305 
+（略）  
+---
+Ciphers common between both SSL end points:
+TLS_AES_128_GCM_SHA256     TLS_AES_256_GCM_SHA384     TLS_CHACHA20_POLY1305_SHA256
+ECDHE-ECDSA-AES128-GCM-SHA256 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-ECDSA-AES256-GCM-SHA384
+ECDHE-RSA-AES256-GCM-SHA384 ECDHE-ECDSA-CHACHA20-POLY1305 ECDHE-RSA-CHACHA20-POLY1305
+ECDHE-RSA-AES128-SHA       ECDHE-RSA-AES256-SHA       AES128-GCM-SHA256         
+AES256-GCM-SHA384          AES128-SHA                 AES256-SHA
+Signature Algorithms: ECDSA+SHA256:RSA-PSS+SHA256:RSA+SHA256:ECDSA+SHA384:RSA-PSS+SHA384:RSA+SHA384:RSA-PSS+SHA512:RSA+SHA512:RSA+SHA1
+Shared Signature Algorithms: ECDSA+SHA256:RSA-PSS+SHA256:RSA+SHA256:ECDSA+SHA384:RSA-PSS+SHA384:RSA+SHA384:RSA-PSS+SHA512:RSA+SHA512:RSA+SHA1
+Supported Elliptic Groups: 0xEAEA:X25519:P-256:P-384
+Shared Elliptic groups: X25519:P-256:P-384
+---
+No server certificate CA names sent
+---
+New, TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256
+SSL-Session:
+    Protocol  : TLSv1.2
+    Cipher    : ECDHE-RSA-AES128-GCM-SHA256
+    Session-ID: 
+    Session-ID-ctx: 01000000
+    Master-Key: 3FF0D7A74290173761702ABE91C08C67B43B6ED54BE69F48F11976C4AE5C209E5EE7E097326F5726063E8121000142BA
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    Start Time: 1531989327
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: yes
+---
+   0 items in the session cache
+   0 client connects (SSL_connect())
+   0 client renegotiates (SSL_connect())
+   0 client connects that finished
+  13 server accepts (SSL_accept())
+   0 server renegotiates (SSL_accept())
+  13 server accepts that finished
+   0 session cache hits
+   0 session cache misses
+   0 session cache timeouts
+   0 callback cache hits
+   0 cache full overflows (128 allowed)
+---
+no client certificate available
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;因为我的chrome开启了draft28，所以能看到上面显示支持TLSv1.3&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;如果本机是Mac，可以用s_client访问这个简易服务器：&lt;/p&gt;
+
+&lt;p&gt;openssl s_client -connect localhost:14433&lt;/p&gt;
+
+&lt;p&gt;返回：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;CONNECTED(00000005)
+depth=0 CN = www.mydom.com, O = &amp;quot;My Dom, Inc.&amp;quot;, C = US, ST = Oregon, L = Portland
+verify error:num=18:self signed certificate
+verify return:1
+depth=0 CN = www.mydom.com, O = &amp;quot;My Dom, Inc.&amp;quot;, C = US, ST = Oregon, L = Portland
+verify return:1
+---
+Certificate chain
+ 0 s:/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland
+   i:/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIDoTCCAomgAwIBAgIUH0Fpo...略
+-----END CERTIFICATE-----
+subject=/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland
+issuer=/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland
+---
+No client certificate CA names sent
+Server Temp Key: ECDH, X25519, 253 bits
+---
+SSL handshake has read 1554 bytes and written 293 bytes
+---
+New, TLSv1/SSLv3, Cipher is ECDHE-RSA-AES256-GCM-SHA384
+Server public key is 2048 bit
+Secure Renegotiation IS supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+SSL-Session:
+    Protocol  : TLSv1.2
+    Cipher    : ECDHE-RSA-AES256-GCM-SHA384
+    Session-ID: 418F508D841D1B9F574A7AF0B7C4C555E56199CCBA9D8D5051D44736674C5DB7
+    Session-ID-ctx: 
+    Master-Key: 64AFECF1FEE891647EF174B417DF960DA6C8A137958075E1AB7F423F9154EBAF0CC0AEE53F0E4176881FD12AC128C1E8
+    TLS session ticket lifetime hint: 7200 (seconds)
+    TLS session ticket:
+    0000 - 85 7c e6 ba 9c 02 b9 c0-e9 6c c6 6c 02 3f 81 0c   .|.......l.l.?..
+    0010 - e3 14 bb 65 76 4f a0 cd-64 a7 ff ff 02 73 b9 dc   ...evO..d....s..
+    0020 - e6 4d 7f 57 52 ee dc 18-eb 05 8a ed b2 f4 18 44   .M.WR..........D
+    0030 - 0f c1 90 88 f6 30 7b 20-eb 87 f0 39 5e a6 37 fd   .....0{ ...9^.7.
+    0040 - ff 5f 92 7b da 61 7e 83-30 7a 04 a8 ef ef 5b 24   ._.{.a~.0z....[$
+    0050 - fa a4 b2 86 55 fd ed 42-9f e6 b7 09 ed f6 2e 3b   ....U..B.......;
+    0060 - a7 d9 89 3f 27 de d1 b8-c8 98 aa e3 32 e0 96 9c   ...?&amp;#39;.......2...
+    0070 - 67 d9 69 2f 0c ed f1 d2-09 fe f8 8f 9f b1 77 67   g.i/..........wg
+    0080 - f3 55 31 07 bb 4e 2e a4-df f5 1f 9d 51 df a4 35   .U1..N......Q..5
+    0090 - 5c 54 71 c0 3c f6 b3 41-e7 4f 07 c4 54 dd a4 d3   \Tq.&amp;lt;..A.O..T...
+
+    Start Time: 1531989017
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self signed certificate)
+---
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;而因为命令行的openSSL还是旧的，所以显示的是TLSv1.2&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;可以在s_server指令最后面加上-msg -state，打印调试信息，来分析TLS握手过程。不过这样子只能看到状态信息，具体的通讯数据是Hex的，可以再加一个 -trace选项，把Hex信息都打印出来。&lt;/p&gt;
+
+&lt;p&gt;要支持-trace，需要重新编译openSSL，参数是 enable-ssl-trace&lt;/p&gt;
+
+&lt;h2&gt;抓包分析TLS1.3握手过程&lt;/h2&gt;
+
+&lt;p&gt;首先，为了屏蔽旧协议，需要修改/include/openssl/ssl.h里的一个宏：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * Enable TLSv1.3 Compatibility mode. This is on by default. A future version&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * of OpenSSL may have this disabled by default.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; */&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;# define SSL_OP_ENABLE_MIDDLEBOX_COMPAT                  0x00100000U&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;改为:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;# define SSL_OP_ENABLE_MIDDLEBOX_COMPAT                  0x00000000U&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后重新编译openssl。&lt;/p&gt;
+
+&lt;p&gt;接着开一个tcpdump的进程：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;tcpdump -i lo host localhost and port 4433 -nn -vvv -X
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后开2个bash分别执行：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;openssl s_server -key key.pem -cert cert.pem -msg -state -tls1_3 -trace no_middlebox -no_ssl3 -no_tls1 -no_tls1_1 -no_tls1_2 no_comp
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;openssl s_client -connect localhost:4433 -msg -state -trace -tls1_3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;三个进程的输出：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;../images/2018.7/server.out&quot;&gt;server.out&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;../images/2018.7/client.out&quot;&gt;client.out&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;../images/2018.7/tcpdump.out&quot;&gt;tcpdump.out&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;然后就可以开始分析了。&lt;/p&gt;
+
+&lt;h2&gt;ClientHello&lt;/h2&gt;
+
+&lt;p&gt;根据tcpdump.out，发现在三次握手后的第一个包是从client发到服务器的，数据长度205字节(不含IP header）。这个就是ClientHello。&lt;/p&gt;
+
+&lt;p&gt;然后看client.out和server.out，发现205字节的头5个字节是独立出来的：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;16 03 01 00 c8
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这5个字节要分成3部分：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;0x16，这个字节指出了包的类型（Content Type），0x16是handshake。&lt;/li&gt;
+&lt;li&gt;0x0301，这2个字节指示SSL/TLS版本（Version），0x0301代表TLSv1.0。&lt;/li&gt;
+&lt;li&gt;0x00c8，转10进制后是200，显然是正文长度(205 - 5)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.7/10.png&quot; alt=&quot;10.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;( &lt;a href=&quot;https://wand.net.nz/trac/libprotoident/wiki/SSL&quot;&gt;图片来源&lt;/a&gt; )&lt;/p&gt;
+
+&lt;p&gt;ContentType在/include/openssl/ssl3.h里定义：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;# define SSL3_RT_CHANGE_CIPHER_SPEC      20&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;# define SSL3_RT_ALERT                   21&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;# define SSL3_RT_HANDSHAKE               22&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;# define SSL3_RT_APPLICATION_DATA        23&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;# define DTLS1_RT_HEARTBEAT              24&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后就是正文200个字节，根据tcpdump.out，按顺序解读下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;4字节，0100 00c4，未知，可能是子协议类型&lt;/li&gt;
+&lt;li&gt;2字节，0303，这个是client_version，0x303表示TLS 1.2&lt;/li&gt;
+&lt;li&gt;4字节，9AC0 E522，gmt_unix_time，时间戳&lt;/li&gt;
+&lt;li&gt;28字节，65 1348 2735 f2d9 ac8c bc83 1850 a0c3 c3f0 a681 ceff 4876 4d1b 80ba 1e，random_bytes&lt;/li&gt;
+&lt;li&gt;1字节，00，session_id，表示长度为0，没有session id&lt;/li&gt;
+&lt;li&gt;2字节，00 08，表示接下来有4个cipher suites（每个要占2个字节，2*4=8）&lt;/li&gt;
+&lt;li&gt;8字节，1302 1303 1301 00ff，4个cipher_suites，撇除最后一个TLS_EMPTY_RENEGOTIATION_INFO_SCSV，实则只有3个cipher_suites&lt;/li&gt;
+&lt;li&gt;1字节，01，未知，可能是分隔符&lt;/li&gt;
+&lt;li&gt;1字节，compression_methods，选择什么压缩算法，0x00表示不压缩&lt;/li&gt;
+&lt;li&gt;2字节，0093，等于10进制147，表示接下来有147字节的extensions&lt;/li&gt;
+&lt;li&gt;147字节，各种extensions，每个extension的长度各不一样。在这里面给出了终端支持的算法列表。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;200 = 4 + 2 + 4 + 28 + 1 + 2 + 8 + 1 + 1 + 2 + 147。虽然里面有一些字节从抓下来的log看不出来。&lt;/p&gt;
+
+&lt;h2&gt;服务端收到ClientHello后的响应&lt;/h2&gt;
+
+&lt;p&gt;接下来看tcpdump.out，发现服务器收到ClientHello后发了个很长的回包，足足有1451字节（不包含IP header）。看起来很长， 实则是几个协议包被tcp合并发送了。先看第一个协议包。&lt;/p&gt;
+
+&lt;h3&gt;ServerHello（95字节）&lt;/h3&gt;
+
+&lt;p&gt;头5字节：16 03 03 00 5a&lt;/p&gt;
+
+&lt;p&gt;协议包头部和ClientHello类似，也是5字节。&lt;/p&gt;
+
+&lt;p&gt;0303表示这个分组的版本是TLSv1.2的。&lt;/p&gt;
+
+&lt;p&gt;最后2字节是005a，十进制是90，表示正文是90字节。&lt;/p&gt;
+
+&lt;p&gt;正文结构和ClientHello很像，除了几点要说的：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;和ClientHello一样没有session_id&lt;/li&gt;
+&lt;li&gt;ClientHello的Version是TLSv1.0，这是为了应付低版本的服务器，实际上在client_version里指出自己能支持TLS 1.2。ServerHello于是把Version填成TLS1.2，以告诉客户端自己支持1.2。&lt;/li&gt;
+&lt;li&gt;cipher_suite字段不再是列表，而是指出了一个加密套件：TLS_AES_256_GCM_SHA384，这就完成了加密套件的协商。&lt;/li&gt;
+&lt;li&gt;extensions里面有一个extension_type=supported_versions的扩展，用这个扩展告诉客户端自己其实还支持到TLS1.3（draft 28）&lt;/li&gt;
+&lt;li&gt;extensions里还有一个extension_type=key_share，指出了秘钥协商算法为ecdh_x25519并且给出了一个key_exchange参数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.7/serverhello.png&quot; alt=&quot;serverhello.png&quot;&gt;&lt;/p&gt;
+
+&lt;h3&gt;write encrypted extensions（28字节）&lt;/h3&gt;
+
+&lt;p&gt;头5字节：17 03 03 00 17&lt;/p&gt;
+
+&lt;p&gt;最后2字节是0017，十进制是23，表示正文是23字节。&lt;/p&gt;
+
+&lt;p&gt;看server.out，发现Inner Content Type = Handshake (22)，说明握手还在进行中。&lt;/p&gt;
+
+&lt;p&gt;23个正文字节，实际上是21+2，2是EncryptedExtensions。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.7/appdata.png&quot; alt=&quot;appdata.png&quot;&gt;&lt;/p&gt;
+
+&lt;h3&gt;write certificate（968字节）&lt;/h3&gt;
+
+&lt;p&gt;头5字节：17 03 03 03 c3&lt;/p&gt;
+
+&lt;p&gt;最后2字节是03c3，十进制是963，表示正文是963字节。这么长是因为这个分组包含了服务端的公钥证书！&lt;/p&gt;
+
+&lt;p&gt;看server.out，发现Inner Content Type = Handshake (22)，说明握手还在进行中。&lt;/p&gt;
+
+&lt;p&gt;963个正文字节，实际上是21+942，942字节是Certificate。&lt;/p&gt;
+
+&lt;h3&gt;write server certificate verify（286字节）&lt;/h3&gt;
+
+&lt;p&gt;头5字节：17 03 03 01 19&lt;/p&gt;
+
+&lt;p&gt;最后2字节是0119，十进制是281，表示正文是281字节。&lt;/p&gt;
+
+&lt;p&gt;看server.out，发现Inner Content Type = Handshake (22)，说明握手还在进行中。&lt;/p&gt;
+
+&lt;p&gt;281个正文字节，实际上是21+260，260字节是CertificateVerify。&lt;/p&gt;
+
+&lt;p&gt;CertificateVerify的组成部分：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Signature Algorithm，4字节，告诉客户端用了什么签名算法（rsa_pss_rsae_sha256）&lt;/li&gt;
+&lt;li&gt;Signature，256字节，对Certificate的签名&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;注意，CertificateVerify这260个字节是加密了的。&lt;/p&gt;
+
+&lt;h3&gt;write finished（74字节）&lt;/h3&gt;
+
+&lt;p&gt;头5字节：17 03 03 00 45&lt;/p&gt;
+
+&lt;p&gt;最后2字节是0045，正文是69字节。&lt;/p&gt;
+
+&lt;p&gt;看server.out，发现Inner Content Type = Handshake (22)，说明握手还在进行中。&lt;/p&gt;
+
+&lt;p&gt;69个正文字节，实际上是21+48，表示握手Finished，48字节存了一个verify_data。&lt;/p&gt;
+
+&lt;p&gt;verify_data也是加密了的。&lt;/p&gt;
+
+&lt;h3&gt;综上&lt;/h3&gt;
+
+&lt;p&gt;服务端收到ClientHello后，总共响应了5个分组，总共占1451字节（不包含IP header）：1451 = 95 + 28 + 968 + 286 + 74。&lt;/p&gt;
+
+&lt;h2&gt;Client收到ServerHello5个分组后的响应&lt;/h2&gt;
+
+&lt;h3&gt;early data（Client Finished 74字节）&lt;/h3&gt;
+
+&lt;p&gt;客户端发了一个和服务端的Finished同等结构的Finished。区别在于verify_data。&lt;/p&gt;
+
+&lt;p&gt;正文一样是69字节。&lt;/p&gt;
+
+&lt;p&gt;这是用来告诉服务端，客户端也完成握手了。&lt;/p&gt;
+
+&lt;h2&gt;Server收到Client Finished后的响应&lt;/h2&gt;
+
+&lt;h3&gt;write session ticket (两次255字节)&lt;/h3&gt;
+
+&lt;p&gt;服务端发了2个&lt;a href=&quot;https://tools.ietf.org/html/draft-ietf-tls-tls13-28#section-4.6.1&quot;&gt;NewSessionTicket&lt;/a&gt;协议分组。&lt;/p&gt;
+
+&lt;p&gt;每个协议是5 + 250 = 255字节。&lt;/p&gt;
+
+&lt;p&gt;第一个是在04:06:58.702027时发送，第二个是在04:06:58.703919。&lt;/p&gt;
+
+&lt;p&gt;这2个分组发完，就没有和TLS有关的分组了。抓包到这里结束。&lt;/p&gt;
+
+&lt;p&gt;服务端会看情况发1到多个session ticket，作用如下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;允许打开多个并行的HTTP连接（Opening multiple parallel HTTP connections）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;执行跨网卡接口和地址族的连接竞争（Performing connection racing across interfaces and address families）&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;回顾整个流程&lt;/h2&gt;
+
+&lt;h3&gt;流程&lt;/h3&gt;
+
+&lt;p&gt;按照数据流方向：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;C-&amp;gt;S:
+
+&lt;ul&gt;
+&lt;li&gt;ClientHello&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;S-&amp;gt;C:
+
+&lt;ul&gt;
+&lt;li&gt;ServerHello&lt;/li&gt;
+&lt;li&gt;write encrypted extensions&lt;/li&gt;
+&lt;li&gt;write certificate&lt;/li&gt;
+&lt;li&gt;write certificate verify&lt;/li&gt;
+&lt;li&gt;write Finished&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;C-&amp;gt;S:
+
+&lt;ul&gt;
+&lt;li&gt;client Finished (early data)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;S-&amp;gt;C:
+
+&lt;ul&gt;
+&lt;li&gt;write session ticket 1&lt;/li&gt;
+&lt;li&gt;write session ticket 2&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;从中可以看出在1-rtt就完成了握手；从第2-rtt开始，已经可以发early data了。&lt;/p&gt;
+
+&lt;h3&gt;信息一览&lt;/h3&gt;
+
+&lt;p&gt;server.out最后面打印了关于此次连接的TLS信息：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Shared ciphers，共享的加密套件列表，TLS_AES_256_GCM_SHA384、TLS_CHACHA20_POLY1305_SHA256、TLS_AES_128_GCM_SHA256&lt;/li&gt;
+&lt;li&gt;Signature Algorithms，签名算法列表，ECDSA+SHA256、ECDSA+SHA384、ECDSA+SHA512、Ed25519、Ed448、RSA-PSS+SHA256、RSA-PSS+SHA384、RSA-PSS+SHA512、RSA-PSS+SHA256、RSA-PSS+SHA384、RSA-PSS+SHA512、RSA+SHA256、RSA+SHA384、RSA+SHA512&lt;/li&gt;
+&lt;li&gt;Shared Signature Algorithms，共享的签名算法列表（同上）&lt;/li&gt;
+&lt;li&gt;Supported Elliptic Groups，支持的椭圆曲线组，X25519、P-256、X448、P-521、P-384&lt;/li&gt;
+&lt;li&gt;Shared Elliptic groups，共享的椭圆曲线组（同上）&lt;/li&gt;
+&lt;li&gt;No server certificate CA names sent&lt;/li&gt;
+&lt;li&gt;CIPHER is TLS_AES_256_GCM_SHA384，最终协商出来的加密套件&lt;/li&gt;
+&lt;li&gt;Secure Renegotiation IS supported&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Wed, 18 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/crypto-4/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-4/</guid>
+      </item>
+    
+      <item>
         <title>漫谈网络通讯加密（3）HKDF</title>
         <description>&lt;p&gt;本文将简单介绍&lt;a href=&quot;https://tools.ietf.org/html/rfc5869&quot;&gt;rfc5869&lt;/a&gt;提出的HKDF。&lt;/p&gt;
 
@@ -1000,6 +1408,8 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 &lt;p&gt;关于master key还有它自身的时效性问题。是否缓存一次，永久使用？答案是不可以，这不安全。&lt;/p&gt;
 
 &lt;p&gt;一般master key要设个过期时间，一天、一个星期、一个月，加了限时，就保证了要定期更换，一定程度降低了master key泄露的风险。过期时间服务器决定，客户端如果缓存的是过期的master key，那服务器应有反馈，并重新协商新的master key。&lt;/p&gt;
+
+&lt;p&gt;Note: 在TLS1.3中，session id、session ticket的做法已经被废弃了。session ticket被更新为一个类似的东西：PSK(pre-shared key)。&lt;/p&gt;
 
 &lt;h2&gt;四，基于master key，得到对称加密密钥，建立对称加密通讯&lt;/h2&gt;
 
@@ -2944,389 +3354,6 @@ cmake .. -G &amp;#39;Xcode&amp;#39;
         <pubDate>Mon, 02 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/zlib-1/</link>
         <guid isPermaLink="true">http://localhost:4000/zlib-1/</guid>
-      </item>
-    
-      <item>
-        <title>多线程网络库开发笔记</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;收到EPOLLOUT事件，但write时返回了EAGAIN？&lt;/h2&gt;
-
-&lt;p&gt;这是因为EAGAIN不止是在发送缓冲区满时返回，还可能是&lt;strong&gt;未ACK的包数量已经达到了拥塞窗口的大小&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;而EPOLLOUT并不会检查拥塞窗口的情况，只要发送缓冲区不满，就返回EPOLLOUT了。&lt;/p&gt;
-
-&lt;p&gt;用并发压力测试可以测出这种情况：在epoll_wait返回后，检测可写事件的fd是否发送缓冲区不满，不满的话尝试写入一个字节，然后通过write的返回值和错误码就可以知道有没出现&lt;strong&gt;缓冲区不满的EAGAIN&lt;/strong&gt;。同时打印出拥塞窗口信息，就可以看出EAGAIN原因：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.3/22.png&quot; alt=&quot;22.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;参考资料：&lt;a href=&quot;https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full&quot;&gt;https://stackoverflow.com/questions/3070127/will-eagain-return-on-send-for-anything-other-than-buffer-full&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://linuxgazette.net/136/pfeiffer.html&quot;&gt;https://linuxgazette.net/136/pfeiffer.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;EAGAIN/EWOULDBLOCK can also be returned (for TCP sockets) when the number of unacknowledged packets has reached the congestion window.&lt;/p&gt;
-
-&lt;p&gt;To check the status of the socket w.r.t. the congestion window, then try this:&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#include&lt;/span&gt; &lt;span class=&quot;cpf&quot;&gt;&amp;lt;netinet/tcp.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_tcp_cwnd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;uint&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tcp_info_length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getsockopt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOL_TCP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TCP_INFO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_info_length&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;tcpi_snd_cwnd: %u, tcpi_unacked: %u&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcpi_snd_cwnd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;tcp_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcpi_unacked&lt;/span&gt;
-           &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;blockquote&gt;
-&lt;p&gt;If tcpi_unacked == tcpi_snd_cwnd then send() will return EAGAIN/EWOULDBLOCK for a non-blocking socket.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2&gt;write无限返回EAGAIN导致的cpu超载和FIN_WAIT1卡死&lt;/h2&gt;
-
-&lt;p&gt;这是只会出现在非阻塞socket的问题。&lt;/p&gt;
-
-&lt;p&gt;解决思路：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;检查是不是意外调用了onWritable接口，即还没有监听可写事件，却调用了可写回调接口&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;尝试用while循环来调用send data，直到send发完数据，或返回-1（EAGAIN）并添加可写监听。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;另外，收到可写事件时，尝试write剩余字节，如果write能把所有字节都写进发送队列，那么就可以删除EPOLLOUT监听了。&lt;/p&gt;
-
-&lt;h2&gt;atomic变量也会segment fault?&lt;/h2&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#0  0x00000000004cb56b in std::atomic&amp;lt;wynet::TcpConnection::State&amp;gt;::load (this=0x58, &lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;_m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;memory_order_seq_cst&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;4.8.2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;atomic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#1  0x00000000004c9a6d in std::atomic&amp;lt;wynet::TcpConnection::State&amp;gt;::operator wynet::TcpConnection::State&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x58&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;4.8.2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;atomic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;176&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;#2  0x00000000004f0fa1 in wynet::TcpConnection::shutdown (this=0x0)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;github&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wynet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;cpp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;74&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;gdb查core文件，发现日志很奇怪，在atomic的load里crash了。&lt;/p&gt;
-
-&lt;p&gt;最终发现是访问了一个null的shared_ptr的atomic变量。加if判断即可。&lt;/p&gt;
-
-&lt;h2&gt;10k和10k+连接问题&lt;/h2&gt;
-
-&lt;p&gt;10k数量级的网络连接，是非常容易暴露出自己写的网络代码的问题的。&lt;/p&gt;
-
-&lt;p&gt;局域网下有2种测试方法：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;server和clients同主机（走回环，不需要经过网卡）&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;server和clients不同主机，clients可以分散到多台主机（需要经过网卡）&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;我现在做的第一种，本地开2个进程，一个进程跑server，另一个进程发起10k+个客户端连接，pingpong发消息，可以测吞吐量并且也可以测下承载能力。&lt;/p&gt;
-
-&lt;p&gt;目前遇到很多问题，逐个列举下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;打开文件描述符数量限制。可以用ulimit -n修改。Mac下有些特殊。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;客户端的port不够用。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;先查看系统上限：cat /proc/sys/net/ipv4/ip_local_port_range，可能会输出32768   60999，只有28231个端口可用。
-但由于port是双字节，理论上撑死只有3万个port可以用。改大这个范围的意义不大。此时要考虑多主机来测试30k+连接了。&lt;/p&gt;
-
-&lt;h2&gt;多线程：wait morphing&lt;/h2&gt;
-
-&lt;p&gt;以pthread为例，在C++中使用pthread的pthread_mutex_xxx和pthread_cond_xxx，实现RAII的mutex guard类以及阻塞队列(BlockingQueue)时，会遇到wait morphing的需求。&lt;/p&gt;
-
-&lt;p&gt;例如，一般会先实现2个类：MutexLock，和MutexLockGuard：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MutexLock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MutexLockGuard&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;MutexLock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MutexLock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unlock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;然后是BlockingQueue：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typename&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;BlockingQueue&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;push_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_notEmpty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// wait morphing&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// 注意，lock是在退出本函数时才销毁，所以顺序是：cond signal -&amp;gt; unlock&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;MutexLockGuard&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_mutex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;m_notEmpty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wait&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()));&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;m_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pop_front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;front&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;调用BlockingQueue的put函数，做了几个事情：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;lock了mutex&lt;/li&gt;
-&lt;li&gt;put一个对象到队列&lt;/li&gt;
-&lt;li&gt;发射条件变量信号&lt;/li&gt;
-&lt;li&gt;函数退出，unlock了mutex&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;MutexLockGuard对mutex lock/unlock的封装，是非常符合RAII的，只需要在函数开头声明一个栈变量，就可以保证成对的lock、unlock。&lt;/p&gt;
-
-&lt;p&gt;然而，这个特性遇到条件变量时，就不是很好了。首先，因为unlock和notify是2个单独的操作，谁先谁后，效果并不一样。以上面的put函数为例，put完一个对象后，做2种情景假设。&lt;/p&gt;
-
-&lt;p&gt;情景1：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;线程1先unlock了mutex&lt;/li&gt;
-&lt;li&gt;线程1调用notify，唤醒等待线程2&lt;/li&gt;
-&lt;li&gt;等待线程2被唤醒，因为mutex已经unlock，于是立即就lock到了mutex&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;情景2：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;线程1先调用notify，唤醒等待线程2&lt;/li&gt;
-&lt;li&gt;等待线程2被唤醒，试图锁住mutex，但mutex还未解锁，于是又进入睡眠。&lt;/li&gt;
-&lt;li&gt;线程1unlock了mutex&lt;/li&gt;
-&lt;li&gt;线程2因为在第2步中试图锁住mutex，所以会被第3步的unlock唤醒，尝试第2次加锁，lock到了mutex&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;分析可见，情景2中，线程2被唤醒了2次才锁到了mutex，有多余的性能开销。&lt;/p&gt;
-
-&lt;p&gt;而我们的C++ RAII MutexLockGuard和BlockingQueue就是情景2.&lt;/p&gt;
-
-&lt;p&gt;linux系统有专门针对这个问题的优化技术：wait morphing。&lt;/p&gt;
-
-&lt;p&gt;wait morphing含义是，&lt;strong&gt;系统可以知道情景2的第2步的该次唤醒并不能锁住mutex，那么把挂在该condvar的所有等待线程，转移(morphing)到mutex的等待线程队列，并不去唤醒它们，从而免去多余的上下文切换&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;当然这个优化是内核的，需要先了解你的linux有没实现这个优化。&lt;/p&gt;
-
-&lt;h2&gt;tcp连接管理问题&lt;/h2&gt;
-
-&lt;h3&gt;Mac下意外的RST：&lt;/h3&gt;
-
-&lt;p&gt;出现情景：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;客户端发送了一些数据包后，调用close或者shutdown(SHUT_WR)，此时客户端会发送FIN&lt;/li&gt;
-&lt;li&gt;服务端收到FIN，如果没有待发送的数据，那么返回FIN+ACK，如果还有数据要发送，那么只返回ACK&lt;/li&gt;
-&lt;li&gt;客户端收到自己发出的FIN的ACK&lt;/li&gt;
-&lt;li&gt;服务端如果仅返回了对客户端FIN的ACK，然后继续发送剩下的数据，并会在最后发一个FIN&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;重点&lt;/strong&gt;，如果客户端没有接收完服务端剩下的数据，就结束进程（会彻底关闭socket），那么客户端协议栈收到服务端余下的数据包时，只能返回RST，因为socket已经不见了&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;结论：在Mac下，客户端进程需要稍微延时关闭，例如在main最后一行加sleep(1)。&lt;/p&gt;
-
-&lt;h2&gt;shared_ptr与多线程安全&lt;/h2&gt;
-
-&lt;p&gt;线程安全要点：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;因为shared_ptr内部维护了2个指针，1个指向真实的对象，一个指向control block，所以修改shared_ptr时需要两步操作，于是就有了race condition问题。&lt;/li&gt;
-&lt;li&gt;在两步操作中，shared_ptr修改control block是保证线程安全的，即ref count不会出问题，但修改对象指针则不是。&lt;/li&gt;
-&lt;li&gt;多线程&lt;strong&gt;只读&lt;/strong&gt;shared_ptr仍然是安全的。&lt;/li&gt;
-&lt;li&gt;多线程&lt;strong&gt;读写&lt;/strong&gt;shared_ptr不安全，其中不安全表现之一是出现&lt;strong&gt;空悬指针&lt;/strong&gt;。在这种情况下， 读写shared_ptr必须用mutex保护。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;shared_ptr细节特点：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;shared_ptr有ptr指针，control block里还有一个ptr指针：这是为了让shared_ptr无需虚析构函数(virtual destructor)，第一次构造shared_ptr时，就把目标对象的指针放进了control block的ptr里，从而记住类型，而shared_ptr的ptr则可以是对象类型也可以是父类型，并不影响计数降为0时的自动析构。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;基于特点1，于是可以实现更粗暴的多态，即任意shared_ptr&lt;T&gt;都可以转成shared_ptr&lt;void&gt;。可以用来防止对象过早析构，或者做泛型编程。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;应尽量用make_shared，可以节约一次new操作，不过需要看构造函数的访问性，不一定可以替代new T。&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;weak_ptr：weak_ptr可以提升为shared_ptr，提升操作lock()据说是线程安全的。&lt;/p&gt;
-
-&lt;h2&gt;self connect 自连接问题&lt;/h2&gt;
-
-&lt;p&gt;资料：&lt;a href=&quot;http://sgros.blogspot.jp/2013/08/tcp-client-self-connect.html&quot;&gt;http://sgros.blogspot.jp/2013/08/tcp-client-self-connect.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;就是客户端socket连接成功后，发现两端ip和port一模一样。&lt;/p&gt;
-
-&lt;p&gt;解释：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;客户端发起连接时，只知道对端的ip和port，以及自己的ip（localhost），但自己的port是操作系统随机分配的。&lt;/li&gt;
-&lt;li&gt;每一个tcp连接都是由四元组(source IP, source port, destination IP, destination port)唯一标识的。&lt;/li&gt;
-&lt;li&gt;source port可以认为是随机分配，但linux可能会先顺序地分配用户有方法自己决定port，用bind，但一般很少这样做。&lt;/li&gt;
-&lt;li&gt;这个source port也叫Ephemeral port（转瞬即逝的端口），这些port是在某个范围段里选的，linux下调用cat /proc/sys/net/ipv4/ip_local_port_range可以查这个范围，会返回2个数字，例如 32768 60999&lt;/li&gt;
-&lt;li&gt;self connect只出现在本机客户端连本机服务器的情景下，这是因为source IP和destination IP要一致。&lt;/li&gt;
-&lt;li&gt;复现self connect的方法是，客户端connect本机ip_local_port_range里的某个端口，因为该端口并没有socket服务器在监听，所以一般情况下会返回RST。随着不断发起这些不可能成功的连接，可能会出现操作系统分配了一个和dest port一样的source port，于是self connect出现。&lt;/li&gt;
-&lt;li&gt;之所以允许这种情况，是因为tcp标准里有&lt;strong&gt;simultaneous open 同时打开&lt;/strong&gt;这个概念。&lt;/li&gt;
-&lt;li&gt;self connect可以成功，意味着“两端”之间完成了三次握手，进入了ESTABLISHED状态。&lt;/li&gt;
-&lt;li&gt;self connect只可能发生在握手阶段，所以对于一个已经ESTABLISHED的socket，也无法利用self connect做什么坏事的。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;接着，剖析下当分配了和dest port一样的source port时，tcp状态机究竟是怎么进入ESTABLISHED的：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;首先socket是CLOSED状态&lt;/li&gt;
-&lt;li&gt;调用connect，发送SYN，进入SYN SENT状态&lt;/li&gt;
-&lt;li&gt;这个socket马上又收到来自自己的SYN包，于是根据tcp状态机图所示，该socket状态机会走simultaneous open路径，发送SYN+ACK，并进入SYN RECEIVED状态&lt;/li&gt;
-&lt;li&gt;因为第3步里面发送了ACK的，所以这个处于SYN RECEIVED状态的socket接着会收到ACK，根据状态机图，socket就进入了ESTABLISHED&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;总结：避免self connect是最佳做法，也就是不要选择Ephemeral port作为server端的监听端口，就没事了。&lt;/p&gt;
-
-&lt;h2&gt;wait-free V.S. lock-free&lt;/h2&gt;
-
-&lt;p&gt;在wiki上这2个东西都是指&lt;a href=&quot;https://en.wikipedia.org/wiki/Non-blocking_algorithm&quot;&gt;Non-blocking algorithm&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h3&gt;非阻塞&lt;/h3&gt;
-
-&lt;p&gt;一个算法被称作非阻塞的前提是：线程的失败或挂起（failure or suspension），不会导致其他线程的失败或挂起。&lt;/p&gt;
-
-&lt;h3&gt;lock-free：&lt;/h3&gt;
-
-&lt;p&gt;在系统级别保证该系统（即用户程序）总是有进展的（progress）。换句话说，如果该系统的所有线程运行足够长时间，能保证至少有一个线程取得进展(make progress），就是lock-free。&lt;/p&gt;
-
-&lt;p&gt;在lock-free中，如果一个线程被挂起，其他线程依然能取得进展。lock-free优点在于CPU是可以一直繁忙的，当当前线程被挂起，CPU可以接着处理别的线程（没有核心处于空闲状态），因此增加了系统的吞吐量。但不足之处是，还是可能存在一些线程是被延迟处理的(waiting)，也就意味着这些线程的工作有延时。&lt;/p&gt;
-
-&lt;p&gt;在lock-free系统中优化延时的办法是，建立调度器，维护一个较好的平均延时。&lt;/p&gt;
-
-&lt;h3&gt;wait-free：&lt;/h3&gt;
-
-&lt;p&gt;和lock-free的区别是，wait-free是在lock-free的前提上，进一步要求该系统的线程的操作在有限步骤内能保证完成。所以wait-free必然满足lock-free。&lt;/p&gt;
-
-&lt;p&gt;就上面说的吞吐量而言，wait-free更佳，因为保证了每个线程只要有机会被CPU载入执行，就总是能在有限步内完成，没有等待延时，no waiting。例如实时交易系统就需要wait-free。&lt;/p&gt;
-
-&lt;h3&gt;Q&amp;amp;A&lt;/h3&gt;
-
-&lt;p&gt;Q：为什么lock-free不等于wait-free？&lt;/p&gt;
-
-&lt;p&gt;A：假设一个情景，系统运行在n核环境，并且有n个线程在做一个长操作，其中有m个（m&amp;lt;n）线程能在有限步内完成操作，其他的n - m线程可能会操作失败(fail)并一直不断重试（retry on failure）（失败原因可能那n个线程有关），n-m线程是不能保证在有限步骤内完成操作的（也就是需要wait），所以这种系统就只是lock-free而已。而如果换作wait-free的话，每个线程都能保证操作能在有限步以内完成，并且每个线程和其他线程相互独立，没有依赖，就是无等待，即wait-free。&lt;/p&gt;
-
-&lt;p&gt;Q：lock-free是不是就是无锁？&lt;/p&gt;
-
-&lt;p&gt;A：确实是要求无锁。因为如果系统内有一个线程获得了锁，然后万一线程异常了没有释放锁（无法保证progress），就会导致等待该线程的其他线程永久饥饿。如果这个锁释不释放对其他线程无所谓，那这个锁也显然无意义。综上，lock-free必然要求无锁。 &lt;/p&gt;
-
-&lt;p&gt;wait-free也是无锁？&lt;/p&gt;
-
-&lt;p&gt;A：wait-free是比lock-free更进一步的东西，当然也得是无锁。&lt;/p&gt;
-
-&lt;h2&gt;ABA problem&lt;/h2&gt;
-
-&lt;h2&gt;指令重排和thread fence&lt;/h2&gt;
-
-&lt;h3&gt;指令重排：&lt;/h3&gt;
-
-&lt;p&gt;（参考资料：&lt;a href=&quot;http://preshing.com/20120625/memory-ordering-at-compile-time/%EF%BC%89&quot;&gt;http://preshing.com/20120625/memory-ordering-at-compile-time/）&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;编译器为了优化性能，可能会按和c/c++代码不一样的顺序重新排列指令。&lt;/p&gt;
-
-&lt;p&gt;指令重排需要打开编译优化选项。&lt;/p&gt;
-
-&lt;p&gt;指令重排保证对单线程程序没有影响。但对多线程程序来说，就惨了。&lt;/p&gt;
-
-&lt;p&gt;例子（Linux 3.10.0-514.26.2.el7.x86_64，gcc 4.8.5）：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;执行 gcc -S -masm=intel test.c，得到：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;    mov eax, DWORD PTR B[rip]   // 取出B值并写入eax
-    add eax, 1                  // eax = eax + 1
-    mov DWORD PTR A[rip], eax   // 把eax写入A
-    mov DWORD PTR B[rip], 0     // B = 0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;执行 gcc -S -masm=intel -O2 test.c，得到：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;    mov eax, DWORD PTR B[rip]   // 取出B值并写入eax
-    mov DWORD PTR B[rip], 0     // B = 0
-    add eax, 1                  // eax = eax + 1
-    mov DWORD PTR A[rip], eax   // 把eax写入A
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;显然，两者区别是第四行B=0指令被提前到第二行了，即B=0发生在对A的赋值之前，和c代码是不同的顺序。&lt;/p&gt;
-
-&lt;p&gt;单线程程序不会感知到这个区别。但考虑在多线程环境下，就容易引发一些问题。&lt;/p&gt;
-
-&lt;p&gt;一是影响到了lock-free代码，考虑下面的代码，用了一个共享变量IsPublished来标志Value是否有数据：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IsPublished&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sendValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;IsPublished&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;如果编译器重排了指令，使得IsPublished=1(Store)发生在Value = x(Store)之前。如果有一个线程在这2次store之间抢占了CPU，它看到IsPublished为1，但其实Value是还未赋值的，就引发了错误。&lt;/p&gt;
-
-&lt;p&gt;如果不想受到重排指令的危害，那就得考虑使用thread fence了。&lt;/p&gt;
-
-&lt;h3&gt;memory_order（访存次序）和thread fence&lt;/h3&gt;
-
-&lt;p&gt;中文：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://zh.cppreference.com/w/cpp/atomic/memory_order&quot;&gt;http://zh.cppreference.com/w/cpp/atomic/memory_order&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;英文：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://en.cppreference.com/w/cpp/atomic/memory_order&quot;&gt;http://en.cppreference.com/w/cpp/atomic/memory_order&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;分成三大类：&lt;/p&gt;
-
-&lt;p&gt;一. 顺序一致性模型：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;memory_order_seq_cst：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;二. relax模型：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;memory_order_relaxed：没有顺序限制，仅保证该操作的原子性。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;三. Acquire-Release模型：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;memory_order_consume：&lt;/li&gt;
-&lt;li&gt;memory_order_acquire：&lt;/li&gt;
-&lt;li&gt;memory_order_release：&lt;/li&gt;
-&lt;li&gt;memory_order_acq_rel：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;cache line 和 cache line bouncing&lt;/h2&gt;
-
-&lt;h2&gt;little&amp;#39;s law 律特定律&lt;/h2&gt;
-
-&lt;h2&gt;consistent hashing 一致性哈希&lt;/h2&gt;
-
-&lt;p&gt;参考代码（python）：&lt;a href=&quot;https://github.com/goller/hashring&quot;&gt;https://github.com/goller/hashring&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;参考代码（go）：&lt;a href=&quot;https://godoc.org/stathat.com/c/consistent#example-New&quot;&gt;https://godoc.org/stathat.com/c/consistent#example-New&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/ioriiod0/consistent_hash&quot;&gt;https://github.com/ioriiod0/consistent_hash&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Thu, 29 Mar 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/wynet-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/wynet-1/</guid>
       </item>
     
   </channel>

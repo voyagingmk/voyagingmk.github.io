@@ -286,6 +286,8 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 
 <p>一般master key要设个过期时间，一天、一个星期、一个月，加了限时，就保证了要定期更换，一定程度降低了master key泄露的风险。过期时间服务器决定，客户端如果缓存的是过期的master key，那服务器应有反馈，并重新协商新的master key。</p>
 
+<p>Note: 在TLS1.3中，session id、session ticket的做法已经被废弃了。session ticket被更新为一个类似的东西：PSK(pre-shared key)。</p>
+
 <h2>四，基于master key，得到对称加密密钥，建立对称加密通讯</h2>
 
 <p>刚才的简化例子有一点没有说清楚的，就是nonce怎么发送。</p>
