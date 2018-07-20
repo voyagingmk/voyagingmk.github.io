@@ -91,29 +91,33 @@
 
 <p>可用于非对称加密、数字签名。</p>
 
-<h2><a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a>（Elliptic-curve cryptography） （1985年）</h2>
+<h2><a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a>（Elliptic-curve cryptography）（1985年）</h2>
 
 <p>基于在椭圆曲线上的离散对数的求取问题。</p>
 
 <p>可以结合其他算法来用，变成：ECDSA（数字签名算法，但不推荐的）、ECDH（密钥交换算法）。</p>
 
-<h2><a href="1991%E5%B9%B4">DSA</a></h2>
+<h2><a href="https://en.wikipedia.org/wiki/Digital_Signature_Algorithm">DSA</a> （1991年）</h2>
 
-<p>基于离散对数问题。</p>
+<p>DSA，即Digital Signature Algorithm，直接就叫数字签名算法，显然被发明的时候就是专门用来做数字签名的。</p>
 
-<p>用于数字签名。现在基本没有被使用的价值了。</p>
+<p>数学上基于离散对数问题。</p>
 
-<h2><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES（Rijndael）</a> （2001年）</h2>
+<p>可惜因为DSA要基于强随机数k，有安全隐患，导致现在基本没有被使用的价值了。</p>
+
+<h2><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES</a> （2001年）</h2>
 
 <p>AES的意思是高级加密标准（Advanced Encryption Standard），使用的算法是Rijndael，Rijndael是当时加密算法竞赛的top 1。</p>
 
 <p>AES是目前被使用最广泛的对称加密算法。</p>
 
-<h2><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DH</a>（Diffie-Hellman key exchange）（1976年）</h2>
+<h2><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DH</a>（1976年）</h2>
+
+<p>DH，即Diffie-Hellman key exchange，是密钥交换算法。</p>
 
 <p>基于离散对数问题，所以数学原理和DSA是一样的。</p>
 
-<p>是密钥交换算法，现在不常用。</p>
+<p>现在基于离散对数的算法都不常用了，包括这个DH。</p>
 
 <h2><a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH</a> (21世纪)</h2>
 
