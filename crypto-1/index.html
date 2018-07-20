@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>漫谈网络通讯加密（1）加密学算法概览 – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
+    <title>漫谈网络通讯加密（1）加密学概览 – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的技术博客" />
 
     
-    <meta property="og:title" content="漫谈网络通讯加密（1）加密学算法概览" />
-    <meta property="twitter:title" content="漫谈网络通讯加密（1）加密学算法概览" />
+    <meta property="og:title" content="漫谈网络通讯加密（1）加密学概览" />
+    <meta property="twitter:title" content="漫谈网络通讯加密（1）加密学概览" />
     
 
     <!--[if lt IE 9]>
@@ -37,7 +37,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/crypto-1/',
-		  'title': '漫谈网络通讯加密（1）加密学算法概览'
+		  'title': '漫谈网络通讯加密（1）加密学概览'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -78,7 +78,7 @@
     <div id="main" role="main" class="container">
       <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 <article class="post">
-    <h1>漫谈网络通讯加密（1）加密学算法概览</h1>
+    <h1>漫谈网络通讯加密（1）加密学概览</h1>
     <h3>Tags: <a href="/tag/crypto/" rel="tag">crypto</a></h3>
     <div class="entry">
         <!--more-->
@@ -95,7 +95,13 @@
 
 <p>基于在椭圆曲线上的离散对数的求取问题。</p>
 
-<p>可以结合其他算法来用，变成：ECDSA（数字签名算法）、ECDH（密钥交换算法）。</p>
+<p>可以结合其他算法来用，变成：ECDSA（数字签名算法，但不推荐的）、ECDH（密钥交换算法）。</p>
+
+<h2><a href="1991%E5%B9%B4">DSA</a></h2>
+
+<p>基于离散对数问题。</p>
+
+<p>用于数字签名。现在基本没有被使用的价值了。</p>
 
 <h2><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES（Rijndael）</a> （2001年）</h2>
 
@@ -105,7 +111,7 @@
 
 <h2><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DH</a>（Diffie-Hellman key exchange）（1976年）</h2>
 
-<p>基于离散对数问题。</p>
+<p>基于离散对数问题，所以数学原理和DSA是一样的。</p>
 
 <p>是密钥交换算法，现在不常用。</p>
 
