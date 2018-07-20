@@ -1229,7 +1229,7 @@ SSL-Session:
       </item>
     
       <item>
-        <title>漫谈网络通讯加密（2）流程设计</title>
+        <title>漫谈网络通讯加密（2）握手流程设计</title>
         <description>&lt;!--more--&gt;
 
 &lt;h1&gt;加密通讯的基础&lt;/h1&gt;
