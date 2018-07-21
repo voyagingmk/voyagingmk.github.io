@@ -16,8 +16,6 @@ RSA算法原理（一）
 RSA算法原理（二）
 
 （Note：里面有些图片要上梯子才能加载，chart.googleapis.com，你懂得）
-
-本文写一些和RSA相关的其他笔记，免得和这两篇文章的内容重复。
 " />
     <meta property="og:description" content="首先强推大神的文章：
 
@@ -26,8 +24,6 @@ RSA算法原理（一）
 RSA算法原理（二）
 
 （Note：里面有些图片要上梯子才能加载，chart.googleapis.com，你懂得）
-
-本文写一些和RSA相关的其他笔记，免得和这两篇文章的内容重复。
 " />
     
     <meta name="author" content="Wyman的技术博客" />
@@ -107,11 +103,97 @@ RSA算法原理（二）
 
 <p>（Note：里面有些图片要上梯子才能加载，chart.googleapis.com，你懂得）</p>
 
-<p>本文写一些和RSA相关的其他笔记，免得和这两篇文章的内容重复。</p>
-
 <!--more-->
 
 <h1>RSA算法</h1>
+
+<h2>需要用到的数论知识</h2>
+
+<h3>每个正整数n都能够被分解成多个质数的乘积</h3>
+
+<p>\[ n = p_{1}^{ a_{1} } p_{2}^{ a_{2} } \cdots p_{k}^{ a_{k} }  \]</p>
+
+<p>这个分解是唯一的。不过质因子的乘积顺序可以变。质因子可以重复出现。</p>
+
+<h3>全等关系式</h3>
+
+<p>当2个整数a、b的差等于k个整数n的积时（k可以是任意整数）:</p>
+
+<p>\[ a - b = kn \]</p>
+
+<p>可以写成：</p>
+
+<p>\[a \equiv b (mod \ n) \]</p>
+
+<p>例如a = 9，b = 1，n = 4时，有:</p>
+
+<p>\[ a - b = 9 - 1 = 2 \cdot 4 \]</p>
+
+<p>\[ 9 \equiv 1 (mod \ 4) \]</p>
+
+<h3><a href="https://en.wikipedia.org/wiki/Euler_function">欧拉函数(Euler&#39;s function)</a></h3>
+
+<p><img src="../images/2018.4/eulerfunction.svg" alt="3.svg"></p>
+
+<p>这个东西深究起来是蛮复杂的。简单地去理解，其实是这么一个公式：</p>
+
+<p>\[ \phi (n) = n ( 1 - \frac{ 1 }{ p_{1} } ) ( 1 - \frac{ 1 }{ p_{2} } ) \cdots ( 1 - \frac{ 1 }{ p_{k} } )  \]</p>
+
+<p>\( p_{1} \ p_{2} \cdots p_{k} \) 就是上文说的质因数分解了。注意，这些质数是不能重复的，每个不同的p只会在\(\phi (n) \)公式里出现一次。</p>
+
+<p>特殊的，当n为质数时，质因数分解得到1和n，1不算，那么\( \phi (n) \)简化成：</p>
+
+<p>\[ \phi (n) = n ( 1 - \frac{ 1 }{ n } )  \]</p>
+
+<p>\[ \phi (n) = n  - \frac{ n }{ n }  = n - 1 \]</p>
+
+<p>资料：</p>
+
+<p><a href="https://artofproblemsolving.com/wiki/index.php?title=Euler%27s_totient_function">https://artofproblemsolving.com/wiki/index.php?title=Euler%27s_totient_function</a></p>
+
+<p><a href="https://www.geeksforgeeks.org/eulers-totient-function/">https://www.geeksforgeeks.org/eulers-totient-function/</a></p>
+
+<h3><a href="https://en.wikipedia.org/wiki/Euler%27s_theorem">欧拉定理(Euler&#39;s theorem)</a></h3>
+
+<p>对于任意的互质的2个正整数a和n，都满足以下全等关系式：</p>
+
+<p>\[ a^{\phi (n) } \equiv 1 (mod \ n) \]</p>
+
+<h3><a href="https://en.wikipedia.org/wiki/Fermat%27s_little_theorem">费马小定理(Fermat&#39;s little theorem)</a></h3>
+
+<p>这个是欧拉定理的特殊情况：若正整数n还是个质数，把n记为p，那么有：</p>
+
+<p>\[ \phi (p) = p - 1 \]</p>
+
+<p>代入欧拉定理公式，得到：</p>
+
+<p>\[ a^{ p - 1 } \equiv 1 (mod \ p) \]</p>
+
+<p>这就是费马小定理。</p>
+
+<h3><a href="https://en.wikipedia.org/wiki/Modular_multiplicative_inverse">模逆元(Modular multiplicative inverse)</a></h3>
+
+<p>当2个正整数a和n互质时，必然存在一个整数x，使得：</p>
+
+<p>\[ ax \equiv 1 (mod \ n) \]</p>
+
+<p>x就是所谓的模逆元。另外限定x取值范围为[0, n-1]，就使得<strong>模逆元x是唯一的</strong>。</p>
+
+<p>x的解，可以用欧拉定理来解决，因为a和n互质，所以有：</p>
+
+<p>\[ a^{\phi (n) } \equiv 1 (mod \ n) \]</p>
+
+<p>对左边转换一下：</p>
+
+<p>\[ a\cdot a^{\phi (n) - 1 } \equiv 1 (mod \ n) \]</p>
+
+<p>显然，模逆元x等于：</p>
+
+<p>\[ x = a^{\phi (n) - 1 } \]</p>
+
+<p>这条公式同时也证明了x必然存在。</p>
+
+<h1>RSA-PSS</h1>
 
     </div>
     <div class="entry">

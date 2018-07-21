@@ -2286,11 +2286,97 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;（Note：里面有些图片要上梯子才能加载，chart.googleapis.com，你懂得）&lt;/p&gt;
 
-&lt;p&gt;本文写一些和RSA相关的其他笔记，免得和这两篇文章的内容重复。&lt;/p&gt;
-
 &lt;!--more--&gt;
 
 &lt;h1&gt;RSA算法&lt;/h1&gt;
+
+&lt;h2&gt;需要用到的数论知识&lt;/h2&gt;
+
+&lt;h3&gt;每个正整数n都能够被分解成多个质数的乘积&lt;/h3&gt;
+
+&lt;p&gt;\[ n = p_{1}^{ a_{1} } p_{2}^{ a_{2} } \cdots p_{k}^{ a_{k} }  \]&lt;/p&gt;
+
+&lt;p&gt;这个分解是唯一的。不过质因子的乘积顺序可以变。质因子可以重复出现。&lt;/p&gt;
+
+&lt;h3&gt;全等关系式&lt;/h3&gt;
+
+&lt;p&gt;当2个整数a、b的差等于k个整数n的积时（k可以是任意整数）:&lt;/p&gt;
+
+&lt;p&gt;\[ a - b = kn \]&lt;/p&gt;
+
+&lt;p&gt;可以写成：&lt;/p&gt;
+
+&lt;p&gt;\[a \equiv b (mod \ n) \]&lt;/p&gt;
+
+&lt;p&gt;例如a = 9，b = 1，n = 4时，有:&lt;/p&gt;
+
+&lt;p&gt;\[ a - b = 9 - 1 = 2 \cdot 4 \]&lt;/p&gt;
+
+&lt;p&gt;\[ 9 \equiv 1 (mod \ 4) \]&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Euler_function&quot;&gt;欧拉函数(Euler&amp;#39;s function)&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/eulerfunction.svg&quot; alt=&quot;3.svg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;这个东西深究起来是蛮复杂的。简单地去理解，其实是这么一个公式：&lt;/p&gt;
+
+&lt;p&gt;\[ \phi (n) = n ( 1 - \frac{ 1 }{ p_{1} } ) ( 1 - \frac{ 1 }{ p_{2} } ) \cdots ( 1 - \frac{ 1 }{ p_{k} } )  \]&lt;/p&gt;
+
+&lt;p&gt;\( p_{1} \ p_{2} \cdots p_{k} \) 就是上文说的质因数分解了。注意，这些质数是不能重复的，每个不同的p只会在\(\phi (n) \)公式里出现一次。&lt;/p&gt;
+
+&lt;p&gt;特殊的，当n为质数时，质因数分解得到1和n，1不算，那么\( \phi (n) \)简化成：&lt;/p&gt;
+
+&lt;p&gt;\[ \phi (n) = n ( 1 - \frac{ 1 }{ n } )  \]&lt;/p&gt;
+
+&lt;p&gt;\[ \phi (n) = n  - \frac{ n }{ n }  = n - 1 \]&lt;/p&gt;
+
+&lt;p&gt;资料：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://artofproblemsolving.com/wiki/index.php?title=Euler%27s_totient_function&quot;&gt;https://artofproblemsolving.com/wiki/index.php?title=Euler%27s_totient_function&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.geeksforgeeks.org/eulers-totient-function/&quot;&gt;https://www.geeksforgeeks.org/eulers-totient-function/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Euler%27s_theorem&quot;&gt;欧拉定理(Euler&amp;#39;s theorem)&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;对于任意的互质的2个正整数a和n，都满足以下全等关系式：&lt;/p&gt;
+
+&lt;p&gt;\[ a^{\phi (n) } \equiv 1 (mod \ n) \]&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Fermat%27s_little_theorem&quot;&gt;费马小定理(Fermat&amp;#39;s little theorem)&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;这个是欧拉定理的特殊情况：若正整数n还是个质数，把n记为p，那么有：&lt;/p&gt;
+
+&lt;p&gt;\[ \phi (p) = p - 1 \]&lt;/p&gt;
+
+&lt;p&gt;代入欧拉定理公式，得到：&lt;/p&gt;
+
+&lt;p&gt;\[ a^{ p - 1 } \equiv 1 (mod \ p) \]&lt;/p&gt;
+
+&lt;p&gt;这就是费马小定理。&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Modular_multiplicative_inverse&quot;&gt;模逆元(Modular multiplicative inverse)&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;当2个正整数a和n互质时，必然存在一个整数x，使得：&lt;/p&gt;
+
+&lt;p&gt;\[ ax \equiv 1 (mod \ n) \]&lt;/p&gt;
+
+&lt;p&gt;x就是所谓的模逆元。另外限定x取值范围为[0, n-1]，就使得&lt;strong&gt;模逆元x是唯一的&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;x的解，可以用欧拉定理来解决，因为a和n互质，所以有：&lt;/p&gt;
+
+&lt;p&gt;\[ a^{\phi (n) } \equiv 1 (mod \ n) \]&lt;/p&gt;
+
+&lt;p&gt;对左边转换一下：&lt;/p&gt;
+
+&lt;p&gt;\[ a\cdot a^{\phi (n) - 1 } \equiv 1 (mod \ n) \]&lt;/p&gt;
+
+&lt;p&gt;显然，模逆元x等于：&lt;/p&gt;
+
+&lt;p&gt;\[ x = a^{\phi (n) - 1 } \]&lt;/p&gt;
+
+&lt;p&gt;这条公式同时也证明了x必然存在。&lt;/p&gt;
+
+&lt;h1&gt;RSA-PSS&lt;/h1&gt;
 </description>
         <pubDate>Fri, 06 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1-rsa/</link>
