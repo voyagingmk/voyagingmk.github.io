@@ -2394,7 +2394,9 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;\[ x = a^{\phi (n) - 1 } (mod \ n) \]&lt;/p&gt;
 
-&lt;p&gt;直接用这条公式计算x，据说比较慢，更快速的算法是用&lt;a href=&quot;https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm&quot;&gt;扩展欧几里得算法&lt;/a&gt;：&lt;/p&gt;
+&lt;p&gt;直接用这条公式计算x，据说比较慢，更快速的算法是用&lt;a href=&quot;https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm&quot;&gt;扩展欧几里得算法&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;中文wiki有更详细的例子：&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E6%89%A9%E5%B1%95%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97%E7%AE%97%E6%B3%95&quot;&gt;扩展欧几里得算法&lt;/a&gt;。&lt;/p&gt;
 
 &lt;h2&gt;RSA加密解密原理&lt;/h2&gt;
 
@@ -2438,6 +2440,8 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;e选择17（在范围[1,3120]内即可），并算出d：&lt;/p&gt;
 
 &lt;p&gt;\( d = 2753 \)&lt;/p&gt;
+
+&lt;p&gt;（用扩展欧几里得算法）&lt;/p&gt;
 
 &lt;h3&gt;加密&lt;/h3&gt;
 

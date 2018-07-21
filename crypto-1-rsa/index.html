@@ -211,7 +211,9 @@ RSA算法原理（二）
 
 <p>\[ x = a^{\phi (n) - 1 } (mod \ n) \]</p>
 
-<p>直接用这条公式计算x，据说比较慢，更快速的算法是用<a href="https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">扩展欧几里得算法</a>：</p>
+<p>直接用这条公式计算x，据说比较慢，更快速的算法是用<a href="https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">扩展欧几里得算法</a>。</p>
+
+<p>中文wiki有更详细的例子：<a href="https://zh.wikipedia.org/wiki/%E6%89%A9%E5%B1%95%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97%E7%AE%97%E6%B3%95">扩展欧几里得算法</a>。</p>
 
 <h2>RSA加密解密原理</h2>
 
@@ -255,6 +257,8 @@ RSA算法原理（二）
 <p>e选择17（在范围[1,3120]内即可），并算出d：</p>
 
 <p>\( d = 2753 \)</p>
+
+<p>（用扩展欧几里得算法）</p>
 
 <h3>加密</h3>
 
