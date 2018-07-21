@@ -2316,19 +2316,33 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;h3&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Euler_function&quot;&gt;欧拉函数(Euler&amp;#39;s function)&lt;/a&gt;&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2018.4/eulerfunction.svg&quot; alt=&quot;3.svg&quot;&gt;&lt;/p&gt;
+&lt;p&gt;\[ \phi (n) = \prod _{k=1}^{ \infty } ( 1 - n^{k} ) \]&lt;/p&gt;
 
-&lt;p&gt;这个东西深究起来是蛮复杂的。简单地去理解，其实是这么一个公式：&lt;/p&gt;
+&lt;p&gt;\( \phi (n) \)的含义是：在小于等于n的正整数之中，有\( \phi (n) \)个数与n构成互质关系。&lt;/p&gt;
+
+&lt;p&gt;这条公式深究起来是蛮复杂的。简单地去理解，其实是这么一个公式：&lt;/p&gt;
 
 &lt;p&gt;\[ \phi (n) = n ( 1 - \frac{ 1 }{ p_{1} } ) ( 1 - \frac{ 1 }{ p_{2} } ) \cdots ( 1 - \frac{ 1 }{ p_{k} } )  \]&lt;/p&gt;
 
 &lt;p&gt;\( p_{1} \ p_{2} \cdots p_{k} \) 就是上文说的质因数分解了。注意，这些质数是不能重复的，每个不同的p只会在\(\phi (n) \)公式里出现一次。&lt;/p&gt;
 
-&lt;p&gt;特殊的，当n为质数时，质因数分解得到1和n，1不算，那么\( \phi (n) \)简化成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;特殊情况1&lt;/strong&gt;，当n为质数时，质因数分解得到1和n，1不算，那么\( \phi (n) \)简化成：&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;\[ \phi (n) = n ( 1 - \frac{ 1 }{ n } )  \]&lt;/p&gt;
 
 &lt;p&gt;\[ \phi (n) = n  - \frac{ n }{ n }  = n - 1 \]&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;特殊情况2&lt;/strong&gt;，当n为2个质数p、q的积时：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\[ \phi (n) = \phi (pq) = (pq) ( 1 - \frac{ 1 }{ p } ) ( 1 - \frac{ 1 }{ q} )   \]&lt;/p&gt;
+
+&lt;p&gt;\[ \phi (pq) = ( p - \frac{ p }{ p } ) ( q - \frac{ q }{ q} )   \]&lt;/p&gt;
+
+&lt;p&gt;\[ \phi (pq) = ( p - 1 ) ( q - 1 )   \]&lt;/p&gt;
 
 &lt;p&gt;资料：&lt;/p&gt;
 
@@ -2375,6 +2389,28 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;\[ x = a^{\phi (n) - 1 } \]&lt;/p&gt;
 
 &lt;p&gt;这条公式同时也证明了x必然存在。&lt;/p&gt;
+
+&lt;h2&gt;RSA加密解密原理&lt;/h2&gt;
+
+&lt;h3&gt;准备&lt;/h3&gt;
+
+&lt;p&gt;用户首先任意选择2个质数p、q，并计算p、q乘积n：&lt;/p&gt;
+
+&lt;p&gt;\[ n = pq \]&lt;/p&gt;
+
+&lt;p&gt;然后应用欧拉定理的特殊情况2公式：&lt;/p&gt;
+
+&lt;p&gt;\[ \phi(n) = (p - 1)(q - 1) \]&lt;/p&gt;
+
+&lt;p&gt;这2个值算出来时，就可以&lt;strong&gt;彻底删除p、q&lt;/strong&gt;了。后面的步骤和原始的p、q无关。&lt;/p&gt;
+
+&lt;h3&gt;加密&lt;/h3&gt;
+
+&lt;h3&gt;解密&lt;/h3&gt;
+
+&lt;h3&gt;参考资料：&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://certauth.epfl.ch/rsa/node3.html&quot;&gt;https://certauth.epfl.ch/rsa/node3.html&lt;/a&gt;&lt;/p&gt;
 
 &lt;h1&gt;RSA-PSS&lt;/h1&gt;
 </description>

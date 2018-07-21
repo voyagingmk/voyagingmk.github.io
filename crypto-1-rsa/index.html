@@ -133,19 +133,33 @@ RSA算法原理（二）
 
 <h3><a href="https://en.wikipedia.org/wiki/Euler_function">欧拉函数(Euler&#39;s function)</a></h3>
 
-<p><img src="../images/2018.4/eulerfunction.svg" alt="3.svg"></p>
+<p>\[ \phi (n) = \prod _{k=1}^{ \infty } ( 1 - n^{k} ) \]</p>
 
-<p>这个东西深究起来是蛮复杂的。简单地去理解，其实是这么一个公式：</p>
+<p>\( \phi (n) \)的含义是：在小于等于n的正整数之中，有\( \phi (n) \)个数与n构成互质关系。</p>
+
+<p>这条公式深究起来是蛮复杂的。简单地去理解，其实是这么一个公式：</p>
 
 <p>\[ \phi (n) = n ( 1 - \frac{ 1 }{ p_{1} } ) ( 1 - \frac{ 1 }{ p_{2} } ) \cdots ( 1 - \frac{ 1 }{ p_{k} } )  \]</p>
 
 <p>\( p_{1} \ p_{2} \cdots p_{k} \) 就是上文说的质因数分解了。注意，这些质数是不能重复的，每个不同的p只会在\(\phi (n) \)公式里出现一次。</p>
 
-<p>特殊的，当n为质数时，质因数分解得到1和n，1不算，那么\( \phi (n) \)简化成：</p>
+<ul>
+<li><strong>特殊情况1</strong>，当n为质数时，质因数分解得到1和n，1不算，那么\( \phi (n) \)简化成：</li>
+</ul>
 
 <p>\[ \phi (n) = n ( 1 - \frac{ 1 }{ n } )  \]</p>
 
 <p>\[ \phi (n) = n  - \frac{ n }{ n }  = n - 1 \]</p>
+
+<ul>
+<li><strong>特殊情况2</strong>，当n为2个质数p、q的积时：</li>
+</ul>
+
+<p>\[ \phi (n) = \phi (pq) = (pq) ( 1 - \frac{ 1 }{ p } ) ( 1 - \frac{ 1 }{ q} )   \]</p>
+
+<p>\[ \phi (pq) = ( p - \frac{ p }{ p } ) ( q - \frac{ q }{ q} )   \]</p>
+
+<p>\[ \phi (pq) = ( p - 1 ) ( q - 1 )   \]</p>
 
 <p>资料：</p>
 
@@ -192,6 +206,28 @@ RSA算法原理（二）
 <p>\[ x = a^{\phi (n) - 1 } \]</p>
 
 <p>这条公式同时也证明了x必然存在。</p>
+
+<h2>RSA加密解密原理</h2>
+
+<h3>准备</h3>
+
+<p>用户首先任意选择2个质数p、q，并计算p、q乘积n：</p>
+
+<p>\[ n = pq \]</p>
+
+<p>然后应用欧拉定理的特殊情况2公式：</p>
+
+<p>\[ \phi(n) = (p - 1)(q - 1) \]</p>
+
+<p>这2个值算出来时，就可以<strong>彻底删除p、q</strong>了。后面的步骤和原始的p、q无关。</p>
+
+<h3>加密</h3>
+
+<h3>解密</h3>
+
+<h3>参考资料：</h3>
+
+<p><a href="https://certauth.epfl.ch/rsa/node3.html">https://certauth.epfl.ch/rsa/node3.html</a></p>
 
 <h1>RSA-PSS</h1>
 
