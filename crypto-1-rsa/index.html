@@ -187,13 +187,15 @@ RSA算法原理（二）
 
 <h3><a href="https://en.wikipedia.org/wiki/Modular_multiplicative_inverse">模逆元(Modular multiplicative inverse)</a></h3>
 
-<p>当2个正整数a和n互质时，必然存在一个整数x，使得：</p>
+<p>当2个正整数a和n互质时（Note：a、n本身不一定是质数），必然存在一个整数x，使得：</p>
 
 <p>\[ ax \equiv 1 (mod \ n) \]</p>
 
 <p>x就是所谓的模逆元。另外限定x取值范围为[0, n-1]，就使得<strong>模逆元x是唯一的</strong>。</p>
 
-<p>x的解，可以用欧拉定理来解决，因为a和n互质，所以有：</p>
+<p>x的存在性证明：</p>
+
+<p>可以用欧拉定理来证明，因为a和n互质，所以有：</p>
 
 <p>\[ a^{\phi (n) } \equiv 1 (mod \ n) \]</p>
 
@@ -201,11 +203,13 @@ RSA算法原理（二）
 
 <p>\[ a\cdot a^{\phi (n) - 1 } \equiv 1 (mod \ n) \]</p>
 
-<p>显然，模逆元x等于：</p>
+<p>显然，模逆元x的其中一个解等于：</p>
 
 <p>\[ x = a^{\phi (n) - 1 } \]</p>
 
-<p>这条公式同时也证明了x必然存在。</p>
+<p>这个解可能会超过限定范围，得做模运算才能得到真正的模逆元。</p>
+
+<p>模逆元的计算并不是直接用</p>
 
 <h2>RSA加密解密原理</h2>
 
