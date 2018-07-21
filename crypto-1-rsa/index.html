@@ -264,6 +264,20 @@ RSA算法原理（二）
 
 <h3>解密</h3>
 
+<h3>RSA算法的可靠性保证</h3>
+
+<p>公钥是(e,n)，私钥是(d,n)，攻击者唯一能知道的只有公钥(e,n)，那么攻击者是否能算出d，得到私钥(d,n)呢？</p>
+
+<p>破解d的思路：</p>
+
+<ol>
+<li>\( ed \equiv 1 (mod \ \phi (n) ) \)，只有知道e和\(\phi (n) \)，才能算出d；</li>
+<li>而 \( \phi (n) = (p - 1)(q - 1) \)，只有知道p和q，才能算出\(\phi (n) \)；</li>
+<li>而 pq = n。只有对n做质因数分解，才能算出p和q。</li>
+</ol>
+
+<p>所以，能否在短时间内对n做分解得到p、q，是RSA算法是否可靠的关键。目前来说，还没有快速地求质因数分解的算法。</p>
+
 <h3>参考资料：</h3>
 
 <p><a href="https://certauth.epfl.ch/rsa/node3.html">https://certauth.epfl.ch/rsa/node3.html</a></p>
