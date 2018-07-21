@@ -2491,7 +2491,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;\[ m^{e} \equiv c ( mod \ n) \]&lt;/p&gt;
 
-&lt;p&gt;从加密公式开始推导（以下等式都隐含mod \ n操作）：&lt;/p&gt;
+&lt;p&gt;从加密公式开始推导（以下等式都隐含\(mod \ n\)操作）：&lt;/p&gt;
 
 &lt;p&gt;\[ c \equiv m^{e}  \]
 \[ c^{d} \equiv m^{ed} \]
@@ -2535,7 +2535,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;h3&gt;参考资料：&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://certauth.epfl.ch/rsa/node3.html&quot;&gt;https://certauth.epfl.ch/rsa/node3.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://certauth.epfl.ch/rsa/&quot;&gt;https://certauth.epfl.ch/rsa/&lt;/a&gt;&lt;/p&gt;
 
 &lt;h1&gt;RSA-PSS&lt;/h1&gt;
 </description>
