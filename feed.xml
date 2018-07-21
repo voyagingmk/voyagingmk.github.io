@@ -2491,33 +2491,27 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;\[ m^{e} \equiv c ( mod \ n) \]&lt;/p&gt;
 
-&lt;p&gt;c可以写成：&lt;/p&gt;
+&lt;p&gt;从加密公式开始推导（以下等式都隐含mod \ n操作）：&lt;/p&gt;
 
-&lt;p&gt;\[ c = m^{e} - kn，k是任意整数 \]&lt;/p&gt;
+&lt;p&gt;\[ c \equiv m^{e}  \]
+\[ c^{d} \equiv m^{ed} \]
+\[ c^{d} \equiv m^{1 + k(p - 1)(q - 1) } \]
+\[ c^{d} \equiv m\cdot m^{ k(p - 1)(q - 1) } \]
+\[ c^{d} \equiv m\cdot (m^{ (p - 1)(q - 1) })^{ k } \]
+\[ c^{d} \equiv m\cdot (1)^{ k } \]
+\[ c^{d} \equiv m\]&lt;/p&gt;
 
-&lt;p&gt;代入解密公式：&lt;/p&gt;
+&lt;p&gt;其中不好理解的是第2行到第3行、第5行到第6行。&lt;/p&gt;
 
-&lt;p&gt;\[ (m^{e} - kn) ^{d} \equiv m (mod \ n) \]&lt;/p&gt;
-
-&lt;p&gt;k取0，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ (m^{e} ) ^{d} \equiv m (mod \ n) \]&lt;/p&gt;
-
-&lt;p&gt;\[ m^{ed} \equiv m (mod \ n) \]&lt;/p&gt;
-
-&lt;p&gt;再看上文中的ed公式：&lt;/p&gt;
+&lt;p&gt;第2行到第3行的原理：&lt;/p&gt;
 
 &lt;p&gt;\[ ed \equiv 1 (mod \ \phi (n) ) \]&lt;/p&gt;
 
-&lt;p&gt;变换下：&lt;/p&gt;
+&lt;p&gt;\[ ed = 1 + k\phi (n) \]&lt;/p&gt;
 
-&lt;p&gt;\[ 1 = ed - k&amp;#39; \phi (n) \]&lt;/p&gt;
+&lt;p&gt;\[ ed = 1 + k(p - 1)(q - 1) \]&lt;/p&gt;
 
-&lt;p&gt;\[ ed = 1 + k&amp;#39; \phi (n) \]&lt;/p&gt;
-
-&lt;p&gt;代入到刚才的\( m^{ed} \equiv m (mod \ n) \)，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ m^{ 1 + k&amp;#39; \phi (n) } \equiv m (mod \ n) \]&lt;/p&gt;
+&lt;p&gt;第5行到第6行的原理：&lt;/p&gt;
 
 &lt;h3&gt;RSA算法的可靠性保证&lt;/h3&gt;
 

@@ -308,33 +308,27 @@ RSA算法原理（二）
 
 <p>\[ m^{e} \equiv c ( mod \ n) \]</p>
 
-<p>c可以写成：</p>
+<p>从加密公式开始推导（以下等式都隐含mod \ n操作）：</p>
 
-<p>\[ c = m^{e} - kn，k是任意整数 \]</p>
+<p>\[ c \equiv m^{e}  \]
+\[ c^{d} \equiv m^{ed} \]
+\[ c^{d} \equiv m^{1 + k(p - 1)(q - 1) } \]
+\[ c^{d} \equiv m\cdot m^{ k(p - 1)(q - 1) } \]
+\[ c^{d} \equiv m\cdot (m^{ (p - 1)(q - 1) })^{ k } \]
+\[ c^{d} \equiv m\cdot (1)^{ k } \]
+\[ c^{d} \equiv m\]</p>
 
-<p>代入解密公式：</p>
+<p>其中不好理解的是第2行到第3行、第5行到第6行。</p>
 
-<p>\[ (m^{e} - kn) ^{d} \equiv m (mod \ n) \]</p>
-
-<p>k取0，得到：</p>
-
-<p>\[ (m^{e} ) ^{d} \equiv m (mod \ n) \]</p>
-
-<p>\[ m^{ed} \equiv m (mod \ n) \]</p>
-
-<p>再看上文中的ed公式：</p>
+<p>第2行到第3行的原理：</p>
 
 <p>\[ ed \equiv 1 (mod \ \phi (n) ) \]</p>
 
-<p>变换下：</p>
+<p>\[ ed = 1 + k\phi (n) \]</p>
 
-<p>\[ 1 = ed - k&#39; \phi (n) \]</p>
+<p>\[ ed = 1 + k(p - 1)(q - 1) \]</p>
 
-<p>\[ ed = 1 + k&#39; \phi (n) \]</p>
-
-<p>代入到刚才的\( m^{ed} \equiv m (mod \ n) \)，得到：</p>
-
-<p>\[ m^{ 1 + k&#39; \phi (n) } \equiv m (mod \ n) \]</p>
+<p>第5行到第6行的原理：</p>
 
 <h3>RSA算法的可靠性保证</h3>
 
