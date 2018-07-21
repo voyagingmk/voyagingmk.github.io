@@ -2410,6 +2410,17 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;\[ ed \equiv 1 (mod \ \phi (n) ) \]&lt;/p&gt;
 
+&lt;p&gt;先不说d怎么计算。此时，用户总共持有4个对象：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\( n \)&lt;/li&gt;
+&lt;li&gt;\( \phi (n) \)&lt;/li&gt;
+&lt;li&gt;\( e \)&lt;/li&gt;
+&lt;li&gt;\( d \)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其中的(e、n)组成了RSA算法的公钥；(d, n)组成了私钥。&lt;/p&gt;
+
 &lt;h3&gt;加密&lt;/h3&gt;
 
 &lt;h3&gt;解密&lt;/h3&gt;
