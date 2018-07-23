@@ -2557,7 +2557,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;这种前后处理方法被叫做padding schemes，但并不只是做padding。&lt;/p&gt;
 
-&lt;p&gt;这类方法最常见的是OAEP，optimal asymmetric encryption padding（1994年）：&lt;/p&gt;
+&lt;p&gt;这类方法最常见的是&lt;a href=&quot;https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding&quot;&gt;OAEP&lt;/a&gt;，optimal asymmetric encryption padding（1994年）：&lt;/p&gt;
 
 &lt;p&gt;OAEP-pre(m): &lt;/p&gt;
 
@@ -2577,9 +2577,13 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;li&gt;output m&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;\[ c = R(OAEP_pre(m), e) \]&lt;/p&gt;
+&lt;p&gt;G、H是典型的某种加密学哈希函数。&lt;/p&gt;
 
-&lt;p&gt;\[ m = OAEP_post(R(c, d)) \]&lt;/p&gt;
+&lt;p&gt;综上，RSA-PAEP的加密解密公式如下：&lt;/p&gt;
+
+&lt;p&gt;\[ c = R(OAEPpre(m), e) = R(m&amp;#39;, e)  \]&lt;/p&gt;
+
+&lt;p&gt;\[ m = OAEPpost(R(c, d)) = OAEPpost(m&amp;#39;) \]&lt;/p&gt;
 
 &lt;h3&gt;参考资料：&lt;/h3&gt;
 

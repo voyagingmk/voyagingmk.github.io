@@ -374,7 +374,7 @@ RSA算法原理（二）
 
 <p>这种前后处理方法被叫做padding schemes，但并不只是做padding。</p>
 
-<p>这类方法最常见的是OAEP，optimal asymmetric encryption padding（1994年）：</p>
+<p>这类方法最常见的是<a href="https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding">OAEP</a>，optimal asymmetric encryption padding（1994年）：</p>
 
 <p>OAEP-pre(m): </p>
 
@@ -394,9 +394,13 @@ RSA算法原理（二）
 <li>output m</li>
 </ol>
 
-<p>\[ c = R(OAEP_pre(m), e) \]</p>
+<p>G、H是典型的某种加密学哈希函数。</p>
 
-<p>\[ m = OAEP_post(R(c, d)) \]</p>
+<p>综上，RSA-PAEP的加密解密公式如下：</p>
+
+<p>\[ c = R(OAEPpre(m), e) = R(m&#39;, e)  \]</p>
+
+<p>\[ m = OAEPpost(R(c, d)) = OAEPpost(m&#39;) \]</p>
 
 <h3>参考资料：</h3>
 
