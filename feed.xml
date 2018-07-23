@@ -2288,7 +2288,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;!--more--&gt;
 
-&lt;h1&gt;RSA算法&lt;/h1&gt;
+&lt;h1&gt;RSA加密/解密&lt;/h1&gt;
 
 &lt;h2&gt;需要用到的数论知识&lt;/h2&gt;
 
@@ -2537,7 +2537,13 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;&lt;a href=&quot;https://certauth.epfl.ch/rsa/&quot;&gt;https://certauth.epfl.ch/rsa/&lt;/a&gt;&lt;/p&gt;
 
+&lt;h1&gt;RSA数字签名&lt;/h1&gt;
+
 &lt;h1&gt;RSA-PSS&lt;/h1&gt;
+
+&lt;p&gt;PSS，Probabilistic Signature Scheme，基于概率的签名方案，&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php&quot;&gt;https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 06 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1-rsa/</link>
