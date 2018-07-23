@@ -350,6 +350,54 @@ RSA算法原理（二）
 
 <p>所以，能否在短时间内对n做分解得到p、q，是RSA算法是否可靠的关键。目前来说，还没有快速地求质因数分解的算法。</p>
 
+<h3>针对RSA加密/解密的攻击问题</h3>
+
+<p>上面的加密解密公式：</p>
+
+<p>\[ m^{e} \equiv c ( mod \ n) \]</p>
+
+<p>\[ c^{d} \equiv m (mod \ n) \]</p>
+
+<p>可以用函数R表达：</p>
+
+<p>\[ c = R(m, e) \]</p>
+
+<p>\[ m = R(c, d) \]</p>
+
+<p>对于同一个RSA加密解密函数，输入同样的原文，就会输出同样的密文，这就给了攻击者可乘之机。攻击者如果观察到有2个密文是一样的，就有可能推导出关于此次通讯的更多信息。</p>
+
+<p>解决办法是增加前后处理：</p>
+
+<p>\[ c = R(preprocess(m), e) \]</p>
+
+<p>\[ m = postprocess(R(c, d)) \]</p>
+
+<p>这种前后处理方法被叫做padding schemes，但并不只是做padding。</p>
+
+<p>这类方法最常见的是OAEP，optimal asymmetric encryption padding（1994年）：</p>
+
+<p>OAEP-pre(m): </p>
+
+<ol>
+<li>r = random nonce </li>
+<li>X = (m || 00...0) XOR H(r) // pad m with zeros </li>
+<li>Y = r XOR H(X) </li>
+<li>output：m&#39; = X || Y</li>
+</ol>
+
+<p>OAEP-post(m&#39;): </p>
+
+<ol>
+<li>split m&#39; into X || Y </li>
+<li>r = Y XOR H(X) </li>
+<li>(m || 00...0) = X XOR G(R) </li>
+<li>output m</li>
+</ol>
+
+<p>\[ c = R(OAEP_pre(m), e) \]</p>
+
+<p>\[ m = OAEP_post(R(c, d)) \]</p>
+
 <h3>参考资料：</h3>
 
 <p><a href="https://certauth.epfl.ch/rsa/">https://certauth.epfl.ch/rsa/</a></p>

@@ -2533,6 +2533,54 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;p&gt;所以，能否在短时间内对n做分解得到p、q，是RSA算法是否可靠的关键。目前来说，还没有快速地求质因数分解的算法。&lt;/p&gt;
 
+&lt;h3&gt;针对RSA加密/解密的攻击问题&lt;/h3&gt;
+
+&lt;p&gt;上面的加密解密公式：&lt;/p&gt;
+
+&lt;p&gt;\[ m^{e} \equiv c ( mod \ n) \]&lt;/p&gt;
+
+&lt;p&gt;\[ c^{d} \equiv m (mod \ n) \]&lt;/p&gt;
+
+&lt;p&gt;可以用函数R表达：&lt;/p&gt;
+
+&lt;p&gt;\[ c = R(m, e) \]&lt;/p&gt;
+
+&lt;p&gt;\[ m = R(c, d) \]&lt;/p&gt;
+
+&lt;p&gt;对于同一个RSA加密解密函数，输入同样的原文，就会输出同样的密文，这就给了攻击者可乘之机。攻击者如果观察到有2个密文是一样的，就有可能推导出关于此次通讯的更多信息。&lt;/p&gt;
+
+&lt;p&gt;解决办法是增加前后处理：&lt;/p&gt;
+
+&lt;p&gt;\[ c = R(preprocess(m), e) \]&lt;/p&gt;
+
+&lt;p&gt;\[ m = postprocess(R(c, d)) \]&lt;/p&gt;
+
+&lt;p&gt;这种前后处理方法被叫做padding schemes，但并不只是做padding。&lt;/p&gt;
+
+&lt;p&gt;这类方法最常见的是OAEP，optimal asymmetric encryption padding（1994年）：&lt;/p&gt;
+
+&lt;p&gt;OAEP-pre(m): &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;r = random nonce &lt;/li&gt;
+&lt;li&gt;X = (m || 00...0) XOR H(r) // pad m with zeros &lt;/li&gt;
+&lt;li&gt;Y = r XOR H(X) &lt;/li&gt;
+&lt;li&gt;output：m&amp;#39; = X || Y&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;OAEP-post(m&amp;#39;): &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;split m&amp;#39; into X || Y &lt;/li&gt;
+&lt;li&gt;r = Y XOR H(X) &lt;/li&gt;
+&lt;li&gt;(m || 00...0) = X XOR G(R) &lt;/li&gt;
+&lt;li&gt;output m&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;\[ c = R(OAEP_pre(m), e) \]&lt;/p&gt;
+
+&lt;p&gt;\[ m = OAEP_post(R(c, d)) \]&lt;/p&gt;
+
 &lt;h3&gt;参考资料：&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://certauth.epfl.ch/rsa/&quot;&gt;https://certauth.epfl.ch/rsa/&lt;/a&gt;&lt;/p&gt;
