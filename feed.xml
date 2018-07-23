@@ -2628,6 +2628,12 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;h1&gt;参考资料&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php&quot;&gt;https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/qq_34911465/article/details/78790377&quot;&gt;https://blog.csdn.net/qq_34911465/article/details/78790377&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://pdfs.semanticscholar.org/b459/5fffe0562776a2830c7b525ba9f641110d7a.pdf&quot;&gt;https://pdfs.semanticscholar.org/b459/5fffe0562776a2830c7b525ba9f641110d7a.pdf&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/mrpre/article/details/81118423&quot;&gt;https://blog.csdn.net/mrpre/article/details/81118423&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 06 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1-rsa/</link>
