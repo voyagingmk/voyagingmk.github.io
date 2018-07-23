@@ -2611,15 +2611,21 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;h3&gt;原文m长度超过上限n&lt;/h3&gt;
 
-&lt;p&gt;此时，可以对m做哈希，算出来的摘要就控制在n长度内：&lt;/p&gt;
+&lt;p&gt;此时，可以对m做哈希，算出来的摘要控制在n长度内：&lt;/p&gt;
 
 &lt;p&gt;\[ c = R(H(m), k) \]&lt;/p&gt;
 
 &lt;p&gt;\[ c = R(s, K) == H(m) \]&lt;/p&gt;
 
+&lt;p&gt;里面H可以用上面的OAEP里的H算法。&lt;/p&gt;
+
+&lt;p&gt;然而这个流程也只是最简单的RSA数字签名方案，还有更完善的PSS。&lt;/p&gt;
+
 &lt;h2&gt;RSA-PSS&lt;/h2&gt;
 
-&lt;p&gt;PSS，Probabilistic Signature Scheme，基于概率的签名方案，&lt;/p&gt;
+&lt;p&gt;RSA-PSS（Probabilistic Signature Scheme），基于概率的RSA数字签名方案。&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php&quot;&gt;https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php&lt;/a&gt;&lt;/p&gt;
 </description>

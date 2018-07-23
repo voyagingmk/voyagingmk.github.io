@@ -428,15 +428,21 @@ RSA算法原理（二）
 
 <h3>原文m长度超过上限n</h3>
 
-<p>此时，可以对m做哈希，算出来的摘要就控制在n长度内：</p>
+<p>此时，可以对m做哈希，算出来的摘要控制在n长度内：</p>
 
 <p>\[ c = R(H(m), k) \]</p>
 
 <p>\[ c = R(s, K) == H(m) \]</p>
 
+<p>里面H可以用上面的OAEP里的H算法。</p>
+
+<p>然而这个流程也只是最简单的RSA数字签名方案，还有更完善的PSS。</p>
+
 <h2>RSA-PSS</h2>
 
-<p>PSS，Probabilistic Signature Scheme，基于概率的签名方案，</p>
+<p>RSA-PSS（Probabilistic Signature Scheme），基于概率的RSA数字签名方案。</p>
+
+<h1>参考资料</h1>
 
 <p><a href="https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php">https://www.cs.cornell.edu/courses/cs5430/2015sp/notes/rsa_sign_vs_dec.php</a></p>
 
