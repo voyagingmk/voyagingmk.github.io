@@ -380,7 +380,7 @@ RSA算法原理（二）
 
 <ol>
 <li>r = random nonce </li>
-<li>X = (m || 00...0) XOR H(r) // pad m with zeros </li>
+<li>X = (m || 00...0) XOR G(r) // pad m with zeros </li>
 <li>Y = r XOR H(X) </li>
 <li>output：m&#39; = X || Y</li>
 </ol>
@@ -390,7 +390,7 @@ RSA算法原理（二）
 <ol>
 <li>split m&#39; into X || Y </li>
 <li>r = Y XOR H(X) </li>
-<li>(m || 00...0) = X XOR G(R) </li>
+<li>(m || 00...0) = X XOR G(r) </li>
 <li>output m</li>
 </ol>
 
@@ -401,6 +401,10 @@ RSA算法原理（二）
 <p>\[ c = R(OAEPpre(m), e) = R(m&#39;, e)  \]</p>
 
 <p>\[ m = OAEPpost(R(c, d)) = OAEPpost(m&#39;) \]</p>
+
+<p>wiki的这张图非常清晰地诠释了OAEP的处理过程：</p>
+
+<p><img src="../images/2018.4/oaep.png" alt="oaep.png"></p>
 
 <h3>参考资料：</h3>
 

@@ -2563,7 +2563,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 &lt;ol&gt;
 &lt;li&gt;r = random nonce &lt;/li&gt;
-&lt;li&gt;X = (m || 00...0) XOR H(r) // pad m with zeros &lt;/li&gt;
+&lt;li&gt;X = (m || 00...0) XOR G(r) // pad m with zeros &lt;/li&gt;
 &lt;li&gt;Y = r XOR H(X) &lt;/li&gt;
 &lt;li&gt;output：m&amp;#39; = X || Y&lt;/li&gt;
 &lt;/ol&gt;
@@ -2573,7 +2573,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;ol&gt;
 &lt;li&gt;split m&amp;#39; into X || Y &lt;/li&gt;
 &lt;li&gt;r = Y XOR H(X) &lt;/li&gt;
-&lt;li&gt;(m || 00...0) = X XOR G(R) &lt;/li&gt;
+&lt;li&gt;(m || 00...0) = X XOR G(r) &lt;/li&gt;
 &lt;li&gt;output m&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -2584,6 +2584,10 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 &lt;p&gt;\[ c = R(OAEPpre(m), e) = R(m&amp;#39;, e)  \]&lt;/p&gt;
 
 &lt;p&gt;\[ m = OAEPpost(R(c, d)) = OAEPpost(m&amp;#39;) \]&lt;/p&gt;
+
+&lt;p&gt;wiki的这张图非常清晰地诠释了OAEP的处理过程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.4/oaep.png&quot; alt=&quot;oaep.png&quot;&gt;&lt;/p&gt;
 
 &lt;h3&gt;参考资料：&lt;/h3&gt;
 
