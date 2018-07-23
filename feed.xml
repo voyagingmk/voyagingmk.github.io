@@ -1663,6 +1663,8 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 &lt;p&gt;&lt;a href=&quot;https://blog.helong.info/blog/2015/01/23/ssl_tls_ciphersuite_intro/&quot;&gt;https://blog.helong.info/blog/2015/01/23/ssl_tls_ciphersuite_intro/&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.cryptologie.net/article/340/tls-pre-master-secrets-and-master-secrets/&quot;&gt;https://www.cryptologie.net/article/340/tls-pre-master-secrets-and-master-secrets/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://robertheaton.com/2015/04/06/the-ssl-freak-vulnerability/&quot;&gt;https://robertheaton.com/2015/04/06/the-ssl-freak-vulnerability/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 01 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-2/</link>
