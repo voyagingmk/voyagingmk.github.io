@@ -286,10 +286,10 @@
 <li>void listRewind(list *list, listIter *li); 重置迭代器到链表头</li>
 <li>void listRewindTail(list *list, listIter *li);重置迭代器到链表尾</li>
 <li>list *listDup(list *orig); 复制整个链表，会调用dup接口</li>
-<li>listNode *listSearchKey(list *list, void *key);</li>
-<li>listNode *listIndex(list *list, long index);</li>
-<li>void listRotate(list *list);</li>
-<li>void listJoin(list *l, list *o);</li>
+<li>listNode *listSearchKey(list *list, void *key); 找出包含key的节点，会调用match接口</li>
+<li>listNode *listIndex(list *list, long index); 模拟数组下标操作</li>
+<li>void listRotate(list *list); 把tail移到head</li>
+<li>void listJoin(list *l, list *o); 把整个链表o插到l末尾，并empty掉o</li>
 </ul>
 
 <h1>参考资料：</h1>
