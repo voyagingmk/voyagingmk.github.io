@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>redis5.0源码学习笔记（1） – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="Note：本文实际绑定的版本是branch5.0（2018-7-25）。
+
+持续更新中。
+" />
+    <meta property="og:description" content="Note：本文实际绑定的版本是branch5.0（2018-7-25）。
+
+持续更新中。
+" />
+    
+    <meta name="author" content="Wyman的技术博客" />
+
+    
+    <meta property="og:title" content="redis5.0源码学习笔记（1）" />
+    <meta property="twitter:title" content="redis5.0源码学习笔记（1）" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482" href="/feed.xml" />
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/redis-1/',
+		  'title': 'redis5.0源码学习笔记（1）'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
+            <p class="site-description">写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<article class="post">
+    <h1>redis5.0源码学习笔记（1）</h1>
+    <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
+    <div class="entry">
+        <p>Note：本文实际绑定的版本是branch5.0（2018-7-25）。</p>
+
+<p>持续更新中。</p>
+
+<!--more-->
+
+<h1>数据结构</h1>
+
+<h2>SDS 简单动态字符串</h2>
+
+<h3>基本特点</h3>
+
+<ul>
+<li>涉及字符串的存储基本都基于SDS，例如set nickname Luffy，就创建了nicknmae和Luffy2个SDS</li>
+<li>不止用于字符串，还用于缓冲区：AOF缓冲区、客户端状态中的输入缓冲区</li>
+<li>减少修改字符串长度时所需的内存重分配次数</li>
+<li>杜绝缓冲区溢出问题</li>
+<li>二进制安全</li>
+<li>兼容部分C字符串函数</li>
+</ul>
+
+<h3>源码位置</h3>
+
+<ul>
+<li>sds.h</li>
+<li>sds.c</li>
+</ul>
+
+<h3>结构定义</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="kt">char</span> <span class="o">*</span><span class="n">sds</span><span class="p">;</span>
+
+<span class="cm">/* Note: sdshdr5 is never used, we just access the flags byte directly.</span>
+<span class="cm"> * However is here to document the layout of type 5 SDS strings. */</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr5</span> <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, and 5 msb of string length */</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+<span class="p">};</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr8</span> <span class="p">{</span>
+    <span class="kt">uint8_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
+    <span class="kt">uint8_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+<span class="p">};</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr16</span> <span class="p">{</span>
+    <span class="kt">uint16_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
+    <span class="kt">uint16_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+<span class="p">};</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr32</span> <span class="p">{</span>
+    <span class="kt">uint32_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
+    <span class="kt">uint32_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+<span class="p">};</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr64</span> <span class="p">{</span>
+    <span class="kt">uint64_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
+    <span class="kt">uint64_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+<span class="p">};</span>
+</code></pre></div>
+<ul>
+<li>sds被定义为5种，根据sds的len属性的bit数量划分：5、8、16、32、64bits，5bits的结构没有被使用。</li>
+<li>紧凑对齐：<strong>attribute</strong> ((<strong>packed</strong>)) 告诉编译器取消结构在编译过程中的优化对齐,按照实际占用字节数进行对齐，是GCC特有的语法。</li>
+<li>char buf[]很有意思，这样子声明buf，是不会增大sizeof(sdshdr#T)的，因为编译器不知道buf的长度，默认0，而如果声明成指针，就会占4或8字节。</li>
+<li>综上，5个sds结构的size分别为1、3、5、9、17</li>
+<li>typedef char *sds，指向的是buf字段，如果要访问sdshdr的len、alloc、flags，是用宏SDS_HDR来定位sdshdr的首字节。</li>
+<li>sds依然遵守C语言用&#39;\0&#39;（null terminator）结尾的习惯，使得sds可以使用C字符串函数库。</li>
+<li>len相当于strlen(buf) - 1，记录实际使用了buf的多少字节</li>
+<li>alloc记录buf的容量，不含&#39;\0&#39;</li>
+<li>&#39;\0&#39;由sds自动处理，用户不会感知到&#39;\0&#39;；len、alloc也是</li>
+<li>因为有len字段，获取sds长度时间复杂度为O(1)</li>
+<li>len、alloc字段能防止缓冲区溢出</li>
+<li>alloc - len = avail, avail有效地降低了频繁内存重分配的开销。这种策略叫空间预分配、惰性空间释放。</li>
+</ul>
+
+<h3>接口说明</h3>
+
+<p>sds.h直接定义的简单接口：</p>
+
+<ul>
+<li>size_t sdslen(const sds s)：获得s的len字段</li>
+<li>size_t sdsavail(const sds s)：返回这个s的空闲空间字节长度</li>
+<li>sdssetlen(sds s, size_t newlen)：直接设置s的len字段（不验证上限的）</li>
+<li>sdsinclen(sds s, size_t inc)：s的len增加inc（不验证上限的）</li>
+<li>size_t sdsalloc(const sds s)：获得s的alloc字段（并不是分配一个sds）</li>
+<li>sdssetalloc(sds s, size_t newlen)：直接设置s的alloc字段</li>
+</ul>
+
+<p>在sds.c定义的简单接口：</p>
+
+<ul>
+<li>int sdsHdrSize(char type)：根据SDS_TYPE_xx，返回对应的sdshdr结构的sizeof</li>
+<li>char sdsReqType(size_t string_size)：根据给定大小，返回对应的sdshdr的类型SDS_TYPE_xx，策略是从小到大匹配</li>
+<li>size_t sdsAllocSize(sds s)：等于sdsalloc(s) + 头部长度 + 1，即sds总共占了多少内存</li>
+<li>void *sdsAllocPtr(sds s)：即得到s的sdshdr头部指针</li>
+<li>sds sdsempty(void)：实际调用sdsnewlen(&quot;&quot;,0);</li>
+<li>sds sdsnew(const char *init)：把C字符串转成sds</li>
+<li>sds sdsdup(const sds s)：克隆一个sds</li>
+</ul>
+
+<p>核心接口：</p>
+
+<ul>
+<li>sds sdsnewlen(const void *init, size_t initlen)：创建一个新的sds对象，内容为init，len字段为initlen</li>
+<li>void sdsfree(sds s)：销毁一个sds</li>
+<li>void sdsupdatelen(sds s)：更新s的len为strlen的结果，如果sds某个字节被置0，就会导致strlen长度发生变化。</li>
+<li>void sdsclear(sds s)：清空sds，但不释放sds内存</li>
+<li>sds sdsMakeRoomFor(sds s, size_t addlen)：增大sds的alloc，但不影响已存内容和len字段，会返回新的sds(地址发生改变)</li>
+<li>sds sdsRemoveFreeSpace(sds s)：缩小sds的alloc，使得没有avail空间（100%利用率），会返回新的sds</li>
+<li>void sdsIncrLen(sds s, ssize_t incr)：和sdsinclen类似，区别在于加了assert防止超过上限，以及会把newlen字节置0</li>
+<li>sds sdsgrowzero(sds s, size_t len)：oldlen增大到len，len - oldlen这段空间会自动置0</li>
+<li>sds sdscatlen(sds s, const void *t, size_t len)：即concat操作</li>
+<li>sds sdscat(sds s, const char *t)：用strlen(t)去调用sdscatlen</li>
+<li>sds sdscatsds(sds s, const sds t)：concat2个sds</li>
+<li>sds sdscpylen(sds s, const char *t, size_t len)：把t复制进sds</li>
+<li>sds sdscpy(sds s, const char *t)：用strlen(t)去调用sdscpylen</li>
+</ul>
+
+<p>其他接口：</p>
+
+<ul>
+<li>int sdsll2str(char *s, long long value)：long long转成字符串并放进s缓冲区</li>
+<li>int sdsull2str(char *s, unsigned long long v)：同上</li>
+<li>sds sdsfromlonglong(long long value) ：long long转成sds</li>
+<li>sds sdscatvprintf(sds s, const char *fmt, va_list ap) ：打印相关</li>
+<li>sds sdscatprintf(sds s, const char *fmt, ...)：打印相关</li>
+<li>sds sdscatfmt(sds s, char const *fmt, ...)：格式化相关</li>
+<li>sds sdstrim(sds s, const char *cset) ：trim掉头尾连续字符串，用cset识别</li>
+<li>void sdsrange(sds s, ssize_t start, ssize_t end)：返回s的子串</li>
+<li>void sdstolower(sds s)：转小写</li>
+<li>void sdstoupper(sds s)：转大写</li>
+<li>int sdscmp(const sds s1, const sds s2)：比较两个sds</li>
+<li>sds *sdssplitlen(const char *s, ssize_t len, const char *sep, int seplen, int *count)：用指定的sep字符串切割sds</li>
+<li>void sdsfreesplitres(sds *tokens, int count)：sdssplitlen、sdssplitargs后要调用这个释放数组</li>
+<li>sds sdscatrepr(sds s, const char *p, size_t len) ：concat p串，p会被转成escaped的串</li>
+<li>int is_hex_digit(char c)：判断是不是hex字符</li>
+<li>int hex_digit_to_int(char c)：hex字符转int</li>
+<li>sds *sdssplitargs(const char *line, int *argc)：把用空格间隔的参数列表转成sds数组</li>
+<li>sds sdsmapchars(sds s, const char *from, const char *to, size_t setlen) ：sdsmapchars(mystring, &quot;ho&quot;, &quot;01&quot;, 2)，&quot;hello&quot; -&gt; &quot;0ell1&quot;</li>
+<li>sds sdsjoin(char **argv, int argc, char *sep)：join一组C字符串</li>
+<li>sds sdsjoinsds(sds *argv, int argc, const char *sep, size_t seplen)：join一组SDS对象</li>
+</ul>
+
+<h1>参考资料：</h1>
+
+<p><a href="https://blog.csdn.net/z69183787/article/details/81121779">https://blog.csdn.net/z69183787/article/details/81121779</a></p>
+
+    </div>
+    <div class="entry">
+        (未经授权禁止转载)
+    </div>
+    <div class="date">
+        Written on July 24, 2018
+    </div>
+    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <img src="../images/dashang1.jpeg" />
+    <img src="../images/dashang2.jpeg" />
+    
+    
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

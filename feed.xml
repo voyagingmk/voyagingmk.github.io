@@ -7,6 +7,162 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>redis5.0源码学习笔记（1）</title>
+        <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
+
+&lt;p&gt;持续更新中。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1&gt;数据结构&lt;/h1&gt;
+
+&lt;h2&gt;SDS 简单动态字符串&lt;/h2&gt;
+
+&lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;涉及字符串的存储基本都基于SDS，例如set nickname Luffy，就创建了nicknmae和Luffy2个SDS&lt;/li&gt;
+&lt;li&gt;不止用于字符串，还用于缓冲区：AOF缓冲区、客户端状态中的输入缓冲区&lt;/li&gt;
+&lt;li&gt;减少修改字符串长度时所需的内存重分配次数&lt;/li&gt;
+&lt;li&gt;杜绝缓冲区溢出问题&lt;/li&gt;
+&lt;li&gt;二进制安全&lt;/li&gt;
+&lt;li&gt;兼容部分C字符串函数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;源码位置&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;sds.h&lt;/li&gt;
+&lt;li&gt;sds.c&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;结构定义&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/* Note: sdshdr5 is never used, we just access the flags byte directly.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * However is here to document the layout of type 5 SDS strings. */&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__attribute__&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__packed__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sdshdr5&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 3 lsb of type, and 5 msb of string length */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__attribute__&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__packed__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sdshdr8&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* used */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* excluding the header and null terminator */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 3 lsb of type, 5 unused bits */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__attribute__&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__packed__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sdshdr16&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint16_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* used */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint16_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* excluding the header and null terminator */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 3 lsb of type, 5 unused bits */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__attribute__&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__packed__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sdshdr32&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint32_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* used */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint32_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* excluding the header and null terminator */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 3 lsb of type, 5 unused bits */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__attribute__&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__packed__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sdshdr64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint64_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* used */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint64_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* excluding the header and null terminator */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* 3 lsb of type, 5 unused bits */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;sds被定义为5种，根据sds的len属性的bit数量划分：5、8、16、32、64bits，5bits的结构没有被使用。&lt;/li&gt;
+&lt;li&gt;紧凑对齐：&lt;strong&gt;attribute&lt;/strong&gt; ((&lt;strong&gt;packed&lt;/strong&gt;)) 告诉编译器取消结构在编译过程中的优化对齐,按照实际占用字节数进行对齐，是GCC特有的语法。&lt;/li&gt;
+&lt;li&gt;char buf[]很有意思，这样子声明buf，是不会增大sizeof(sdshdr#T)的，因为编译器不知道buf的长度，默认0，而如果声明成指针，就会占4或8字节。&lt;/li&gt;
+&lt;li&gt;综上，5个sds结构的size分别为1、3、5、9、17&lt;/li&gt;
+&lt;li&gt;typedef char *sds，指向的是buf字段，如果要访问sdshdr的len、alloc、flags，是用宏SDS_HDR来定位sdshdr的首字节。&lt;/li&gt;
+&lt;li&gt;sds依然遵守C语言用&amp;#39;\0&amp;#39;（null terminator）结尾的习惯，使得sds可以使用C字符串函数库。&lt;/li&gt;
+&lt;li&gt;len相当于strlen(buf) - 1，记录实际使用了buf的多少字节&lt;/li&gt;
+&lt;li&gt;alloc记录buf的容量，不含&amp;#39;\0&amp;#39;&lt;/li&gt;
+&lt;li&gt;&amp;#39;\0&amp;#39;由sds自动处理，用户不会感知到&amp;#39;\0&amp;#39;；len、alloc也是&lt;/li&gt;
+&lt;li&gt;因为有len字段，获取sds长度时间复杂度为O(1)&lt;/li&gt;
+&lt;li&gt;len、alloc字段能防止缓冲区溢出&lt;/li&gt;
+&lt;li&gt;alloc - len = avail, avail有效地降低了频繁内存重分配的开销。这种策略叫空间预分配、惰性空间释放。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;接口说明&lt;/h3&gt;
+
+&lt;p&gt;sds.h直接定义的简单接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;size_t sdslen(const sds s)：获得s的len字段&lt;/li&gt;
+&lt;li&gt;size_t sdsavail(const sds s)：返回这个s的空闲空间字节长度&lt;/li&gt;
+&lt;li&gt;sdssetlen(sds s, size_t newlen)：直接设置s的len字段（不验证上限的）&lt;/li&gt;
+&lt;li&gt;sdsinclen(sds s, size_t inc)：s的len增加inc（不验证上限的）&lt;/li&gt;
+&lt;li&gt;size_t sdsalloc(const sds s)：获得s的alloc字段（并不是分配一个sds）&lt;/li&gt;
+&lt;li&gt;sdssetalloc(sds s, size_t newlen)：直接设置s的alloc字段&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在sds.c定义的简单接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;int sdsHdrSize(char type)：根据SDS_TYPE_xx，返回对应的sdshdr结构的sizeof&lt;/li&gt;
+&lt;li&gt;char sdsReqType(size_t string_size)：根据给定大小，返回对应的sdshdr的类型SDS_TYPE_xx，策略是从小到大匹配&lt;/li&gt;
+&lt;li&gt;size_t sdsAllocSize(sds s)：等于sdsalloc(s) + 头部长度 + 1，即sds总共占了多少内存&lt;/li&gt;
+&lt;li&gt;void *sdsAllocPtr(sds s)：即得到s的sdshdr头部指针&lt;/li&gt;
+&lt;li&gt;sds sdsempty(void)：实际调用sdsnewlen(&amp;quot;&amp;quot;,0);&lt;/li&gt;
+&lt;li&gt;sds sdsnew(const char *init)：把C字符串转成sds&lt;/li&gt;
+&lt;li&gt;sds sdsdup(const sds s)：克隆一个sds&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;核心接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;sds sdsnewlen(const void *init, size_t initlen)：创建一个新的sds对象，内容为init，len字段为initlen&lt;/li&gt;
+&lt;li&gt;void sdsfree(sds s)：销毁一个sds&lt;/li&gt;
+&lt;li&gt;void sdsupdatelen(sds s)：更新s的len为strlen的结果，如果sds某个字节被置0，就会导致strlen长度发生变化。&lt;/li&gt;
+&lt;li&gt;void sdsclear(sds s)：清空sds，但不释放sds内存&lt;/li&gt;
+&lt;li&gt;sds sdsMakeRoomFor(sds s, size_t addlen)：增大sds的alloc，但不影响已存内容和len字段，会返回新的sds(地址发生改变)&lt;/li&gt;
+&lt;li&gt;sds sdsRemoveFreeSpace(sds s)：缩小sds的alloc，使得没有avail空间（100%利用率），会返回新的sds&lt;/li&gt;
+&lt;li&gt;void sdsIncrLen(sds s, ssize_t incr)：和sdsinclen类似，区别在于加了assert防止超过上限，以及会把newlen字节置0&lt;/li&gt;
+&lt;li&gt;sds sdsgrowzero(sds s, size_t len)：oldlen增大到len，len - oldlen这段空间会自动置0&lt;/li&gt;
+&lt;li&gt;sds sdscatlen(sds s, const void *t, size_t len)：即concat操作&lt;/li&gt;
+&lt;li&gt;sds sdscat(sds s, const char *t)：用strlen(t)去调用sdscatlen&lt;/li&gt;
+&lt;li&gt;sds sdscatsds(sds s, const sds t)：concat2个sds&lt;/li&gt;
+&lt;li&gt;sds sdscpylen(sds s, const char *t, size_t len)：把t复制进sds&lt;/li&gt;
+&lt;li&gt;sds sdscpy(sds s, const char *t)：用strlen(t)去调用sdscpylen&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其他接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;int sdsll2str(char *s, long long value)：long long转成字符串并放进s缓冲区&lt;/li&gt;
+&lt;li&gt;int sdsull2str(char *s, unsigned long long v)：同上&lt;/li&gt;
+&lt;li&gt;sds sdsfromlonglong(long long value) ：long long转成sds&lt;/li&gt;
+&lt;li&gt;sds sdscatvprintf(sds s, const char *fmt, va_list ap) ：打印相关&lt;/li&gt;
+&lt;li&gt;sds sdscatprintf(sds s, const char *fmt, ...)：打印相关&lt;/li&gt;
+&lt;li&gt;sds sdscatfmt(sds s, char const *fmt, ...)：格式化相关&lt;/li&gt;
+&lt;li&gt;sds sdstrim(sds s, const char *cset) ：trim掉头尾连续字符串，用cset识别&lt;/li&gt;
+&lt;li&gt;void sdsrange(sds s, ssize_t start, ssize_t end)：返回s的子串&lt;/li&gt;
+&lt;li&gt;void sdstolower(sds s)：转小写&lt;/li&gt;
+&lt;li&gt;void sdstoupper(sds s)：转大写&lt;/li&gt;
+&lt;li&gt;int sdscmp(const sds s1, const sds s2)：比较两个sds&lt;/li&gt;
+&lt;li&gt;sds *sdssplitlen(const char *s, ssize_t len, const char *sep, int seplen, int *count)：用指定的sep字符串切割sds&lt;/li&gt;
+&lt;li&gt;void sdsfreesplitres(sds *tokens, int count)：sdssplitlen、sdssplitargs后要调用这个释放数组&lt;/li&gt;
+&lt;li&gt;sds sdscatrepr(sds s, const char *p, size_t len) ：concat p串，p会被转成escaped的串&lt;/li&gt;
+&lt;li&gt;int is_hex_digit(char c)：判断是不是hex字符&lt;/li&gt;
+&lt;li&gt;int hex_digit_to_int(char c)：hex字符转int&lt;/li&gt;
+&lt;li&gt;sds *sdssplitargs(const char *line, int *argc)：把用空格间隔的参数列表转成sds数组&lt;/li&gt;
+&lt;li&gt;sds sdsmapchars(sds s, const char *from, const char *to, size_t setlen) ：sdsmapchars(mystring, &amp;quot;ho&amp;quot;, &amp;quot;01&amp;quot;, 2)，&amp;quot;hello&amp;quot; -&amp;gt; &amp;quot;0ell1&amp;quot;&lt;/li&gt;
+&lt;li&gt;sds sdsjoin(char **argv, int argc, char *sep)：join一组C字符串&lt;/li&gt;
+&lt;li&gt;sds sdsjoinsds(sds *argv, int argc, const char *sep, size_t seplen)：join一组SDS对象&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1&gt;参考资料：&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/z69183787/article/details/81121779&quot;&gt;https://blog.csdn.net/z69183787/article/details/81121779&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 24 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/redis-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-1/</guid>
+      </item>
+    
+      <item>
         <title>漫谈网络通讯加密（4）用openSSL学习TLS1.3</title>
         <description>&lt;!--more--&gt;
 
@@ -1291,6 +1447,14 @@ SSL-Session:
 &lt;li&gt;硬链接：创建直接与目标文件关联的i节点。删除文件操作会变得复杂。&lt;/li&gt;
 &lt;li&gt;符号链接：创建一个符号文件（类型link），文件中只包含&lt;strong&gt;所链接的文件的路径&lt;/strong&gt;。删除文件没什么大问题。额外开销时是要通过路径找到目标文件的i节点，以及符号文件本身还是要有一个i节点和一个磁盘块放路径，毕竟还是个文件。&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h1&gt;文件系统&lt;/h1&gt;
+
+&lt;h3&gt;mmap&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/hj605635529/article/details/73163513&quot;&gt;https://blog.csdn.net/hj605635529/article/details/73163513&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/luckywang1103/article/details/50619251&quot;&gt;https://blog.csdn.net/luckywang1103/article/details/50619251&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 10 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/os-1/</link>
@@ -2766,125 +2930,6 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
         <pubDate>Fri, 06 Apr 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-1-rsa/</link>
         <guid isPermaLink="true">http://localhost:4000/crypto-1-rsa/</guid>
-      </item>
-    
-      <item>
-        <title>漫谈网络通讯加密（1）加密学算法之DH</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h1&gt;DH算法&lt;/h1&gt;
-
-&lt;h2&gt;key exchange例子（ &lt;a href=&quot;https://scotthelme.co.uk/perfect-forward-secrecy/&quot;&gt;from here&lt;/a&gt; )：&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Alice和Bob首先线下商量好，使用&lt;strong&gt;p (prime, 质数) = 23、g (generator, 生成器) = 5&lt;/strong&gt;作为通讯基础（p和g不需要绝对的保密，泄露了也没事）&lt;/li&gt;
-&lt;li&gt;每次Alice和Bob想要建立通讯(连接)时，Alice自己随机生成一个在范围[1, p - 1]的数：a = 6&lt;/li&gt;
-&lt;li&gt;同样，Bob自己也随机一个：b = 15&lt;/li&gt;
-&lt;li&gt;Alice计算： \( A =  g^{a}  \% p =  5^{6}  \% 23 =  15625 \% 23 = 8 \)，把A发给Bob&lt;/li&gt;
-&lt;li&gt;Bob计算： \( B =  g^{b}  \% p =  5^{15}  \% 23 =  30517578125 \% 23 = 19 \)，把B发给Alice&lt;/li&gt;
-&lt;li&gt;Alice收到B后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Alice} =  B^{a}  \% p =  19^{6}  \% 23 = 47045881 \% 23 = 2 \)&lt;/li&gt;
-&lt;li&gt;Bob收到A后，可计算出&lt;strong&gt;对称密钥&lt;/strong&gt;：\( s_{Bob} =  A^{b}  \% p =  8^{15}  \% 23 = 35184372088832 \% 23 = 2 \)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;数学原理&lt;/h2&gt;
-
-&lt;p&gt;其中，用到了&lt;strong&gt;模幂运算&lt;/strong&gt;的基本定理，对于任意自然数a、b、n，有：&lt;/p&gt;
-
-&lt;p&gt;\[ ab\  \%\  n =  ( ab\ \%\  n) \  \%\  n =  ( (a\ \%\  n)  (b\ \%\  n) ) \ \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;应用到幂运算：&lt;/p&gt;
-
-&lt;p&gt;\[ a^{b}\  \%\  n =  ( a \cdots  a ) \  \%\  n =  ( (a\ \%\  n) \cdots  (a\ \%\  n) ) \  \%\  n =  ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;\[ a^{b}\  \%\  n =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;观察这2个式子最右边，发现b的位置是可以移动的：&lt;/p&gt;
-
-&lt;p&gt;\[ ( \ (a\ \%\  n)  ^{b}\  ) \ \%\  n  =  ( a^{b}\ \%\  n) \  \%\  n \]&lt;/p&gt;
-
-&lt;p&gt;套进上一节的例子里的推导公式，得到：&lt;/p&gt;
-
-&lt;p&gt;\[ s_{Alice} = B^{a} \% p = (\  (\  g^{b} \% p\  ) ^{a}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p =  \ g ^{ab} \% p \]&lt;/p&gt;
-
-&lt;p&gt;同理：&lt;/p&gt;
-
-&lt;p&gt;\[ s_{Bob} = A^{b} \% p = (\  (\  g^{a}  \% p\  ) ^{b}\   ) \% p = (  \ g^{ab} \% p\  \  ) \% p  =  \ g ^{ab} \% p \]&lt;/p&gt;
-
-&lt;p&gt;显然有：&lt;/p&gt;
-
-&lt;p&gt;\[  s_{Alice} = s_{Bob}  \]&lt;/p&gt;
-
-&lt;p&gt;这样就协商出了对称的密钥，密钥实质等于：&lt;/p&gt;
-
-&lt;p&gt;\[ g ^{ab} \% p \]&lt;/p&gt;
-
-&lt;p&gt;其中，g、p可公开、a、b保密。&lt;/p&gt;
-
-&lt;h2&gt;为什么可行&lt;/h2&gt;
-
-&lt;p&gt;从攻击者角度看，攻击者最多只能获得以下信息：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;p：23&lt;/li&gt;
-&lt;li&gt;g：5&lt;/li&gt;
-&lt;li&gt;A：8&lt;/li&gt;
-&lt;li&gt;B：19&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;攻击者目标是获得s（serect）。要计算s，就是算2条式子：&lt;/p&gt;
-
-&lt;p&gt;\[ s = ( B^{a} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;\[ s = ( A^{b} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;显然，攻击者只需要破解出a或b，就能得到s。&lt;/p&gt;
-
-&lt;p&gt;又因为有：&lt;/p&gt;
-
-&lt;p&gt;\[ A = ( g^{a} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;\[ B = ( g^{b} ) \% p \]&lt;/p&gt;
-
-&lt;p&gt;所以破解a或b的方法是：&lt;/p&gt;
-
-&lt;p&gt;\[ a = log_{g}^{A} \% p \]&lt;/p&gt;
-
-&lt;p&gt;\[ b = log_{g}^{B} \% p \]&lt;/p&gt;
-
-&lt;p&gt;这看似很简单的算术（对数运算和取模运算），其实是很难算的。目前为止没有找到一个快速计算对数的算法。&lt;/p&gt;
-
-&lt;p&gt;关键在于&lt;strong&gt;p这个素数要足够大&lt;/strong&gt;，那么以现在的计算机计算速度，就很难通过A（或B）、g、p这3个参数算出a，这被称为&lt;a href=&quot;https://en.wikipedia.org/wiki/Discrete_logarithm&quot;&gt;离散对数难题&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;这里需要注意，难的是&lt;strong&gt;离散对数&lt;/strong&gt;，即有log和mod运算并且参数是整数；若单单只有log运算，是不难的。&lt;/p&gt;
-
-&lt;h2&gt;p、g的选取问题&lt;/h2&gt;
-
-&lt;p&gt;涉及到了一些数论的概念：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Greatest_common_divisor&quot;&gt;最大公约数gcd&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Multiplicative_order&quot;&gt;数论阶&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Primitive_root_modulo_n&quot;&gt;原根&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;首先明确下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;p必须是素数，且必须是大数(1024-2048bits)，算法才安全&lt;/li&gt;
-&lt;li&gt;g不需要是素数，且不需要很大&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;p、g不需要自己挑选，可以直接用&lt;a href=&quot;https://tools.ietf.org/html/rfc5114&quot;&gt;rfc5114&lt;/a&gt;给定的值。&lt;/p&gt;
-
-&lt;p&gt;例如&lt;a href=&quot;https://tools.ietf.org/html/rfc5114#section-2.1&quot;&gt;1024-bit MODP Group with 160-bit Prime Order Subgroup&lt;/a&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.4/3.png&quot; alt=&quot;3.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;再讲下去就是深入密码学、数论了，按住不表。&lt;/p&gt;
-</description>
-        <pubDate>Thu, 05 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/crypto-1-dh/</link>
-        <guid isPermaLink="true">http://localhost:4000/crypto-1-dh/</guid>
       </item>
     
   </channel>
