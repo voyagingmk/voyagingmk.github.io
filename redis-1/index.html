@@ -424,6 +424,34 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 <p>k是dict_hash_function_seed，一个dict.c里的静态全局变量，在服务启动时初始化。</p>
 
+<h2>zskiplist 跳跃表</h2>
+
+<h3>基本特点</h3>
+
+<h3>源码位置</h3>
+
+<ul>
+<li>server.h</li>
+<li>t_zset.c</li>
+</ul>
+
+<h3>结构定义</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="p">{</span>
+    <span class="n">sds</span> <span class="n">ele</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">score</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">backward</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">zskiplistLevel</span> <span class="p">{</span>
+        <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">forward</span><span class="p">;</span>
+        <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">span</span><span class="p">;</span>
+    <span class="p">}</span> <span class="n">level</span><span class="p">[];</span>
+<span class="p">}</span> <span class="n">zskiplistNode</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplist</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">level</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">zskiplist</span><span class="p">;</span>
+</code></pre></div>
 <h1>参考资料：</h1>
 
 <p><a href="https://blog.csdn.net/z69183787/article/details/81121779">https://blog.csdn.net/z69183787/article/details/81121779</a></p>

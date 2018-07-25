@@ -345,6 +345,34 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 &lt;p&gt;k是dict_hash_function_seed，一个dict.c里的静态全局变量，在服务启动时初始化。&lt;/p&gt;
 
+&lt;h2&gt;zskiplist 跳跃表&lt;/h2&gt;
+
+&lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;h3&gt;源码位置&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;server.h&lt;/li&gt;
+&lt;li&gt;t_zset.c&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;结构定义&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplistNode&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;sds&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ele&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplistNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;backward&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplistLevel&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplistNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;forward&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;span&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;level&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplistNode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplist&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplistNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tail&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;level&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h1&gt;参考资料：&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/z69183787/article/details/81121779&quot;&gt;https://blog.csdn.net/z69183787/article/details/81121779&lt;/a&gt;&lt;/p&gt;
