@@ -220,15 +220,25 @@
 &lt;li&gt;void listJoin(list *l, list *o); 把整个链表o插到l末尾，并empty掉o&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2&gt;dict 泛型散列表&lt;/h2&gt;
+&lt;h2&gt;dict 泛型字典&lt;/h2&gt;
 
 &lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;字典基于散列表&lt;/li&gt;
+&lt;li&gt;每个dict有2个dictht，用来实现rehashing，即扩容操作&lt;/li&gt;
+&lt;li&gt;rehashing是渐进式的，不是在瞬间做完&lt;/li&gt;
+&lt;li&gt;键冲突的解决方案是chaining，于是每个dictEntry都有一个next指针，用来构成同哈希键链表&lt;/li&gt;
+&lt;li&gt;因为只有next指针，所以chain是单向的，为了加速插入性能，后加入的kv，会插到链表头而不是链表尾&lt;/li&gt;
+&lt;li&gt;rehash和chaining的特点，使得rehashing时，新的表项都插入到dt[1]，而dt用chaing没有容量限制，于是rehashing过程总能完成&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h3&gt;源码位置&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;dict.h&lt;/li&gt;
 &lt;li&gt;dict.c&lt;/li&gt;
+&lt;li&gt;siphash.c&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3&gt;结构定义&lt;/h3&gt;
@@ -243,6 +253,7 @@
     &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dictEntry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dictEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
+&lt;span class=&quot;c1&quot;&gt;// dictType实现泛型，在server.c里有各种dictType的定义&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dictType&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;uint64_t&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hashFunction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keyDup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;privdata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
@@ -252,10 +263,8 @@
     &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;valDestructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;privdata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dictType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;span class=&quot;cm&quot;&gt;/* This is our hash table structure. Every dictionary has two of this as we&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * implement incremental rehashing, for the old to the new table. */&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dictht&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dictEntry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dictEntry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 表项&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sizemask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;used&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -269,10 +278,7 @@
     &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iterators&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* number of iterators currently running */&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;span class=&quot;cm&quot;&gt;/* If safe is set to 1 this is a safe iterator, that means, you can call&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * dictAdd, dictFind, and other functions against the dictionary even while&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * iterating. Otherwise it is a non safe iterator, and only dictNext()&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * should be called while iterating. */&lt;/span&gt;
+
 &lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dictIterator&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -288,42 +294,56 @@
 &lt;span class=&quot;cm&quot;&gt;/* This is the initial size of every hash table */&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define DICT_HT_INITIAL_SIZE     4&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;接口说明&lt;/h3&gt;
+&lt;h3&gt;关键逻辑&lt;/h3&gt;
+
+&lt;h4&gt;rehashing&lt;/h4&gt;
+
+&lt;p&gt;扩容和收缩是通过dictExpand。&lt;/p&gt;
+
+&lt;p&gt;dictExpand让一个dict扩大或缩小到size（实际是_dictNextPower(size)），前提条件是used数要小于size，不然就意味着新的size不足以容纳现有的元素。&lt;/p&gt;
+
+&lt;p&gt;dictExpand最终会设置d-&amp;gt;ht[1] = n 和 d-&amp;gt;rehashidx = 0; 启动rehashing程序。&lt;/p&gt;
+
+&lt;p&gt;之后，dict.c里有大量地方用dictIsRehashing宏，走不同的逻辑，处理rehashing。&lt;/p&gt;
+
+&lt;p&gt;rehashing的迭代接口是dictRehash，参数n表示此次要迭代多少步。&lt;/p&gt;
+
+&lt;p&gt;调用dictRehash的地方：&lt;/p&gt;
+
+&lt;p&gt;_dictRehashStep里调用dictRehash(d,1)
+dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。dictRehashMilliseconds只在server.c里调用。&lt;/p&gt;
+
+&lt;p&gt;调用dictExpand的地方：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;dict *dictCreate(dictType *type, void *privDataPtr);&lt;/li&gt;
-&lt;li&gt;int dictExpand(dict *d, unsigned long size);&lt;/li&gt;
-&lt;li&gt;int dictAdd(dict *d, void *key, void *val);&lt;/li&gt;
-&lt;li&gt;dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing);&lt;/li&gt;
-&lt;li&gt;dictEntry *dictAddOrFind(dict *d, void *key);&lt;/li&gt;
-&lt;li&gt;int dictReplace(dict *d, void *key, void *val);&lt;/li&gt;
-&lt;li&gt;int dictDelete(dict *d, const void *key);&lt;/li&gt;
-&lt;li&gt;dictEntry *dictUnlink(dict *ht, const void *key);&lt;/li&gt;
-&lt;li&gt;void dictFreeUnlinkedEntry(dict *d, dictEntry *he);&lt;/li&gt;
-&lt;li&gt;void dictRelease(dict *d);&lt;/li&gt;
-&lt;li&gt;dictEntry * dictFind(dict *d, const void *key);&lt;/li&gt;
-&lt;li&gt;void *dictFetchValue(dict *d, const void *key);&lt;/li&gt;
-&lt;li&gt;int dictResize(dict *d);&lt;/li&gt;
-&lt;li&gt;dictIterator *dictGetIterator(dict *d);&lt;/li&gt;
-&lt;li&gt;dictIterator *dictGetSafeIterator(dict *d);&lt;/li&gt;
-&lt;li&gt;dictEntry *dictNext(dictIterator *iter);&lt;/li&gt;
-&lt;li&gt;void dictReleaseIterator(dictIterator *iter);&lt;/li&gt;
-&lt;li&gt;dictEntry *dictGetRandomKey(dict *d);&lt;/li&gt;
-&lt;li&gt;unsigned int dictGetSomeKeys(dict *d, dictEntry **des, unsigned int count);&lt;/li&gt;
-&lt;li&gt;void dictGetStats(char *buf, size_t bufsize, dict *d);&lt;/li&gt;
-&lt;li&gt;uint64_t dictGenHashFunction(const void *key, int len);&lt;/li&gt;
-&lt;li&gt;uint64_t dictGenCaseHashFunction(const unsigned char *buf, int len);&lt;/li&gt;
-&lt;li&gt;void dictEmpty(dict &lt;em&gt;d, void(callback)(void&lt;/em&gt;));&lt;/li&gt;
-&lt;li&gt;void dictEnableResize(void);&lt;/li&gt;
-&lt;li&gt;void dictDisableResize(void);&lt;/li&gt;
-&lt;li&gt;int dictRehash(dict *d, int n);&lt;/li&gt;
-&lt;li&gt;int dictRehashMilliseconds(dict *d, int ms);&lt;/li&gt;
-&lt;li&gt;void dictSetHashFunctionSeed(uint8_t *seed);&lt;/li&gt;
-&lt;li&gt;uint8_t *dictGetHashFunctionSeed(void);&lt;/li&gt;
-&lt;li&gt;unsigned long dictScan(dict *d, unsigned long v, dictScanFunction *fn, dictScanBucketFunction *bucketfn, void *privdata);&lt;/li&gt;
-&lt;li&gt;uint64_t dictGetHash(dict *d, const void *key);&lt;/li&gt;
-&lt;li&gt;dictEntry **dictFindEntryRefByPtrAndHash(dict *d, const void *oldptr, uint64_t hash);&lt;/li&gt;
+&lt;li&gt;dictResize：把dict缩小到used大小，使得空间利用率尽量靠近1。dictResize并不在dict.c调用，所以是由上层策略决定的，实际上是根据htNeedsResize，即ratio小于0.1时，就会开始收缩。&lt;/li&gt;
+&lt;li&gt;_dictKeyIndex：每次调用都会执行_dictExpandIfNeeded，如果used已经大于size且两者之比ratio大于5，就调用dictExpand开始扩容（说明有很多chain了）&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;每次dictExpand，都会创建一个dictht，并分配空间：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;table&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zcalloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;realsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dictEntry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// realsize个桶&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;dictRehash的rehashing完成时：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span class=&quot;cm&quot;&gt;/* Check if we already rehashed the whole table... */&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ht&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;used&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ht&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ht&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ht&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_dictReset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ht&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rehashidx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;缺省哈希函数：siphash&lt;/h4&gt;
+
+&lt;p&gt;缺省哈希函数是siphash，以前是murmurhash2。&lt;/p&gt;
+
+&lt;p&gt;跟踪dictType的hashFunction调用，最终会找到dict.c里的：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint64_t&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;siphash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;uint64_t&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;siphash_nocase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这2个函数是在 siphash.c里定义的，siphash.c有且只有这2个函数。&lt;/p&gt;
+
+&lt;p&gt;k是dict_hash_function_seed，一个dict.c里的静态全局变量，在服务启动时初始化。&lt;/p&gt;
 
 &lt;h1&gt;参考资料：&lt;/h1&gt;
 
