@@ -234,6 +234,19 @@
 
 <h2>adlist 泛型双向链表</h2>
 
+<h3>基本特点</h3>
+
+<ul>
+<li>增加一个len字段用来记录链表长度，使得获取链表长度O(1)</li>
+</ul>
+
+<p>泛型原理：</p>
+
+<ul>
+<li>value字段用void*类型，使得可以存任意类型的对象</li>
+<li>list结构里存了3个函数指针：dup、free、match，使得不同类型的list可以自定义节点的复制、销毁、匹配函数</li>
+</ul>
+
 <h3>结构定义</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Node, List, and Iterator are the only data structures used currently. */</span>
 
@@ -257,31 +270,24 @@
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">list</span><span class="p">;</span>
 </code></pre></div>
-<h3>泛型原理</h3>
-
-<ul>
-<li>value字段用void*类型，使得可以存任意类型的对象</li>
-<li>list结构里存了3个函数指针：dup、free、match，使得不同类型的list可以自定义复制、销毁、查找函数</li>
-</ul>
-
 <h3>接口说明</h3>
 
 <ul>
-<li>list *listCreate(void);</li>
-<li>void listRelease(list *list);</li>
-<li>void listEmpty(list *list);</li>
-<li>list *listAddNodeHead(list *list, void *value);</li>
-<li>list *listAddNodeTail(list *list, void *value);</li>
-<li>list *listInsertNode(list *list, listNode *old_node, void *value, int after);</li>
-<li>void listDelNode(list *list, listNode *node);</li>
-<li>listIter *listGetIterator(list *list, int direction);</li>
-<li>listNode *listNext(listIter *iter);</li>
-<li>void listReleaseIterator(listIter *iter);</li>
-<li>list *listDup(list *orig);</li>
+<li>list *listCreate(void); 创建新的list对象</li>
+<li>void listEmpty(list *list); 清空list里的所有元素</li>
+<li>void listRelease(list *list); 调用了listEmpty(list)、zfree(list)</li>
+<li>list *listAddNodeHead(list *list, void *value); 创建一个存value的node并插在链表头</li>
+<li>list *listAddNodeTail(list *list, void *value);创建一个存value的node并插在链表尾</li>
+<li>list *listInsertNode(list *list, listNode *old_node, void *value, int after); 创建一个存value的node并插在old_node的前或后</li>
+<li>void listDelNode(list *list, listNode *node); 删node</li>
+<li>listIter *listGetIterator(list *list, int direction); 创建迭代器</li>
+<li>listNode *listNext(listIter *iter); 根据迭代方向步进1</li>
+<li>void listReleaseIterator(listIter *iter);删迭代器</li>
+<li>void listRewind(list *list, listIter *li); 重置迭代器到链表头</li>
+<li>void listRewindTail(list *list, listIter *li);重置迭代器到链表尾</li>
+<li>list *listDup(list *orig); 复制整个链表，会调用dup接口</li>
 <li>listNode *listSearchKey(list *list, void *key);</li>
 <li>listNode *listIndex(list *list, long index);</li>
-<li>void listRewind(list *list, listIter *li);</li>
-<li>void listRewindTail(list *list, listIter *li);</li>
 <li>void listRotate(list *list);</li>
 <li>void listJoin(list *l, list *o);</li>
 </ul>
