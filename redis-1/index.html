@@ -247,6 +247,13 @@
 <li>list结构里存了3个函数指针：dup、free、match，使得不同类型的list可以自定义节点的复制、销毁、匹配函数</li>
 </ul>
 
+<h3>源码位置</h3>
+
+<ul>
+<li>adlist.h</li>
+<li>adlist.c</li>
+</ul>
+
 <h3>结构定义</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Node, List, and Iterator are the only data structures used currently. */</span>
 
@@ -290,6 +297,111 @@
 <li>listNode *listIndex(list *list, long index); 模拟数组下标操作</li>
 <li>void listRotate(list *list); 把tail移到head</li>
 <li>void listJoin(list *l, list *o); 把整个链表o插到l末尾，并empty掉o</li>
+</ul>
+
+<h2>dict 泛型散列表</h2>
+
+<h3>基本特点</h3>
+
+<h3>源码位置</h3>
+
+<ul>
+<li>dict.h</li>
+<li>dict.c</li>
+</ul>
+
+<h3>结构定义</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictEntry</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span>
+    <span class="k">union</span> <span class="p">{</span>
+        <span class="kt">void</span> <span class="o">*</span><span class="n">val</span><span class="p">;</span>
+        <span class="kt">uint64_t</span> <span class="n">u64</span><span class="p">;</span>
+        <span class="kt">int64_t</span> <span class="n">s64</span><span class="p">;</span>
+        <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+    <span class="p">}</span> <span class="n">v</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">dictEntry</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictType</span> <span class="p">{</span>
+    <span class="kt">uint64_t</span> <span class="p">(</span><span class="o">*</span><span class="n">hashFunction</span><span class="p">)(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">keyDup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">valDup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">keyCompare</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key1</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key2</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">keyDestructor</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">valDestructor</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">);</span>
+<span class="p">}</span> <span class="n">dictType</span><span class="p">;</span>
+
+<span class="cm">/* This is our hash table structure. Every dictionary has two of this as we</span>
+<span class="cm"> * implement incremental rehashing, for the old to the new table. */</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictht</span> <span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">**</span><span class="n">table</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">size</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">sizemask</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">used</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">dictht</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dict</span> <span class="p">{</span>
+    <span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">;</span>
+    <span class="n">dictht</span> <span class="n">ht</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="kt">long</span> <span class="n">rehashidx</span><span class="p">;</span> <span class="cm">/* rehashing not in progress if rehashidx == -1 */</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">iterators</span><span class="p">;</span> <span class="cm">/* number of iterators currently running */</span>
+<span class="p">}</span> <span class="n">dict</span><span class="p">;</span>
+
+<span class="cm">/* If safe is set to 1 this is a safe iterator, that means, you can call</span>
+<span class="cm"> * dictAdd, dictFind, and other functions against the dictionary even while</span>
+<span class="cm"> * iterating. Otherwise it is a non safe iterator, and only dictNext()</span>
+<span class="cm"> * should be called while iterating. */</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictIterator</span> <span class="p">{</span>
+    <span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">index</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">table</span><span class="p">,</span> <span class="n">safe</span><span class="p">;</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">entry</span><span class="p">,</span> <span class="o">*</span><span class="n">nextEntry</span><span class="p">;</span>
+    <span class="cm">/* unsafe iterator fingerprint for misuse detection. */</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">fingerprint</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">dictIterator</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="n">dictScanFunction</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="n">de</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="n">dictScanBucketFunction</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="n">dictEntry</span> <span class="o">**</span><span class="n">bucketref</span><span class="p">);</span>
+
+<span class="cm">/* This is the initial size of every hash table */</span>
+<span class="cp">#define DICT_HT_INITIAL_SIZE     4</span>
+</code></pre></div>
+<h3>接口说明</h3>
+
+<ul>
+<li>dict *dictCreate(dictType *type, void *privDataPtr);</li>
+<li>int dictExpand(dict *d, unsigned long size);</li>
+<li>int dictAdd(dict *d, void *key, void *val);</li>
+<li>dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing);</li>
+<li>dictEntry *dictAddOrFind(dict *d, void *key);</li>
+<li>int dictReplace(dict *d, void *key, void *val);</li>
+<li>int dictDelete(dict *d, const void *key);</li>
+<li>dictEntry *dictUnlink(dict *ht, const void *key);</li>
+<li>void dictFreeUnlinkedEntry(dict *d, dictEntry *he);</li>
+<li>void dictRelease(dict *d);</li>
+<li>dictEntry * dictFind(dict *d, const void *key);</li>
+<li>void *dictFetchValue(dict *d, const void *key);</li>
+<li>int dictResize(dict *d);</li>
+<li>dictIterator *dictGetIterator(dict *d);</li>
+<li>dictIterator *dictGetSafeIterator(dict *d);</li>
+<li>dictEntry *dictNext(dictIterator *iter);</li>
+<li>void dictReleaseIterator(dictIterator *iter);</li>
+<li>dictEntry *dictGetRandomKey(dict *d);</li>
+<li>unsigned int dictGetSomeKeys(dict *d, dictEntry **des, unsigned int count);</li>
+<li>void dictGetStats(char *buf, size_t bufsize, dict *d);</li>
+<li>uint64_t dictGenHashFunction(const void *key, int len);</li>
+<li>uint64_t dictGenCaseHashFunction(const unsigned char *buf, int len);</li>
+<li>void dictEmpty(dict <em>d, void(callback)(void</em>));</li>
+<li>void dictEnableResize(void);</li>
+<li>void dictDisableResize(void);</li>
+<li>int dictRehash(dict *d, int n);</li>
+<li>int dictRehashMilliseconds(dict *d, int ms);</li>
+<li>void dictSetHashFunctionSeed(uint8_t *seed);</li>
+<li>uint8_t *dictGetHashFunctionSeed(void);</li>
+<li>unsigned long dictScan(dict *d, unsigned long v, dictScanFunction *fn, dictScanBucketFunction *bucketfn, void *privdata);</li>
+<li>uint64_t dictGetHash(dict *d, const void *key);</li>
+<li>dictEntry **dictFindEntryRefByPtrAndHash(dict *d, const void *oldptr, uint64_t hash);</li>
 </ul>
 
 <h1>参考资料：</h1>
