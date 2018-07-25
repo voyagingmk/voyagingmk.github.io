@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Wyman的技术博客</title>
-    <description>写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</description>
+    <title>Wyman的别致技术博客</title>
+    <description>恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</description>
     <link>http://localhost:4000</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
@@ -351,6 +351,8 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 &lt;ul&gt;
 &lt;li&gt;用来存放有序集合（zset）&lt;/li&gt;
+&lt;li&gt;集合元素不能重复，但分值score可以重复&lt;/li&gt;
+&lt;li&gt;最高level是64，旧版本是32（ZSKIPLIST_MAXLEVEL）&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3&gt;源码位置&lt;/h3&gt;
@@ -377,6 +379,47 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
     &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;level&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zskiplist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;表头节点是特殊的，不存数据（ele、score无用）。&lt;/p&gt;
+
+&lt;h3&gt;接口说明&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;zskiplist *zslCreate(void); 创建一个zskiplist并初始化表头&lt;/li&gt;
+&lt;li&gt;void zslFree(zskiplist *zsl); 沿着level[0]遍历整个跳跃表释放各个节点，并最终释放zsl&lt;/li&gt;
+&lt;li&gt;zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele);&lt;/li&gt;
+&lt;li&gt;unsigned char *zzlInsert(unsigned char *zl, sds ele, double score);&lt;/li&gt;
+&lt;li&gt;int zslDelete(zskiplist *zsl, double score, sds ele, zskiplistNode **node);&lt;/li&gt;
+&lt;li&gt;zskiplistNode *zslFirstInRange(zskiplist *zsl, zrangespec *range);&lt;/li&gt;
+&lt;li&gt;zskiplistNode *zslLastInRange(zskiplist *zsl, zrangespec *range);&lt;/li&gt;
+&lt;li&gt;double zzlGetScore(unsigned char *sptr);&lt;/li&gt;
+&lt;li&gt;void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);&lt;/li&gt;
+&lt;li&gt;void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);&lt;/li&gt;
+&lt;li&gt;unsigned char *zzlFirstInRange(unsigned char *zl, zrangespec *range);&lt;/li&gt;
+&lt;li&gt;unsigned char *zzlLastInRange(unsigned char *zl, zrangespec *range);&lt;/li&gt;
+&lt;li&gt;unsigned long zsetLength(const robj *zobj);&lt;/li&gt;
+&lt;li&gt;void zsetConvert(robj *zobj, int encoding);&lt;/li&gt;
+&lt;li&gt;void zsetConvertToZiplistIfNeeded(robj *zobj, size_t maxelelen);&lt;/li&gt;
+&lt;li&gt;int zsetScore(robj *zobj, sds member, double *score);&lt;/li&gt;
+&lt;li&gt;unsigned long zslGetRank(zskiplist *zsl, double score, sds o);&lt;/li&gt;
+&lt;li&gt;int zsetAdd(robj *zobj, double score, sds ele, int *flags, double *newscore);&lt;/li&gt;
+&lt;li&gt;long zsetRank(robj *zobj, sds ele, int reverse);&lt;/li&gt;
+&lt;li&gt;int zsetDel(robj *zobj, sds ele);&lt;/li&gt;
+&lt;li&gt;void genericZpopCommand(client *c, robj **keyv, int keyc, int where, int emitkey, robj *countarg);&lt;/li&gt;
+&lt;li&gt;sds ziplistGetObject(unsigned char *sptr);&lt;/li&gt;
+&lt;li&gt;int zslValueGteMin(double value, zrangespec *spec);&lt;/li&gt;
+&lt;li&gt;int zslValueLteMax(double value, zrangespec *spec);&lt;/li&gt;
+&lt;li&gt;void zslFreeLexRange(zlexrangespec *spec);&lt;/li&gt;
+&lt;li&gt;int zslParseLexRange(robj *min, robj *max, zlexrangespec *spec);&lt;/li&gt;
+&lt;li&gt;unsigned char *zzlFirstInLexRange(unsigned char *zl, zlexrangespec *range);&lt;/li&gt;
+&lt;li&gt;unsigned char *zzlLastInLexRange(unsigned char *zl, zlexrangespec *range);&lt;/li&gt;
+&lt;li&gt;zskiplistNode *zslFirstInLexRange(zskiplist *zsl, zlexrangespec *range);&lt;/li&gt;
+&lt;li&gt;zskiplistNode *zslLastInLexRange(zskiplist *zsl, zlexrangespec *range);&lt;/li&gt;
+&lt;li&gt;int zzlLexValueGteMin(unsigned char *p, zlexrangespec *spec);&lt;/li&gt;
+&lt;li&gt;int zzlLexValueLteMax(unsigned char *p, zlexrangespec *spec);&lt;/li&gt;
+&lt;li&gt;int zslLexValueGteMin(sds value, zlexrangespec *spec);&lt;/li&gt;
+&lt;li&gt;int zslLexValueLteMax(sds value, zlexrangespec *spec);&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h1&gt;参考资料：&lt;/h1&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/z69183787/article/details/81121779&quot;&gt;https://blog.csdn.net/z69183787/article/details/81121779&lt;/a&gt;&lt;/p&gt;

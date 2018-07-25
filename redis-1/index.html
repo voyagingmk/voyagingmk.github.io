@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>redis5.0源码学习笔记（1） – Wyman的技术博客 – 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</title>
+    <title>redis5.0源码学习笔记（1） – Wyman的别致技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -18,7 +18,7 @@
 持续更新中。
 " />
     
-    <meta name="author" content="Wyman的技术博客" />
+    <meta name="author" content="Wyman的别致技术博客" />
 
     
     <meta property="og:title" content="redis5.0源码学习笔记（1）" />
@@ -30,7 +30,7 @@
     <![endif]-->
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="Wyman的技术博客 - 写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482" href="/feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的别致技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
 
     
 	<!-- Google Analytics -->
@@ -69,8 +69,8 @@
           <a href="/" class="site-avatar"><img src="https://www.qiujiawei.com/images/avatar.jpg" /></a>
 
           <div class="site-info">
-            <h1 class="site-name"><a href="/">Wyman的技术博客</a></h1>
-            <p class="site-description">写作主题覆盖：游戏开发技术、图形学、机器学习。QQ：234707482</p>
+            <h1 class="site-name"><a href="/">Wyman的别致技术博客</a></h1>
+            <p class="site-description">恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</p>
           </div>
 
           <nav>
@@ -430,6 +430,8 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 <ul>
 <li>用来存放有序集合（zset）</li>
+<li>集合元素不能重复，但分值score可以重复</li>
+<li>最高level是64，旧版本是32（ZSKIPLIST_MAXLEVEL）</li>
 </ul>
 
 <h3>源码位置</h3>
@@ -456,6 +458,47 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
     <span class="kt">int</span> <span class="n">level</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">zskiplist</span><span class="p">;</span>
 </code></pre></div>
+<p>表头节点是特殊的，不存数据（ele、score无用）。</p>
+
+<h3>接口说明</h3>
+
+<ul>
+<li>zskiplist *zslCreate(void); 创建一个zskiplist并初始化表头</li>
+<li>void zslFree(zskiplist *zsl); 沿着level[0]遍历整个跳跃表释放各个节点，并最终释放zsl</li>
+<li>zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele);</li>
+<li>unsigned char *zzlInsert(unsigned char *zl, sds ele, double score);</li>
+<li>int zslDelete(zskiplist *zsl, double score, sds ele, zskiplistNode **node);</li>
+<li>zskiplistNode *zslFirstInRange(zskiplist *zsl, zrangespec *range);</li>
+<li>zskiplistNode *zslLastInRange(zskiplist *zsl, zrangespec *range);</li>
+<li>double zzlGetScore(unsigned char *sptr);</li>
+<li>void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);</li>
+<li>void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);</li>
+<li>unsigned char *zzlFirstInRange(unsigned char *zl, zrangespec *range);</li>
+<li>unsigned char *zzlLastInRange(unsigned char *zl, zrangespec *range);</li>
+<li>unsigned long zsetLength(const robj *zobj);</li>
+<li>void zsetConvert(robj *zobj, int encoding);</li>
+<li>void zsetConvertToZiplistIfNeeded(robj *zobj, size_t maxelelen);</li>
+<li>int zsetScore(robj *zobj, sds member, double *score);</li>
+<li>unsigned long zslGetRank(zskiplist *zsl, double score, sds o);</li>
+<li>int zsetAdd(robj *zobj, double score, sds ele, int *flags, double *newscore);</li>
+<li>long zsetRank(robj *zobj, sds ele, int reverse);</li>
+<li>int zsetDel(robj *zobj, sds ele);</li>
+<li>void genericZpopCommand(client *c, robj **keyv, int keyc, int where, int emitkey, robj *countarg);</li>
+<li>sds ziplistGetObject(unsigned char *sptr);</li>
+<li>int zslValueGteMin(double value, zrangespec *spec);</li>
+<li>int zslValueLteMax(double value, zrangespec *spec);</li>
+<li>void zslFreeLexRange(zlexrangespec *spec);</li>
+<li>int zslParseLexRange(robj *min, robj *max, zlexrangespec *spec);</li>
+<li>unsigned char *zzlFirstInLexRange(unsigned char *zl, zlexrangespec *range);</li>
+<li>unsigned char *zzlLastInLexRange(unsigned char *zl, zlexrangespec *range);</li>
+<li>zskiplistNode *zslFirstInLexRange(zskiplist *zsl, zlexrangespec *range);</li>
+<li>zskiplistNode *zslLastInLexRange(zskiplist *zsl, zlexrangespec *range);</li>
+<li>int zzlLexValueGteMin(unsigned char *p, zlexrangespec *spec);</li>
+<li>int zzlLexValueLteMax(unsigned char *p, zlexrangespec *spec);</li>
+<li>int zslLexValueGteMin(sds value, zlexrangespec *spec);</li>
+<li>int zslLexValueLteMax(sds value, zlexrangespec *spec);</li>
+</ul>
+
 <h1>参考资料：</h1>
 
 <p><a href="https://blog.csdn.net/z69183787/article/details/81121779">https://blog.csdn.net/z69183787/article/details/81121779</a></p>
