@@ -349,6 +349,10 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 &lt;h3&gt;基本特点&lt;/h3&gt;
 
+&lt;ul&gt;
+&lt;li&gt;用来存放有序集合（zset）&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h3&gt;源码位置&lt;/h3&gt;
 
 &lt;ul&gt;
