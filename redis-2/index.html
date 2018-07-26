@@ -168,6 +168,18 @@
 
 <p>每个对象的释放都是自动的，在decrRefCount里执行，会自动根据o-&gt;type来执行不同的释放动作。</p>
 
+<p>根据decrRefCount可以知道type和encoding的对应关系：</p>
+
+<ul>
+<li>OBJ_STRING: OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR</li>
+<li>OBJ_LIST: OBJ_ENCODING_QUICKLIST / OBJ_ENCODING_ZIPLIST</li>
+<li>OBJ_SET: OBJ_ENCODING_HT / OBJ_ENCODING_INTSET</li>
+<li>OBJ_ZSET: OBJ_ENCODING_SKIPLIST / OBJ_ENCODING_ZIPLIST</li>
+<li>OBJ_HASH: OBJ_ENCODING_HT / OBJ_ENCODING_ZIPLIST</li>
+<li>OBJ_MODULE: 无</li>
+<li>OBJ_STREAM: 无</li>
+</ul>
+
     </div>
     <div class="entry">
         (未经授权禁止转载)
