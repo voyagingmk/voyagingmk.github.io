@@ -129,6 +129,37 @@
     <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">robj</span><span class="p">;</span>
 </code></pre></div>
+<h2>createObject</h2>
+
+<p>这个是最基本的创建对象接口：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="nf">createObject</span><span class="p">(</span><span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">o</span><span class="p">));</span>
+    <span class="n">o</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+    <span class="n">o</span><span class="o">-&gt;</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">OBJ_ENCODING_RAW</span><span class="p">;</span>
+    <span class="n">o</span><span class="o">-&gt;</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="n">o</span><span class="o">-&gt;</span><span class="n">refcount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxmemory_policy</span> <span class="o">&amp;</span> <span class="n">MAXMEMORY_FLAG_LFU</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">o</span><span class="o">-&gt;</span><span class="n">lru</span> <span class="o">=</span> <span class="p">(</span><span class="n">LFUGetTimeInMinutes</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="mi">8</span><span class="p">)</span> <span class="o">|</span> <span class="n">LFU_INIT_VAL</span><span class="p">;</span> <span class="c1">// 根据访问频率的</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">o</span><span class="o">-&gt;</span><span class="n">lru</span> <span class="o">=</span> <span class="n">LRU_CLOCK</span><span class="p">();</span> <span class="c1">// 根据最近访问时间淘汰的，精确到分钟</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">o</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>蛮简单的，没啥好说。</p>
+
+<h2>createRawStringObject</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="nf">createRawStringObject</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">createObject</span><span class="p">(</span><span class="n">OBJ_STRING</span><span class="p">,</span> <span class="n">sdsnewlen</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span><span class="n">len</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>需要2次内存分配，返回一个type为OBJ_STRING、encoding为OBJ_ENCODING_RAW的sds对象。</p>
+
+<h2>createEmbeddedStringObject</h2>
+
+<p>这个和createRawStringObject的最大区别是，只做一次内存分配：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</code></pre></div>
     </div>
     <div class="entry">
         (未经授权禁止转载)
