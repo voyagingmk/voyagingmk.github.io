@@ -705,18 +705,14 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <span class="cm"> * 0110需要再减1，得到5。</span>
 <span class="cm"> * 最后，[ff]表示ziplist到此结束。</span>
 <span class="cm"> *</span>
-<span class="cm"> * Adding another element to the above string with the value &quot;Hello World&quot;</span>
-<span class="cm"> * allows us to show how the ziplist encodes small strings. We&#39;ll just show</span>
-<span class="cm"> * the hex dump of the entry itself. Imagine the bytes as following the</span>
-<span class="cm"> * entry that stores &quot;5&quot; in the ziplist above:</span>
+<span class="cm"> * 再演示怎么编码一个短字符串&quot;Hello World&quot;。</span>
+<span class="cm"> * 把下面这串东西插入到上面的[02 f6]后面：</span>
 <span class="cm"> *</span>
 <span class="cm"> * [02] [0b] [48 65 6c 6c 6f 20 57 6f 72 6c 64]</span>
 <span class="cm"> *</span>
-<span class="cm"> * The first byte, 02, is the length of the previous entry. The next</span>
-<span class="cm"> * byte represents the encoding in the pattern |00pppppp| that means</span>
-<span class="cm"> * that the entry is a string of length &lt;pppppp&gt;, so 0B means that</span>
-<span class="cm"> * an 11 bytes string follows. From the third byte (48) to the last (64)</span>
-<span class="cm"> * there are just the ASCII characters for &quot;Hello World&quot;.</span>
+<span class="cm"> * [02]表示prevlen；[0b]是encoding |0000 1011|，前2bits表示这是个字符串，</span>
+<span class="cm"> * 后6bits表示字符串长度11字节；</span>
+<span class="cm"> * 后面的那串就是正文&quot;Hello World&quot;了。</span>
 <span class="cm"> */</span>
 </code></pre></div>
 <h1>参考资料：</h1>
