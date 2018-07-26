@@ -467,25 +467,17 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 &lt;h3&gt;结构定义&lt;/h3&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zlentry&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;prevrawlensize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* Bytes used to encode the previous entry len*/&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;prevrawlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;     &lt;span class=&quot;cm&quot;&gt;/* Previous entry len. */&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lensize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;        &lt;span class=&quot;cm&quot;&gt;/* Bytes used to encode this entry type/len.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    For example strings have a 1, 2 or 5 bytes&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    header. Integers always use a single byte.*/&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;            &lt;span class=&quot;cm&quot;&gt;/* Bytes used to represent the actual entry.&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    For strings this is just the string length&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    while for integers it is 1, 2, 3, 4, 8 or&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    0 (for 4 bit immediate) depending on the&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    number range. */&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headersize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;     &lt;span class=&quot;cm&quot;&gt;/* prevrawlensize + lensize. */&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;      &lt;span class=&quot;cm&quot;&gt;/* Set to ZIP_STR_* or ZIP_INT_* depending on&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    the entry encoding. However for 4 bits&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    immediate integers this can assume a range&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    of values and must be range-checked. */&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;            &lt;span class=&quot;cm&quot;&gt;/* Pointer to the very start of the entry, that&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;                                    is, this points to prev-entry-len field. */&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zlentry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;prevrawlensize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 上一节点头部长度&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;prevrawlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// 上一节点内容部分的长度&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lensize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;       &lt;span class=&quot;c1&quot;&gt;// 当前节点头部长度&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;           &lt;span class=&quot;c1&quot;&gt;// 当前节点内容部分的长度&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headersize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;// 上一节点头部长度 + 当前节点头部长度&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;// 编码&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;            &lt;span class=&quot;cm&quot;&gt;/* points to prev-entry-len field&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;} zlentry;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;实际上zlentry不是直接用的，这相当于是个结构说明。&lt;/p&gt;
+
 &lt;p&gt;表头没有结构，而是用三个宏访问：&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Return total bytes a ziplist is composed of. */&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define ZIPLIST_BYTES(zl)       (*((uint32_t*)(zl)))&lt;/span&gt;
@@ -508,6 +500,28 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 &lt;p&gt;表头占4+4+2 = 10字节，表尾1字节（255)。&lt;/p&gt;
 
 &lt;h3&gt;接口说明&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;unsigned char *ziplistNew(void);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistMerge(unsigned char **first, unsigned char **second);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistIndex(unsigned char *zl, int index);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistNext(unsigned char *zl, unsigned char *p);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistPrev(unsigned char *zl, unsigned char *p);&lt;/li&gt;
+&lt;li&gt;unsigned int ziplistGet(unsigned char *p, unsigned char **sval, unsigned int *slen, long long *lval);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where); 插入头或尾，实际是调用Insert&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistInsert(unsigned char *zl, unsigned char *p, unsigned char *s, unsigned int slen); 调用Insert&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistDelete(unsigned char *zl, unsigned char **p);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistDeleteRange(unsigned char *zl, int index, unsigned int num);&lt;/li&gt;
+&lt;li&gt;unsigned int ziplistCompare(unsigned char *p, unsigned char *s, unsigned int slen);&lt;/li&gt;
+&lt;li&gt;unsigned char *ziplistFind(unsigned char *p, unsigned char *vstr, unsigned int vlen, unsigned int skip);&lt;/li&gt;
+&lt;li&gt;unsigned int ziplistLen(unsigned char *zl);&lt;/li&gt;
+&lt;li&gt;size_t ziplistBlobLen(unsigned char *zl);&lt;/li&gt;
+&lt;li&gt;void ziplistRepr(unsigned char *zl);&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;关键逻辑&lt;/h3&gt;
+
+&lt;h4&gt;__ziplistInsert&lt;/h4&gt;
 
 &lt;h1&gt;参考资料：&lt;/h1&gt;
 

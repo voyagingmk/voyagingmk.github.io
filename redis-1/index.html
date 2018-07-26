@@ -546,25 +546,17 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 <h3>结构定义</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zlentry</span> <span class="p">{</span>
-    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlensize</span><span class="p">;</span> <span class="cm">/* Bytes used to encode the previous entry len*/</span>
-    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlen</span><span class="p">;</span>     <span class="cm">/* Previous entry len. */</span>
-    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lensize</span><span class="p">;</span>        <span class="cm">/* Bytes used to encode this entry type/len.</span>
-<span class="cm">                                    For example strings have a 1, 2 or 5 bytes</span>
-<span class="cm">                                    header. Integers always use a single byte.*/</span>
-    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>            <span class="cm">/* Bytes used to represent the actual entry.</span>
-<span class="cm">                                    For strings this is just the string length</span>
-<span class="cm">                                    while for integers it is 1, 2, 3, 4, 8 or</span>
-<span class="cm">                                    0 (for 4 bit immediate) depending on the</span>
-<span class="cm">                                    number range. */</span>
-    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">headersize</span><span class="p">;</span>     <span class="cm">/* prevrawlensize + lensize. */</span>
-    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">encoding</span><span class="p">;</span>      <span class="cm">/* Set to ZIP_STR_* or ZIP_INT_* depending on</span>
-<span class="cm">                                    the entry encoding. However for 4 bits</span>
-<span class="cm">                                    immediate integers this can assume a range</span>
-<span class="cm">                                    of values and must be range-checked. */</span>
-    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>            <span class="cm">/* Pointer to the very start of the entry, that</span>
-<span class="cm">                                    is, this points to prev-entry-len field. */</span>
-<span class="p">}</span> <span class="n">zlentry</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlensize</span><span class="p">;</span> <span class="c1">// 上一节点头部长度</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlen</span><span class="p">;</span>    <span class="c1">// 上一节点内容部分的长度</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lensize</span><span class="p">;</span>       <span class="c1">// 当前节点头部长度</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>           <span class="c1">// 当前节点内容部分的长度</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">headersize</span><span class="p">;</span>     <span class="c1">// 上一节点头部长度 + 当前节点头部长度</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">encoding</span><span class="p">;</span>      <span class="c1">// 编码</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>            <span class="cm">/* points to prev-entry-len field</span>
+<span class="cm">} zlentry;</span>
 </code></pre></div>
+<p>实际上zlentry不是直接用的，这相当于是个结构说明。</p>
+
 <p>表头没有结构，而是用三个宏访问：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Return total bytes a ziplist is composed of. */</span>
 <span class="cp">#define ZIPLIST_BYTES(zl)       (*((uint32_t*)(zl)))</span>
@@ -587,6 +579,28 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <p>表头占4+4+2 = 10字节，表尾1字节（255)。</p>
 
 <h3>接口说明</h3>
+
+<ul>
+<li>unsigned char *ziplistNew(void);</li>
+<li>unsigned char *ziplistMerge(unsigned char **first, unsigned char **second);</li>
+<li>unsigned char *ziplistIndex(unsigned char *zl, int index);</li>
+<li>unsigned char *ziplistNext(unsigned char *zl, unsigned char *p);</li>
+<li>unsigned char *ziplistPrev(unsigned char *zl, unsigned char *p);</li>
+<li>unsigned int ziplistGet(unsigned char *p, unsigned char **sval, unsigned int *slen, long long *lval);</li>
+<li>unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where); 插入头或尾，实际是调用Insert</li>
+<li>unsigned char *ziplistInsert(unsigned char *zl, unsigned char *p, unsigned char *s, unsigned int slen); 调用Insert</li>
+<li>unsigned char *ziplistDelete(unsigned char *zl, unsigned char **p);</li>
+<li>unsigned char *ziplistDeleteRange(unsigned char *zl, int index, unsigned int num);</li>
+<li>unsigned int ziplistCompare(unsigned char *p, unsigned char *s, unsigned int slen);</li>
+<li>unsigned char *ziplistFind(unsigned char *p, unsigned char *vstr, unsigned int vlen, unsigned int skip);</li>
+<li>unsigned int ziplistLen(unsigned char *zl);</li>
+<li>size_t ziplistBlobLen(unsigned char *zl);</li>
+<li>void ziplistRepr(unsigned char *zl);</li>
+</ul>
+
+<h3>关键逻辑</h3>
+
+<h4>__ziplistInsert</h4>
 
 <h1>参考资料：</h1>
 
