@@ -10,8 +10,46 @@
         <title>redis5.0源码学习笔记（2）对象实现</title>
         <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
 
+&lt;p&gt;(更新中)&lt;/p&gt;
+
 &lt;!--more--&gt;
-</description>
+
+&lt;h2&gt;对象是什么&lt;/h2&gt;
+
+&lt;p&gt;上一篇文章中，介绍了redis的各种基础数据结构，实际上，那些数据结构不是直接对应到那些redis指令的，而是加了一层object层，每种object可以用特定的1种或多种基础数据结构来实现。&lt;/p&gt;
+
+&lt;h2&gt;对象类型&lt;/h2&gt;
+
+&lt;p&gt;总共有5种：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* The actual Redis Object */&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_STRING 0    &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* String object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_LIST 1      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* List object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_SET 2       &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Set object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ZSET 3      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Sorted set object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_HASH 4      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Hash object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;对象编码&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_RAW 0     &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 什么数据结构都没用到 */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_INT 1     &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 整数 */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_HT 2      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 散列表 */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_ZIPMAP 3  &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* zipmap */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_LINKEDLIST 4 &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 已废弃 */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_ZIPLIST 5 &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* ziplist */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_INTSET 6  &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* intset */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_SKIPLIST 7  &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* skiplist */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_EMBSTR 8  &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 嵌入式sds */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_QUICKLIST 9 &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 由多个ziplist组成的链表（linked list） */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_STREAM 10 &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* radix tree of listpacks */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;对象结构体&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;redisObject&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 上文已介绍&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 上文已介绍&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;lru&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LRU_BITS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 计时的&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;refcount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ptr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;robj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-2/</link>
         <guid isPermaLink="true">http://localhost:4000/redis-2/</guid>
