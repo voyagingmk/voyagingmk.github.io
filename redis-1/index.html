@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>redis5.0源码学习笔记（1） – Wyman的别致技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
+    <title>redis5.0源码学习笔记（1）基础数据结构 – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -10,19 +10,15 @@
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
     <meta name="description" content="Note：本文实际绑定的版本是branch5.0（2018-7-25）。
-
-持续更新中。
 " />
     <meta property="og:description" content="Note：本文实际绑定的版本是branch5.0（2018-7-25）。
-
-持续更新中。
 " />
     
-    <meta name="author" content="Wyman的别致技术博客" />
+    <meta name="author" content="Wyman的原创技术博客" />
 
     
-    <meta property="og:title" content="redis5.0源码学习笔记（1）" />
-    <meta property="twitter:title" content="redis5.0源码学习笔记（1）" />
+    <meta property="og:title" content="redis5.0源码学习笔记（1）基础数据结构" />
+    <meta property="twitter:title" content="redis5.0源码学习笔记（1）基础数据结构" />
     
 
     <!--[if lt IE 9]>
@@ -30,7 +26,7 @@
     <![endif]-->
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="Wyman的别致技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
 
     
 	<!-- Google Analytics -->
@@ -43,7 +39,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/redis-1/',
-		  'title': 'redis5.0源码学习笔记（1）'
+		  'title': 'redis5.0源码学习笔记（1）基础数据结构'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -69,7 +65,7 @@
           <a href="/" class="site-avatar"><img src="https://www.qiujiawei.com/images/avatar.jpg" /></a>
 
           <div class="site-info">
-            <h1 class="site-name"><a href="/">Wyman的别致技术博客</a></h1>
+            <h1 class="site-name"><a href="/">Wyman的原创技术博客</a></h1>
             <p class="site-description">恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</p>
           </div>
 
@@ -84,12 +80,10 @@
     <div id="main" role="main" class="container">
       <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 <article class="post">
-    <h1>redis5.0源码学习笔记（1）</h1>
+    <h1>redis5.0源码学习笔记（1）基础数据结构</h1>
     <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
     <div class="entry">
         <p>Note：本文实际绑定的版本是branch5.0（2018-7-25）。</p>
-
-<p>持续更新中。</p>
 
 <!--more-->
 
