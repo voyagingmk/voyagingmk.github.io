@@ -458,6 +458,12 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 &lt;h3&gt;基本特点&lt;/h3&gt;
 
+&lt;ul&gt;
+&lt;li&gt;通过在每个entry维护一个prevlen字段，使得逆向遍历链表变成可能&lt;/li&gt;
+&lt;li&gt;删除节点可能会引发连锁更新，因为prevlen不一定够空间存长度，这样会导致连锁性的内存重分配&lt;/li&gt;
+&lt;li&gt;压缩列表的压缩体现在对于小整数的存储是高度优化的，减少了大量空间浪费&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h3&gt;源码位置&lt;/h3&gt;
 
 &lt;ul&gt;
@@ -606,10 +612,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 &lt;span class=&quot;cm&quot;&gt; *&lt;/span&gt;
 &lt;span class=&quot;cm&quot;&gt; * EXAMPLES OF ACTUAL ZIPLISTS&lt;/span&gt;
 &lt;span class=&quot;cm&quot;&gt; * ===========================&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; *&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * The following is a ziplist containing the two elements representing&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * the strings &amp;quot;2&amp;quot; and &amp;quot;5&amp;quot;. It is composed of 15 bytes, that we visually&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt; * split into sections:&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * 实例：&lt;/span&gt;
 &lt;span class=&quot;cm&quot;&gt; *&lt;/span&gt;
 &lt;span class=&quot;cm&quot;&gt; *  [0f 00 00 00] [0c 00 00 00] [02 00] [00 f3] [02 f6] [ff]&lt;/span&gt;
 &lt;span class=&quot;cm&quot;&gt; *        |             |          |       |       |     |&lt;/span&gt;

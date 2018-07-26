@@ -537,6 +537,12 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 <h3>基本特点</h3>
 
+<ul>
+<li>通过在每个entry维护一个prevlen字段，使得逆向遍历链表变成可能</li>
+<li>删除节点可能会引发连锁更新，因为prevlen不一定够空间存长度，这样会导致连锁性的内存重分配</li>
+<li>压缩列表的压缩体现在对于小整数的存储是高度优化的，减少了大量空间浪费</li>
+</ul>
+
 <h3>源码位置</h3>
 
 <ul>
@@ -685,10 +691,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <span class="cm"> *</span>
 <span class="cm"> * EXAMPLES OF ACTUAL ZIPLISTS</span>
 <span class="cm"> * ===========================</span>
-<span class="cm"> *</span>
-<span class="cm"> * The following is a ziplist containing the two elements representing</span>
-<span class="cm"> * the strings &quot;2&quot; and &quot;5&quot;. It is composed of 15 bytes, that we visually</span>
-<span class="cm"> * split into sections:</span>
+<span class="cm"> * 实例：</span>
 <span class="cm"> *</span>
 <span class="cm"> *  [0f 00 00 00] [0c 00 00 00] [02 00] [00 f3] [02 f6] [ff]</span>
 <span class="cm"> *        |             |          |       |       |     |</span>
