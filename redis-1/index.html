@@ -470,7 +470,12 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 <h3>基本特点</h3>
 
-<h2>- 用紧凑的数组结构来存放集合元素，访问效率很高</h2>
+<ul>
+<li>用紧凑的数组结构来存放集合元素，缓存命中率高</li>
+<li>插入、删除性能不会太好，会触发realloc，如果是中间元素，还会触发大段memcpy</li>
+<li>查找性能极好，基于数组的迭代式的二分查找</li>
+<li>元素不能重复，省却了大量插入开销</li>
+</ul>
 
 <h3>源码位置</h3>
 
@@ -499,12 +504,12 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <ul>
 <li>intset *intsetNew(void); zmalloc一个intset，缺省编码是INTSET_ENC_INT16，contents为空</li>
 <li>intset *intsetAdd(intset *is, int64_t value, uint8_t *success); 看下文。</li>
-<li>intset *intsetRemove(intset *is, int64_t value, int *success);</li>
-<li>uint8_t intsetFind(intset *is, int64_t value);</li>
-<li>int64_t intsetRandom(intset *is);</li>
-<li>uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);</li>
-<li>uint32_t intsetLen(const intset *is);</li>
-<li>size_t intsetBlobLen(intset *is);</li>
+<li>intset *intsetRemove(intset *is, int64_t value, int *success); 移除一个元素，会引起该元素之后的所有元素的整体移动；不会降级</li>
+<li>uint8_t intsetFind(intset *is, int64_t value); 二分查找一个元素</li>
+<li>int64_t intsetRandom(intset *is); 随机返回一个元素，基于random()</li>
+<li>uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);  返回指定元素</li>
+<li>uint32_t intsetLen(const intset *is); 返回is-&gt;length</li>
+<li>size_t intsetBlobLen(intset *is); 返回is总共占内存多少字节</li>
 </ul>
 
 <h3>关键逻辑</h3>
@@ -515,6 +520,16 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
  + 1，并判断pos是不是小于newlength - 1，是的话意味着插入位置后面还有元素，那么要把pos后的元素全体向右挪1（intsetMoveTail）。</p>
 
 <p>最后，调用_intsetSet(is,pos,value)，把value放进pos位置，并更新is-&gt;length。</p>
+
+<h4>intset *intsetUpgradeAndAdd(intset *is, int64_t value)</h4>
+
+<p>先intsetResize扩容到length+1，然后从后到前把旧数据刷到新的位置，防止覆盖；刷完后，必然剩一个位置，或者在最前或者在最后，根据value的正负，把value插到头或尾即可。</p>
+
+<p>升级后就再不会降级的。</p>
+
+<h3>ifbe</h3>
+
+<p>在这个intset.c里经常看到这个后缀，含义是 if big endian（是否是大端字节序）。</p>
 
 <h1>参考资料：</h1>
 
