@@ -20,13 +20,15 @@
 
 &lt;h2&gt;对象类型&lt;/h2&gt;
 
-&lt;p&gt;总共有5种：&lt;/p&gt;
+&lt;p&gt;总共有7种：&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* The actual Redis Object */&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define OBJ_STRING 0    &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* String object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define OBJ_LIST 1      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* List object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define OBJ_SET 2       &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Set object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define OBJ_ZSET 3      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Sorted set object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define OBJ_HASH 4      &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Hash object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_MODULE 5    &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Module object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define OBJ_STREAM 6    &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Stream object. */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2&gt;对象编码&lt;/h2&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#define OBJ_ENCODING_RAW 0     &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* 什么数据结构都没用到 */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
@@ -80,7 +82,13 @@
 
 &lt;p&gt;这个和createRawStringObject的最大区别是，只做一次内存分配：&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;robj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;o&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zmalloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;robj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sdshdr8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;encoding是OBJ_ENCODING_EMBSTR。&lt;/p&gt;
+
+&lt;h2&gt;对象释放&lt;/h2&gt;
+
+&lt;p&gt;每个对象的释放都是自动的，在decrRefCount里执行，会自动根据o-&amp;gt;type来执行不同的释放动作。&lt;/p&gt;
+</description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-2/</link>
         <guid isPermaLink="true">http://localhost:4000/redis-2/</guid>

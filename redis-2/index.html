@@ -99,13 +99,15 @@
 
 <h2>对象类型</h2>
 
-<p>总共有5种：</p>
+<p>总共有7种：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* The actual Redis Object */</span>
 <span class="cp">#define OBJ_STRING 0    </span><span class="cm">/* String object. */</span><span class="cp"></span>
 <span class="cp">#define OBJ_LIST 1      </span><span class="cm">/* List object. */</span><span class="cp"></span>
 <span class="cp">#define OBJ_SET 2       </span><span class="cm">/* Set object. */</span><span class="cp"></span>
 <span class="cp">#define OBJ_ZSET 3      </span><span class="cm">/* Sorted set object. */</span><span class="cp"></span>
 <span class="cp">#define OBJ_HASH 4      </span><span class="cm">/* Hash object. */</span><span class="cp"></span>
+<span class="cp">#define OBJ_MODULE 5    </span><span class="cm">/* Module object. */</span><span class="cp"></span>
+<span class="cp">#define OBJ_STREAM 6    </span><span class="cm">/* Stream object. */</span><span class="cp"></span>
 </code></pre></div>
 <h2>对象编码</h2>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define OBJ_ENCODING_RAW 0     </span><span class="cm">/* 什么数据结构都没用到 */</span><span class="cp"></span>
@@ -160,6 +162,12 @@
 <p>这个和createRawStringObject的最大区别是，只做一次内存分配：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
 </code></pre></div>
+<p>encoding是OBJ_ENCODING_EMBSTR。</p>
+
+<h2>对象释放</h2>
+
+<p>每个对象的释放都是自动的，在decrRefCount里执行，会自动根据o-&gt;type来执行不同的释放动作。</p>
+
     </div>
     <div class="entry">
         (未经授权禁止转载)
