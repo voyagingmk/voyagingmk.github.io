@@ -475,6 +475,8 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <li>插入、删除性能不会太好，会触发realloc，如果是中间元素，还会触发大段memcpy</li>
 <li>查找性能极好，基于数组的迭代式的二分查找</li>
 <li>元素不能重复，省却了大量插入开销</li>
+<li>升级逻辑使得存放int16、int32的开销要比int64小得多，节约内存</li>
+<li>不支持降级</li>
 </ul>
 
 <h3>源码位置</h3>

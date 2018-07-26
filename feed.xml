@@ -396,6 +396,8 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 &lt;li&gt;插入、删除性能不会太好，会触发realloc，如果是中间元素，还会触发大段memcpy&lt;/li&gt;
 &lt;li&gt;查找性能极好，基于数组的迭代式的二分查找&lt;/li&gt;
 &lt;li&gt;元素不能重复，省却了大量插入开销&lt;/li&gt;
+&lt;li&gt;升级逻辑使得存放int16、int32的开销要比int64小得多，节约内存&lt;/li&gt;
+&lt;li&gt;不支持降级&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3&gt;源码位置&lt;/h3&gt;
