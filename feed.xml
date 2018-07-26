@@ -381,44 +381,61 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;表头节点是特殊的，不存数据（ele、score无用）。&lt;/p&gt;
 
-&lt;h3&gt;接口说明&lt;/h3&gt;
+&lt;h3&gt;资料&lt;/h3&gt;
+
+&lt;p&gt;精简的skiplist实现：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/begeekmyfriend/skiplist&quot;&gt;https://github.com/begeekmyfriend/skiplist&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;intset 整数集合&lt;/h2&gt;
+
+&lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;h2&gt;- 用紧凑的数组结构来存放集合元素，访问效率很高&lt;/h2&gt;
+
+&lt;h3&gt;源码位置&lt;/h3&gt;
 
 &lt;ul&gt;
-&lt;li&gt;zskiplist *zslCreate(void); 创建一个zskiplist并初始化表头&lt;/li&gt;
-&lt;li&gt;void zslFree(zskiplist *zsl); 沿着level[0]遍历整个跳跃表释放各个节点，并最终释放zsl&lt;/li&gt;
-&lt;li&gt;zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele);&lt;/li&gt;
-&lt;li&gt;unsigned char *zzlInsert(unsigned char *zl, sds ele, double score);&lt;/li&gt;
-&lt;li&gt;int zslDelete(zskiplist *zsl, double score, sds ele, zskiplistNode **node);&lt;/li&gt;
-&lt;li&gt;zskiplistNode *zslFirstInRange(zskiplist *zsl, zrangespec *range);&lt;/li&gt;
-&lt;li&gt;zskiplistNode *zslLastInRange(zskiplist *zsl, zrangespec *range);&lt;/li&gt;
-&lt;li&gt;double zzlGetScore(unsigned char *sptr);&lt;/li&gt;
-&lt;li&gt;void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);&lt;/li&gt;
-&lt;li&gt;void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);&lt;/li&gt;
-&lt;li&gt;unsigned char *zzlFirstInRange(unsigned char *zl, zrangespec *range);&lt;/li&gt;
-&lt;li&gt;unsigned char *zzlLastInRange(unsigned char *zl, zrangespec *range);&lt;/li&gt;
-&lt;li&gt;unsigned long zsetLength(const robj *zobj);&lt;/li&gt;
-&lt;li&gt;void zsetConvert(robj *zobj, int encoding);&lt;/li&gt;
-&lt;li&gt;void zsetConvertToZiplistIfNeeded(robj *zobj, size_t maxelelen);&lt;/li&gt;
-&lt;li&gt;int zsetScore(robj *zobj, sds member, double *score);&lt;/li&gt;
-&lt;li&gt;unsigned long zslGetRank(zskiplist *zsl, double score, sds o);&lt;/li&gt;
-&lt;li&gt;int zsetAdd(robj *zobj, double score, sds ele, int *flags, double *newscore);&lt;/li&gt;
-&lt;li&gt;long zsetRank(robj *zobj, sds ele, int reverse);&lt;/li&gt;
-&lt;li&gt;int zsetDel(robj *zobj, sds ele);&lt;/li&gt;
-&lt;li&gt;void genericZpopCommand(client *c, robj **keyv, int keyc, int where, int emitkey, robj *countarg);&lt;/li&gt;
-&lt;li&gt;sds ziplistGetObject(unsigned char *sptr);&lt;/li&gt;
-&lt;li&gt;int zslValueGteMin(double value, zrangespec *spec);&lt;/li&gt;
-&lt;li&gt;int zslValueLteMax(double value, zrangespec *spec);&lt;/li&gt;
-&lt;li&gt;void zslFreeLexRange(zlexrangespec *spec);&lt;/li&gt;
-&lt;li&gt;int zslParseLexRange(robj *min, robj *max, zlexrangespec *spec);&lt;/li&gt;
-&lt;li&gt;unsigned char *zzlFirstInLexRange(unsigned char *zl, zlexrangespec *range);&lt;/li&gt;
-&lt;li&gt;unsigned char *zzlLastInLexRange(unsigned char *zl, zlexrangespec *range);&lt;/li&gt;
-&lt;li&gt;zskiplistNode *zslFirstInLexRange(zskiplist *zsl, zlexrangespec *range);&lt;/li&gt;
-&lt;li&gt;zskiplistNode *zslLastInLexRange(zskiplist *zsl, zlexrangespec *range);&lt;/li&gt;
-&lt;li&gt;int zzlLexValueGteMin(unsigned char *p, zlexrangespec *spec);&lt;/li&gt;
-&lt;li&gt;int zzlLexValueLteMax(unsigned char *p, zlexrangespec *spec);&lt;/li&gt;
-&lt;li&gt;int zslLexValueGteMin(sds value, zlexrangespec *spec);&lt;/li&gt;
-&lt;li&gt;int zslLexValueLteMax(sds value, zlexrangespec *spec);&lt;/li&gt;
+&lt;li&gt;intset.h&lt;/li&gt;
+&lt;li&gt;intset.c&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h3&gt;结构定义&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;intset&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint32_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;uint32_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;intset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;接口说明&lt;/h3&gt;
+
+&lt;p&gt;内部接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;uint8_t _intsetValueEncoding(int64_t v) 根据v的值范围，返回INTSET_ENC_INT64/INTSET_ENC_INT32/INTSET_ENC_INT16&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;对外接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;intset *intsetNew(void); zmalloc一个intset，缺省编码是INTSET_ENC_INT16，contents为空&lt;/li&gt;
+&lt;li&gt;intset *intsetAdd(intset *is, int64_t value, uint8_t *success); 看下文。&lt;/li&gt;
+&lt;li&gt;intset *intsetRemove(intset *is, int64_t value, int *success);&lt;/li&gt;
+&lt;li&gt;uint8_t intsetFind(intset *is, int64_t value);&lt;/li&gt;
+&lt;li&gt;int64_t intsetRandom(intset *is);&lt;/li&gt;
+&lt;li&gt;uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);&lt;/li&gt;
+&lt;li&gt;uint32_t intsetLen(const intset *is);&lt;/li&gt;
+&lt;li&gt;size_t intsetBlobLen(intset *is);&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;关键逻辑&lt;/h3&gt;
+
+&lt;h4&gt;intsetAdd(intset *is, int64_t value, uint8_t *success);&lt;/h4&gt;
+
+&lt;p&gt;先获取value的编码，然后对比is的编码，如果value编码大于is的编码，那么转而执行intsetUpgradeAndAdd(is,value)，没有传入success是因为value肯定不在集合中，毕竟越界了；如果value编码小于等于is的编码，就要检查value是不是已经在集合中（调用intsetSearch(is,value,&amp;amp;pos)），如果在，那么中止，如果不在，pos会设成value可以插入的位置，intsetResize这个is到length
+ + 1，并判断pos是不是小于newlength - 1，是的话意味着插入位置后面还有元素，那么要把pos后的元素全体向右挪1（intsetMoveTail）。&lt;/p&gt;
+
+&lt;p&gt;最后，调用_intsetSet(is,pos,value)，把value放进pos位置，并更新is-&amp;gt;length。&lt;/p&gt;
 
 &lt;h1&gt;参考资料：&lt;/h1&gt;
 
