@@ -473,7 +473,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <ul>
 <li>用紧凑的数组结构来存放集合元素，缓存命中率高</li>
 <li>插入、删除性能不会太好，会触发realloc，如果是中间元素，还会触发大段memcpy</li>
-<li>查找性能极好，基于数组的迭代式的二分查找</li>
+<li>查找性能极好，因为数据有序，是基于数组的迭代式的二分查找</li>
 <li>元素不能重复，省却了大量插入开销</li>
 <li>升级逻辑使得存放int16、int32的开销要比int64小得多，节约内存</li>
 <li>不支持降级</li>
@@ -532,6 +532,61 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 <h3>ifbe</h3>
 
 <p>在这个intset.c里经常看到这个后缀，含义是 if big endian（是否是大端字节序）。</p>
+
+<h2>ziplist 压缩列表</h2>
+
+<h3>基本特点</h3>
+
+<h3>源码位置</h3>
+
+<ul>
+<li>ziplist.h</li>
+<li>ziplist.c</li>
+</ul>
+
+<h3>结构定义</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zlentry</span> <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlensize</span><span class="p">;</span> <span class="cm">/* Bytes used to encode the previous entry len*/</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlen</span><span class="p">;</span>     <span class="cm">/* Previous entry len. */</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lensize</span><span class="p">;</span>        <span class="cm">/* Bytes used to encode this entry type/len.</span>
+<span class="cm">                                    For example strings have a 1, 2 or 5 bytes</span>
+<span class="cm">                                    header. Integers always use a single byte.*/</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>            <span class="cm">/* Bytes used to represent the actual entry.</span>
+<span class="cm">                                    For strings this is just the string length</span>
+<span class="cm">                                    while for integers it is 1, 2, 3, 4, 8 or</span>
+<span class="cm">                                    0 (for 4 bit immediate) depending on the</span>
+<span class="cm">                                    number range. */</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">headersize</span><span class="p">;</span>     <span class="cm">/* prevrawlensize + lensize. */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">encoding</span><span class="p">;</span>      <span class="cm">/* Set to ZIP_STR_* or ZIP_INT_* depending on</span>
+<span class="cm">                                    the entry encoding. However for 4 bits</span>
+<span class="cm">                                    immediate integers this can assume a range</span>
+<span class="cm">                                    of values and must be range-checked. */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>            <span class="cm">/* Pointer to the very start of the entry, that</span>
+<span class="cm">                                    is, this points to prev-entry-len field. */</span>
+<span class="p">}</span> <span class="n">zlentry</span><span class="p">;</span>
+</code></pre></div>
+<p>表头没有结构，而是用三个宏访问：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Return total bytes a ziplist is composed of. */</span>
+<span class="cp">#define ZIPLIST_BYTES(zl)       (*((uint32_t*)(zl)))</span>
+
+<span class="cm">/* Return the offset of the last item inside the ziplist. */</span>
+<span class="cp">#define ZIPLIST_TAIL_OFFSET(zl) (*((uint32_t*)((zl)+sizeof(uint32_t))))</span>
+
+<span class="cm">/* Return the length of a ziplist, or UINT16_MAX if the length cannot be</span>
+<span class="cm"> * determined without scanning the whole ziplist. */</span>
+<span class="cp">#define ZIPLIST_LENGTH(zl)      (*((uint16_t*)((zl)+sizeof(uint32_t)*2)))</span>
+</code></pre></div>
+<p>表头：</p>
+
+<ul>
+<li>zlbytes：表示这个ziplist占用内存多少字节</li>
+<li>zltail：表示这个ziplist头和尾之间的偏移量，即最后一个字节和zl首地址的差，初始偏移量等于头部大小（10字节）</li>
+<li>zllen：表示这个ziplist中节点的数量</li>
+</ul>
+
+<p>表头占4+4+2 = 10字节，表尾1字节（255)。</p>
+
+<h3>接口说明</h3>
 
 <h1>参考资料：</h1>
 
