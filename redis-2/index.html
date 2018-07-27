@@ -298,6 +298,148 @@
 <span class="k">if</span> <span class="p">(</span><span class="n">intsetLen</span><span class="p">(</span><span class="n">subject</span><span class="o">-&gt;</span><span class="n">ptr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">server</span><span class="p">.</span><span class="n">set_max_intset_entries</span><span class="p">)</span>
     <span class="n">setTypeConvert</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="n">OBJ_ENCODING_HT</span><span class="p">);</span>
 </code></pre></div>
+<h2>交集并集运算</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">sunionDiffGenericCommand</span><span class="p">(</span><span class="n">client</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="n">robj</span> <span class="o">**</span><span class="n">setkeys</span><span class="p">,</span> <span class="kt">int</span> <span class="n">setnum</span><span class="p">,</span>
+                              <span class="n">robj</span> <span class="o">*</span><span class="n">dstkey</span><span class="p">,</span> <span class="kt">int</span> <span class="n">op</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">robj</span> <span class="o">**</span><span class="n">sets</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">)</span><span class="o">*</span><span class="n">setnum</span><span class="p">);</span>
+    <span class="n">setTypeIterator</span> <span class="o">*</span><span class="n">si</span><span class="p">;</span>
+    <span class="n">robj</span> <span class="o">*</span><span class="n">dstset</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">sds</span> <span class="n">ele</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">j</span><span class="p">,</span> <span class="n">cardinality</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">diff_algo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// diff有2种算法，自动选最佳的</span>
+
+    <span class="c1">// 初始化sets</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">setnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">robj</span> <span class="o">*</span><span class="n">setobj</span> <span class="o">=</span> <span class="n">dstkey</span> <span class="o">?</span>
+            <span class="n">lookupKeyWrite</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">setkeys</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">:</span>
+            <span class="n">lookupKeyRead</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">setkeys</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">setobj</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">checkType</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">setobj</span><span class="p">,</span><span class="n">OBJ_SET</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">zfree</span><span class="p">(</span><span class="n">sets</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">setobj</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 用algo_one_work, algo_two_work算出，用哪个DIFF算法比较好，</span>
+    <span class="c1">// 一个O(N*M)，N=是第一个set的元素数量，M是set数量</span>
+    <span class="c1">// 一个 O(N)，N=所有set的元素数量之和</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_DIFF</span> <span class="o">&amp;&amp;</span> <span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
+        <span class="kt">long</span> <span class="kt">long</span> <span class="n">algo_one_work</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">algo_two_work</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">setnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+
+            <span class="n">algo_one_work</span> <span class="o">+=</span> <span class="n">setTypeSize</span><span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+            <span class="n">algo_two_work</span> <span class="o">+=</span> <span class="n">setTypeSize</span><span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+        <span class="p">}</span>
+
+        <span class="n">algo_one_work</span> <span class="o">/=</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 0.5的常数</span>
+        <span class="n">diff_algo</span> <span class="o">=</span> <span class="p">(</span><span class="n">algo_one_work</span> <span class="o">&lt;=</span> <span class="n">algo_two_work</span><span class="p">)</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 比较并选择其一</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">diff_algo</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">setnum</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 按照包含元素数量 降序排序 方便尽快找到重复元素</span>
+            <span class="n">qsort</span><span class="p">(</span><span class="n">sets</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">setnum</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">),</span>
+                <span class="n">qsortCompareSetsByRevCardinality</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">dstset</span> <span class="o">=</span> <span class="n">createIntsetObject</span><span class="p">();</span> <span class="c1">// 存结果的</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_UNION</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 最简单的，往dstset怼元素就行了</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">setnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">continue</span><span class="p">;</span> <span class="cm">/* non existing keys are like empty sets */</span>
+
+            <span class="n">si</span> <span class="o">=</span> <span class="n">setTypeInitIterator</span><span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+            <span class="k">while</span><span class="p">((</span><span class="n">ele</span> <span class="o">=</span> <span class="n">setTypeNextObject</span><span class="p">(</span><span class="n">si</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">setTypeAdd</span><span class="p">(</span><span class="n">dstset</span><span class="p">,</span><span class="n">ele</span><span class="p">))</span> <span class="n">cardinality</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">sdsfree</span><span class="p">(</span><span class="n">ele</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_DIFF</span> <span class="o">&amp;&amp;</span> <span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">diff_algo</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// DIFF Algorithm 1:</span>
+        <span class="c1">// 遍历第一个集合每个元素，与其他集合做setTypeIsMember操作，</span>
+        <span class="c1">// 只在第一个集合的元素就添加到dstset里</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">setTypeInitIterator</span><span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+        <span class="k">while</span><span class="p">((</span><span class="n">ele</span> <span class="o">=</span> <span class="n">setTypeNextObject</span><span class="p">(</span><span class="n">si</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">setnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">continue</span><span class="p">;</span> <span class="cm">/* no key is an empty set. */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">break</span><span class="p">;</span> <span class="cm">/* same set! */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">setTypeIsMember</span><span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">ele</span><span class="p">))</span> <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">==</span> <span class="n">setnum</span><span class="p">)</span> <span class="p">{</span>
+                <span class="cm">/* There is no other set with this element. Add it. */</span>
+                <span class="n">setTypeAdd</span><span class="p">(</span><span class="n">dstset</span><span class="p">,</span><span class="n">ele</span><span class="p">);</span>
+                <span class="n">cardinality</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">sdsfree</span><span class="p">(</span><span class="n">ele</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_DIFF</span> <span class="o">&amp;&amp;</span> <span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">diff_algo</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* DIFF Algorithm 2:</span>
+<span class="cm">         *</span>
+<span class="cm">         * Add all the elements of the first set to the auxiliary set.</span>
+<span class="cm">         * Then remove all the elements of all the next sets from it.</span>
+<span class="cm">         *</span>
+<span class="cm">         * This is O(N) where N is the sum of all the elements in every</span>
+<span class="cm">         * set. */</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">setnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">continue</span><span class="p">;</span> <span class="cm">/* non existing keys are like empty sets */</span>
+
+            <span class="n">si</span> <span class="o">=</span> <span class="n">setTypeInitIterator</span><span class="p">(</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+            <span class="k">while</span><span class="p">((</span><span class="n">ele</span> <span class="o">=</span> <span class="n">setTypeNextObject</span><span class="p">(</span><span class="n">si</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">setTypeAdd</span><span class="p">(</span><span class="n">dstset</span><span class="p">,</span><span class="n">ele</span><span class="p">))</span> <span class="n">cardinality</span><span class="o">++</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">setTypeRemove</span><span class="p">(</span><span class="n">dstset</span><span class="p">,</span><span class="n">ele</span><span class="p">))</span> <span class="n">cardinality</span><span class="o">--</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">sdsfree</span><span class="p">(</span><span class="n">ele</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
+
+            <span class="cm">/* Exit if result set is empty as any additional removal</span>
+<span class="cm">             * of elements will have no effect. */</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">cardinality</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* Output the content of the resulting set, if not in STORE mode */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dstkey</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">addReplyMultiBulkLen</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">cardinality</span><span class="p">);</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">setTypeInitIterator</span><span class="p">(</span><span class="n">dstset</span><span class="p">);</span>
+        <span class="k">while</span><span class="p">((</span><span class="n">ele</span> <span class="o">=</span> <span class="n">setTypeNextObject</span><span class="p">(</span><span class="n">si</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">addReplyBulkCBuffer</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">ele</span><span class="p">,</span><span class="n">sdslen</span><span class="p">(</span><span class="n">ele</span><span class="p">));</span>
+            <span class="n">sdsfree</span><span class="p">(</span><span class="n">ele</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
+        <span class="n">decrRefCount</span><span class="p">(</span><span class="n">dstset</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="cm">/* If we have a target key where to store the resulting set</span>
+<span class="cm">         * create this key with the result set inside */</span>
+        <span class="kt">int</span> <span class="n">deleted</span> <span class="o">=</span> <span class="n">dbDelete</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">setTypeSize</span><span class="p">(</span><span class="n">dstset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">dbAdd</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">,</span><span class="n">dstset</span><span class="p">);</span>
+            <span class="n">addReplyLongLong</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">setTypeSize</span><span class="p">(</span><span class="n">dstset</span><span class="p">));</span>
+            <span class="n">notifyKeyspaceEvent</span><span class="p">(</span><span class="n">NOTIFY_SET</span><span class="p">,</span>
+                <span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_UNION</span> <span class="o">?</span> <span class="s">&quot;sunionstore&quot;</span> <span class="o">:</span> <span class="s">&quot;sdiffstore&quot;</span><span class="p">,</span>
+                <span class="n">dstkey</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">decrRefCount</span><span class="p">(</span><span class="n">dstset</span><span class="p">);</span>
+            <span class="n">addReply</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">shared</span><span class="p">.</span><span class="n">czero</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">deleted</span><span class="p">)</span>
+                <span class="n">notifyKeyspaceEvent</span><span class="p">(</span><span class="n">NOTIFY_GENERIC</span><span class="p">,</span><span class="s">&quot;del&quot;</span><span class="p">,</span>
+                    <span class="n">dstkey</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">signalModifiedKey</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">dirty</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">zfree</span><span class="p">(</span><span class="n">sets</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
     </div>
     <div class="entry">
         (未经授权禁止转载)
