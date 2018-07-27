@@ -93,6 +93,8 @@
 
 <!--more-->
 
+<h1>对象基础</h1>
+
 <h2>对象是什么</h2>
 
 <p>上一篇文章中，介绍了redis的各种基础数据结构，实际上，那些数据结构不是直接对应到那些redis指令的，而是加了一层object层，每种object可以用特定的1种或多种基础数据结构来实现。</p>
@@ -168,16 +170,65 @@
 
 <p>每个对象的释放都是自动的，在decrRefCount里执行，会自动根据o-&gt;type来执行不同的释放动作。</p>
 
+<h2>对象的编码情况</h2>
+
 <p>根据decrRefCount可以知道type和encoding的对应关系：</p>
 
 <ul>
 <li>OBJ_STRING: OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR</li>
-<li>OBJ_LIST: OBJ_ENCODING_QUICKLIST / OBJ_ENCODING_ZIPLIST</li>
+<li>OBJ_LIST: OBJ_ENCODING_QUICKLIST（OBJ_ENCODING_ZIPLIST的list实际上没有被用到）</li>
 <li>OBJ_SET: OBJ_ENCODING_HT / OBJ_ENCODING_INTSET</li>
 <li>OBJ_ZSET: OBJ_ENCODING_SKIPLIST / OBJ_ENCODING_ZIPLIST</li>
 <li>OBJ_HASH: OBJ_ENCODING_HT / OBJ_ENCODING_ZIPLIST</li>
 <li>OBJ_MODULE: 无</li>
 <li>OBJ_STREAM: 无</li>
+</ul>
+
+<p>P.S.，并不是所有的redis功能指令都会创建object的，例如pfadd。</p>
+
+<h1>redisCommand</h1>
+
+<h2>结构</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">redisCommand</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="c1">// 即暴露给客户端的指令名</span>
+    <span class="n">redisCommandProc</span> <span class="o">*</span><span class="n">proc</span><span class="p">;</span> <span class="c1">// 接口</span>
+    <span class="kt">int</span> <span class="n">arity</span><span class="p">;</span> <span class="c1">// 参数数量</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">sflags</span><span class="p">;</span> <span class="c1">// 字符串形式的flags</span>
+    <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>    <span class="c1">// sflags的数值表示</span>
+    <span class="n">redisGetKeysProc</span> <span class="o">*</span><span class="n">getkeys_proc</span><span class="p">;</span> <span class="c1">// 貌似还在施工的</span>
+    <span class="kt">int</span> <span class="n">firstkey</span><span class="p">;</span> 
+    <span class="kt">int</span> <span class="n">lastkey</span><span class="p">;</span>  
+    <span class="kt">int</span> <span class="n">keystep</span><span class="p">;</span> 
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">microseconds</span><span class="p">,</span> <span class="n">calls</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>server.c里面定义了各种指令。</p>
+
+<h2>flags解释</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/*</span>
+<span class="cm"> * w: 写指令</span>
+<span class="cm"> * r: 读指令</span>
+<span class="cm"> * m: 会增加内存使用量的指令（如果out of memory了就不要使用）</span>
+<span class="cm"> * a: 管理员指令（SAVE / SHUTDOWN / ···)</span>
+<span class="cm"> * p: 发布订阅相关指令</span>
+<span class="cm"> * f: 没有指令用到这个flag</span>
+<span class="cm"> * s: 不能在脚本中使用的指令</span>
+<span class="cm"> * R: 带有随机性的指令(SPOP / RANDOMKEY / ···）</span>
+<span class="cm"> * S: 软指令，会输出数组，有确定性（hkeys/hvals/smembers/sdiff/sunion/sinter/keys）</span>
+<span class="cm"> * l: 在加载数据库过程中允许使用的指令（select/shutdown/···)</span>
+<span class="cm"> * t: 和主从的数据同步状态有关</span>
+<span class="cm"> * M: 开启了MONITOR时不需要列入监控的指令(exec)</span>
+<span class="cm"> * k: 和cluster模式有关，只有restore-asking用到</span>
+<span class="cm"> * F: 高速指令，O(1)或O(log(N))。如果会触发del（del可能会拖时间），那么不是高速指令（如set不是高速指令，而get是）</span>
+<span class="cm"> */</span>
+</code></pre></div>
+<h1>t_string</h1>
+
+<h2>特点</h2>
+
+<ul>
+<li>大小不超过512MB</li>
+<li>二进制安全</li>
 </ul>
 
     </div>

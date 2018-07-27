@@ -14,6 +14,8 @@
 
 &lt;!--more--&gt;
 
+&lt;h1&gt;对象基础&lt;/h1&gt;
+
 &lt;h2&gt;对象是什么&lt;/h2&gt;
 
 &lt;p&gt;上一篇文章中，介绍了redis的各种基础数据结构，实际上，那些数据结构不是直接对应到那些redis指令的，而是加了一层object层，每种object可以用特定的1种或多种基础数据结构来实现。&lt;/p&gt;
@@ -89,16 +91,65 @@
 
 &lt;p&gt;每个对象的释放都是自动的，在decrRefCount里执行，会自动根据o-&amp;gt;type来执行不同的释放动作。&lt;/p&gt;
 
+&lt;h2&gt;对象的编码情况&lt;/h2&gt;
+
 &lt;p&gt;根据decrRefCount可以知道type和encoding的对应关系：&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;OBJ_STRING: OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR&lt;/li&gt;
-&lt;li&gt;OBJ_LIST: OBJ_ENCODING_QUICKLIST / OBJ_ENCODING_ZIPLIST&lt;/li&gt;
+&lt;li&gt;OBJ_LIST: OBJ_ENCODING_QUICKLIST（OBJ_ENCODING_ZIPLIST的list实际上没有被用到）&lt;/li&gt;
 &lt;li&gt;OBJ_SET: OBJ_ENCODING_HT / OBJ_ENCODING_INTSET&lt;/li&gt;
 &lt;li&gt;OBJ_ZSET: OBJ_ENCODING_SKIPLIST / OBJ_ENCODING_ZIPLIST&lt;/li&gt;
 &lt;li&gt;OBJ_HASH: OBJ_ENCODING_HT / OBJ_ENCODING_ZIPLIST&lt;/li&gt;
 &lt;li&gt;OBJ_MODULE: 无&lt;/li&gt;
 &lt;li&gt;OBJ_STREAM: 无&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;P.S.，并不是所有的redis功能指令都会创建object的，例如pfadd。&lt;/p&gt;
+
+&lt;h1&gt;redisCommand&lt;/h1&gt;
+
+&lt;h2&gt;结构&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;redisCommand&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 即暴露给客户端的指令名&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;redisCommandProc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 接口&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 参数数量&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sflags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 字符串形式的flags&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// sflags的数值表示&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;redisGetKeysProc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getkeys_proc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 貌似还在施工的&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;firstkey&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lastkey&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keystep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+    &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;microseconds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;calls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;server.c里面定义了各种指令。&lt;/p&gt;
+
+&lt;h2&gt;flags解释&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * w: 写指令&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * r: 读指令&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * m: 会增加内存使用量的指令（如果out of memory了就不要使用）&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * a: 管理员指令（SAVE / SHUTDOWN / ···)&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * p: 发布订阅相关指令&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * f: 没有指令用到这个flag&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * s: 不能在脚本中使用的指令&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * R: 带有随机性的指令(SPOP / RANDOMKEY / ···）&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * S: 软指令，会输出数组，有确定性（hkeys/hvals/smembers/sdiff/sunion/sinter/keys）&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * l: 在加载数据库过程中允许使用的指令（select/shutdown/···)&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * t: 和主从的数据同步状态有关&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * M: 开启了MONITOR时不需要列入监控的指令(exec)&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * k: 和cluster模式有关，只有restore-asking用到&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * F: 高速指令，O(1)或O(log(N))。如果会触发del（del可能会拖时间），那么不是高速指令（如set不是高速指令，而get是）&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; */&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1&gt;t_string&lt;/h1&gt;
+
+&lt;h2&gt;特点&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;大小不超过512MB&lt;/li&gt;
+&lt;li&gt;二进制安全&lt;/li&gt;
 &lt;/ul&gt;
 </description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
