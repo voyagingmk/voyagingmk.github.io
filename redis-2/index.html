@@ -175,7 +175,7 @@
 <p>根据decrRefCount可以知道type和encoding的对应关系：</p>
 
 <ul>
-<li>OBJ_STRING: OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR</li>
+<li>OBJ_STRING: OBJ_ENCODING_INT / OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR</li>
 <li>OBJ_LIST: OBJ_ENCODING_QUICKLIST（OBJ_ENCODING_ZIPLIST的list实际上没有被用到）</li>
 <li>OBJ_SET: OBJ_ENCODING_HT / OBJ_ENCODING_INTSET</li>
 <li>OBJ_ZSET: OBJ_ENCODING_SKIPLIST / OBJ_ENCODING_ZIPLIST</li>
@@ -229,7 +229,54 @@
 <ul>
 <li>大小不超过512MB</li>
 <li>二进制安全</li>
+<li>t_string.c都是业务逻辑，主要还是看sds的实现</li>
 </ul>
+
+<h1>t_list</h1>
+
+<h2>特点</h2>
+
+<ul>
+<li>t_list就是quicklist，入口是robj *createQuicklistObject(void);</li>
+</ul>
+
+<h2>和list有关的配置项</h2>
+
+<h3>list-max-ziplist-size：(就是quicklist的fill)</h3>
+
+<p>是用来控制quicklist里的节点（ziplist）的大小的，大小有2种指标：entry数或者ziplist字节总数。</p>
+
+<p>按字节总数：</p>
+
+<ul>
+<li>-5: max size: 64 Kb  &lt;-- not recommended for normal workloads</li>
+<li>-4: max size: 32 Kb  &lt;-- not recommended</li>
+<li>-3: max size: 16 Kb  &lt;-- probably not recommended</li>
+<li>-2: max size: 8 Kb   &lt;-- good（默认值）</li>
+<li>-1: max size: 4 Kb   &lt;-- good</li>
+</ul>
+
+<p>按entry数：</p>
+
+<ul>
+<li>要填大于等于0的数</li>
+<li>每个节点最多存这么多个entries</li>
+<li>每个节点单独计数</li>
+</ul>
+
+<h3>list-compress-depth</h3>
+
+<ul>
+<li>默认0，表示关闭压缩功能</li>
+<li>depth表示头尾各有多少个节点不压缩</li>
+<li>头尾节点必然不压缩</li>
+<li>1表示只有head和tail不压缩，其他节点都压缩</li>
+<li>2表示head、head-&gt;next、tail-&gt;prev、tail不压缩，其他节点都压缩；&gt;2的情况以此类推</li>
+</ul>
+
+<p>这2个全局参数是通过调用这个函数，填入quicklist对象的：</p>
+
+<p>void quicklistSetOptions(quicklist *quicklist, int fill, int depth);</p>
 
     </div>
     <div class="entry">

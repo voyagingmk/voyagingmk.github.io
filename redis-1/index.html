@@ -293,6 +293,57 @@
 <li>void listJoin(list *l, list *o); 把整个链表o插到l末尾，并empty掉o</li>
 </ul>
 
+<h2>quicklist 泛型双重双向链表</h2>
+
+<h3>基本特点</h3>
+
+<ul>
+<li></li>
+</ul>
+
+<h3>源码位置</h3>
+
+<ul>
+<li>quicklist.h</li>
+<li>quicklist.c</li>
+</ul>
+
+<h3>quicklistNode</h3>
+
+<ul>
+<li>32字节对齐</li>
+<li>双向链表 有prev、next指针</li>
+<li>zl：指向一个ziplist或者指向一个quicklistLZF</li>
+<li>sz：存了ziplist的占用字节数，是压缩前大小</li>
+<li>count：记录ziplist里元素数量，不超过32k</li>
+<li>encodig：就是标识是否有压缩</li>
+<li>container：</li>
+<li>recompress：1表示这个node是暂时被解压缩出来使用的</li>
+<li>attempted_compress：1表示这个节点大小太小了，不能压缩</li>
+<li>extra：备用</li>
+</ul>
+
+<h3>quicklistLZF</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklistLZF</span> <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">sz</span><span class="p">;</span> <span class="cm">/* LZF size in bytes*/</span>
+    <span class="kt">char</span> <span class="n">compressed</span><span class="p">[];</span>
+<span class="p">}</span> <span class="n">quicklistLZF</span><span class="p">;</span>
+</code></pre></div>
+<ul>
+<li>sz记录compressed字节长度，即压缩后大小</li>
+<li>用LZF算法压缩</li>
+</ul>
+
+<h3>quicklist</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklist</span> <span class="p">{</span>
+    <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
+    <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">count</span><span class="p">;</span> <span class="c1">// 总entry个数</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span> <span class="c1">// quicklistNodes个数</span>
+    <span class="kt">int</span> <span class="nl">fill</span> <span class="p">:</span> <span class="mi">16</span><span class="p">;</span> <span class="c1">// list-max-ziplist-size</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">compress</span> <span class="p">:</span> <span class="mi">16</span><span class="p">;</span> <span class="c1">// list-compress-depth</span>
+<span class="p">}</span> <span class="n">quicklist</span><span class="p">;</span>
+</code></pre></div>
 <h2>dict 泛型字典</h2>
 
 <h3>基本特点</h3>

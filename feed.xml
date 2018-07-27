@@ -96,7 +96,7 @@
 &lt;p&gt;根据decrRefCount可以知道type和encoding的对应关系：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;OBJ_STRING: OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR&lt;/li&gt;
+&lt;li&gt;OBJ_STRING: OBJ_ENCODING_INT / OBJ_ENCODING_RAW / OBJ_ENCODING_EMBSTR&lt;/li&gt;
 &lt;li&gt;OBJ_LIST: OBJ_ENCODING_QUICKLIST（OBJ_ENCODING_ZIPLIST的list实际上没有被用到）&lt;/li&gt;
 &lt;li&gt;OBJ_SET: OBJ_ENCODING_HT / OBJ_ENCODING_INTSET&lt;/li&gt;
 &lt;li&gt;OBJ_ZSET: OBJ_ENCODING_SKIPLIST / OBJ_ENCODING_ZIPLIST&lt;/li&gt;
@@ -150,7 +150,54 @@
 &lt;ul&gt;
 &lt;li&gt;大小不超过512MB&lt;/li&gt;
 &lt;li&gt;二进制安全&lt;/li&gt;
+&lt;li&gt;t_string.c都是业务逻辑，主要还是看sds的实现&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h1&gt;t_list&lt;/h1&gt;
+
+&lt;h2&gt;特点&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;t_list就是quicklist，入口是robj *createQuicklistObject(void);&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;和list有关的配置项&lt;/h2&gt;
+
+&lt;h3&gt;list-max-ziplist-size：(就是quicklist的fill)&lt;/h3&gt;
+
+&lt;p&gt;是用来控制quicklist里的节点（ziplist）的大小的，大小有2种指标：entry数或者ziplist字节总数。&lt;/p&gt;
+
+&lt;p&gt;按字节总数：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;-5: max size: 64 Kb  &amp;lt;-- not recommended for normal workloads&lt;/li&gt;
+&lt;li&gt;-4: max size: 32 Kb  &amp;lt;-- not recommended&lt;/li&gt;
+&lt;li&gt;-3: max size: 16 Kb  &amp;lt;-- probably not recommended&lt;/li&gt;
+&lt;li&gt;-2: max size: 8 Kb   &amp;lt;-- good（默认值）&lt;/li&gt;
+&lt;li&gt;-1: max size: 4 Kb   &amp;lt;-- good&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;按entry数：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;要填大于等于0的数&lt;/li&gt;
+&lt;li&gt;每个节点最多存这么多个entries&lt;/li&gt;
+&lt;li&gt;每个节点单独计数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;list-compress-depth&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;默认0，表示关闭压缩功能&lt;/li&gt;
+&lt;li&gt;depth表示头尾各有多少个节点不压缩&lt;/li&gt;
+&lt;li&gt;头尾节点必然不压缩&lt;/li&gt;
+&lt;li&gt;1表示只有head和tail不压缩，其他节点都压缩&lt;/li&gt;
+&lt;li&gt;2表示head、head-&amp;gt;next、tail-&amp;gt;prev、tail不压缩，其他节点都压缩；&amp;gt;2的情况以此类推&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这2个全局参数是通过调用这个函数，填入quicklist对象的：&lt;/p&gt;
+
+&lt;p&gt;void quicklistSetOptions(quicklist *quicklist, int fill, int depth);&lt;/p&gt;
 </description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-2/</link>
@@ -369,6 +416,57 @@
 &lt;li&gt;void listJoin(list *l, list *o); 把整个链表o插到l末尾，并empty掉o&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;h2&gt;quicklist 泛型双重双向链表&lt;/h2&gt;
+
+&lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;源码位置&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;quicklist.h&lt;/li&gt;
+&lt;li&gt;quicklist.c&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;quicklistNode&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;32字节对齐&lt;/li&gt;
+&lt;li&gt;双向链表 有prev、next指针&lt;/li&gt;
+&lt;li&gt;zl：指向一个ziplist或者指向一个quicklistLZF&lt;/li&gt;
+&lt;li&gt;sz：存了ziplist的占用字节数，是压缩前大小&lt;/li&gt;
+&lt;li&gt;count：记录ziplist里元素数量，不超过32k&lt;/li&gt;
+&lt;li&gt;encodig：就是标识是否有压缩&lt;/li&gt;
+&lt;li&gt;container：&lt;/li&gt;
+&lt;li&gt;recompress：1表示这个node是暂时被解压缩出来使用的&lt;/li&gt;
+&lt;li&gt;attempted_compress：1表示这个节点大小太小了，不能压缩&lt;/li&gt;
+&lt;li&gt;extra：备用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;quicklistLZF&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;quicklistLZF&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* LZF size in bytes*/&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;compressed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;quicklistLZF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;sz记录compressed字节长度，即压缩后大小&lt;/li&gt;
+&lt;li&gt;用LZF算法压缩&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;quicklist&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;quicklist&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;quicklistNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;quicklistNode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tail&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 总entry个数&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// quicklistNodes个数&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;fill&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// list-max-ziplist-size&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;compress&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// list-compress-depth&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;quicklist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2&gt;dict 泛型字典&lt;/h2&gt;
 
 &lt;h3&gt;基本特点&lt;/h3&gt;
