@@ -152,20 +152,6 @@
 </code></pre></div>
 <p>蛮简单的，没啥好说。</p>
 
-<h2>createRawStringObject</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="nf">createRawStringObject</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">createObject</span><span class="p">(</span><span class="n">OBJ_STRING</span><span class="p">,</span> <span class="n">sdsnewlen</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span><span class="n">len</span><span class="p">));</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>需要2次内存分配，返回一个type为OBJ_STRING、encoding为OBJ_ENCODING_RAW的sds对象。</p>
-
-<h2>createEmbeddedStringObject</h2>
-
-<p>这个和createRawStringObject的最大区别是，只做一次内存分配：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-</code></pre></div>
-<p>encoding是OBJ_ENCODING_EMBSTR。</p>
-
 <h2>对象释放</h2>
 
 <p>每个对象的释放都是自动的，在decrRefCount里执行，会自动根据o-&gt;type来执行不同的释放动作。</p>
@@ -232,12 +218,26 @@
 <li>t_string.c都是业务逻辑，主要还是看sds的实现</li>
 </ul>
 
+<h2>createRawStringObject</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="nf">createRawStringObject</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">createObject</span><span class="p">(</span><span class="n">OBJ_STRING</span><span class="p">,</span> <span class="n">sdsnewlen</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span><span class="n">len</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>需要2次内存分配，返回一个type为OBJ_STRING、encoding为OBJ_ENCODING_RAW的sds对象。</p>
+
+<h2>createEmbeddedStringObject</h2>
+
+<p>这个和createRawStringObject的最大区别是，只做一次内存分配：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</code></pre></div>
+<p>encoding是OBJ_ENCODING_EMBSTR。</p>
+
 <h1>t_list</h1>
 
 <h2>特点</h2>
 
 <ul>
-<li>t_list就是quicklist，入口是robj *createQuicklistObject(void);</li>
+<li>t_list就只用了quicklist，入口是robj *createQuicklistObject(void);</li>
 </ul>
 
 <h2>和list有关的配置项</h2>
@@ -278,6 +278,24 @@
 
 <p>void quicklistSetOptions(quicklist *quicklist, int fill, int depth);</p>
 
+<h1>t_set</h1>
+
+<h2>特点</h2>
+
+<ul>
+<li>如果sadd第一个元素是整数，那么创建的是intset，否则是set（dict，即hashtable）</li>
+</ul>
+
+<p>当满足一些条件时，t_set会从intset升级到set：</p>
+
+<ul>
+<li>添加的元素不是整数时</li>
+<li>包含元素过多时</li>
+</ul>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// set-max-intset-entries 默认 512</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">intsetLen</span><span class="p">(</span><span class="n">subject</span><span class="o">-&gt;</span><span class="n">ptr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">server</span><span class="p">.</span><span class="n">set_max_intset_entries</span><span class="p">)</span>
+    <span class="n">setTypeConvert</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="n">OBJ_ENCODING_HT</span><span class="p">);</span>
+</code></pre></div>
     </div>
     <div class="entry">
         (未经授权禁止转载)
