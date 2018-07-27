@@ -421,7 +421,8 @@
 &lt;h3&gt;基本特点&lt;/h3&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;/li&gt;
+&lt;li&gt;基于ziplist的扩展list，平衡了内存连续性和随机插入删除问题&lt;/li&gt;
+&lt;li&gt;支持对中间节点做压缩，依据是list通常只对表头表尾做操作而不是中间节点&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3&gt;源码位置&lt;/h3&gt;
