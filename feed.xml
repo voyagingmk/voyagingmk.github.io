@@ -207,6 +207,8 @@
 &lt;li&gt;如果sadd第一个元素是整数，那么创建的是intset，否则是set（dict，即hashtable）&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;h2&gt;- 元素都是sds，意味着要么是整数，要么是二进制安全字符串&lt;/h2&gt;
+
 &lt;p&gt;当满足一些条件时，t_set会从intset升级到set：&lt;/p&gt;
 
 &lt;ul&gt;
