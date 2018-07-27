@@ -372,6 +372,26 @@
 &lt;h3&gt;hash-max-ziplist-value 64&lt;/h3&gt;
 
 &lt;p&gt;单个元素超过64字节时，就得转成hashtable&lt;/p&gt;
+
+&lt;h1&gt;t_zset&lt;/h1&gt;
+
+&lt;h2&gt;特点&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;有升级转换也有降级转换&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;和zset有关的配置项&lt;/h2&gt;
+
+&lt;p&gt;用这2个配置项来控制什么时候升级什么时候降级：&lt;/p&gt;
+
+&lt;h3&gt;zset-max-ziplist-entries 128&lt;/h3&gt;
+
+&lt;p&gt;用ziplist时，最多存128个元素&lt;/p&gt;
+
+&lt;h3&gt;zset-max-ziplist-value 64&lt;/h3&gt;
+
+&lt;p&gt;单个元素超过64字节时，就得转成hashtable&lt;/p&gt;
 </description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-2/</link>

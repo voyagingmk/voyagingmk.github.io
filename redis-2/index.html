@@ -452,6 +452,26 @@
 
 <p>单个元素超过64字节时，就得转成hashtable</p>
 
+<h1>t_zset</h1>
+
+<h2>特点</h2>
+
+<ul>
+<li>有升级转换也有降级转换</li>
+</ul>
+
+<h2>和zset有关的配置项</h2>
+
+<p>用这2个配置项来控制什么时候升级什么时候降级：</p>
+
+<h3>zset-max-ziplist-entries 128</h3>
+
+<p>用ziplist时，最多存128个元素</p>
+
+<h3>zset-max-ziplist-value 64</h3>
+
+<p>单个元素超过64字节时，就得转成hashtable</p>
+
     </div>
     <div class="entry">
         (未经授权禁止转载)
