@@ -284,9 +284,8 @@
 
 <ul>
 <li>如果sadd第一个元素是整数，那么创建的是intset，否则是set（dict，即hashtable）</li>
+<li>元素都是sds，意味着要么是整数，要么是二进制安全字符串</li>
 </ul>
-
-<h2>- 元素都是sds，意味着要么是整数，要么是二进制安全字符串</h2>
 
 <p>当满足一些条件时，t_set会从intset升级到set：</p>
 
@@ -434,6 +433,25 @@
     <span class="n">zfree</span><span class="p">(</span><span class="n">sets</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
+<h1>t_hash</h1>
+
+<h2>特点</h2>
+
+<ul>
+<li>默认用OBJ_ENCODING_ZIPLIST</li>
+<li>用一个hashTypeLookupWriteOrCreate来获取一个hash对象，如果hash对象不存在会即时创建一个</li>
+</ul>
+
+<h2>和list有关的配置项</h2>
+
+<h3>hash-max-ziplist-entries 512</h3>
+
+<p>用ziplist时，最多存512个元素</p>
+
+<h3>hash-max-ziplist-value 64</h3>
+
+<p>单个元素超过64字节时，就得转成hashtable</p>
+
     </div>
     <div class="entry">
         (未经授权禁止转载)

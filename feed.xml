@@ -205,9 +205,8 @@
 
 &lt;ul&gt;
 &lt;li&gt;如果sadd第一个元素是整数，那么创建的是intset，否则是set（dict，即hashtable）&lt;/li&gt;
+&lt;li&gt;元素都是sds，意味着要么是整数，要么是二进制安全字符串&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;h2&gt;- 元素都是sds，意味着要么是整数，要么是二进制安全字符串&lt;/h2&gt;
 
 &lt;p&gt;当满足一些条件时，t_set会从intset升级到set：&lt;/p&gt;
 
@@ -354,7 +353,26 @@
     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;zfree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1&gt;t_hash&lt;/h1&gt;
+
+&lt;h2&gt;特点&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;默认用OBJ_ENCODING_ZIPLIST&lt;/li&gt;
+&lt;li&gt;用一个hashTypeLookupWriteOrCreate来获取一个hash对象，如果hash对象不存在会即时创建一个&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;和list有关的配置项&lt;/h2&gt;
+
+&lt;h3&gt;hash-max-ziplist-entries 512&lt;/h3&gt;
+
+&lt;p&gt;用ziplist时，最多存512个元素&lt;/p&gt;
+
+&lt;h3&gt;hash-max-ziplist-value 64&lt;/h3&gt;
+
+&lt;p&gt;单个元素超过64字节时，就得转成hashtable&lt;/p&gt;
+</description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-2/</link>
         <guid isPermaLink="true">http://localhost:4000/redis-2/</guid>
