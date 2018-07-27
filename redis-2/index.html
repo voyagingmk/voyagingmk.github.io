@@ -313,10 +313,12 @@
         <span class="n">robj</span> <span class="o">*</span><span class="n">setobj</span> <span class="o">=</span> <span class="n">dstkey</span> <span class="o">?</span>
             <span class="n">lookupKeyWrite</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">setkeys</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">:</span>
             <span class="n">lookupKeyRead</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">setkeys</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+        <span class="c1">// 这个kv可能不存在，跳过</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">setobj</span><span class="p">)</span> <span class="p">{</span>
             <span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
             <span class="k">continue</span><span class="p">;</span>
         <span class="p">}</span>
+        <span class="c1">// 检查这个kv是不是set</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">checkType</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">setobj</span><span class="p">,</span><span class="n">OBJ_SET</span><span class="p">))</span> <span class="p">{</span>
             <span class="n">zfree</span><span class="p">(</span><span class="n">sets</span><span class="p">);</span>
             <span class="k">return</span><span class="p">;</span>
@@ -380,13 +382,9 @@
         <span class="p">}</span>
         <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_DIFF</span> <span class="o">&amp;&amp;</span> <span class="n">sets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">diff_algo</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="cm">/* DIFF Algorithm 2:</span>
-<span class="cm">         *</span>
-<span class="cm">         * Add all the elements of the first set to the auxiliary set.</span>
-<span class="cm">         * Then remove all the elements of all the next sets from it.</span>
-<span class="cm">         *</span>
-<span class="cm">         * This is O(N) where N is the sum of all the elements in every</span>
-<span class="cm">         * set. */</span>
+        <span class="c1">// DIFF Algorithm 2:</span>
+        <span class="c1">// 第一个集合的元素都add到dstset，然后对于其他集合的元素，执行</span>
+        <span class="c1">// setTypeRemove(dstset,ele)，如果移除成功，说明重复了，计数-1</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">setnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">sets</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">continue</span><span class="p">;</span> <span class="cm">/* non existing keys are like empty sets */</span>
 
@@ -400,15 +398,13 @@
                 <span class="n">sdsfree</span><span class="p">(</span><span class="n">ele</span><span class="p">);</span>
             <span class="p">}</span>
             <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
-
-            <span class="cm">/* Exit if result set is empty as any additional removal</span>
-<span class="cm">             * of elements will have no effect. */</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cardinality</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
 
-    <span class="cm">/* Output the content of the resulting set, if not in STORE mode */</span>
+    <span class="c1">// 已经得到结果后</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dstkey</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 直接reply</span>
         <span class="n">addReplyMultiBulkLen</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">cardinality</span><span class="p">);</span>
         <span class="n">si</span> <span class="o">=</span> <span class="n">setTypeInitIterator</span><span class="p">(</span><span class="n">dstset</span><span class="p">);</span>
         <span class="k">while</span><span class="p">((</span><span class="n">ele</span> <span class="o">=</span> <span class="n">setTypeNextObject</span><span class="p">(</span><span class="n">si</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
@@ -418,8 +414,6 @@
         <span class="n">setTypeReleaseIterator</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
         <span class="n">decrRefCount</span><span class="p">(</span><span class="n">dstset</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="cm">/* If we have a target key where to store the resulting set</span>
-<span class="cm">         * create this key with the result set inside */</span>
         <span class="kt">int</span> <span class="n">deleted</span> <span class="o">=</span> <span class="n">dbDelete</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">setTypeSize</span><span class="p">(</span><span class="n">dstset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
             <span class="n">dbAdd</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">,</span><span class="n">dstset</span><span class="p">);</span>
