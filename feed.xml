@@ -379,6 +379,8 @@
 
 &lt;ul&gt;
 &lt;li&gt;有升级转换也有降级转换&lt;/li&gt;
+&lt;li&gt;如果是skiplist编码，那么其实还用了dict，用来判断key是不是已经在zset里了&lt;/li&gt;
+&lt;li&gt;dict的key是引用skiplist里的，所以不会有2个key副本，没有冗余&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2&gt;和zset有关的配置项&lt;/h2&gt;
