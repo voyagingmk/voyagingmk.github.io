@@ -239,6 +239,17 @@ appendonly yes
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;和预期的一样，都是先算出槽号并找出对应的目标节点，重定向到目标节点上执行。&lt;/p&gt;
 
+&lt;h2&gt;sentinel&lt;/h2&gt;
+
+&lt;p&gt;sentinel是用来自动化管理的：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;避免人工处理节点故障&lt;/li&gt;
+&lt;li&gt;主节点故障时，实现新的主节点选举&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;当主节点故障时，要等待一段时间，确认主节点不会恢复时，才开始从节点的选举（故障转移）。&lt;/p&gt;
+
 &lt;h2&gt;资料&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.redis.cn/topics/cluster-tutorial.html&quot;&gt;http://www.redis.cn/topics/cluster-tutorial.html&lt;/a&gt;&lt;/p&gt;
