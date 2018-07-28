@@ -265,6 +265,130 @@ appendonly yes
       </item>
     
       <item>
+        <title>python源码复习笔记</title>
+        <description>&lt;!--more--&gt;
+
+&lt;p&gt;以前看过python源码，没记笔记，忘光了，现在重新瞧瞧。&lt;/p&gt;
+
+&lt;h1&gt;各种对象的实现&lt;/h1&gt;
+
+&lt;h2&gt;PyObject_HEAD 和 PyObject_VAR_HEAD&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* PyObject_HEAD defines the initial segment of every PyObject. */&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define PyObject_HEAD                   \&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;    _PyObject_HEAD_EXTRA                \&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;    Py_ssize_t ob_refcnt;               \&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;    struct _typeobject *ob_type;&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;#define PyObject_VAR_HEAD               \&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;    PyObject_HEAD                       \&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;    Py_ssize_t ob_size; &lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Number of items in variable part */&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这2个东西会出现在各种对象的结构定义里。obj_refcnt显然是引用计数，ob_type是类型元信息的指针，ob_size是变长对象的对象数量信息。&lt;/p&gt;
+
+&lt;h2&gt;PyIntObject 普通整数（long）&lt;/h2&gt;
+
+&lt;p&gt;文件：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;intobject.h&lt;/li&gt;
+&lt;li&gt;intobject.c&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject_HEAD&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ob_ival&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyIntObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;应该是最简单的对象类型了，用一个long存数据信息。&lt;/p&gt;
+
+&lt;p&gt;下面是整数对象的类型元信息，其实就是自定义实现了object.h里的_typeobject：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyTypeObject&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyInt_Type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyVarObject_HEAD_INIT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyType_Type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&amp;quot;int&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// tp_name 用于打印&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyIntObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// tp_basicsize &lt;/span&gt;
+    &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// tp_itemsize 因为不是变长类型，所以为0&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// 下面是各种函数指针&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;destructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int_dealloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;                    &lt;span class=&quot;cm&quot;&gt;/* tp_dealloc */&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;printfunc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int_print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;                       &lt;span class=&quot;cm&quot;&gt;/* tp_print */&lt;/span&gt;
+    &lt;span class=&quot;err&quot;&gt;···&lt;/span&gt;  
+    &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int_as_number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;                             &lt;span class=&quot;cm&quot;&gt;/* tp_as_number */&lt;/span&gt;
+    &lt;span class=&quot;err&quot;&gt;···&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Py_TPFLAGS_DEFAULT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Py_TPFLAGS_CHECKTYPES&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Py_TPFLAGS_BASETYPE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Py_TPFLAGS_INT_SUBCLASS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;          &lt;span class=&quot;cm&quot;&gt;/* tp_flags */&lt;/span&gt;
+    &lt;span class=&quot;err&quot;&gt;···&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;PyIntObject的代数运算过程中，可能会转换成PyLongObject。&lt;/p&gt;
+
+&lt;p&gt;因为PyIntObject是值语义，&lt;/p&gt;
+
+&lt;h3&gt;创建&lt;/h3&gt;
+
+&lt;p&gt;总共4个C API：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyAPI_FUNC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyInt_FromString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;PyAPI_FUNC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyInt_FromLong&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;PyAPI_FUNC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyInt_FromSize_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;PyAPI_FUNC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyInt_FromSsize_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Py_ssize_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;第1、3、4个API会根据传入的值的大小，选择创建PyIntObject还是PyLongObject。&lt;/p&gt;
+
+&lt;p&gt;所以主要看PyInt_FromLong。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;PyInt_FromLong&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ival&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;register&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyIntObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#if NSMALLNEGINTS + NSMALLPOSINTS &amp;gt; 0&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NSMALLNEGINTS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ival&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ival&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NSMALLPOSINTS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;small_ints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ival&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NSMALLNEGINTS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Py_INCREF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#ifdef COUNT_ALLOCS&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ival&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;quick_int_allocs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;quick_neg_int_allocs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;free_list&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;free_list&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fill_free_list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;cm&quot;&gt;/* Inline PyObject_New */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;free_list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;free_list&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyIntObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Py_TYPE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject_INIT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyInt_Type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ob_ival&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ival&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;PyLongObject 任意大整数&lt;/h2&gt;
+
+&lt;p&gt;文件：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;longobject.h&lt;/li&gt;
+&lt;li&gt;longobject.c&lt;/li&gt;
+&lt;li&gt;longintrepr.h&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个longObject反而不是用long实现了，而是用了复杂的大数运算技巧。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_longobject&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject_VAR_HEAD&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;digit&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ob_digit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PY_UINT32_T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;digit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_longobject&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyLongObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* Revealed in longintrepr.h */&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;可见，PyLong&lt;/p&gt;
+</description>
+        <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/python-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/python-1/</guid>
+      </item>
+    
+      <item>
         <title>redis5.0源码学习笔记（3）内存管理</title>
         <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
 
@@ -3211,477 +3335,6 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
         <pubDate>Sun, 01 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/crypto-2/</link>
         <guid isPermaLink="true">http://localhost:4000/crypto-2/</guid>
-      </item>
-    
-      <item>
-        <title>《计算机网络-自顶向下方法》笔记</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h1&gt;网络层&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;是否对ip包分片，取决于输出链路的mtu，如果包大小大于mtu（可能500多到1500字节），那么就会自动分片&lt;/li&gt;
-&lt;li&gt;分片有3个不可或缺字段：ip包的唯一标识（ID)、字节偏移offset、结束标志（0或1，1表示还没结束，0表示当前已是最后一个片）&lt;/li&gt;
-&lt;li&gt;分片是ipv4的机制，且有安全问题，ipv6没有分片，杜绝了安全隐患&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;分片重组是在目的地端主机上进行的，路由器只可能做分片，而不会做重组&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;主机和物理链路之间的边界叫做接口&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;每个接口有自己的ip地址，所以ip地址技术是与接口关联，而不是和主机或路由器&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;子网：直接互联并与其他网络岛隔离的主机接口+路由器接口组成子网&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;子网掩码：例如223.1.1.0/24，/24就是子网掩码&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;网络层有三个主要组件：IP协议、路由选择协议(RIP、OSPF、BGP）、因特网控制报文协议ICMP&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;查看和修改系统的mtu值：&lt;/p&gt;
-
-&lt;p&gt;查看：&lt;/p&gt;
-
-&lt;p&gt;ifconfig eth0&lt;/p&gt;
-
-&lt;p&gt;修改：&lt;/p&gt;
-
-&lt;p&gt;ifconfig eth0 mtu 1460&lt;/p&gt;
-
-&lt;h2&gt;DHCP动态主机配置协议&lt;/h2&gt;
-
-&lt;p&gt;四大步骤：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;DHCP发现报文，用UDP，端口67，src ip为0.0.0.0，dst ip为255.255.255.255，广播一个发现报文，报文里包含一个事物ID。&lt;/li&gt;
-&lt;li&gt;DHCP提供报文，DHCP服务器收到广播而来的发现报文后，用一个提供报文做响应，src ip为自己的ip，dst ip为255.255.255.255，也是广播。因为DHCP服务器不一定唯一，所以客户机有选择权。提供报文包含，收到的发现报文的事物ID、向客户推荐的IP地址、IP地址的掩码、IP地址租用期（address lease time），租用期一般为几小时到几天。&lt;/li&gt;
-&lt;li&gt;DHCP请求报文，客户机从1到多个提供报文中选择一个，并向该服务器发送DHCP请求报文。&lt;/li&gt;
-&lt;li&gt;DHCP ACK报文，就是第三步的响应报文，告诉客户配置参数。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;第四步完成后，客户就可以在租用期里使用这个ip。另外，DHCP也有延长租用期的办法。&lt;/p&gt;
-
-&lt;h2&gt;NAT网络地址转换&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;NAT是用来解决ipv4的ip地址不够用问题的&lt;/li&gt;
-&lt;li&gt;NAT会使得外部主机不能直接访问内网主机（内网主机不可见），因为内网主机没有自己的全球唯一ip地址&lt;/li&gt;
-&lt;li&gt;NAT用一张转换表来双向转发数据包&lt;/li&gt;
-&lt;li&gt;内网主机可以主动访问外网，反过来就不行&lt;/li&gt;
-&lt;li&gt;NAT的存在对实现p2p应用很不好&lt;/li&gt;
-&lt;li&gt;应用NAT穿越技术，可以改善p2p应用的通讯问题&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;NAT穿越：&lt;a href=&quot;https://www.jianshu.com/p/84e8c78ca61d&quot;&gt;https://www.jianshu.com/p/84e8c78ca61d&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2&gt;ICMP控制报文协议&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;常用于差错报告，例如目的地不可达时，中间路由器就会返回类型3的ICMP报文&lt;/li&gt;
-&lt;li&gt;ICMP协议是建立在IP协议上面的，因为是用IP分组承载的。类似TCP、UDP。但一般认为ICMP是属于网络层的协议。&lt;/li&gt;
-&lt;li&gt;ICMP报文组成：类型、编码。编码可理解为大类型里的子类型。&lt;a href=&quot;https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol&quot;&gt;wiki&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ping程序： 发一个ICMP[8,0]报文，目的主机发回一个ICMP[0,0]的报文。&lt;/p&gt;
-
-&lt;p&gt;源抑制报文：从wiki可以看到已经deprecated了，最初是用来做拥塞控制的，不过tcp自己有拥塞控制，所以没卵用。&lt;/p&gt;
-
-&lt;p&gt;traceroute：原理就是发送一系列IP数据报，每个数据报携带UDP报文，目的地ip为目标主机，端口号设置为不可达的端口号。关键的，第一个数据报的TTL设为1，第二个的TTL为2，以此类推。当第n个数据报到达第n台路由器时，第n台路由器发现这个数据报的TTL正好过期，然后就会发给源主机一个ICMP[11,0]，携带了该路由器的ip地址。然后每个数据报都设置了定时器，收到回复时就可以算出往返延迟RTT。&lt;/p&gt;
-
-&lt;p&gt;traceroute还有个问题是何时停止发送udp报文，这是通过ICMP的类型和编码字段判断的，因为如果目的地主机在线，那么最终会返回一个ICMP[3,3]，表示目的主机端口不可达。&lt;/p&gt;
-
-&lt;h2&gt;ipv6&lt;/h2&gt;
-
-&lt;p&gt;改进：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;去掉了分片功能，因为分片功能是耗时操作，去掉后能提高路由器性能&lt;/li&gt;
-&lt;li&gt;没有分片后，如果包太大，就无法发进链路层，只能丢弃，并返回ICMP差错报文，让发送方重新发一个小的&lt;/li&gt;
-&lt;li&gt;去掉了首部校验和，因为传输层协议、链路层协议也会做校验和，所以多余了。另外，因为IP头部有个动态的跳数，会导致每次修改跳数都得重新计算校验和，影响性能。&lt;/li&gt;
-&lt;li&gt;选项字段从IP首部去掉，但依然可以存在选项，方法是用“下一个头部”字段来实现，就是说选项信息是一个可选的头部。&lt;/li&gt;
-&lt;li&gt;去掉了选项后，ipv6的头部就是定长的40字节，非常高效。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;2个ipv6主机之间通讯，可能会经过一段由仅支持ipv4的主机组成的路径，这时可以用隧道技术，把ipv6分组，放到ipv4分组的有效载荷里。&lt;/p&gt;
-
-&lt;h2&gt;路由选择算法&lt;/h2&gt;
-
-&lt;p&gt;全局式算法：路由器拥有网络拓扑信息、连通信息、链路费用信息，从而算出最优路径。也称为链路状态算法。链路费用一般取决于链路承载流量。&lt;/p&gt;
-
-&lt;p&gt;分散式算法：路由器没有网络链路信息，而只需要拥有和路由器直接相连链路的费用信息就可开始工作。通过迭代、和邻居交换信息，就能逐渐计算出到达某目的地结点的最低费用路径。&lt;/p&gt;
-
-&lt;p&gt;静态算法：依靠人工。&lt;/p&gt;
-
-&lt;p&gt;动态算法：拓扑或负载变化时更新。不过容易受&lt;strong&gt;路由选择循环、路由震荡&lt;/strong&gt;影响。&lt;/p&gt;
-
-&lt;p&gt;负载敏感算法：链路费用会动态地变化，以反映链路拥塞情况。&lt;/p&gt;
-
-&lt;p&gt;负载迟钝算法：相反的，对拥塞不敏感，费用固定。更普遍可行的方法。&lt;/p&gt;
-
-&lt;p&gt;路由震荡：用随机化的链路通告时间，可以改善震荡。&lt;/p&gt;
-
-&lt;p&gt;LS链路状态算法：基于无向图最短路算法。最坏情况n平方。&lt;/p&gt;
-
-&lt;p&gt;DV距离向量算法：是一种迭代、异步、分布式的算法。&lt;/p&gt;
-
-&lt;h2&gt;互联网当前的路由算法&lt;/h2&gt;
-
-&lt;h3&gt;RIP，&lt;strong&gt;路由选择信息协议&lt;/strong&gt;&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;路由选择表（routing table），也叫RIP表，包含该路由器的距离向量、转发表。&lt;/li&gt;
-&lt;li&gt;目的子网，就是把目的地路由器当成一个子网网络&lt;/li&gt;
-&lt;li&gt;跳数，理解为到目的子网的链接边数即可&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;转发表的结构：目的子网，下一台路由器，到目的子网的跳数。每个子网占一行。&lt;/p&gt;
-
-&lt;p&gt;转发表的状态是迭代的，不可能是实时获得整个网络的状态信息。&lt;/p&gt;
-
-&lt;p&gt;邻居路由器之间会互相通告最新的转发表信息。大概30秒一次。&lt;/p&gt;
-
-&lt;p&gt;如果邻居超过180秒没有发来报文，认为不可达，更新自己的路由表，并向其他存活的邻居发公告。&lt;/p&gt;
-
-&lt;p&gt;每次收到转发表信息，都可能导致当前路由器的所知的到达某个子网的跳数、下一跳路由器信息，产生更新，因为新的路径（跳数）可能会更短。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.6/2.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.6/3.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.6/4.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;路由器可以主动询问邻居&lt;strong&gt;到指定目的地的费用&lt;/strong&gt;（RIP请求报文）。基于UDP 520端口。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;RIP是一个基于传输层UDP协议的应用层进程（叫routed），用UDP来控制IP路由。&lt;/strong&gt;这也是一个特殊进程，因为它可以操作系统内核的转发表。&lt;/p&gt;
-
-&lt;p&gt;routed会和邻居路由器的routed进程相互联系。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.6/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;h3&gt;OSPF&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;被设想为RIP的后继者，因为有许多先进特性&lt;/li&gt;
-&lt;li&gt;洪泛链路状态信息的链路状态协议 + Dijkstra最低费用路径算法&lt;/li&gt;
-&lt;li&gt;是基于完整信息状态的算法&lt;/li&gt;
-&lt;li&gt;各条链路费用可用网络管理员配置，如果都设为1，则退化成&lt;strong&gt;最少跳数路由选择（RIP）&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;管理员可以根据带宽大小来设置链路费用，反比，带宽越大，费用越低。&lt;/li&gt;
-&lt;li&gt;路由选择信息是广播到整个网络的，而不仅仅是邻居&lt;/li&gt;
-&lt;li&gt;当一跳链路状态（费用、连接/中断）变化时，更新并广播&lt;/li&gt;
-&lt;li&gt;即使无变化，也要定期广播&lt;/li&gt;
-&lt;li&gt;OSPF报文直接承载于IP层，所以OSPF要自行实现可靠传输，链路状态广播功能。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;优点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;安全，对网络成员有身份鉴别功能，从而鉴别假冒的OSPF协议包。但这是可选的功能。鉴别方法是在每台路由器上配置一样的共享密钥，发包时，把密钥添加到分组里然后算一个MD5，再把MD5放到发包分组里，接收端收到分组后，对内容段添加自己的密钥并算一个MD5，并和收到的MD5进行比较鉴别。另外还有个序号，用来针对重放攻击。&lt;/li&gt;
-&lt;li&gt;负载均衡，如果去某个目的地存在多条费用一样的路径，OSPF允许同时使用多条路径，而不是只用其中一条。&lt;/li&gt;
-&lt;li&gt;层次结构&lt;/li&gt;
-&lt;li&gt;对多播的支持&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;OSPF可按区域划分（大区分小区），区域和区域外的联系要经过&lt;strong&gt;区域边界路由器&lt;/strong&gt;，边界路由器都连到主干路由，从而实现区域之间的连通。&lt;/p&gt;
-
-&lt;h3&gt;BGP 边界网关协议&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;BGP确保了因特网中所有AS知道该子网以及如何到达那里。&lt;/li&gt;
-&lt;li&gt;没有BGP，那么每个子网将是隔离的，不为互联网其他部分所知。&lt;/li&gt;
-&lt;li&gt;是BGP这个协议将所有东西粘合在一起&lt;/li&gt;
-&lt;li&gt;BGP基于TCP端口179，半永久TCP连接&lt;/li&gt;
-&lt;li&gt;BGP作用：使得每个AS知道经过其相邻AS可达哪些目的地。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;关键词定义：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;BGP对等方，BGP peers，即一条BG TCP连接的两端&lt;/li&gt;
-&lt;li&gt;沿着该连接发送所有BGP报文的TCP连接称为BGP会话&lt;/li&gt;
-&lt;li&gt;跨越2个AS的BGP会话称为外部BGP，eBGP；同理，内部的叫iBGP。&lt;/li&gt;
-&lt;li&gt;目的地：不是主机IP，而是CDIR化的前缀，表示一个子网或子网的集合，如：138.16.64/24。&lt;/li&gt;
-&lt;li&gt;前缀聚合：如果AS连接了4个子网，138.16.64/24，138.16.65/24，138.16.66/24，138.16.67/24，可以聚合成138.16.64/22&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;链路层&lt;/h1&gt;
-
-&lt;h2&gt;交换局域网-ARP协议&lt;/h2&gt;
-
-&lt;h3&gt;ARP表&lt;/h3&gt;
-
-&lt;p&gt;每个主机维护一张ARP表，key是IP地址（所在子网的其他主机的局域网地址），value是MAC地址，并且有一个ttl，指明这key到value的映射关系什么时候过期。&lt;/p&gt;
-
-&lt;h3&gt;适配器、接口、ARP模块、MAC地址&lt;/h3&gt;
-
-&lt;p&gt;一个接口对应一个适配器、一个ARP模块、一个MAC地址&lt;/p&gt;
-
-&lt;h3&gt;例子：同子网下的ARP&lt;/h3&gt;
-
-&lt;p&gt;主机10.10.10.1要发送一个数据报，给本子网上的另一台主机10.10.10.2或路由器&lt;/p&gt;
-
-&lt;p&gt;分2种情况：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;发送主机的ARP表有目的主机ip的MAC地址：直接可以发。&lt;/li&gt;
-&lt;li&gt;发送主机没有目的主机的MAC地址：发送方用ARP协议来解析这个目的ip地址。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ARP解析过程：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;发送主机构造一个ARP分组（ARP packet），发送IP地址、接收IP地址、MAC地址。ARP分组细分为&lt;strong&gt;查询分组&lt;/strong&gt;和&lt;strong&gt;响应分组&lt;/strong&gt;，格式一样。&lt;/li&gt;
-&lt;li&gt;发送方把ARP查询分组送到适配器，并且指示适配器&lt;strong&gt;用MAC广播地址FF-FF-FF-FF-FF-FF&lt;/strong&gt;发送它&lt;/li&gt;
-&lt;li&gt;适配器在链路层帧中封装这个查询分组，用广播地址作为帧的目的地址，并把该帧传输进子网（广播）&lt;/li&gt;
-&lt;li&gt;同子网上的所有其他适配器都会收到这个ARP查询，因为地址是广播地址，所以适配器底层不能直接判断是否丢弃分组，而是向上传递给&lt;strong&gt;ARP模块&lt;/strong&gt;。&lt;/li&gt;
-&lt;li&gt;ARP模块检查自己的IP地址是否和分组的目的IP地址相匹配。&lt;/li&gt;
-&lt;li&gt;最终只有一个ARP模块会匹配，此时回发给最开始的发送主机一个响应分组（响应分组的目的MAC地址是已知的，不需要广播）。&lt;/li&gt;
-&lt;li&gt;发送主机收到响应分组，更新ARP表。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;由此可见，ARP协议是一个同时跨越链路层和网络层边界的协议&lt;/p&gt;
-
-&lt;h3&gt;例子：跨子网ARP&lt;/h3&gt;
-
-&lt;p&gt;背景：1个路由器打通了2个子网，子网1的主机A想要发数据报给子网2的主机B&lt;/p&gt;
-
-&lt;p&gt;问题：目的地主机不在同一子网上，意味着即使已知目的主机的MAC地址，也不可能让链路帧直接送达&lt;/p&gt;
-
-&lt;p&gt;流程：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;发送主机把数据帧发送到路由器接口1&lt;/li&gt;
-&lt;li&gt;路由器会看到该帧的目的地址是自己的接口1，于是解析链路帧，把数据报传递到路由器的网络层&lt;/li&gt;
-&lt;li&gt;路由器网络层观察数据报的ip目的地址，发现转发表里有这个子网（最长前缀匹配），并且知道得通过接口2转发这个数据报&lt;/li&gt;
-&lt;li&gt;接口2的适配器把该数据报封装到一个新的帧中，帧的目的MAC地址就是主机B的MAC地址（路由器从自己的ARP表获得），并且将帧发送进子网2中&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2&gt;交换局域网-以太网&lt;/h2&gt;
-
-&lt;p&gt;以太网是高速局域网。&lt;/p&gt;
-
-&lt;p&gt;21世纪早期，集线器（hub）换成了交换机（switch）。&lt;/p&gt;
-
-&lt;p&gt;交换机特点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;无碰撞&lt;/li&gt;
-&lt;li&gt;存储转发分组&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;交换机和路由器区别：交换机仅工作在2层，而路由器是3层。&lt;/p&gt;
-
-&lt;p&gt;以太网帧结构：&lt;/p&gt;
-
-&lt;p&gt;前同步码(Preamble) | 帧开始符（Start of frame delimiter, SFD）| 目的MAC地址 | 源MAC地址 | tag (optional) | 类型（或长度）| 数据 | FCS，Frame check sequence（即CRC） | IPG(interpacket gap)&lt;/p&gt;
-
-&lt;p&gt;各字段占用字节数：&lt;/p&gt;
-
-&lt;p&gt;7 | 1 | 6 | 6 | 4(optional) | 2 | 46~1500 | 4 | 12&lt;/p&gt;
-
-&lt;p&gt;一帧里面要分为两部分，一部分是2层链路层的，一部分是1层物理层的。&lt;/p&gt;
-
-&lt;p&gt;物理层的：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Preamble （用于链路2端的时钟同步，10101010····，且有唤醒接收适配器的作用）&lt;/li&gt;
-&lt;li&gt;SFD（标明下一个字节为目的MAC字段，10101011，最后2位突然变成2个1，警告接收适配器重要的内容要来了）&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Interpacket_gap&quot;&gt;IPG&lt;/a&gt; (一个pause段，让接收者有时间准备接收下一个分组)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;占7 + 1 + 12 = 20字节。&lt;/p&gt;
-
-&lt;p&gt;链路层的：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;目的MAC地址&lt;/li&gt;
-&lt;li&gt;源MAC地址&lt;/li&gt;
-&lt;li&gt;tag (optional) &lt;/li&gt;
-&lt;li&gt;类型（或长度）&lt;/li&gt;
-&lt;li&gt;数据 (3层协议数据)&lt;/li&gt;
-&lt;li&gt;FCS (对接收网卡提供判断是否传输错误的一种方法，如果发现错误，丢弃此帧)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;min：6 + 6 + 2 + 46 + 4 = 64字节，max：6 + 6 + 4 + 2 + 1500 + 4 = 1522字节&lt;/p&gt;
-
-&lt;p&gt;注意，数据字段是有填充需求的，即要让以太网帧至少有64字节。&lt;/p&gt;
-
-&lt;p&gt;另外，如果上下文是物理层，那么以太网帧应该叫以太网分组（Ethernet packet），以太网分组包括上面整个帧结构。&lt;/p&gt;
-
-&lt;p&gt;以太网技术特点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;向网络层提供无连接服务，类似3层数据报、4层UDP&lt;/li&gt;
-&lt;li&gt;向网络层提供不可靠服务，接收端无论是否正确接收，都不会做任何反馈，错帧直接丢弃。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;交换局域网-链路层交换机&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.7/1.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;交换机的任务：接收&lt;strong&gt;入链路层帧&lt;/strong&gt;，并将它们转发到&lt;strong&gt;出链路&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;特点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;交换的是链路层帧，工作在2层&lt;/li&gt;
-&lt;li&gt;对子网中的主机和路由器&lt;strong&gt;透明&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;交换机有缓存，因为转发输出速率可能会超过输出接口的链路容量&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;转发&amp;amp;过滤&lt;/h3&gt;
-
-&lt;p&gt;过滤和转发的实现，依赖于&lt;strong&gt;交换机表（switch table）&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;交换机表包含局域网上&lt;strong&gt;某些主机和路由器&lt;/strong&gt;的表项：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.7/2.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;例子：假设有一个目的地地址为DD-DD-DD-DD-DD-DD的帧从交换机接口x到达，交换机用该MAC地址索引交换机表。有3种情况：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;表中没有对于DD-DD-DD-DD-DD-DD的表项。交换机向除了接口x外的所有接口广播该帧。广播前，实际是把帧放到接口的缓冲区。&lt;/li&gt;
-&lt;li&gt;表中有一个表项将DD-DD-DD-DD-DD-DD与接口x联系起来。交换机丢失该帧。&lt;/li&gt;
-&lt;li&gt;表中有一个表项将DD-DD-DD-DD-DD-DD与接口y（y!=x）联系起来。该帧被转发到与接口y相连的局域网网段，交换机通过将该帧放到接口y的输出缓冲区完成转发功能。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;自学习&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;交换机表初始为空&lt;/li&gt;
-&lt;li&gt;对于在每个接口接收到的每个入帧，该交换机在其表中存储：
-
-&lt;ol&gt;
-&lt;li&gt;帧里的源MAC地址&lt;/li&gt;
-&lt;li&gt;该帧到达的接口&lt;/li&gt;
-&lt;li&gt;当前时间&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;li&gt;因为每条记录有时间戳，所以过期的记录会删除&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;自学习性质使得交换机变成即插即用设备，不需要做配置。&lt;/p&gt;
-
-&lt;h3&gt;交换机和路由器的区别&lt;/h3&gt;
-
-&lt;p&gt;共同点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;都是存储转发分组交换机&lt;/li&gt;
-&lt;li&gt;有时候相互可替代&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;不同点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;路由器使用网络层IP地址转发分组；交换机用MAC地址转发分组&lt;/li&gt;
-&lt;li&gt;路由器是3层设备；交换机是2层设备&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;各自特点优缺点：&lt;/p&gt;
-
-&lt;p&gt;交换机特点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;MAC地址寻址扁平&lt;/li&gt;
-&lt;li&gt;为了防止广播帧的循环，交换网络的活跃拓扑限制为一颗&lt;strong&gt;生成树&lt;/strong&gt;。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;交换机优点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;即插即用&lt;/li&gt;
-&lt;li&gt;具有相对高的分组过滤和转发速率（只需要处理高到2层的帧，而路由器高至3层）&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;交换机缺点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;交换机对于广播风暴并不提供任何保护措施，即某主机故障并传输无尽的以太网广播帧，交换机将转发所有这些帧，导致整个以太网崩溃&lt;/li&gt;
-&lt;li&gt;所以如果没有生成树，会循环。而生成树限制了转发路径唯一。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;路由器优点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;即使存在冗余路径，分组也不会循环&lt;/li&gt;
-&lt;li&gt;没有生成树限制。允许以丰富的拓扑结构构建因特网，例如：欧洲与北美之间的多条活跃链路。&lt;/li&gt;
-&lt;li&gt;对2层的广播风暴提供了防火墙保护。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;路由器缺点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;不是即插即用（但DHCP使得路由器可以自动分配IP）&lt;/li&gt;
-&lt;li&gt;对每个分组的处理时间比交换机更长&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;选择策略：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;通常，由几百台主机组成的小网络有几个局域网网段。对于这些小网络，交换机就足够了，&lt;strong&gt;因为它们不要求IP地址的任何配置就能使流量局部化并增加总计吞吐量&lt;/strong&gt;。&lt;/li&gt;
-&lt;li&gt;如果是几千台主机，则需要路由器，因为&lt;strong&gt;路由器提供了更健壮的流量隔离方式和对广播风暴的控制，并在网络的主机之间使用更智能的路由&lt;/strong&gt;。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.7/3.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.7/4.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;h2&gt;实例：web页面请求的历程&lt;/h2&gt;
-
-&lt;p&gt;背景：Bob用以太网电缆将他的电脑连到学校的以太网交换机，交换机又与学校的路由器相连，路由器和一个ISP（comcast）相连；comcast为学校提供DNS服务，所以DNS服务器在comcast网络里；DHCP服务器运行在路由器中。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/2018.7/5.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
-
-&lt;h3&gt;第1步：Bob电脑连接网络&lt;/h3&gt;
-
-&lt;p&gt;刚连接时，Bob电脑没有本机IP，所以第一步是获得IP。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Bob电脑运行DHCP协议，生成&lt;strong&gt;DHCP请求报文&lt;/strong&gt;，并将这个报文放入一个&lt;strong&gt;UDP报文段&lt;/strong&gt;，UDP报文段的的目的地端口为67、源端口为68&lt;/li&gt;
-&lt;li&gt;该UDP报文段进而被放置在一个&lt;strong&gt;IP数据报&lt;/strong&gt;中，数据报的目的地IP地址为255.255.255.255（广播地址）、源IP地址为0.0.0.0&lt;/li&gt;
-&lt;li&gt;包含DHCP请求报文的IP数据报则被放置在以&lt;strong&gt;太网帧&lt;/strong&gt;中，以太网帧的目的MAC地址为FF:FF:FF:FF:FF:FF，这会使该帧广播到&lt;strong&gt;与交换机连接的所有设备&lt;/strong&gt;，源MAC地址为Bob电脑的MAC地址00:16:D3:23:68:8A&lt;/li&gt;
-&lt;li&gt;该以太网帧是第一个由Bob电脑发送到以太网交换机的帧，该交换机在所有的出端口广播这个入帧&lt;/li&gt;
-&lt;li&gt;路由器在它的具有MAC地址00:22:6B:45:1F:1B的接口收到该广播以太网帧(该帧中包含DHCP请求)，从该以太网帧中抽取出IP数据报。因为该IP数据报的目的地IP地址为广播地址，所以该IP数据报的载荷被分解向上到达UDP模块，DHCP请求报文从该UDP报文段中抽取出来，此时路由器即DHCP服务器有了DHCP请求报文&lt;/li&gt;
-&lt;li&gt;假设路由器DHCP服务器能够以CIDR块68.85.2.0/24分配IP地址，DHCP服务器因此分配地址68.85.2.101给Bob电脑。&lt;/li&gt;
-&lt;li&gt;除了分配IP地址，DHCP服务器还需要将DNS服务器的IP地址（68.87.71.226）、默认网关路由器的IP地址（68.85.2.1）、子网块（68.85.2.0/24）（子网掩码），这些东西组成一个DHCP ACK报文。&lt;/li&gt;
-&lt;li&gt;该DHCP ACK报文被放入一个UDP报文段，UDP报文段被放入一个IP数据报，IP数据报被放入以太网帧中，这个以太网帧的源MAC地址是00:22:6B:45:1F:1B（归属网络的接口），目的地址是Bob电脑的MAC地址&lt;/li&gt;
-&lt;li&gt;包含DHCP ACK的以太网帧由路由器发给交换机，因为交换机是自学习的，并且先前从Bob电脑收到DHCP请求报文以太网帧，所以该交换机知道寻址到00:16:D3:23:68:8A的帧仅从通向Bob电脑的端口转发。&lt;/li&gt;
-&lt;li&gt;Bob电脑接收到包含DHCP ACK的以太网帧，从里面抽出DHCP ACK报文，Bob电脑的DHCP客户端记录下它的IP地址和DNS服务器的IP地址，另外，它还在IP转发表中安装默认网关的IP地址68.85.2.1，Bob电脑将向该网关发送目的地址为其子网68.85.2.0/24以外的所有数据报。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;第2步：DNS和ARP（1）&lt;/h3&gt;
-
-&lt;p&gt;Bob电脑初始化好它的网络组件后，准备访问一个google的网页。&lt;/p&gt;
-
-&lt;p&gt;首先需要知道www.google.com的地址。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Bob电脑生成一个DNS查询报文，将字符串www.google.com放入DNS报文的问题段，DNS报文被放进一个UDP报文段，UDP目的地端口为53；UDP报文进而被放入一个IP数据报， IP数据报的目的地IP地址为68.87.71.226（DNS服务器的IP地址！），源IP地址为68.85.2.101&lt;/li&gt;
-&lt;li&gt;Bob电脑把这个IP数据报放入一个以太网帧，该帧将发送到Bob学校网络中的网关路由器（因为不在同子网），但Bob电脑并不知道DNS服务器的MAC地址，Bob电脑为了获得该网关路由器的MAC地址，需要使用ARP协议。&lt;/li&gt;
-&lt;li&gt;Bob电脑生成一个具有目的地IP地址为68.85.2.1（默认网关）的ARP查询报文，将该ARP报文放置在一个具有广播目的地址（FF:FF:FF:FF:FF:FF）、源MAC地址为00:16:D3:23:68:8A(Bob电脑)的以太网帧中，并向交换机发送该以太网帧，交换机将该帧广播到所有连接的设备，包括网关路由器。&lt;/li&gt;
-&lt;li&gt;网关路由器在通往学校网络的接口上接收到包含该ARP查询报文的帧，发现在ARP报文中目标IP地址68.85.2.1匹配自己的接口的IP地址，网关路由器因此发送一个ARP应答，指示它的MAC地址00:22:6B:45:1F:1B，对应IP地址68.85.2.1。它将ARP回答放在一个以太网帧中，其目的地址为00:16:D3:23:68:8A(Bob电脑)，并向交换机发送该帧，再由交换机将帧交付给Bob电脑。&lt;/li&gt;
-&lt;li&gt;Bob电脑接收到包含ARP应答报文的以太网帧，从中拿出网关路由器的MAC地址。&lt;/li&gt;
-&lt;li&gt;此时，Bob电脑能够使包含DNS查询的以太网帧寻址到网关路由器的MAC地址。这个以太网帧的目的IP地址为68.87.71.226（DNS服务器）、MAC目的地址为00:22:6B:45:1F:1B（网关）。Bob电脑向交换机发送该帧，交换机将该帧交付网关路由器。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;小结：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Bob电脑已知DNS服务器IP，所以发送DNS请求，因为DNS服务器不在同子网，所以得先把请求发到默认网关，然而又发现没有网关的MAC地址，所以只能先发起ARP查询；&lt;/li&gt;
-&lt;li&gt;ARP查询返回应答时，Bob电脑就能继续向网关发送包含DNS查询的udp包，但此时DNS请求还没有到达DNS服务器，下面继续。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;第3步：DNS（2）&lt;/h3&gt;
-
-&lt;p&gt;此时，网关路由器收到了来自Bob电脑的包含DNS查询的IP数据报。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;网关路由器查找该数据报的目的地址68.87.71.226（DNS服务器），并根据其&lt;strong&gt;转发表&lt;/strong&gt;决定该数据报应当发送到comcast网路中最左边的路由器。&lt;/li&gt;
-&lt;li&gt;这个comcast路由器收到转发来的IP数据报，也查看数据报的目的IP地址，并根据本地转发表确定出口，朝着DNS服务器继续转发。转发表由域内协议（RIP、OSPF、IS-IS）和域间协议（BGP）填写。&lt;/li&gt;
-&lt;li&gt;最终的，包含DNS查询的数据报到达了DNS服务器，DNS查询抽取出DNS查询报文，在自己的DNS数据库中查找名字www.google.com，找到包含对应www.google.com的IP地址（64.233.169.105）的&lt;strong&gt;DNS源记录&lt;/strong&gt;（这里假设了该记录已缓存在本机，源于权威DNS服务器）。&lt;/li&gt;
-&lt;li&gt;DNS服务器生成一条包含主机名www.google.com到IP地址（64.233.169.105）的DNS回答报文，放入UDP、UDP放入到寻址到Bob电脑的IP数据报，该数据报通过comcast网络反向转发到学校的路由器，并从这里经过以太网交换机到Bob电脑。&lt;/li&gt;
-&lt;li&gt;Bob电脑收到这条DNS应答报文，从中取出www.google.com的IP地址。此时就可以真正地访问google网站了。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;第4步：Web客户端-服务器交互：TCP和HTTP&lt;/h3&gt;
-
-&lt;p&gt;这一步就是传输层和应用层的事情了：tcp三次握手，tcp承载了HTTP协议。&lt;/p&gt;
-</description>
-        <pubDate>Sun, 24 Jun 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/network/</link>
-        <guid isPermaLink="true">http://localhost:4000/network/</guid>
       </item>
     
   </channel>
