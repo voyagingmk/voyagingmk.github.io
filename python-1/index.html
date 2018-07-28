@@ -133,8 +133,6 @@
 </code></pre></div>
 <p>PyIntObject的代数运算过程中，可能会转换成PyLongObject。</p>
 
-<p>因为PyIntObject是值语义，</p>
-
 <h3>创建</h3>
 
 <p>总共4个C API：</p>
@@ -150,16 +148,12 @@
 <span class="nf">PyInt_FromLong</span><span class="p">(</span><span class="kt">long</span> <span class="n">ival</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">register</span> <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">v</span><span class="p">;</span>
+    <span class="c1">// small_ints</span>
 <span class="cp">#if NSMALLNEGINTS + NSMALLPOSINTS &gt; 0</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="n">NSMALLNEGINTS</span> <span class="o">&lt;=</span> <span class="n">ival</span> <span class="o">&amp;&amp;</span> <span class="n">ival</span> <span class="o">&lt;</span> <span class="n">NSMALLPOSINTS</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">small_ints</span><span class="p">[</span><span class="n">ival</span> <span class="o">+</span> <span class="n">NSMALLNEGINTS</span><span class="p">];</span>
         <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
-<span class="cp">#ifdef COUNT_ALLOCS</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">ival</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="n">quick_int_allocs</span><span class="o">++</span><span class="p">;</span>
-        <span class="k">else</span>
-            <span class="n">quick_neg_int_allocs</span><span class="o">++</span><span class="p">;</span>
-<span class="cp">#endif</span>
+        <span class="err">···</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span> <span class="n">v</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="cp">#endif</span>
@@ -173,6 +167,90 @@
     <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">PyObject_INIT</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PyInt_Type</span><span class="p">);</span>
     <span class="n">v</span><span class="o">-&gt;</span><span class="n">ob_ival</span> <span class="o">=</span> <span class="n">ival</span><span class="p">;</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span> <span class="n">v</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这段代码涉及到了2大机制，一个是small_ints:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define NSMALLPOSINTS           257</span>
+<span class="cp">#define NSMALLNEGINTS           5</span>
+<span class="k">static</span> <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">small_ints</span><span class="p">[</span><span class="n">NSMALLNEGINTS</span> <span class="o">+</span> <span class="n">NSMALLPOSINTS</span><span class="p">];</span>
+</code></pre></div>
+<p>python最多会缓存262个小整数，PyInt_FromLong每次检测val是不是在小整数范围，是的话就复用small_ints里的对象。</p>
+
+<p>small_ints是在python启动的时候就先初始化的：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span>
+<span class="nf">_PyInt_Init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">v</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ival</span><span class="p">;</span>
+<span class="cp">#if NSMALLNEGINTS + NSMALLPOSINTS &gt; 0</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">ival</span> <span class="o">=</span> <span class="o">-</span><span class="n">NSMALLNEGINTS</span><span class="p">;</span> <span class="n">ival</span> <span class="o">&lt;</span> <span class="n">NSMALLPOSINTS</span><span class="p">;</span> <span class="n">ival</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">free_list</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">free_list</span> <span class="o">=</span> <span class="n">fill_free_list</span><span class="p">())</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="cm">/* PyObject_New is inlined */</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">free_list</span><span class="p">;</span>
+        <span class="n">free_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="p">)</span><span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">PyObject_INIT</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PyInt_Type</span><span class="p">);</span>
+        <span class="n">v</span><span class="o">-&gt;</span><span class="n">ob_ival</span> <span class="o">=</span> <span class="n">ival</span><span class="p">;</span>
+        <span class="n">small_ints</span><span class="p">[</span><span class="n">ival</span> <span class="o">+</span> <span class="n">NSMALLNEGINTS</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="cp">#endif</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这里面已经用到了free_list。</p>
+
+<p>另一个机制是内存池，一块内存放几百个整数，并且会复用内存，改善了性能：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define BLOCK_SIZE      1000    </span><span class="cm">/* 1K less typical malloc overhead */</span><span class="cp"></span>
+<span class="cp">#define BHEAD_SIZE      8       </span><span class="cm">/* Enough for a 64-bit pointer */</span><span class="cp"></span>
+<span class="cp">#define N_INTOBJECTS    ((BLOCK_SIZE - BHEAD_SIZE) / sizeof(PyIntObject))</span>
+
+<span class="c1">// 连续存放多个PyIntObject的内存块</span>
+<span class="c1">// 块与块之间用next指针串起来</span>
+<span class="k">struct</span> <span class="n">_intblock</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">_intblock</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="n">PyIntObject</span> <span class="n">objects</span><span class="p">[</span><span class="n">N_INTOBJECTS</span><span class="p">];</span>
+<span class="p">};</span>
+
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">_intblock</span> <span class="n">PyIntBlock</span><span class="p">;</span>
+
+<span class="c1">// 当前int内存块的头节点</span>
+<span class="k">static</span> <span class="n">PyIntBlock</span> <span class="o">*</span><span class="n">block_list</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="c1">// 可用的PyIntObject链表的头</span>
+<span class="k">static</span> <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">free_list</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+<span class="k">static</span> <span class="n">PyIntObject</span> <span class="o">*</span>
+<span class="nf">fill_free_list</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+    <span class="cm">/* Python&#39;s object allocator isn&#39;t appropriate for large blocks. */</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="p">)</span> <span class="n">PyMem_MALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">PyIntBlock</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="p">)</span> <span class="n">PyErr_NoMemory</span><span class="p">();</span>
+    <span class="p">((</span><span class="n">PyIntBlock</span> <span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">block_list</span><span class="p">;</span>
+    <span class="n">block_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyIntBlock</span> <span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="p">;</span>
+    <span class="cm">/* Link the int objects together, from rear to front, then return</span>
+<span class="cm">       the address of the last int object in the block. */</span>
+    <span class="c1">// 这里用Py_TYPE指针，把内存块里的所有对象都串成链表，</span>
+    <span class="c1">// 不过要注意，串的方向是逆的，从后往前，函数最后返回的是最后一个对象</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">((</span><span class="n">PyIntBlock</span> <span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">objects</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">N_INTOBJECTS</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">--</span><span class="n">q</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_typeobject</span> <span class="o">*</span><span class="p">)(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">p</span> <span class="o">+</span> <span class="n">N_INTOBJECTS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>每次一个PyIntObject被回收，就会放进free_list的头：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
+<span class="nf">int_dealloc</span><span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PyInt_CheckExact</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_typeobject</span> <span class="o">*</span><span class="p">)</span><span class="n">free_list</span><span class="p">;</span>
+        <span class="n">free_list</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">tp_free</span><span class="p">((</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span><span class="n">v</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2>PyLongObject 任意大整数</h2>
@@ -195,8 +273,6 @@
 
 <span class="k">typedef</span> <span class="k">struct</span> <span class="n">_longobject</span> <span class="n">PyLongObject</span><span class="p">;</span> <span class="cm">/* Revealed in longintrepr.h */</span>
 </code></pre></div>
-<p>可见，PyLong</p>
-
   </div>
   <div class="entry">
   (未经授权禁止转载)
