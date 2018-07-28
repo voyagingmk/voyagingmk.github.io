@@ -7,7 +7,7 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>redis5.0源码学习笔记（2）分布式相关</title>
+        <title>redis5.0源码学习笔记（4）分布式相关</title>
         <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
 
 &lt;!--more--&gt;
@@ -243,13 +243,13 @@ appendonly yes
 
 &lt;p&gt;&lt;a href=&quot;http://www.redis.cn/topics/cluster-tutorial.html&quot;&gt;http://www.redis.cn/topics/cluster-tutorial.html&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
+        <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-4/</link>
         <guid isPermaLink="true">http://localhost:4000/redis-4/</guid>
       </item>
     
       <item>
-        <title>redis5.0源码学习笔记（2）内存管理</title>
+        <title>redis5.0源码学习笔记（3）内存管理</title>
         <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
 
 &lt;!--more--&gt;
@@ -366,7 +366,7 @@ appendonly yes
 
 &lt;h1&gt;第三方内存分配器&lt;/h1&gt;
 </description>
-        <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
+        <pubDate>Fri, 27 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-3/</link>
         <guid isPermaLink="true">http://localhost:4000/redis-3/</guid>
       </item>
