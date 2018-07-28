@@ -10,12 +10,8 @@
     <meta name="baidu-site-verification" content="0OpfO1OtHA" />
     
     <meta name="description" content="Note：本文实际绑定的版本是branch5.0（2018-7-25）。
-
-(更新中)
 " />
     <meta property="og:description" content="Note：本文实际绑定的版本是branch5.0（2018-7-25）。
-
-(更新中)
 " />
     
     <meta name="author" content="Wyman的原创技术博客" />
@@ -89,9 +85,9 @@
     <div class="entry">
         <p>Note：本文实际绑定的版本是branch5.0（2018-7-25）。</p>
 
-<p>(更新中)</p>
-
 <!--more-->
+
+<p>redis的内存分配机制不复杂，主要是看插件。</p>
 
 <h2>void *zmalloc(size_t size)</h2>
 
@@ -200,6 +196,8 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>realloc一个ptr，重新分配内存，这里并不能看出底层内存是怎么分配的，也因此代码很简单，只是做了oom和stat处理就没了。</p>
+
+<h1>第三方内存分配器</h1>
 
     </div>
     <div class="entry">

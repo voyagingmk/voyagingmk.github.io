@@ -7,12 +7,254 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>redis5.0源码学习笔记（2）分布式相关</title>
+        <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;先过一遍cluster的原理和使用方法，再来看代码。&lt;/p&gt;
+
+&lt;h2&gt;cluster设计&lt;/h2&gt;
+
+&lt;h3&gt;slots&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;#define CLUSTER_SLOTS 16384&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;redis集群用了槽的概念，总共限定16384个slots。&lt;/p&gt;
+
+&lt;p&gt;每个kv的key，用CRC16（hash）然后取模16384，得到槽索引值，就知道对应哪个槽了。&lt;/p&gt;
+
+&lt;p&gt;另外还有个节点的概念，节点是指redis集群里单个redis服务器。&lt;/p&gt;
+
+&lt;p&gt;节点数量上限是16384，即一个节点一个槽，下限是1。&lt;/p&gt;
+
+&lt;p&gt;节点和槽的对应关系：&lt;/p&gt;
+
+&lt;p&gt;这个架构下的2个关键点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;添加删除节点，槽需要在节点之间移动&lt;/li&gt;
+&lt;li&gt;槽的移动过程中，服务依然可用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;单节点的问题&lt;/h3&gt;
+
+&lt;p&gt;因为不同节点存的数据是不一样的，所以单节点故障就会导致那部分数据不可用，实际上，这会导致整个redis集群不可用，因为要保证一致性。&lt;/p&gt;
+
+&lt;p&gt;解决方案是单节点要实现主从复制，例如一个主节点可以有一个从节点，这样节点数量会翻一倍。&lt;/p&gt;
+
+&lt;h3&gt;集群的主从一致性问题&lt;/h3&gt;
+
+&lt;p&gt;redis并不能保证强一致。这是因为使用了异步复制的设计：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端向某主节点调用会触发write的指令，例如hmset&lt;/li&gt;
+&lt;li&gt;该主节点立即执行并立即回复客户端执行结果&lt;/li&gt;
+&lt;li&gt;主节点将写操作复制给它的所有从节点&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;如果2和3调换，就是强一致，但是就会损失可用性（C和A不能同时达到）。&lt;/p&gt;
+
+&lt;h2&gt;本机搭建一个集群教程&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;随便创建一个文件夹如test&lt;/li&gt;
+&lt;li&gt;在test里面创建6个文件夹：7000、7001、7002、7003、7004、7005&lt;/li&gt;
+&lt;li&gt;复制redis的redis-server和redis-cli到test文件夹&lt;/li&gt;
+&lt;li&gt;每个700x子文件夹放一个redis.conf，并启动： ../redis-server ./redis.conf&lt;/li&gt;
+&lt;li&gt;在test文件夹执行：./redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 --cluster-replicas 1&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;redis.conf：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;port 7002
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;执行了create指令后，会输出：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Performing&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hash&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;allocation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Master&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Slots&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5460&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Master&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Slots&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5461&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10922&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Master&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Slots&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10923&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16383&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Adding&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replica&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7003&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Adding&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replica&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7004&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7001&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Adding&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replica&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7005&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Trying&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;optimize&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slaves&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;allocation&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;anti&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;affinity&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WARNING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Some&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slaves&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;are&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;same&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;their&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10921696574&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc509be40ae48d704ef6ca67b4171&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+   &lt;span class=&quot;nl&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5460&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5461&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1f776cd30527cffb9046e01ca30031e1d5bc578&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7001&lt;/span&gt;
+   &lt;span class=&quot;nl&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5461&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10922&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5462&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;77001&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d974c1f5f6db0256622b276293ec36359fb&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;
+   &lt;span class=&quot;nl&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10923&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;16383&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5461&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;235238&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c0774c50721e8f8f0fad6ca8efb13a6f19&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7003&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;replicates&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10921696574&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc509be40ae48d704ef6ca67b4171&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;248661&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b074edd363e91d151391577c4ac0c43bdf&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7004&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;replicates&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1f776cd30527cffb9046e01ca30031e1d5bc578&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;61199063&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df69d57a096a16ab2c97138f59aeb36d&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7005&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;replicates&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;77001&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d974c1f5f6db0256622b276293ec36359fb&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Can&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;I&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;above&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configuration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yes&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;accept&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;槽的分配都显示出来了：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;主节点0，对应槽[0, 5460]&lt;/li&gt;
+&lt;li&gt;主节点1，对应槽[5461, 10922]&lt;/li&gt;
+&lt;li&gt;主节点2，对应槽[10923, 16383]&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;主节点是端口分别为7000、7001、7002的节点；7003、7004、7005是相应的从节点。&lt;/p&gt;
+
+&lt;p&gt;这里还有个细节：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;&amp;gt;&amp;gt;&amp;gt; Trying to optimize slaves allocation for anti-affinity
+[WARNING] Some slaves are in the same host as their master
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这2行表示redis分析出了这些节点之间组织得并不好，从节点和主节点在同一个主机上。当然现在是测试，忽略它。&lt;/p&gt;
+
+&lt;p&gt;键入yes后：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;OK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;All&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodes&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;agree&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;about&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Check&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;open&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Check&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;coverage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;OK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;All&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16384&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slots&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;covered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;就会把配置告诉所有节点，并且让节点建立起相互通讯，完成集群初始化。&lt;/p&gt;
+
+&lt;h2&gt;看下各个节点的输出信息&lt;/h2&gt;
+
+&lt;p&gt;7000:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;50.634&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configEpoch&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;via&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CLUSTER&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SET&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EPOCH&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;50.679&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IP&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;address&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;this&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;node&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;updated&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.360&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Slave&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7003&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;asks&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;synchronization&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.360&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Partial&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resynchronization&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;accepted&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Replication&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mismatch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Slave&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;asked&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;33f&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;68&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b0a5ab33163019bb1897036d3b7dd1ac982&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;my&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replication&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IDs&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;are&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;36&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b868ab0e64403a1fae3b9257c799b4cd3a3808&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;0000000000000000000000000000000000000000&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.360&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Starting&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BGSAVE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SYNC&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;disk&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.361&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Background&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saving&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;started&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;by&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pid&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;69655&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69655&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.364&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DB&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saved&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;disk&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.426&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Background&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saving&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;terminated&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;success&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.427&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Synchronization&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slave&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7003&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;succeeded&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69047&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.633&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Cluster&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ok&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;第三行显示从节点7003开始请求同步数据&lt;/li&gt;
+&lt;li&gt;第四行显示不能执行部分重同步，因为复制ID不匹配，这是因为这是主从之间的第一次同步&lt;/li&gt;
+&lt;li&gt;第五行，主节点7000启动了BGSAVE，这是为了把数据同步到硬盘&lt;/li&gt;
+&lt;li&gt;第六行，提示bg存盘进程启动&lt;/li&gt;
+&lt;li&gt;第七行，提示数据库已经保存到硬盘上&lt;/li&gt;
+&lt;li&gt;第八行，提示bg存盘进程成功结束并销毁&lt;/li&gt;
+&lt;li&gt;第九行，提示和slave的同步也完成了&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;再看下从节点的7003的输出：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;50.636&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configEpoch&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;via&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CLUSTER&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SET&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EPOCH&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;50.716&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IP&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;address&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;this&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;node&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;updated&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;54.662&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Before&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;turning&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;into&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slave&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;my&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parameters&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;synthesize&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cached&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;master&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;I&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;may&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;be&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;able&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;synchronize&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;partial&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transfer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;54.662&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Cluster&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ok&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.358&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Connecting&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MASTER&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.359&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MASTER&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SLAVE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sync&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;started&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.359&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Non&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blocking&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SYNC&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fired&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.359&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Master&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replied&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replication&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;can&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.360&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Trying&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;partial&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resynchronization&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;33f&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;68&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;b0a5ab33163019bb1897036d3b7dd1ac982&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.361&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Full&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resync&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;master&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;ab929efaa31dd35b6b4a83c7c6c7dd6c75ce157f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.361&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Discarding&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;previously&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cached&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.427&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MASTER&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SLAVE&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;sync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;receiving&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;177&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bytes&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;master&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.427&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MASTER&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SLAVE&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;sync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Flushing&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;old&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.427&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MASTER&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SLAVE&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;sync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Loading&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DB&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;memory&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.427&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MASTER&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SLAVE&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;sync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Finished&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;success&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.428&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Background&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;append&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;only&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rewriting&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;started&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;by&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pid&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;69657&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.453&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AOF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rewrite&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;child&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;asks&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stop&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sending&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;diffs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69657&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.453&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Parent&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;agreed&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stop&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sending&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;diffs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Finalizing&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AOF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69657&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.453&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Concatenating&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.00&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MB&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AOF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;diff&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;received&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69657&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.453&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SYNC&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;append&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;only&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rewrite&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;performed&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.459&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Background&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AOF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rewrite&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;terminated&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;success&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.459&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Residual&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parent&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;diff&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;successfully&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flushed&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rewritten&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AOF&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.00&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;69054&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Jul&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;07&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;55.460&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Background&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AOF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rewrite&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;finished&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;successfully&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;从节点因为不能做部分重同步，所以变成完整同步，并清除了旧数据，并载入收到的完整DB数据&lt;/li&gt;
+&lt;li&gt;从节点还做了AOF文件的处理&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;测试&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;启动一个客户端连接到7000节点，并发送一个set指令：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;redis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cli&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Redirected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slot&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12182&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;located&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;OK&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;提示这个set指令被重定向到槽12182，即7002节点，根据前面的配置信息，7002是一个主节点。指令返回后，发现终端变成127.0.0.1:7002&amp;gt; ，说明之后的指令都是发往7002主机（也被重定向了）。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;再发一个set指令：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;world&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Redirected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slot&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;866&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;located&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;OK&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;现在又回到了7000，hello对应的槽是866。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;测试读指令，发送一个get：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Redirected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slot&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12182&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;located&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7002&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;因为foo是在7002上的，所以又回到了7002，并拿到了刚才写入的&amp;quot;bar&amp;quot;。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;另外开一个redis-cli来测试下：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;redis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cli&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7001&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7001&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Redirected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slot&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;866&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;located&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;&amp;quot;world&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这次连的是另外一台主服务器，被重定向到7000，没什么问题。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;测试从节点：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;redis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cli&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7005&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7005&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Redirected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slot&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;866&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;located&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;&amp;quot;world&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;和连接主节点7001的一样，也是重定向到7000，没什么问题。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;再测试下在从节点执行del指令：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;redis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cli&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7005&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7005&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;del&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hello&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Redirected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slot&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;866&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;located&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;integer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;和预期的一样，都是先算出槽号并找出对应的目标节点，重定向到目标节点上执行。&lt;/p&gt;
+
+&lt;h2&gt;资料&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.redis.cn/topics/cluster-tutorial.html&quot;&gt;http://www.redis.cn/topics/cluster-tutorial.html&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/redis-4/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-4/</guid>
+      </item>
+    
+      <item>
         <title>redis5.0源码学习笔记（2）内存管理</title>
         <description>&lt;p&gt;Note：本文实际绑定的版本是branch5.0（2018-7-25）。&lt;/p&gt;
 
-&lt;p&gt;(更新中)&lt;/p&gt;
-
 &lt;!--more--&gt;
+
+&lt;p&gt;redis的内存分配机制不复杂，主要是看插件。&lt;/p&gt;
 
 &lt;h2&gt;void *zmalloc(size_t size)&lt;/h2&gt;
 
@@ -121,6 +363,8 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;realloc一个ptr，重新分配内存，这里并不能看出底层内存是怎么分配的，也因此代码很简单，只是做了oom和stat处理就没了。&lt;/p&gt;
+
+&lt;h1&gt;第三方内存分配器&lt;/h1&gt;
 </description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/redis-3/</link>
@@ -3422,132 +3666,6 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
         <pubDate>Sun, 24 Jun 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/network/</link>
         <guid isPermaLink="true">http://localhost:4000/network/</guid>
-      </item>
-    
-      <item>
-        <title>select和epoll多路复用用法总结</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;select&lt;/h2&gt;
-
-&lt;p&gt;资料：&lt;a href=&quot;https://notes.shichao.io/unp/ch6/#select-function&quot;&gt;https://notes.shichao.io/unp/ch6/#select-function&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;struct fd_set，fd的集合&lt;/li&gt;
-&lt;li&gt;FD_ZERO(fd_set *)， 清零一个fd_set，传fd_set的地址&lt;/li&gt;
-&lt;li&gt;FD_SET(int fd, fdset *)，把fd添加到这个fd_set&lt;/li&gt;
-&lt;li&gt;FD_CLR(int fd, fdset *)，把fd移出这个fd_set&lt;/li&gt;
-&lt;li&gt;int FD_ISSET(int fd, fd_set *fdset); 查询fd是否在这个fd_set&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;核心函数：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;返回值：&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;&amp;lt;0：出错&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;0：select超时返回了，没有读、写事件&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;&amp;gt;0：有事件发生的fd数量&lt;/span&gt;
-
-&lt;span class=&quot;cm&quot;&gt;maxfdp：是最大的fd再加1！&lt;/span&gt;
-
-&lt;span class=&quot;cm&quot;&gt;readfds、writefds、errorfds是值-结果参数，调用的时候作为值语义参数，函数返回的时候作为结果，所以没有const修饰&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;readfds：   要监听读事件的fd集合   /    有读事件的fd集合&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;writefds：  要监听写事件的fd集合   /    有写事件的fd集合&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;errorfds：  错误事件，一般传null即可&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;*/&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxfdp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fd_set&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readfds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fd_set&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;writefds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fd_set&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;errorfds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeval&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;用法要点：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;按读、写声明2个fd_set：rfds、wfds&lt;/li&gt;
-&lt;li&gt;需要再声明2个读、写fd_set，用于存放第一步的fd_set的拷贝，用于select：_rfds、_wfds&lt;/li&gt;
-&lt;li&gt;用FD_SET和FD_CLR控制要监听哪个fd的读、写事件&lt;/li&gt;
-&lt;li&gt;调用select前，要先复制一份fd_set，用memcpy即可&lt;/li&gt;
-&lt;li&gt;调用select：retval = select(eventLoop-&amp;gt;getMaxFd() + 1, &amp;amp;_rfds, &amp;amp;_wfds, NULL, tvp);&lt;/li&gt;
-&lt;li&gt;如果retval&amp;gt;0，就遍历所有fd（[0, maxfd]），用FD_ISSET(fd, _rfds)，判断这个fd是否可读，写事件同理&lt;/li&gt;
-&lt;li&gt;到此就完成一次循环，做完其他逻辑后，回到第4步&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;总结：&lt;/p&gt;
-
-&lt;p&gt;select是基于位掩码的设计，所以fd_set有固定长度。长度由FD_SETSIZE确定，FD_SETSIZE可以用户自己定。默认只有1024。&lt;/p&gt;
-
-&lt;h2&gt;epoll&lt;/h2&gt;
-
-&lt;h3&gt;创建epfd&lt;/h3&gt;
-
-&lt;p&gt;epoll_create1(0)，创建一个epfd，epoll所有接口都会用到它，它也是个文件描述符，持有资源&lt;/p&gt;
-
-&lt;h3&gt;添加监听事件&lt;/h3&gt;
-
-&lt;p&gt;需要区分是首次添加还是修改操作（用户自己要做记录），op = EPOLL_CTL_ADD或者EPOLL_CTL_MOD。&lt;/p&gt;
-
-&lt;p&gt;然后创建一个epoll_event ee，如果需要监听读事件就执行ee.events |= EPOLLIN，写事件就 ee.events |= EPOLLOUT；然后要登记目标fd到ee里，ee.data.fd = fd。&lt;/p&gt;
-
-&lt;p&gt;ee准备好后，就可以调用epoll_ctl(epfd, op, fd, &amp;amp;ee)。&lt;/p&gt;
-
-&lt;p&gt;epoll_ctl返回值：0是成功；-1失败，errno记录错误类型。&lt;/p&gt;
-
-&lt;h3&gt;删除监听事件&lt;/h3&gt;
-
-&lt;p&gt;和添加监听事件类似，也是构造ee，也要设置ee.data.fd，最终调用epoll_ctl。&lt;/p&gt;
-
-&lt;p&gt;op的就有点不一样，如果已经没有任何要监听的事件了，那么op是EPOLL_CTL_DEL；如果至少有监听某种事件，那么用EPOLL_CTL_MOD。&lt;/p&gt;
-
-&lt;p&gt;需要注意的是，即使是删除监听事件，epoll_ctl一个参数都不能少。&lt;/p&gt;
-
-&lt;h3&gt;轮询&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;epoll_wait&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epoll_event&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-               &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxevents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;timeout：-1，永久阻塞；0，立即返回，不阻塞； &amp;gt;0，阻塞多少毫秒后返回
-events和maxevents：就是指定一块数组用来存epoll_wait的返回结果，maxevents就是这个数组的长度。&lt;/p&gt;
-
-&lt;p&gt;如果返回值（numevents）大于0，那么就可以遍历events，遍历上限为numevents，逐个epoll_event访问它的events变量，看含有什么事件。也就是说，epoll_wait只返回了有事件的fd集合，比select要高效。&lt;/p&gt;
-
-&lt;h3&gt;底层特点&lt;/h3&gt;
-
-&lt;p&gt;epfd被创建时，会相应地创建一个eventpoll结构体：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;struct eventpoll {  
-    /*红黑树的根节点，这颗树中存储着所有添加到epoll中的需要监控的事件*/  
-    struct rb_root  rbr;  
-    /*双链表中则存放着将要通过epoll_wait返回给用户的满足条件的事件*/  
-    struct list_head rdlist;    
-};  
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;eventpoll可理解为存了2个数据结构的头部指针，一个指向一个红黑树的根，一个指向双向链表的头。&lt;/p&gt;
-
-&lt;p&gt;只要某个fd的某个事件被监听中，就会存在和这个fd关联的一个epitem:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epitem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;  
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rb_node&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;rbn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//红黑树节点  &lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list_head&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;rdllink&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//双向链表节点  &lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epoll_filefd&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;ffd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;//事件句柄信息  &lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eventpoll&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;//指向其所属的eventpoll对象  &lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epoll_event&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//期待发生的事件类型  &lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;  
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;红黑树中的每个节点都等同于某个epitem的rbn对象指针；双向链表的每个节点都等同于某个epitem的rdllink指针。&lt;/p&gt;
-
-&lt;p&gt;所以epitem应该是一个内存连接的数组，而红黑树和双向链表用指针的方式和这个数组产生联系。&lt;/p&gt;
-
-&lt;p&gt;为什么高效：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;当监听的事件发生时，会回调ep_poll_callback，把事件信息添加到双向链表rdlist&lt;/li&gt;
-&lt;li&gt;当调用epoll_wait检查是否有事件发生时，只需检查eventpoll的rdlist链表中是否有epitem元素即可。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;1、2点已经凸显了epoll_wait的高效，这是一种基于驱动回调的技术，epoll_wait的成本只是获取这个rdlist而已。&lt;/p&gt;
-
-&lt;p&gt;另外，为了保证不会重复添加同个fd的epitem，只能遍历内核的epitem数组，但这是个O(n)的操作，所以就需要红黑树，可以快速找出某个fd是否已被监听，并且也用于快速找到epitem从而修改fd的监听事件。这可是log(n)的复杂度，性能大大提高。&lt;/p&gt;
-
-&lt;h3&gt;总结：&lt;/h3&gt;
-
-&lt;p&gt;epoll是在内核维护复杂数据结构的设计，用户态的接口就相对复杂一些，但可控制性高一点；另外利用了回调技术，就不需要主动去查询每个fd是否有事件，效率自然就高了。&lt;/p&gt;
-</description>
-        <pubDate>Tue, 12 Jun 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/multiplexing/</link>
-        <guid isPermaLink="true">http://localhost:4000/multiplexing/</guid>
       </item>
     
   </channel>
