@@ -86,7 +86,9 @@
 
 <h1>各种对象的实现</h1>
 
-<h2>PyObject_HEAD 和 PyObject_VAR_HEAD</h2>
+<h2>通用部分</h2>
+
+<h3>PyObject_HEAD 和 PyObject_VAR_HEAD</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* PyObject_HEAD defines the initial segment of every PyObject. */</span>
 <span class="cp">#define PyObject_HEAD                   \</span>
 <span class="cp">    _PyObject_HEAD_EXTRA                \</span>
@@ -273,6 +275,73 @@
 
 <span class="k">typedef</span> <span class="k">struct</span> <span class="n">_longobject</span> <span class="n">PyLongObject</span><span class="p">;</span> <span class="cm">/* Revealed in longintrepr.h */</span>
 </code></pre></div>
+<p>PyLongObject的创建和销毁都是直接在堆内存中发生，没有什么复杂优化：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// _PyLong_New是根据数字digit的数量来创建的，而不是数值上的大小</span>
+<span class="n">PyLongObject</span> <span class="o">*</span>
+<span class="nf">_PyLong_New</span><span class="p">(</span><span class="n">Py_ssize_t</span> <span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">size</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">Py_ssize_t</span><span class="p">)</span><span class="n">MAX_LONG_DIGITS</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_OverflowError</span><span class="p">,</span>
+                        <span class="s">&quot;too many digits in integer&quot;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="cm">/* coverity[ampersand_in_size] */</span>
+    <span class="cm">/* XXX(nnorwitz): PyObject_NEW_VAR / _PyObject_VAR_SIZE need to detect</span>
+<span class="cm">       overflow */</span>
+    <span class="k">return</span> <span class="n">PyObject_NEW_VAR</span><span class="p">(</span><span class="n">PyLongObject</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PyLong_Type</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="nf">long_dealloc</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">tp_free</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>PyFloatObject 普通浮点数(double)</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">PyObject_HEAD</span>
+    <span class="kt">double</span> <span class="n">ob_fval</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">PyFloatObject</span><span class="p">;</span>
+</code></pre></div>
+<p>可见对于double范围内的浮点数，都是用double实现的。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">PyFloat_FromDouble</span><span class="p">(</span><span class="kt">double</span> <span class="n">fval</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">register</span> <span class="n">PyFloatObject</span> <span class="o">*</span><span class="n">op</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">free_list</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">free_list</span> <span class="o">=</span> <span class="n">fill_free_list</span><span class="p">())</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="cm">/* Inline PyObject_New */</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">free_list</span><span class="p">;</span>
+    <span class="n">free_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyFloatObject</span> <span class="o">*</span><span class="p">)</span><span class="n">Py_TYPE</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+    <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">PyObject_INIT</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PyFloat_Type</span><span class="p">);</span>
+    <span class="n">op</span><span class="o">-&gt;</span><span class="n">ob_fval</span> <span class="o">=</span> <span class="n">fval</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span> <span class="n">op</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>观察创建函数，发现也有free_list对象池机制。不过就没有small_ints了，毕竟是实数。</p>
+
+<h2>PyStringObject</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">PyObject_VAR_HEAD</span>
+    <span class="kt">long</span> <span class="n">ob_shash</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ob_sstate</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">ob_sval</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+    <span class="cm">/* Invariants:</span>
+<span class="cm">     *     ob_sval contains space for &#39;ob_size+1&#39; elements.</span>
+<span class="cm">     *     ob_sval[ob_size] == 0.</span>
+<span class="cm">     *     ob_shash is the hash of the string or -1 if not computed yet.</span>
+<span class="cm">     *     ob_sstate != 0 iff the string object is in stringobject.c&#39;s</span>
+<span class="cm">     *       &#39;interned&#39; dictionary; in this case the two references</span>
+<span class="cm">     *       from &#39;interned&#39; to this object are *not counted* in ob_refcnt.</span>
+<span class="cm">     */</span>
+<span class="p">}</span> <span class="n">PyStringObject</span><span class="p">;</span>
+</code></pre></div>
+<p>根据注释看，ob_sval存了ob_size+1个字符字节，+1是为了存&#39;\0&#39;；ob_shash相当于这个字符串的id，用来快速比对字符串；ob_sstate和缓冲池设计有关。</p>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)
