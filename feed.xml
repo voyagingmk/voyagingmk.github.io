@@ -542,6 +542,34 @@ appendonly yes
 &lt;h3&gt;连接字符串问题&lt;/h3&gt;
 
 &lt;p&gt;一句话总结，用+号来连接字符串是低效的，要做N-1次内存分配；正确的做法是用join函数。&lt;/p&gt;
+
+&lt;h2&gt;PyListObject&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject_VAR_HEAD&lt;/span&gt;
+    &lt;span class=&quot;cm&quot;&gt;/* Vector of pointers to list elements.  list[0] is ob_item[0], etc. */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ob_item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* ob_item contains space for &amp;#39;allocated&amp;#39; elements.  The number&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * currently in use is ob_size.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * Invariants:&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     *     0 &amp;lt;= ob_size &amp;lt;= allocated&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     *     len(list) == ob_size&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     *     ob_item == NULL implies ob_size == allocated == 0&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * list.sort() temporarily sets allocated to -1 to detect mutations.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     *&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * Items must normally not be NULL, except during construction when&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * the list is not yet visible outside the function that builds it.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Py_ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;allocated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyListObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;也有free_list对象池优化，默认80个&lt;/li&gt;
+&lt;li&gt;list的设计像STL的vector&lt;/li&gt;
+&lt;li&gt;因为存的是指针，所以移动元素的开销比较小，插入元素，就会发生大量元素挪动&lt;/li&gt;
+&lt;/ul&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/python-1/</link>

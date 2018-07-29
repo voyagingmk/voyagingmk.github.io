@@ -357,6 +357,34 @@
 
 <p>一句话总结，用+号来连接字符串是低效的，要做N-1次内存分配；正确的做法是用join函数。</p>
 
+<h2>PyListObject</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">PyObject_VAR_HEAD</span>
+    <span class="cm">/* Vector of pointers to list elements.  list[0] is ob_item[0], etc. */</span>
+    <span class="n">PyObject</span> <span class="o">**</span><span class="n">ob_item</span><span class="p">;</span>
+
+    <span class="cm">/* ob_item contains space for &#39;allocated&#39; elements.  The number</span>
+<span class="cm">     * currently in use is ob_size.</span>
+<span class="cm">     * Invariants:</span>
+<span class="cm">     *     0 &lt;= ob_size &lt;= allocated</span>
+<span class="cm">     *     len(list) == ob_size</span>
+<span class="cm">     *     ob_item == NULL implies ob_size == allocated == 0</span>
+<span class="cm">     * list.sort() temporarily sets allocated to -1 to detect mutations.</span>
+<span class="cm">     *</span>
+<span class="cm">     * Items must normally not be NULL, except during construction when</span>
+<span class="cm">     * the list is not yet visible outside the function that builds it.</span>
+<span class="cm">     */</span>
+    <span class="n">Py_ssize_t</span> <span class="n">allocated</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">PyListObject</span><span class="p">;</span>
+</code></pre></div>
+<h3>基本特点</h3>
+
+<ul>
+<li>也有free_list对象池优化，默认80个</li>
+<li>list的设计像STL的vector</li>
+<li>因为存的是指针，所以移动元素的开销比较小，插入元素，就会发生大量元素挪动</li>
+</ul>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)
