@@ -502,6 +502,8 @@
 
 <p>lookdict_string是比lookdict高效的，所以能用字符串当key就尽量用字符串。</p>
 
+<p>观察通用的lookdict，发现有一个freeslot变量，它指向第一个dummy的entry，当lookdict找不到目标key对应的entry时，就会返回freeslot，如果没有freeslot，那么就返回第一个被发现的unused的entry。</p>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)
