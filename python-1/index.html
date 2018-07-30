@@ -498,6 +498,10 @@
 
 <p>共同点是，如果找不到目标key，那么会返回一个entry对象，entry里的me_value为NULL，这个entry不是临时的，而是dict里对应这个key的entry。所以caller可以增加kv到这个entry里。</p>
 
+<p>一个dict默认是用lookdict_string的，只有遇到lookdict_string的key参数不是string，才会提升到lookdict。</p>
+
+<p>lookdict_string是比lookdict高效的，所以能用字符串当key就尽量用字符串。</p>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)

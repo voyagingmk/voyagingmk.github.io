@@ -683,6 +683,10 @@ appendonly yes
 &lt;p&gt;区别在于比较字符串不会引发异常，而比较一般化的key可能会引发异常。&lt;/p&gt;
 
 &lt;p&gt;共同点是，如果找不到目标key，那么会返回一个entry对象，entry里的me_value为NULL，这个entry不是临时的，而是dict里对应这个key的entry。所以caller可以增加kv到这个entry里。&lt;/p&gt;
+
+&lt;p&gt;一个dict默认是用lookdict_string的，只有遇到lookdict_string的key参数不是string，才会提升到lookdict。&lt;/p&gt;
+
+&lt;p&gt;lookdict_string是比lookdict高效的，所以能用字符串当key就尽量用字符串。&lt;/p&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/python-1/</link>
