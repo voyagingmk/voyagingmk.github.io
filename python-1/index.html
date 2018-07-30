@@ -504,6 +504,54 @@
 
 <p>观察通用的lookdict，发现有一个freeslot变量，它指向第一个dummy的entry，当lookdict找不到目标key对应的entry时，就会返回freeslot，如果没有freeslot，那么就返回第一个被发现的unused的entry。</p>
 
+<h3>insertdict</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">insertdict</span><span class="p">(</span><span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">register</span> <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">;</span>
+
+    <span class="n">assert</span><span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_lookup</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">ep</span> <span class="o">=</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_lookup</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ep</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">insertdict_by_entry</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>insertdict内部调用lookup，找出目标entry，然后再调用真正的insert接口：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">insertdict_by_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span>
+                    <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">old_value</span><span class="p">;</span>
+
+    <span class="n">MAINTAIN_TRACKING</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_value</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 替换操作</span>
+        <span class="n">old_value</span> <span class="o">=</span> <span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_value</span><span class="p">;</span>
+        <span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">old_value</span><span class="p">);</span> <span class="cm">/* which **CAN** re-enter */</span>
+        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// 要么是unused，要么是dummy</span>
+        <span class="c1">// unused的话，fill统计值+1</span>
+        <span class="c1">// dummy的话，dummy对象引用-1</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_key</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_fill</span><span class="o">++</span><span class="p">;</span>
+        <span class="k">else</span> <span class="p">{</span>
+            <span class="n">assert</span><span class="p">(</span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_key</span> <span class="o">==</span> <span class="n">dummy</span><span class="p">);</span>
+            <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">dummy</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">;</span> <span class="c1">// 此时已经处理完me_key的引用计数了，可以直接赋值</span>
+        <span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_hash</span> <span class="o">=</span> <span class="p">(</span><span class="n">Py_ssize_t</span><span class="p">)</span><span class="n">hash</span><span class="p">;</span>
+        <span class="n">ep</span><span class="o">-&gt;</span><span class="n">me_value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+        <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
   </div>
   <div class="entry">
   (未经授权禁止转载)
