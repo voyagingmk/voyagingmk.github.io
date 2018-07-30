@@ -430,21 +430,73 @@
     <span class="n">PyObject_HEAD</span>
     <span class="n">Py_ssize_t</span> <span class="n">ma_fill</span><span class="p">;</span>  <span class="cm">/* # Active + # Dummy */</span>
     <span class="n">Py_ssize_t</span> <span class="n">ma_used</span><span class="p">;</span>  <span class="cm">/* # Active */</span>
-
     <span class="c1">// slots等于2的幂，而ma_mask = slots - 1，mask除了记录了slots数之外还有别的用途  </span>
     <span class="n">Py_ssize_t</span> <span class="n">ma_mask</span><span class="p">;</span>
-
-    <span class="cm">/* ma_table points to ma_smalltable for small tables, else to</span>
-<span class="cm">     * additional malloc&#39;ed memory.  ma_table is never NULL!  This rule</span>
-<span class="cm">     * saves repeated runtime null-tests in the workhorse getitem and</span>
-<span class="cm">     * setitem calls.</span>
-<span class="cm">     */</span>
     <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ma_table</span><span class="p">;</span>
     <span class="n">PyDictEntry</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">ma_lookup</span><span class="p">)(</span><span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">);</span>
     <span class="n">PyDictEntry</span> <span class="n">ma_smalltable</span><span class="p">[</span><span class="n">PyDict_MINSIZE</span><span class="p">];</span>
 <span class="p">};</span>
 </code></pre></div>
+<h3>entry的状态机</h3>
+
+<ul>
+<li>active: 被使用中</li>
+<li>dummy：已移除，但因为还在冲突链中，所以不可使用</li>
+<li>unused：未使用</li>
+</ul>
+
 <p><img src="../images/2018.7/dict.png" alt="1.png"></p>
+
+<h3>PyDict_New</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">PyDict_New</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dummy</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* Auto-initialize dummy */</span>
+        <span class="n">dummy</span> <span class="o">=</span> <span class="n">PyString_FromString</span><span class="p">(</span><span class="s">&quot;&lt;dummy key&gt;&quot;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dummy</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">numfree</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mp</span> <span class="o">=</span> <span class="n">free_list</span><span class="p">[</span><span class="o">--</span><span class="n">numfree</span><span class="p">];</span>
+        <span class="n">assert</span> <span class="p">(</span><span class="n">mp</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">assert</span> <span class="p">(</span><span class="n">Py_TYPE</span><span class="p">(</span><span class="n">mp</span><span class="p">)</span> <span class="o">==</span> <span class="o">&amp;</span><span class="n">PyDict_Type</span><span class="p">);</span>
+        <span class="n">_Py_NewReference</span><span class="p">((</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span><span class="n">mp</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_fill</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">EMPTY_TO_MINSIZE</span><span class="p">(</span><span class="n">mp</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="cm">/* At least set ma_table and ma_mask; these are wrong</span>
+<span class="cm">               if an empty but presized dict is added to freelist */</span>
+            <span class="n">INIT_NONZERO_DICT_SLOTS</span><span class="p">(</span><span class="n">mp</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">assert</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="n">assert</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_table</span> <span class="o">==</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_smalltable</span><span class="p">);</span>
+        <span class="n">assert</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_mask</span> <span class="o">==</span> <span class="n">PyDict_MINSIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">mp</span> <span class="o">=</span> <span class="n">PyObject_GC_New</span><span class="p">(</span><span class="n">PyDictObject</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PyDict_Type</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">mp</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">EMPTY_TO_MINSIZE</span><span class="p">(</span><span class="n">mp</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_lookup</span> <span class="o">=</span> <span class="n">lookdict_string</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span><span class="n">mp</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>主要做了三件事：</p>
+
+<ul>
+<li>初始化dummy</li>
+<li>判断有无free_list，有的话从free_list拿mp，没有的话new一个mp，并重置</li>
+<li>设置ma_lookup</li>
+</ul>
+
+<h3>lookdict和lookdict_string</h3>
+
+<p>lookdict_string是针对string作为key的那些dict的，而lookdict则是一般化的。</p>
+
+<p>区别在于比较字符串不会引发异常，而比较一般化的key可能会引发异常。</p>
+
+<p>共同点是，如果找不到目标key，那么会返回一个entry对象，entry里的me_value为NULL，这个entry不是临时的，而是dict里对应这个key的entry。所以caller可以增加kv到这个entry里。</p>
 
   </div>
   <div class="entry">
