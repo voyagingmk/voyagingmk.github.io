@@ -383,7 +383,68 @@
 <li>也有free_list对象池优化，默认80个</li>
 <li>list的设计像STL的vector</li>
 <li>因为存的是指针，所以移动元素的开销比较小，插入元素，就会发生大量元素挪动</li>
+<li>list_dealloc会销毁元素列表并回收内存，以及尝试把list对象放进free_list里</li>
 </ul>
+
+<h3>list_resize</h3>
+
+<ul>
+<li>如果newsize在[allocated, allocated/2]范围，那么不用动内存</li>
+<li>如果newsize小于allocated/2，还会发生内存收缩，以节省内存</li>
+</ul>
+
+<h2>PyDictObject</h2>
+
+<h3>基本特点</h3>
+
+<ul>
+<li>基于散列表而不是二叉树</li>
+<li>冲突解决基于开放定址法，而不是开链</li>
+</ul>
+
+<h3>结构</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 表示每个dict至少有8个entry</span>
+<span class="cp">#define PyDict_MINSIZE 8</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="cm">/* Cached hash code of me_key.  Note that hash codes are C longs.</span>
+<span class="cm">     * We have to use Py_ssize_t instead because dict_popitem() abuses</span>
+<span class="cm">     * me_hash to hold a search finger.</span>
+<span class="cm">     */</span>
+    <span class="n">Py_ssize_t</span> <span class="n">me_hash</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">me_key</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">me_value</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">PyDictEntry</span><span class="p">;</span>
+
+<span class="cm">/*</span>
+<span class="cm">To ensure the lookup algorithm terminates, there must be at least one Unused</span>
+<span class="cm">slot (NULL key) in the table.</span>
+<span class="cm">The value ma_fill is the number of non-NULL keys (sum of Active and Dummy);</span>
+<span class="cm">ma_used is the number of non-NULL, non-dummy keys (== the number of non-NULL</span>
+<span class="cm">values == the number of Active items).</span>
+<span class="cm">To avoid slowing down lookups on a near-full table, we resize the table when</span>
+<span class="cm">it&#39;s two-thirds full.</span>
+<span class="cm">*/</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">_dictobject</span> <span class="n">PyDictObject</span><span class="p">;</span>
+<span class="k">struct</span> <span class="n">_dictobject</span> <span class="p">{</span>
+    <span class="n">PyObject_HEAD</span>
+    <span class="n">Py_ssize_t</span> <span class="n">ma_fill</span><span class="p">;</span>  <span class="cm">/* # Active + # Dummy */</span>
+    <span class="n">Py_ssize_t</span> <span class="n">ma_used</span><span class="p">;</span>  <span class="cm">/* # Active */</span>
+
+    <span class="c1">// slots等于2的幂，而ma_mask = slots - 1，mask除了记录了slots数之外还有别的用途  </span>
+    <span class="n">Py_ssize_t</span> <span class="n">ma_mask</span><span class="p">;</span>
+
+    <span class="cm">/* ma_table points to ma_smalltable for small tables, else to</span>
+<span class="cm">     * additional malloc&#39;ed memory.  ma_table is never NULL!  This rule</span>
+<span class="cm">     * saves repeated runtime null-tests in the workhorse getitem and</span>
+<span class="cm">     * setitem calls.</span>
+<span class="cm">     */</span>
+    <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ma_table</span><span class="p">;</span>
+    <span class="n">PyDictEntry</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">ma_lookup</span><span class="p">)(</span><span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">);</span>
+    <span class="n">PyDictEntry</span> <span class="n">ma_smalltable</span><span class="p">[</span><span class="n">PyDict_MINSIZE</span><span class="p">];</span>
+<span class="p">};</span>
+</code></pre></div>
+<p><img src="../images/2018.7/dict.png" alt="1.png"></p>
 
   </div>
   <div class="entry">

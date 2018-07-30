@@ -569,7 +569,68 @@ appendonly yes
 &lt;li&gt;也有free_list对象池优化，默认80个&lt;/li&gt;
 &lt;li&gt;list的设计像STL的vector&lt;/li&gt;
 &lt;li&gt;因为存的是指针，所以移动元素的开销比较小，插入元素，就会发生大量元素挪动&lt;/li&gt;
+&lt;li&gt;list_dealloc会销毁元素列表并回收内存，以及尝试把list对象放进free_list里&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h3&gt;list_resize&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果newsize在[allocated, allocated/2]范围，那么不用动内存&lt;/li&gt;
+&lt;li&gt;如果newsize小于allocated/2，还会发生内存收缩，以节省内存&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;PyDictObject&lt;/h2&gt;
+
+&lt;h3&gt;基本特点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;基于散列表而不是二叉树&lt;/li&gt;
+&lt;li&gt;冲突解决基于开放定址法，而不是开链&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;结构&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// 表示每个dict至少有8个entry&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define PyDict_MINSIZE 8&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;cm&quot;&gt;/* Cached hash code of me_key.  Note that hash codes are C longs.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * We have to use Py_ssize_t instead because dict_popitem() abuses&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * me_hash to hold a search finger.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Py_ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;me_hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;me_key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;me_value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyDictEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/*&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;To ensure the lookup algorithm terminates, there must be at least one Unused&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;slot (NULL key) in the table.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;The value ma_fill is the number of non-NULL keys (sum of Active and Dummy);&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;ma_used is the number of non-NULL, non-dummy keys (== the number of non-NULL&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;values == the number of Active items).&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;To avoid slowing down lookups on a near-full table, we resize the table when&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;it&amp;#39;s two-thirds full.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;*/&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_dictobject&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyDictObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_dictobject&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyObject_HEAD&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Py_ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ma_fill&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* # Active + # Dummy */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Py_ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ma_used&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  &lt;span class=&quot;cm&quot;&gt;/* # Active */&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// slots等于2的幂，而ma_mask = slots - 1，mask除了记录了slots数之外还有别的用途  &lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Py_ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ma_mask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* ma_table points to ma_smalltable for small tables, else to&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * additional malloc&amp;#39;ed memory.  ma_table is never NULL!  This rule&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * saves repeated runtime null-tests in the workhorse getitem and&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     * setitem calls.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;     */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyDictEntry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ma_table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyDictEntry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ma_lookup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyDictObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyObject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyDictEntry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ma_smalltable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PyDict_MINSIZE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018.7/dict.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/python-1/</link>
