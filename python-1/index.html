@@ -504,23 +504,9 @@
 
 <p>观察通用的lookdict，发现有一个freeslot变量，它指向第一个dummy的entry，当lookdict找不到目标key对应的entry时，就会返回freeslot，如果没有freeslot，那么就返回第一个被发现的unused的entry。</p>
 
-<h3>insertdict</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
-<span class="nf">insertdict</span><span class="p">(</span><span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">register</span> <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">;</span>
+<h3>插入元素</h3>
 
-    <span class="n">assert</span><span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_lookup</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
-    <span class="n">ep</span> <span class="o">=</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_lookup</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">ep</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
-        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">insertdict_by_entry</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>insertdict内部调用lookup，找出目标entry，然后再调用真正的insert接口：</p>
+<p>insert接口：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
 <span class="nf">insertdict_by_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span>
                     <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
@@ -550,6 +536,35 @@
         <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="o">++</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>调用insertdict_by_entry的主要入口：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">dict_set_item_by_hash_or_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
+                               <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span> <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">;</span>
+    <span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="n">n_used</span><span class="p">;</span>
+
+    <span class="n">mp</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyDictObject</span> <span class="o">*</span><span class="p">)</span><span class="n">op</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_fill</span> <span class="o">&lt;=</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_mask</span><span class="p">);</span>  <span class="cm">/* at least one empty slot */</span>
+    <span class="n">n_used</span> <span class="o">=</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="p">;</span>
+    <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+    <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ep</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">insertdict</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">insertdict_by_entry</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// 这里有个控制是否resize的规则：</span>
+    <span class="c1">// 如果插入了新元素且填充率（fill / (mask+1））大于2/3 那么要resize</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">&gt;</span> <span class="n">n_used</span> <span class="o">&amp;&amp;</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_fill</span><span class="o">*</span><span class="mi">3</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_mask</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="c1">// resize，新的size和used数有关</span>
+    <span class="k">return</span> <span class="n">dictresize</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">&gt;</span> <span class="mi">50000</span> <span class="o">?</span> <span class="mi">2</span> <span class="o">:</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
   </div>
