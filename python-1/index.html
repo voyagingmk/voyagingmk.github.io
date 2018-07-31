@@ -839,7 +839,41 @@
     <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">56</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">57</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">58</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">59</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">60</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">61</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">62</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">63</span><span class="p">)</span>
 <span class="p">};</span>
 </code></pre></div>
-<p>现在以一个例子来分析这个分配过程，假设要分配的内存大小是28字节，那么第一步是算出sizeClassIdx：</p>
+<p>usedpools总共有128个元素PT(0)、PT(1)、···、PT(63)，或者说是PTA(0)、PTA(0)、PTA(1)、PTA(1)、···、PTA(63)、PTA(63)。每相邻的2个元素的值是一样的。</p>
+
+<p>i of usedpools: 0 1 2 3 4 5 6 7 8 9</p>
+
+<p>x of PTA:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 0 1 1 2 2 3 3 4 4</p>
+
+<p>以PT(5)为例：</p>
+
+<p>PT(5) &lt;=&gt; PTA(5), PTA(5) &lt;=&gt; usedpools[10]，usedpools[11] </p>
+
+<p>usedpools[10] = PTA(5) = &amp;usedpools[10] - 2</p>
+
+<p>usedpools[11] = PTA(5) = &amp;usedpools[10] - 2</p>
+
+<p>也就是说，PT(5)使得usedpools[10]和usedpools[11]存了(&amp;usedpools[10] - 2)的地址。</p>
+
+<p>更一般地说，PT(x)使得usedpools[2 * x]和usedpools[2 * x + 1]存了(&amp;usedpools[2 * x] - 2)的地址。</p>
+
+<p>这么折腾，是和pool_header有关：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">pool_header</span> <span class="p">{</span> <span class="c1">// (&amp;usedpools[2 * x] - 2)</span>
+    <span class="k">union</span> <span class="p">{</span> <span class="n">block</span> <span class="o">*</span><span class="n">_padding</span><span class="p">;</span>
+            <span class="n">uint</span> <span class="n">count</span><span class="p">;</span> <span class="p">}</span> <span class="n">ref</span><span class="p">;</span>     
+    <span class="n">block</span> <span class="o">*</span><span class="n">freeblock</span><span class="p">;</span> 
+    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">nextpool</span><span class="p">;</span> <span class="c1">// 这个就是 usedpools[2 * x]</span>
+    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">prevpool</span><span class="p">;</span> <span class="c1">// 这个就是 usedpools[2 * x + 1]</span>
+    <span class="err">···</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>也就是每2个usedpools中的元素，都相当于nextpool和prevpool指针，2个元素的值都存了对应的“pool_header&quot;的地址。</p>
+
+<p><strong>usedpools是next、prev的集合</strong>。</p>
+
+<p>usedpools初始结构先理解到这里，现在要先看看usedpools是怎么使用的。</p>
+
+<p>假设要分配的内存大小是28字节，那么第一步是算出sizeClassIdx：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 在 void * PyObject_Malloc(size_t nbytes)</span>
 <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="p">)(</span><span class="n">nbytes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">ALIGNMENT_SHIFT</span><span class="p">;</span>
 <span class="c1">// 即 size class idx = (28 - 1) &gt;&gt; 3 = 3</span>
@@ -847,8 +881,95 @@
 <p>下一行是查询usedpools数组了：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">usedpools</span><span class="p">[</span><span class="n">size</span> <span class="o">+</span> <span class="n">size</span><span class="p">];</span>
 </code></pre></div>
-<p>很迷的操作，获取了usedpools[3+3]位置的pool，</p>
+<p>前面已经分析过了usedpools, 每个usedpools的元素的值其实都是一个地址（指向对应的pool_header）。所以可以推知：</p>
 
+<p>pool = usedpools[3 + 3] = PTA(3) = &amp;usedpools[2*3] - 2</p>
+
+<p>(&amp;usedpools[2*sizeClassIdx] - 2)就是聚合了所有处于used态的、对应这个sizeClassIdx的pools链表的首个pool。</p>
+
+<p><strong>所以这一行操作，就是为了拿到目标used链表的表头。</strong></p>
+
+<p>（纵观usedpools的所有调用代码，都是usedpools[size + size]这样的调用）</p>
+
+<p>接着下一行代码是：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">if</span> <span class="p">(</span><span class="n">pool</span> <span class="o">!=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>第一次分配时，pool和pool-&gt;nextpool是相等的（usedpools的初始值），并不会进入这个if。换句话说，就是没有处于used状态的对应这个sizeClassIdx的pool。</p>
+
+<p>跳过这个if后，接着会new一个arena，然后获取它的freepool：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">usable_arenas</span><span class="o">-&gt;</span><span class="n">freepools</span><span class="p">;</span>
+</code></pre></div>
+<p>然后直接进入init_pool逻辑段：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="nl">init_pool</span><span class="p">:</span>
+    <span class="cm">/* Frontlink to used pools. */</span>
+    <span class="n">next</span> <span class="o">=</span> <span class="n">usedpools</span><span class="p">[</span><span class="n">size</span> <span class="o">+</span> <span class="n">size</span><span class="p">];</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+    <span class="n">next</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">;</span>
+    <span class="n">next</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">;</span>
+    <span class="err">···</span>
+    <span class="k">return</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这4行骚操作，是在维护一个used双向链表，且是把pool插入了next（next含义是头节点）的nextpool（叫frontlink），当然这里因为已知链表是空的，所以nextpool也是prevpool。</p>
+
+<p>在PyObject_Free里有一个是插在nex他的prev：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="o">--</span><span class="n">pool</span><span class="o">-&gt;</span><span class="n">ref</span><span class="p">.</span><span class="n">count</span><span class="p">;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">szidx</span><span class="p">;</span>
+    <span class="n">next</span> <span class="o">=</span> <span class="n">usedpools</span><span class="p">[</span><span class="n">size</span> <span class="o">+</span> <span class="n">size</span><span class="p">];</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="n">next</span><span class="o">-&gt;</span><span class="n">prevpool</span><span class="p">;</span>
+    <span class="cm">/* insert pool before next:   prev &lt;-&gt; pool &lt;-&gt; next */</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">prev</span><span class="p">;</span>
+    <span class="n">next</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">;</span>
+    <span class="n">prev</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">;</span>
+</code></pre></div>
+<p>这是把pool插在next的prevpool位置。</p>
+
+<p>然后是移除操作，在PyObject_Free里：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">POOL_ADDR</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="cm">/* Pool is now empty:  unlink from usedpools, and</span>
+<span class="cm">* link to the front of freepools.  This ensures that</span>
+<span class="cm">* previously freed pools will be allocated later</span>
+<span class="cm">* (being not referenced, they are perhaps paged out).</span>
+<span class="cm">*/</span>
+<span class="n">next</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span><span class="p">;</span>
+<span class="n">prev</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">prevpool</span><span class="p">;</span>
+<span class="n">next</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">prev</span><span class="p">;</span>
+<span class="n">prev</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</code></pre></div>
+<p>很经典的双向链表移除节点操作。</p>
+
+<p>翻译下usedpools的注释：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/*</span>
+
+<span class="cm">Pool table -- headed, circular, doubly-linked lists of partially used pools.</span>
+<span class="cm">Pool table就是usedpools，它是有头部的、有环的、双向链接的部分使用pools。</span>
+
+<span class="cm">This is involved.  For an index i, usedpools[i+i] is the header for a list of</span>
+<span class="cm">all partially used pools holding small blocks with &quot;size class idx&quot; i. So</span>
+<span class="cm">usedpools[0] corresponds to blocks of size 8, usedpools[2] to blocks of size</span>
+<span class="cm">16, and so on:  index 2*i &lt;-&gt; blocks of size (i+1)&lt;&lt;ALIGNMENT_SHIFT.</span>
+<span class="cm">对于一个索引i，usedpools[i+i]是，聚合了所有处于used态的、对应i这个sizeClassIdx的</span>
+<span class="cm">pools链表的头节点。例如，usedpools[0]对应size8的blocks，usedpools[2]对应size16</span>
+<span class="cm">的blocks。</span>
+<span class="cm">用公式表示这种对应关系：index 2*i &lt;-&gt; blocks of size (i+1)&lt;&lt;ALIGNMENT_SHIFT</span>
+
+
+<span class="cm">Pools are carved off an arena&#39;s highwater mark (an arena_object&#39;s pool_address</span>
+<span class="cm">member) as needed.  Once carved off, a pool is in one of three states forever</span>
+<span class="cm">after:</span>
+<span class="cm">有需要时，pools会从arena里割除(carved off)，当被割除时，这个pool处于以下三个状态之一：</span>
+
+<span class="cm">used：上文已经介绍过了。</span>
+
+<span class="cm">full: 当pool变成full时（没有freeblock），会从usedpools中移除，并且poolnextpool、</span>
+<span class="cm">prevpool指针会变得无意义。</span>
+
+<span class="cm">empty: 这个状态也会导致把pool从usedpools中移除。</span>
+<span class="cm">*/</span>
+</code></pre></div>
   </div>
   <div class="entry">
   (未经授权禁止转载)
