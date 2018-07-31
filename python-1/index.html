@@ -646,6 +646,8 @@
 
 <ul>
 <li>pool是block的集合</li>
+<li>每个pool大小都是4KB</li>
+<li>pool里的block的大小取决于szidx</li>
 </ul>
 
 <p>首先是POOL_SIZE的定义：</p>
@@ -717,6 +719,8 @@
 <ul>
 <li>arena是pool的集合</li>
 <li>arena数量是否有限看三个宏：WITH_MEMORY_LIMITS、SMALL_MEMORY_LIMIT、MAX_ARENAS，默认无限制</li>
+<li>arena里的各个pool虽然都是4KB，但pool的szidx不一定一样</li>
+<li>单个arena默认为256KB</li>
 </ul>
 
 <p>先看arena_object:</p>
@@ -869,7 +873,7 @@
 </code></pre></div>
 <p>也就是每2个usedpools中的元素，都相当于nextpool和prevpool指针，2个元素的值都存了对应的“pool_header&quot;的地址。</p>
 
-<p><strong>usedpools是next、prev的集合</strong>。</p>
+<p><strong>usedpools是next、prev的集合，也是各个pool的双向链表的头节点</strong>。</p>
 
 <p>usedpools初始结构先理解到这里，现在要先看看usedpools是怎么使用的。</p>
 
