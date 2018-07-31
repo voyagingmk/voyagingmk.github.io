@@ -1159,7 +1159,15 @@ appendonly yes
 
 &lt;span class=&quot;cm&quot;&gt;empty: 这个状态也会导致把pool从usedpools中移除。&lt;/span&gt;
 &lt;span class=&quot;cm&quot;&gt;*/&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1&gt;引用计数与GC&lt;/h1&gt;
+
+&lt;p&gt;C++也有引用计数，不过C++没有GC机制，计数降为0就立即回收内存，且C++不会自动处理循环引用，避免在C++中出现循环引用的办法是使用weak指针，且需要程序员自己管理好指针才行。&lt;/p&gt;
+
+&lt;p&gt;而python的循环引用，是通过GC来处理的，并不需要什么weak指针。&lt;/p&gt;
+
+&lt;h2&gt;标记-清除和分代收集&lt;/h2&gt;
+</description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/python-1/</link>
         <guid isPermaLink="true">http://localhost:4000/python-1/</guid>
