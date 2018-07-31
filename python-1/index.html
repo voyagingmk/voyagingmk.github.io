@@ -642,6 +642,12 @@
 
 <h3>pool</h3>
 
+<p>基本特点：</p>
+
+<ul>
+<li>pool是block的集合</li>
+</ul>
+
 <p>首先是POOL_SIZE的定义：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define SYSTEM_PAGE_SIZE        (4 * 1024)</span>
 <span class="cp">#define SYSTEM_PAGE_SIZE_MASK   (SYSTEM_PAGE_SIZE - 1)</span>
@@ -696,7 +702,22 @@
     <span class="n">next</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">;</span>
     <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
 </code></pre></div>
+<p>pool有三个状态：</p>
+
+<ul>
+<li>used: pool中至少有一个block被使用，且至少有一个block未使用</li>
+<li>full: pool中所有block都被使用了</li>
+<li>empty:pool中所有block都未被使用</li>
+</ul>
+
 <h3>arena</h3>
+
+<p>基本特点：</p>
+
+<ul>
+<li>arena是pool的集合</li>
+<li>arena数量是否有限看三个宏：WITH_MEMORY_LIMITS、SMALL_MEMORY_LIMIT、MAX_ARENAS，默认无限制</li>
+</ul>
 
 <p>先看arena_object:</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Record keeping for arenas. */</span>
@@ -721,8 +742,9 @@
 <span class="c1">// 初始化默认创建16个arena_object 总共占16*256KB = 4MB内存</span>
 <span class="cp">#define INITIAL_ARENA_OBJECTS 16</span>
 </code></pre></div>
-<p>new_arena函数，是唯一会修改arenas地址的地方：</p>
+<p>new_arena函数，是唯一会修改arenas地址的地方，当unused_arena_objects == NULL时会执行以下代码：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>        <span class="c1">// numarenas表示总共要分配多少个arena，最后会存进maxarenas</span>
+        <span class="c1">// 每次翻一番</span>
         <span class="n">numarenas</span> <span class="o">=</span> <span class="n">maxarenas</span> <span class="o">?</span> <span class="n">maxarenas</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">:</span> <span class="n">INITIAL_ARENA_OBJECTS</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">numarenas</span> <span class="o">&lt;=</span> <span class="n">maxarenas</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                <span class="c1">// 溢出判断</span>
@@ -754,6 +776,78 @@
 </ul>
 
 <p><img src="../images/2018.7/arena_object.png" alt="arena_object.png"></p>
+
+<p>下面看new_arena中unused_arena_objects的取用：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">assert</span><span class="p">(</span><span class="n">unused_arena_objects</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="c1">// 表头arena_object被取出</span>
+    <span class="n">arenaobj</span> <span class="o">=</span> <span class="n">unused_arena_objects</span><span class="p">;</span>
+    <span class="n">unused_arena_objects</span> <span class="o">=</span> <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">nextarena</span><span class="p">;</span> <span class="c1">// 指向链表下一节点，可能为NULL</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">address</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">//  unused链表的arenaobj必然是没有关联内存块的</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="n">ARENA_SIZE</span><span class="p">);</span> <span class="c1">// 分配内存 256KB</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="p">(</span><span class="n">address</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="err">···</span>
+    <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">address</span> <span class="o">=</span> <span class="p">(</span><span class="n">uptr</span><span class="p">)</span><span class="n">address</span><span class="p">;</span>
+
+
+    <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">freepools</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">// 经过free回收的pool，初始当然是null</span>
+    <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">pool_address</span> <span class="o">=</span> <span class="p">(</span><span class="n">block</span><span class="o">*</span><span class="p">)</span><span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">address</span><span class="p">;</span>
+    <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">nfreepools</span> <span class="o">=</span> <span class="n">ARENA_SIZE</span> <span class="o">/</span> <span class="n">POOL_SIZE</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">POOL_SIZE</span> <span class="o">*</span> <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">nfreepools</span> <span class="o">==</span> <span class="n">ARENA_SIZE</span><span class="p">);</span>
+    <span class="n">excess</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="p">)(</span><span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">address</span> <span class="o">&amp;</span> <span class="n">POOL_SIZE_MASK</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">excess</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span><span class="c1">// 处理对齐，会导致实际少一个pool（部分空间是浪费掉的）</span>
+        <span class="o">--</span><span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">nfreepools</span><span class="p">;</span>
+        <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">pool_address</span> <span class="o">+=</span> <span class="n">POOL_SIZE</span> <span class="o">-</span> <span class="n">excess</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">ntotalpools</span> <span class="o">=</span> <span class="n">arenaobj</span><span class="o">-&gt;</span><span class="n">nfreepools</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">arenaobj</span><span class="p">;</span>
+</code></pre></div>
+<p>unused_arena_objects的分析到此为止。下面是usable_arenas，在理解usable_arenas之前需要先理解usedpool。</p>
+
+<p>usedpool面向一个需求：用户给定一个内存分配需求nbytes，怎么从arena、pool这些东西里得到合适的内存块？</p>
+
+<p>首先第一点是，arena没有size属性，arena只是pool的集合。所以不能直接请求一个nbytes的arena。因此，应该是寻找一个pool。</p>
+
+<p>前面说过pool有三种状态，现在可以深入分析下：</p>
+
+<ul>
+<li>used: pool中至少有一个block被使用，且至少有一个block未使用。这种pool会被usedpools数组控制。</li>
+<li>full: pool中所有block都被使用了。full状态的pool并不会组织成链表。</li>
+<li>empty:pool中所有block都未被使用。这种pool的集合，它们之间通过pool_header的nextpool组织成一个链表，链表表头就是arena_object的freepools</li>
+</ul>
+
+<p>当申请内存时，入手点是usedpools，在其中找到和nbytes匹配的pool，并从中分配一个block。</p>
+
+<p>这里面的玄机非常复杂，先搬出usedpools观摩下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define ALIGNMENT               8               </span><span class="cm">/* must be 2^N */</span><span class="cp"></span>
+<span class="cp">#define ALIGNMENT_SHIFT         3</span>
+<span class="cp">#define ALIGNMENT_MASK          (ALIGNMENT - 1)</span>
+<span class="c1">// NB_SMALL_SIZE_CLASSES等于64         ( 512 / 8 )</span>
+<span class="cp">#define NB_SMALL_SIZE_CLASSES   (SMALL_REQUEST_THRESHOLD / ALIGNMENT)</span>
+
+<span class="cp">#define PTA(x)  ((poolp )((uchar *)&amp;(usedpools[2*(x)]) - 2*sizeof(block *)))</span>
+<span class="cp">#define PT(x)   PTA(x), PTA(x)</span>
+
+<span class="k">static</span> <span class="n">poolp</span> <span class="n">usedpools</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="n">NB_SMALL_SIZE_CLASSES</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">PT</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">14</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">17</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">19</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">21</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">22</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">23</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">26</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">27</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">28</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">29</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">33</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">34</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">35</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">36</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">37</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">38</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">39</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">40</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">41</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">42</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">43</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">44</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">45</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">46</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">47</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">48</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">49</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">51</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">52</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">53</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">54</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">55</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">PT</span><span class="p">(</span><span class="mi">56</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">57</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">58</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">59</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">60</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">61</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">62</span><span class="p">),</span> <span class="n">PT</span><span class="p">(</span><span class="mi">63</span><span class="p">)</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>现在以一个例子来分析这个分配过程，假设要分配的内存大小是28字节，那么第一步是算出sizeClassIdx：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 在 void * PyObject_Malloc(size_t nbytes)</span>
+<span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="p">)(</span><span class="n">nbytes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">ALIGNMENT_SHIFT</span><span class="p">;</span>
+<span class="c1">// 即 size class idx = (28 - 1) &gt;&gt; 3 = 3</span>
+</code></pre></div>
+<p>下一行是查询usedpools数组了：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">usedpools</span><span class="p">[</span><span class="n">size</span> <span class="o">+</span> <span class="n">size</span><span class="p">];</span>
+</code></pre></div>
+<p>很迷的操作，获取了usedpools[3+3]位置的pool，</p>
 
   </div>
   <div class="entry">
