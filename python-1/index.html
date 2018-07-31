@@ -982,6 +982,105 @@
 
 <h2>标记-清除和分代收集</h2>
 
+<h2>基本概念</h2>
+
+<ul>
+<li>循环引用出现在容器类的对象之间</li>
+<li>GC只需要考虑这些容器对象，而不用操心int、string之类的对象</li>
+<li>为了跟踪这些容器对象，python用一个双向链表来跟踪这些容器对象</li>
+</ul>
+
+<h2>支持GC的对象的创建</h2>
+
+<p>这种对象都得用PyObject_GC_New来创建，否则就跟踪不到了。</p>
+
+<p>这个函数定义如下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// objimpl.h</span>
+<span class="cp">#define PyObject_GC_New(type, typeobj) \</span>
+<span class="cp">                ( (type *) _PyObject_GC_New(typeobj) )</span>
+<span class="cp">#define PyObject_GC_NewVar(type, typeobj, n) \</span>
+<span class="cp">                ( (type *) _PyObject_GC_NewVar((typeobj), (n)) )</span>
+
+
+<span class="c1">// gcmodule.c</span>
+
+<span class="c1">// 非var的</span>
+<span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">_PyObject_GC_New</span><span class="p">(</span><span class="n">PyTypeObject</span> <span class="o">*</span><span class="n">tp</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span> <span class="o">=</span> <span class="n">_PyObject_GC_Malloc</span><span class="p">(</span><span class="n">_PyObject_SIZE</span><span class="p">(</span><span class="n">tp</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">PyObject_INIT</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">tp</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">op</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// var的</span>
+<span class="n">PyVarObject</span> <span class="o">*</span>
+<span class="nf">_PyObject_GC_NewVar</span><span class="p">(</span><span class="n">PyTypeObject</span> <span class="o">*</span><span class="n">tp</span><span class="p">,</span> <span class="n">Py_ssize_t</span> <span class="n">nitems</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="kt">size_t</span> <span class="n">size</span> <span class="o">=</span> <span class="n">_PyObject_VAR_SIZE</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">nitems</span><span class="p">);</span>
+    <span class="n">PyVarObject</span> <span class="o">*</span><span class="n">op</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyVarObject</span> <span class="o">*</span><span class="p">)</span> <span class="n">_PyObject_GC_Malloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">PyObject_INIT_VAR</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">nitems</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">op</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>其中重点的_PyObject_GC_Malloc：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">_PyObject_GC_Malloc</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">basicsize</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">;</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">g</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">basicsize</span> <span class="o">&gt;</span> <span class="n">PY_SSIZE_T_MAX</span> <span class="o">-</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">PyGC_Head</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">PyErr_NoMemory</span><span class="p">();</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="p">)</span><span class="n">PyObject_MALLOC</span><span class="p">(</span>
+        <span class="k">sizeof</span><span class="p">(</span><span class="n">PyGC_Head</span><span class="p">)</span> <span class="o">+</span> <span class="n">basicsize</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">g</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PyErr_NoMemory</span><span class="p">();</span>
+    <span class="n">g</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">GC_UNTRACKED</span><span class="p">;</span>
+    <span class="n">generations</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">count</span><span class="o">++</span><span class="p">;</span> <span class="cm">/* number of allocated GC objects */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">generations</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">generations</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">threshold</span> <span class="o">&amp;&amp;</span>
+        <span class="n">enabled</span> <span class="o">&amp;&amp;</span>
+        <span class="n">generations</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">threshold</span> <span class="o">&amp;&amp;</span>
+        <span class="o">!</span><span class="n">collecting</span> <span class="o">&amp;&amp;</span>
+        <span class="o">!</span><span class="n">PyErr_Occurred</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">collecting</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">collect_generations</span><span class="p">();</span>
+        <span class="n">collecting</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">FROM_GC</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">op</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>出现一个未知的结构PyGC_Head：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* GC information is stored BEFORE the object structure. */</span>
+<span class="k">typedef</span> <span class="k">union</span> <span class="n">_gc_head</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="p">{</span>
+        <span class="c1">// 上文说的双向链表</span>
+        <span class="k">union</span> <span class="n">_gc_head</span> <span class="o">*</span><span class="n">gc_next</span><span class="p">;</span>
+        <span class="k">union</span> <span class="n">_gc_head</span> <span class="o">*</span><span class="n">gc_prev</span><span class="p">;</span>
+        <span class="n">Py_ssize_t</span> <span class="n">gc_refs</span><span class="p">;</span> <span class="c1">// gc专用的引用计数</span>
+    <span class="p">}</span> <span class="n">gc</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">dummy</span><span class="p">;</span> <span class="cm">/* Force at least 8-byte alignment. */</span>
+    <span class="kt">char</span> <span class="n">dummy_padding</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="k">union</span> <span class="n">_gc_head_old</span><span class="p">)];</span>
+<span class="p">}</span> <span class="n">PyGC_Head</span><span class="p">;</span>
+</code></pre></div>
+<p>忽略那些对齐的东西，其实就是让这个object多了几个字段，用来做GC。</p>
+
+<p>上面的还有别的东西要注意：</p>
+
+<p>用来做指针转换的宏：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Get an object&#39;s GC head */</span>
+<span class="cp">#define AS_GC(o) ((PyGC_Head *)(o)-1)</span>
+<span class="cm">/* Get the object given the GC head */</span>
+<span class="cp">#define FROM_GC(g) ((PyObject *)(((PyGC_Head *)g)+1))</span>
+</code></pre></div>
+<p>enabled和collecting全局变量：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 是否开启自动垃圾收集</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">enabled</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="c1">// 实际是bool变量，用来表示是否正在收集垃圾</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">collecting</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></div>
   </div>
   <div class="entry">
   (未经授权禁止转载)
