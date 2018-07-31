@@ -568,6 +568,193 @@
     <span class="k">return</span> <span class="n">dictresize</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">&gt;</span> <span class="mi">50000</span> <span class="o">?</span> <span class="mi">2</span> <span class="o">:</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
+<h1>内存管理策略</h1>
+
+<h2>第一层</h2>
+
+<p>相关文件：</p>
+
+<ul>
+<li>pymem.h</li>
+</ul>
+
+<p>这一层的名字叫PYMEM。</p>
+
+<p>这个文件定义了最底层的内存管理接口：</p>
+
+<ul>
+<li>PyMem_MALLOC: 实际调用C的malloc</li>
+<li>PyMem_REALLOC: 实际调用C的realloc</li>
+<li>PyMem_FREE: 实际调用C的free</li>
+</ul>
+
+<p>C的接口可以认为是第0层。</p>
+
+<p>这3个接口的目标是做到平台无关，加了各种参数检查。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define PyMem_MALLOC(n)     ((size_t)(n) &gt; (size_t)PY_SSIZE_T_MAX ? NULL \</span>
+<span class="cp">                : malloc(((n) != 0) ? (n) : 1))</span>
+<span class="cp">#define PyMem_REALLOC(p, n) ((size_t)(n) &gt; (size_t)PY_SSIZE_T_MAX  ? NULL \</span>
+<span class="cp">                : realloc((p), ((n) != 0) ? (n) : 1))</span>
+<span class="cp">#define PyMem_FREE      free</span>
+</code></pre></div>
+<p>有了这3个后，又定义了面向对象的接口：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define PyMem_New(type, n) \</span>
+<span class="cp">  ( ((size_t)(n) &gt; PY_SSIZE_T_MAX / sizeof(type)) ? NULL :  \</span>
+<span class="cp">    ( (type *) PyMem_Malloc((n) * sizeof(type)) ) )</span>
+<span class="cp">#define PyMem_NEW(type, n) \</span>
+<span class="cp">  ( ((size_t)(n) &gt; PY_SSIZE_T_MAX / sizeof(type)) ? NULL :  \</span>
+<span class="cp">    ( (type *) PyMem_MALLOC((n) * sizeof(type)) ) )</span>
+</code></pre></div>
+<p>new接口很适合用来做数组的内存分配，例如这样：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">PyMem_New</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+</code></pre></div>
+<h2>第二层</h2>
+
+<p>相关文件：</p>
+
+<ul>
+<li>objimpl.h</li>
+<li>obmalloc.c</li>
+</ul>
+
+<p>这一层的名字叫PYMALLOC。</p>
+
+<p>这一层关于内存管理的是这么三个接口：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">PyAPI_FUNC</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="n">PyObject_Malloc</span><span class="p">(</span><span class="kt">size_t</span><span class="p">);</span>
+<span class="n">PyAPI_FUNC</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="n">PyObject_Realloc</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">,</span> <span class="kt">size_t</span><span class="p">);</span>
+<span class="n">PyAPI_FUNC</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="n">PyObject_Free</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">);</span>
+
+<span class="cp">#define PyObject_MALLOC         PyObject_Malloc</span>
+<span class="cp">#define PyObject_REALLOC        PyObject_Realloc</span>
+<span class="cp">#define PyObject_FREE           PyObject_Free</span>
+</code></pre></div>
+<p>这3个接口的实现很复杂，并不能直接理解。而是得先理解更基础的几个东西：block、pool、arena。</p>
+
+<h3>block</h3>
+
+<ul>
+<li>block按8字节内存对齐 (ALIGNMENT)</li>
+<li>按照单block的size，总共有64种block，size分别是8、16、24、···、512字节,sizeClassIdx分别是0、1、···、63 (INDEX2SIZE)</li>
+<li>小于等于512字节的内存分配请求，都是用block（SMALL_REQUEST_THRESHOLD）</li>
+</ul>
+
+<p>实际上block是个抽象的概念，通过有限的几个宏表达了这个概念。没有很具体的地方，所以直接看pool即可。</p>
+
+<h3>pool</h3>
+
+<p>首先是POOL_SIZE的定义：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define SYSTEM_PAGE_SIZE        (4 * 1024)</span>
+<span class="cp">#define SYSTEM_PAGE_SIZE_MASK   (SYSTEM_PAGE_SIZE - 1)</span>
+<span class="cp">#define POOL_SIZE               SYSTEM_PAGE_SIZE        </span><span class="cm">/* must be 2^N */</span><span class="cp"></span>
+<span class="cp">#define POOL_SIZE_MASK          SYSTEM_PAGE_SIZE_MASK</span>
+</code></pre></div>
+<p>可见，POOL_SIZE等于系统页大小，默认4KB。</p>
+
+<p>然后是pool_header：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Pool for small blocks. */</span>
+<span class="k">struct</span> <span class="n">pool_header</span> <span class="p">{</span>
+    <span class="k">union</span> <span class="p">{</span> <span class="n">block</span> <span class="o">*</span><span class="n">_padding</span><span class="p">;</span> <span class="c1">// 没有被使用的，只是为了让count也是按8字节对齐</span>
+            <span class="n">uint</span> <span class="n">count</span><span class="p">;</span> <span class="p">}</span> <span class="n">ref</span><span class="p">;</span>  <span class="c1">// 每次取用freeblock加1，在PyObject_Free里可能会减1</span>
+    <span class="n">block</span> <span class="o">*</span><span class="n">freeblock</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">nextpool</span><span class="p">;</span>       
+    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">prevpool</span><span class="p">;</span>       
+    <span class="n">uint</span> <span class="n">arenaindex</span><span class="p">;</span>                   
+    <span class="n">uint</span> <span class="n">szidx</span><span class="p">;</span>                         
+    <span class="n">uint</span> <span class="n">nextoffset</span><span class="p">;</span>  <span class="c1">// 相当于指向pool内的下一个未曾用过的block的地址</span>
+    <span class="n">uint</span> <span class="n">maxnextoffset</span><span class="p">;</span>  <span class="c1">// nextoffset的最大有效值</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">poolp</span><span class="p">;</span>
+</code></pre></div>
+<ul>
+<li>pool是一块4KB的内存块，pool_header是这块内存块的地址头。</li>
+<li>每个pool会对应某一种类型的block，这是通过pool_header的szidx来对应的。</li>
+<li>pool的初始化代码在init_pool里</li>
+<li>maxnextoffset，实际上可以基于szidx实时计算得到，缓存在header里是为了性能考虑</li>
+</ul>
+
+<p>nextoffset的唯一用途是获得freeblock地址：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">if</span> <span class="p">(</span><span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextoffset</span> <span class="o">&lt;=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">maxnextoffset</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//nextoffset还没超出maxnextoffset，说明还有空闲block</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">freeblock</span> <span class="o">=</span> <span class="p">(</span><span class="n">block</span><span class="o">*</span><span class="p">)</span><span class="n">pool</span> <span class="o">+</span>
+                        <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextoffset</span><span class="p">;</span>
+    <span class="c1">// 继续指向下一个偏移地址（可能会超过maxnextoffset）</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextoffset</span> <span class="o">+=</span> <span class="n">INDEX2SIZE</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+    <span class="c1">// 这一行就比较迷了</span>
+    <span class="o">*</span><span class="p">(</span><span class="n">block</span> <span class="o">**</span><span class="p">)(</span><span class="n">pool</span><span class="o">-&gt;</span><span class="n">freeblock</span><span class="p">)</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">UNLOCK</span><span class="p">();</span>
+    <span class="k">return</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>（注意，nextoffset是只增不减的）</p>
+
+<p>nextpool、prevpool字段则是用来把同类型的pool串成链表的（链表头暂时先不表）。
+例如，当pool-&gt;nextoffset &gt; pool-&gt;maxnextoffset时，会执行下面的代码，把这个pool从链表中移除：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="cm">/* Pool is full, unlink from used pools. */</span>
+    <span class="n">next</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span><span class="p">;</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">prevpool</span><span class="p">;</span>
+    <span class="n">next</span><span class="o">-&gt;</span><span class="n">prevpool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">;</span>
+    <span class="n">pool</span><span class="o">-&gt;</span><span class="n">nextpool</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</code></pre></div>
+<h3>arena</h3>
+
+<p>先看arena_object:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Record keeping for arenas. */</span>
+<span class="k">struct</span> <span class="n">arena_object</span> <span class="p">{</span>
+    <span class="n">uptr</span> <span class="n">address</span><span class="p">;</span>
+
+    <span class="n">block</span><span class="o">*</span> <span class="n">pool_address</span><span class="p">;</span> <span class="c1">// 指向这个arena的第一个pool</span>
+
+    <span class="n">uint</span> <span class="n">nfreepools</span><span class="p">;</span> <span class="c1">// 可用pool数 free的 + 未分配的</span>
+
+    <span class="n">uint</span> <span class="n">ntotalpools</span><span class="p">;</span> <span class="c1">// 总pool数</span>
+
+    <span class="k">struct</span> <span class="n">pool_header</span><span class="o">*</span> <span class="n">freepools</span><span class="p">;</span> <span class="c1">// 可用free pool的单向链表</span>
+
+    <span class="k">struct</span> <span class="n">arena_object</span><span class="o">*</span> <span class="n">nextarena</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">arena_object</span><span class="o">*</span> <span class="n">prevarena</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>arena_object的实例不是随便存放的，而是用一个数组来组织：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="k">struct</span> <span class="n">arena_object</span><span class="o">*</span> <span class="n">arenas</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="k">static</span> <span class="n">uint</span> <span class="n">maxarenas</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="c1">// 初始化默认创建16个arena_object 总共占16*256KB = 4MB内存</span>
+<span class="cp">#define INITIAL_ARENA_OBJECTS 16</span>
+</code></pre></div>
+<p>new_arena函数，是唯一会修改arenas地址的地方：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>        <span class="c1">// numarenas表示总共要分配多少个arena，最后会存进maxarenas</span>
+        <span class="n">numarenas</span> <span class="o">=</span> <span class="n">maxarenas</span> <span class="o">?</span> <span class="n">maxarenas</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">:</span> <span class="n">INITIAL_ARENA_OBJECTS</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">numarenas</span> <span class="o">&lt;=</span> <span class="n">maxarenas</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                <span class="c1">// 溢出判断</span>
+<span class="cp">#if SIZEOF_SIZE_T &lt;= SIZEOF_INT</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">numarenas</span> <span class="o">&gt;</span> <span class="n">PY_SIZE_MAX</span> <span class="o">/</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">arenas</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                <span class="c1">// 溢出判断</span>
+<span class="cp">#endif</span>
+        <span class="n">nbytes</span> <span class="o">=</span> <span class="n">numarenas</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">arenas</span><span class="p">);</span> <span class="c1">// arenas数组总共占多少字节</span>
+        <span class="n">arenaobj</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">arena_object</span> <span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">arenas</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">arenaobj</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">arenas</span> <span class="o">=</span> <span class="n">arenaobj</span><span class="p">;</span><span class="c1">// 指向该内存块首地址</span>
+        <span class="err">···</span>
+        <span class="n">maxarenas</span> <span class="o">=</span> <span class="n">numarenas</span><span class="p">;</span>
+</code></pre></div>
+<p>···省略的是arenas内部的初始化逻辑，目的是让新分配的arena_object之间串成链表，并让unused_arena_objects指向这些新对象的第一个：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">maxarenas</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numarenas</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">arenas</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">address</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> 
+        <span class="n">arenas</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">nextarena</span> <span class="o">=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numarenas</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">?</span>
+                                <span class="o">&amp;</span><span class="n">arenas</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">unused_arena_objects</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">arenas</span><span class="p">[</span><span class="n">maxarenas</span><span class="p">];</span>
+</code></pre></div>
+<p>arena_object有2种状态：</p>
+
+<ul>
+<li>unused：arena_object未关联内存块。用unused_arena_objects组织成<strong>单向</strong>链表。表头arena_object在new_arena被取出，在PyObject_Free被放回。简单地说，当address字段为0时，arena_objectt就在unused链表里</li>
+<li>usable：arena_object已关联内存块。用usable_arenas组织成<strong>双向</strong>链表。这个链表是有排序的，按照nfreepools大小，升序，意味着下一次内存分配，会优先使用nfreepools最小的。这就使得nfreepools最大的arena有机会被清空，并把内存归还给系统。</li>
+</ul>
+
+<p><img src="../images/2018.7/arena_object.png" alt="arena_object.png"></p>
+
   </div>
   <div class="entry">
   (未经授权禁止转载)
