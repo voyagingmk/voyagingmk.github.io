@@ -1164,16 +1164,14 @@ appendonly yes
 
 &lt;p&gt;C++也有引用计数，不过C++没有GC机制，计数降为0就立即回收内存，且C++不会自动处理循环引用，避免在C++中出现循环引用的办法是使用weak指针，且需要程序员自己管理好指针才行。&lt;/p&gt;
 
-&lt;p&gt;而python的循环引用，是通过GC来处理的，并不需要什么weak指针。&lt;/p&gt;
-
-&lt;h2&gt;标记-清除和分代收集&lt;/h2&gt;
+&lt;p&gt;而python的循环引用，是通过GC来处理的，并不需要什么weak指针(不过python有一个weakref模块可以实现弱引用)。&lt;/p&gt;
 
 &lt;h2&gt;基本概念&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;循环引用出现在容器类的对象之间&lt;/li&gt;
 &lt;li&gt;GC只需要考虑这些容器对象，而不用操心int、string之类的对象&lt;/li&gt;
-&lt;li&gt;为了跟踪这些容器对象，python用一个双向链表来跟踪这些容器对象&lt;/li&gt;
+&lt;li&gt;为了跟踪这些容器对象，python用一个双向链表来跟踪这些容器对象，有一定代价&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2&gt;支持GC的对象的创建&lt;/h2&gt;
@@ -1251,7 +1249,7 @@ appendonly yes
     &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dummy_padding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;union&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_gc_head_old&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)];&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PyGC_Head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;忽略那些对齐的东西，其实就是让这个object多了几个字段，用来做GC。&lt;/p&gt;
+&lt;p&gt;忽略那些对齐的东西，其实就是让这个object多了几个字段，用来做GC。gc_next和gc_prev是通过_PyObject_GC_TRACK和_PyObject_GC_UNTRACK控制的，这2个接口在创建完对象、即将返回对象前才调用，因为要确保被track的对象真的被成功创建了。gc_refs下文再解释。&lt;/p&gt;
 
 &lt;p&gt;上面的还有别的东西要注意：&lt;/p&gt;
 
@@ -1266,7 +1264,40 @@ appendonly yes
 &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enabled&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;// 实际是bool变量，用来表示是否正在收集垃圾&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;collecting&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;标记-清除和分代GC&lt;/h2&gt;
+
+&lt;h3&gt;分代GC&lt;/h3&gt;
+
+&lt;h4&gt;代：&lt;/h4&gt;
+
+&lt;p&gt;将系统中的所有内存块根据其存活时间划分为不同的集合，每一个集合就称为一个“代”，垃圾收集的频率随着“代”的存活时间的增大而减小，也就是说，活得越长的对象，就越可能不是垃圾，就应该越少去收集。那么这个存活时间是如何来衡量的呢，通常是利用经过了几次垃圾收集动作来衡量，如果一个对象经过的垃圾收集次数越多，那么显然，其存活时间就越长。&lt;/p&gt;
+
+&lt;p&gt;和代有关的代码：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/*** Global GC state ***/&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gc_generation&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;PyGC_Head&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;threshold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* collection threshold */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* count of allocations or collections of younger&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;                  generations */&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;#define NUM_GENERATIONS 3&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define GEN_HEAD(n) (&amp;amp;generations[n].head)&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/* linked lists of container objects */&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gc_generation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;generations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NUM_GENERATIONS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;cm&quot;&gt;/* PyGC_Head,                               threshold,      count */&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;           &lt;span class=&quot;mi&quot;&gt;700&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;            &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;           &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;             &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;           &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;             &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;PyGC_Head&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_PyGC_generation0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GEN_HEAD&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;定义三个代，阈值分别为700、10、10，&lt;/p&gt;
+</description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/python-1/</link>
         <guid isPermaLink="true">http://localhost:4000/python-1/</guid>
