@@ -1292,6 +1292,85 @@
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>最终的，利用unreachable链表，就可以回收垃圾了：delete_garbage(&amp;unreachable, old)</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Break reference cycles by clearing the containers involved.  This is</span>
+<span class="cm"> * tricky business as the lists can be changing and we don&#39;t know which</span>
+<span class="cm"> * objects may be freed.  It is possible I screwed something up here.</span>
+<span class="cm"> */</span>
+<span class="k">static</span> <span class="kt">void</span>
+<span class="nf">delete_garbage</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">collectable</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">old</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">inquiry</span> <span class="n">clear</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gc_list_is_empty</span><span class="p">(</span><span class="n">collectable</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">collectable</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+        <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span> <span class="o">=</span> <span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">);</span>
+
+        <span class="n">assert</span><span class="p">(</span><span class="n">IS_TENTATIVELY_UNREACHABLE</span><span class="p">(</span><span class="n">op</span><span class="p">));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">debug</span> <span class="o">&amp;</span> <span class="n">DEBUG_SAVEALL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">PyList_Append</span><span class="p">(</span><span class="n">garbage</span><span class="p">,</span> <span class="n">op</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">clear</span> <span class="o">=</span> <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">tp_clear</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+                <span class="n">clear</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">collectable</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span> <span class="o">==</span> <span class="n">gc</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 这2个指针仍然相等意味着销毁失败了</span>
+            <span class="c1">// 放回去old列表认为是可达对象即可</span>
+            <span class="n">gc_list_move</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">old</span><span class="p">);</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">GC_REACHABLE</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>销毁操作是精妙的三小步：</p>
+
+<ul>
+<li>增加引用计数</li>
+<li>tp_clear（清空容器，使得容器不再引用任何对象）</li>
+<li>减引用计数</li>
+</ul>
+
+<p>假设现在有1个循环引用的list：</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="bp">None</span>
+</code></pre></div>
+<p>a = None后，这个列表对象[]就没有外部引用了。但[]里存了一个元素，这个元素是[]自己，于是就形成了循环引用，且[]的引用计数为1。</p>
+
+<p>当delete_garbage开始处理这个[]时，第一步使得[]的引用计数+1，变成2，然后调用list_clear：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">list_clear</span><span class="p">(</span><span class="n">PyListObject</span> <span class="o">*</span><span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Py_ssize_t</span> <span class="n">i</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">**</span><span class="n">item</span> <span class="o">=</span> <span class="n">a</span><span class="o">-&gt;</span><span class="n">ob_item</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">item</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* Because XDECREF can recursively invoke operations on</span>
+<span class="cm">           this list, we make it empty first. */</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">Py_SIZE</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+        <span class="n">Py_SIZE</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">a</span><span class="o">-&gt;</span><span class="n">ob_item</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">a</span><span class="o">-&gt;</span><span class="n">allocated</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">--</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">PyMem_FREE</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="cm">/* Never fails; the return value can be ignored.</span>
+<span class="cm">       Note that there is no guarantee that the list is actually empty</span>
+<span class="cm">       at this point, because XDECREF may have populated it again! */</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>list_clear遍历它的所有元素并使引用计数-1，因为[]里只有一个元素，且是[]本身，于是list_clear之后，[]里就没有任何元素了，且引用计数降为1。</p>
+
+<p>第三步，又减了一次[]的引用计数，此时引用计数终于降为0，这会导致立即销毁了[]本身，也导致[]从它所属的generation链表中被移除。</p>
+
+<p>垃圾回收就这么完成了。</p>
+
 <h1>测试gc</h1>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">gc</span>
 <span class="kn">import</span> <span class="nn">sys</span>
