@@ -986,6 +986,8 @@
 <li>循环引用出现在容器类的对象之间</li>
 <li>GC只需要考虑这些容器对象，而不用操心int、string之类的对象</li>
 <li>为了跟踪这些容器对象，python用一个双向链表来跟踪这些容器对象，有一定代价</li>
+<li>如果没有循环引用，那么不需要有GC这套东西，引用计数就足以处理对象释放问题了</li>
+<li>GC就是为了循环引用问题而存在的</li>
 </ul>
 
 <h2>支持GC的对象的创建</h2>
@@ -1067,6 +1069,8 @@
 
 <p>上面的还有别的东西要注意：</p>
 
+<p>_PyObject_GC_TRACK永远都是把对象放进0代的链表，而_PyObject_GC_UNTRACK则是把对象从它所属的代链表中移除，注意移除的时候不一定是0代了，可能是1、2。</p>
+
 <p>用来做指针转换的宏：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Get an object&#39;s GC head */</span>
 <span class="cp">#define AS_GC(o) ((PyGC_Head *)(o)-1)</span>
@@ -1111,6 +1115,360 @@
 <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">_PyGC_generation0</span> <span class="o">=</span> <span class="n">GEN_HEAD</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </code></pre></div>
 <p>定义三个代，阈值分别为700、10、10，</p>
+
+<h3>collect_generations</h3>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="n">Py_ssize_t</span>
+<span class="nf">collect_generations</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="n">Py_ssize_t</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="c1">// 从最老的代遍历到最年轻的代，如果发现哪一代的count大于threshold</span>
+    <span class="c1">// 那么收集&lt;=i代的对象</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">NUM_GENERATIONS</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">generations</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">generations</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">threshold</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 如果连最老的一代超过阈值，且pending数还不到long_lived_total的四分之一</span>
+            <span class="c1">// 就不collect了</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">NUM_GENERATIONS</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="o">&amp;&amp;</span> <span class="n">long_lived_pending</span> <span class="o">&lt;</span> <span class="n">long_lived_total</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">collect</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3>root object</h3>
+
+<p>root object是不能被删除的对象，被root object引用到的对象也是不能删除的。</p>
+
+<h3>gc_ref</h3>
+
+<p>有效引用计数：例如循环引用的2个对象，引用计数都为1，但有效引用计数都为0。</p>
+
+<p>计算有效引用计数的办法是，从每个对象出发，把它引用的对象的计数都减1，例如上面的2个互相引用的对象，就都会变0。</p>
+
+<p>但有个问题：如果减完发现不能变为0，那么意味着有效引用计数大于0，这个对象就不能删除，因此被它引用的对象也不能删除但可能引用计数被减到0了。</p>
+
+<p>于是，需要另外弄一个gc_ref来做这件事情:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
+<span class="nf">update_refs</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">containers</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">containers</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">gc</span> <span class="o">!=</span> <span class="n">containers</span><span class="p">;</span> <span class="n">gc</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">==</span> <span class="n">GC_REACHABLE</span><span class="p">);</span>
+        <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">Py_REFCNT</span><span class="p">(</span><span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">));</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>update_refs，遍历链表的每个对象，把ob_refcnt复制到gc_refs，以备后续的subtract_refs使用：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
+<span class="nf">subtract_refs</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">containers</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">traverseproc</span> <span class="n">traverse</span><span class="p">;</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">containers</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">gc</span> <span class="o">!=</span> <span class="n">containers</span><span class="p">;</span> <span class="n">gc</span><span class="o">=</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">traverse</span> <span class="o">=</span> <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">tp_traverse</span><span class="p">;</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="n">traverse</span><span class="p">(</span><span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">),</span>
+                       <span class="p">(</span><span class="n">visitproc</span><span class="p">)</span><span class="n">visit_decref</span><span class="p">,</span>
+                       <span class="nb">NULL</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>也是遍历同一个链表，但这次是取出每个对象的tp_traverse函数指针，并执行：</p>
+
+<p>traverse(FROM_GC(gc), (visitproc)visit_decref, NULL);</p>
+
+<p>意思是遍历该对象引用的所有对象，对每个对象调用visit_decref，附加参数为NULL：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">visit_decref</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">op</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PyObject_IS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">AS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span><span class="o">--</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>很简单，判断是不是有GC head，有的话就可以对gc_refs做-1操作。</p>
+
+<p>看一个dict的traverse例子：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">dict_traverse</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">visitproc</span> <span class="n">visit</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Py_ssize_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">pk</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">pv</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">PyDict_Next</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pk</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pv</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">Py_VISIT</span><span class="p">(</span><span class="n">pk</span><span class="p">);</span>
+        <span class="n">Py_VISIT</span><span class="p">(</span><span class="n">pv</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>也就这么回事，利用dict的迭代机制，拿到所有pk、pv，执行Py_VISIT：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 这个东西暴力地默认了变量名，这是为了统一所有traverse接口的命名</span>
+<span class="cp">#define Py_VISIT(op)                                                    \</span>
+<span class="cp">    do {                                                                \</span>
+<span class="cp">        if (op) {                                                       \</span>
+<span class="cp">            int vret = visit((PyObject *)(op), arg);                    \</span>
+<span class="cp">            if (vret)                                                   \</span>
+<span class="cp">                return vret;                                            \</span>
+<span class="cp">        }                                                               \</span>
+<span class="cp">    } while (0)</span>
+</code></pre></div>
+<p>执行完subtract_refs，就完成了循环引用的摘除，链表里的对象如果还有gc_ref大于0，那么就是不可删除对象了。</p>
+
+<p>接着就是开始做<strong>标记-清除</strong>:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">gc_list_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">unreachable</span><span class="p">);</span>
+    <span class="n">move_unreachable</span><span class="p">(</span><span class="n">young</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">unreachable</span><span class="p">);</span>
+</code></pre></div>
+<p>这2行意图是把链表（young就是链表头）中的不可达对象都放进unreachable链表里，之后young里面就都是可达对象了。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
+<span class="nf">move_unreachable</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">young</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">unreachable</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">young</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">gc</span> <span class="o">!=</span> <span class="n">young</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span> <span class="o">=</span> <span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">);</span>
+            <span class="n">traverseproc</span> <span class="n">traverse</span> <span class="o">=</span> <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">tp_traverse</span><span class="p">;</span>
+            <span class="n">assert</span><span class="p">(</span><span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+            <span class="c1">// 引用计数大于0，必然是可达对象</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">GC_REACHABLE</span><span class="p">;</span>
+            <span class="c1">// 这个traverse可能会修改young链表</span>
+            <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="n">traverse</span><span class="p">(</span><span class="n">op</span><span class="p">,</span>
+                            <span class="p">(</span><span class="n">visitproc</span><span class="p">)</span><span class="n">visit_reachable</span><span class="p">,</span>
+                            <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">young</span><span class="p">);</span>
+            <span class="n">next</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">PyTuple_CheckExact</span><span class="p">(</span><span class="n">op</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">_PyTuple_MaybeUntrack</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">else</span> <span class="p">{</span>
+            <span class="n">next</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+            <span class="n">gc_list_move</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">unreachable</span><span class="p">);</span>
+            <span class="c1">// gc_refs不一定就是不可达，因为可能是只有一个root object引用了它</span>
+            <span class="c1">// 于是标记为”暂时“不可达</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">GC_TENTATIVELY_UNREACHABLE</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">gc</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">int</span>
+<span class="nf">visit_reachable</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">reachable</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PyObject_IS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">AS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+        <span class="k">const</span> <span class="n">Py_ssize_t</span> <span class="n">gc_refs</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">gc_refs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> 
+            <span class="c1">// 这种对象就是已经在young链表，但是move_unreachable函数还没</span>
+            <span class="c1">// 遍历到它</span>
+            <span class="c1">// 因为被visit的对象，都是可达对象引用到的对象，所以此时可以</span>
+            <span class="c1">// 提前把它标记为可达的，即gc_refs改为大于0的值</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">gc_refs</span> <span class="o">==</span> <span class="n">GC_TENTATIVELY_UNREACHABLE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 这种对象是已经被move_unreachable遍历到了，此时和第一个if</span>
+            <span class="c1">// 一样，标记为可达，并重新放进reachable(young)链表</span>
+            <span class="c1">// move_unreachable会再次遍历到这个对象</span>
+            <span class="n">gc_list_move</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">reachable</span><span class="p">);</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 这个else就相当于bug检测了</span>
+            <span class="n">assert</span><span class="p">(</span><span class="n">gc_refs</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                   <span class="o">||</span> <span class="n">gc_refs</span> <span class="o">==</span> <span class="n">GC_REACHABLE</span>
+                   <span class="o">||</span> <span class="n">gc_refs</span> <span class="o">==</span> <span class="n">GC_UNTRACKED</span><span class="p">);</span>
+         <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h1>测试gc</h1>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">class</span> <span class="nc">T</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span> <span class="o">=</span> <span class="bp">self</span> 
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">generate</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">T</span><span class="p">()</span>
+        <span class="c1"># print(sys.getrefcount(a)) 输出 3</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+<span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_STATS</span><span class="o">|</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_LEAK</span><span class="p">)</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to generate garbages&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;running...&quot;</span><span class="p">)</span>
+<span class="n">generate</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+
+<span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_STATS</span><span class="o">|</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_LEAK</span><span class="p">)</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to exit&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;exit&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>输出：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>$python test_gc.py 
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 663 3148 0
+gc: done, 0.0014s elapsed.
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 0 0 3442
+gc: done, 0.0013s elapsed.
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 0 0 3440
+gc: done, 0.0014s elapsed.
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 0 0 3440
+gc: done, 0.0013s elapsed.
+press to generate garbages
+running...
+done
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 38 7710 1995692
+gc: uncollectable &lt;T instance at 0x11891e200&gt;
+gc: uncollectable &lt;T instance at 0x11891e248&gt;
+gc: uncollectable &lt;T instance at 0x11891e290&gt;
+gc: uncollectable &lt;T instance at 0x11891e2d8&gt;
+gc: uncollectable &lt;T instance at 0x11891e320&gt;
+gc: uncollectable &lt;T instance at 0x11891e368&gt;
+gc: uncollectable &lt;T instance at 0x11891e3b0&gt;
+gc: uncollectable &lt;T instance at 0x11891e3f8&gt;
+gc: uncollectable &lt;T instance at 0x11891e440&gt;
+gc: uncollectable &lt;T instance at 0x11891e488&gt;
+gc: uncollectable &lt;T instance at 0x11891e4d0&gt;
+gc: uncollectable &lt;T instance at 0x11891e518&gt;
+gc: uncollectable &lt;T instance at 0x11891e560&gt;
+gc: uncollectable &lt;T instance at 0x11891e5a8&gt;
+gc: uncollectable &lt;T instance at 0x11891e5f0&gt;
+gc: uncollectable &lt;T instance at 0x11891e638&gt;
+gc: uncollectable &lt;T instance at 0x11891e680&gt;
+gc: uncollectable &lt;T instance at 0x11891e6c8&gt;
+gc: uncollectable &lt;T instance at 0x11891e710&gt;
+gc: uncollectable &lt;dict 0x11891f280&gt;
+gc: uncollectable &lt;dict 0x11891f398&gt;
+gc: uncollectable &lt;dict 0x11891f4b0&gt;
+gc: uncollectable &lt;dict 0x11891f5c8&gt;
+gc: uncollectable &lt;dict 0x11891f6e0&gt;
+gc: uncollectable &lt;dict 0x11891f7f8&gt;
+gc: uncollectable &lt;dict 0x11891f910&gt;
+gc: uncollectable &lt;dict 0x11891fa28&gt;
+gc: uncollectable &lt;dict 0x11891fb40&gt;
+gc: uncollectable &lt;dict 0x11891fc58&gt;
+gc: uncollectable &lt;dict 0x11891fd70&gt;
+gc: uncollectable &lt;dict 0x11891fe88&gt;
+gc: uncollectable &lt;dict 0x118920050&gt;
+gc: uncollectable &lt;dict 0x118920168&gt;
+gc: uncollectable &lt;dict 0x118920280&gt;
+gc: uncollectable &lt;dict 0x118920398&gt;
+gc: uncollectable &lt;dict 0x1189204b0&gt;
+gc: uncollectable &lt;dict 0x1189205c8&gt;
+gc: uncollectable &lt;dict 0x1189206e0&gt;
+gc: done, 38 unreachable, 38 uncollectable, 0.2670s elapsed.
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 0 0 2003440
+gc: done, 0.2749s elapsed.
+press to gc.collect again
+gc: collecting generation 2...
+gc: objects in each generation: 0 0 2003440
+gc: done, 0.2798s elapsed.
+press to exit
+exit
+</code></pre></div>
+<p>观察输出，可以发现generate()共产生了200万个不能被gc销毁的垃圾对象。</p>
+
+<p>generate()的for循环总共循环了100万次，所以每次迭代，都产生了2个垃圾对象。</p>
+
+<p>根据输出信息:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>gc: uncollectable &lt;T instance at 0x11891e710&gt;
+gc: uncollectable &lt;dict 0x11891f280&gt;
+</code></pre></div>
+<p>可确定，2个垃圾对象的其中一个是T的实例（PyInstanceObject），另一个是T实例的属性字典（PyInstanceObject.in_dict）。</p>
+
+<p>T实例因为有<strong>del</strong>，has_finalizer会返回true，于是被放进finializer链表：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
+<span class="nf">move_finalizers</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">unreachable</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">finalizers</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span><span class="p">;</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">gc</span> <span class="o">=</span> <span class="n">unreachable</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span> <span class="n">gc</span> <span class="o">!=</span> <span class="n">unreachable</span><span class="p">;</span> <span class="n">gc</span> <span class="o">=</span> <span class="n">next</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span> <span class="o">=</span> <span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">);</span>
+
+        <span class="n">assert</span><span class="p">(</span><span class="n">IS_TENTATIVELY_UNREACHABLE</span><span class="p">(</span><span class="n">op</span><span class="p">));</span>
+        <span class="n">next</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">has_finalizer</span><span class="p">(</span><span class="n">op</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">gc_list_move</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">finalizers</span><span class="p">);</span>
+            <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">GC_REACHABLE</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>move_finalizers之后会执行move_finalizer_reachable：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
+<span class="nf">move_finalizer_reachable</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">finalizers</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">traverseproc</span> <span class="n">traverse</span><span class="p">;</span>
+    <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">finalizers</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">gc</span> <span class="o">!=</span> <span class="n">finalizers</span><span class="p">;</span> <span class="n">gc</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">traverse</span> <span class="o">=</span> <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">tp_traverse</span><span class="p">;</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="n">traverse</span><span class="p">(</span><span class="n">FROM_GC</span><span class="p">(</span><span class="n">gc</span><span class="p">),</span>
+                        <span class="p">(</span><span class="n">visitproc</span><span class="p">)</span><span class="n">visit_move</span><span class="p">,</span>
+                        <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">finalizers</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>move_finalizers把一些对象放进了finalizers链表并且设为GC_REACHABLE，这就导致，这些对象引用的所有对象，也应该是GC_REACHABLE。</p>
+
+<p>所以move_finalizer_reachable的作用是，遍历finalizer，把被引用的其他对象也放进finalizer列表，即使这些对象并没有<strong>del</strong>，如上面测试程序里的uncollectable的dict。</p>
+
+<p>总结：</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">class</span> <span class="nc">T</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span> <span class="o">=</span> <span class="bp">self</span> 
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</code></pre></div>
+<p>这样定义的一个T类，它的任意实例都会导致产生2个垃圾对象，一个是实例本身，一个是实例引用的in_dict。</p>
+
+<p>所以写python程序切勿写出这样子的代码，不然GC都帮不了你。</p>
 
   </div>
   <div class="entry">
