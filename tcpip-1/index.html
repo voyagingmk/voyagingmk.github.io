@@ -252,20 +252,7 @@
 <ul>
 <li>ACK只有在flags的ACK位置1时才有效，握手和断开报文段之外的报文段都是置1的（待考证）</li>
 <li>默认窗口大小最大才65KB，需要用窗口缩放选项来放大，才能满足高速和大延迟网络</li>
-</ul>
-
-<p>tcp features：</p>
-
-<ul>
-<li>通信速率SW/R (bits/s)：S是分组比特总大小，W是窗口大小，R是RTT</li>
-<li>如果发送速率超过中间路由器的能力，就需要拥塞控制(congestion control)，否则会路由器丢包</li>
-<li>组包(packetization)：把一个字节流转换成一组IP可以携带的分组</li>
-<li>分组序列号：代表了每个分组的第一个字节在整个数据流中的字节偏移，而不是分组号</li>
-<li>分组大小可变，并允许分组重新组合（repacketization)</li>
-<li>校验和：报文段收到时如果检验和不对，会丢弃分组</li>
-<li>差错保护：发送大数据时检验和可能会失效，需要用户自己做更强大的校验和（CRC）</li>
-<li>ACK：一个指示字节号N的ACK暗示了所有&lt;=N的字节都呗成功接收了</li>
-<li>若前面的ACK丢失，后续的ACK也可以确认前面的分组（robust）</li>
+<li>通信速率SW/R (bits/s)：S是分组比特总大小，W是窗口大小（分组数量），R是RTT</li>
 <li><strong>不带数据的包可能没有可靠性保证，如Window Update ACK包</strong></li>
 </ul>
 
