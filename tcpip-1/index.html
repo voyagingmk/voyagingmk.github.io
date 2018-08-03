@@ -370,7 +370,7 @@
 <li>RTT = current time - TSER</li>
 </ul>
 
-<h3>路径MTU发现</h3>
+<h3>13.4 路径MTU发现</h3>
 
 <ul>
 <li>主要方案是：发大包，收到PTB（packet too big）消息后，调整自己MSS</li>
@@ -389,10 +389,18 @@
 <p>TIME_WAIT：</p>
 
 <ul>
+<li>MSL：最大段生存期，代表任何报文段在被丢弃前在网络中被允许存在的最长时间</li>
+<li>TIME_WAIT一般要持续2个MSL（60秒）(加倍等待)</li>
+<li>静默时间：如果TIME_WAIT主机崩溃重启，需要等待2MSL后才能建立新连接（但一般操作系统不会这样做）</li>
+<li>net.ipv4.tcp_fin_timeout：记录了2MSL需要等待的超时时间（秒）（执行sysctl net.ipv4.tcp_fin_timeout输出了60）</li>
+</ul>
+
+<p>TIME_WAIT作用：</p>
+
+<ul>
+<li>为了可以重传最终的ACK。本质上是因为对端会重传FIN如果收不到ACK的话。</li>
 <li>让迷途的报文可以在网络中消失</li>
 <li>防止新连接错误接收旧的迷途的报文</li>
-<li>一般要持续2个MSL（60秒）</li>
-<li>静默时间：如果TIME_WAIT主机崩溃重启，需要等待2MSL后才能建立新连接（但一般操作系统不会这样做）</li>
 </ul>
 
 <p>TIME_WAIT状态其实不做什么事情，就是限制1分钟内这条连接的其中一端不能发起对另一端的新连接，这也是为什么只有一端进入TIME_WAIT而另一端可以直接CLOSED的原因。</p>
