@@ -432,7 +432,7 @@
 <ul>
 <li>客户端连接请求没有对应的监听socket时</li>
 <li>主动发RST强制终止连接时。发RST同时排队报文会被丢弃。也被称为<strong>终止释放</strong>。发FIN是<strong>有序释放</strong>。</li>
-<li>一端崩溃重启，收到正常工作（半开连接）的另一端的报文时</li>
+<li>一端崩溃重启，另一端就进入<strong>半开连接</strong>状态。若收到半开连接（正常工作）的报文时，就会发RST。</li>
 <li>TIME_WAIT错误时，TIME_WAIT端收到迷途的报文并发送ACK但被CLOSED的对端<strong>RST</strong></li>
 </ul>
 
@@ -449,6 +449,8 @@
 <p>发送RST，不需要一个RSTACK。对端收到RST就自然重置连接了（不过可能对端会丢失RST）。</p>
 
 <p>UDP没有RST，但是有ICMP目的地不可达消息。</p>
+
+<h3>13.7 TCP服务器选项</h3>
 
 <h2>14章 TCP超时和重传</h2>
 
