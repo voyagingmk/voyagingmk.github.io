@@ -380,7 +380,7 @@
 <li>MSS大小影响吞吐量和窗口大小</li>
 </ul>
 
-<h3>TCP状态转换</h3>
+<h3>13.5 TCP状态转换</h3>
 
 <p><img src="../images/2018.3/20.png" alt="5.png"></p>
 
@@ -393,25 +393,26 @@
 <li>TIME_WAIT一般要持续2个MSL（60秒）(加倍等待)</li>
 <li>静默时间：如果TIME_WAIT主机崩溃重启，需要等待2MSL后才能建立新连接（但一般操作系统不会这样做）</li>
 <li>net.ipv4.tcp_fin_timeout：记录了2MSL需要等待的超时时间（秒）（执行sysctl net.ipv4.tcp_fin_timeout输出了60）</li>
+<li>对于服务器而言，如果当前有连接、且主动关闭了服务器，那么正常是不能重新建立一个对同端口的监听socket的，一样要等2MSL，</li>
 </ul>
 
 <p>TIME_WAIT作用：</p>
 
 <ul>
-<li>为了可以重传最终的ACK。本质上是因为对端会重传FIN如果收不到ACK的话。</li>
-<li>让迷途的报文可以在网络中消失</li>
-<li>防止新连接错误接收旧的迷途的报文</li>
+<li>为了可以重传最终的ACK，或者叫<strong>可靠地实现TCP全双工连接的终止</strong>。本质上是因为对端会重传FIN如果收不到ACK的话。重传成功，服务器收到ACK，就可以从LAST_ACK进入CLOSED。但客户端即使重传成功也不能结束TIME_WAIT（或者说客户端无法确定ACK是否重传成功）。假如不能够发ACK，那么收到FIN时只能是发RST，这样会导致服务器生成一个错误。</li>
+<li>让老的重复报文可以在网络中消失，即是说处于2MSL时，收到的数据报文都是要丢弃的。这也是为了防止新连接错误接收旧报文引发数据异常。有的实现允许设一个大于所有旧的Seq的ISN，忽略2MSL状态直接创建新连接，但有的实现是不允许，必须等到2MSL结束。</li>
 </ul>
 
-<p>TIME_WAIT状态其实不做什么事情，就是限制1分钟内这条连接的其中一端不能发起对另一端的新连接，这也是为什么只有一端进入TIME_WAIT而另一端可以直接CLOSED的原因。</p>
+<p>TIME_WAIT状态其实不做什么事情，就是限制1分钟内这条连接的其中一端不能发起对另一端的新连接，这也是为什么只有一端进入TIME_WAIT而另一端可以直接CLOSED的原因，对端相信TIME_WAIT一端不会立即重新连接，</p>
 
-<p>FIN_WAIT_2:</p>
+<p>FIN_WAIT_2无限等待问题：</p>
 
 <ul>
 <li>主动关闭方发送fin并收到finack就进入了FIN_WAIT_2</li>
 <li>处于FIN_WAIT_2时需要等另一方发送fin（永久等待）</li>
-<li>close系统调用会自动启动定时器，60秒后强制进入CLOSED状态</li>
+<li>close系统调用会自动启动定时器，60秒(net.ipv4.tcp_fin_timeout)后强制进入CLOSED状态</li>
 <li>用shutdown的半关闭不会启动定时器</li>
+<li>FIN_WAIT_1不会无限等待，因为不断重发FIN直到收到ACK进入FIN_WAIT_2</li>
 </ul>
 
 <p>同时打开同时关闭：</p>
@@ -420,7 +421,7 @@
 <li>是可以正确处理的，并且只会建立一条连接</li>
 </ul>
 
-<h3>RST重置报文段</h3>
+<h3>13.6 RST重置报文段</h3>
 
 <p>发送时机：</p>
 
