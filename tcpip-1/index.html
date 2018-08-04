@@ -458,14 +458,18 @@
 
 <h4>SYN flood的对策(countermeasures)</h4>
 
+<p>其实都写在<a href="https://tools.ietf.org/html/rfc4987">RFC</a>里了。</p>
+
 <ul>
 <li>SYN cookies：把连接信息编码到ISN，因为第三次握手会发ISN+1给服务器，于是可以解码出连接信息。不过tcp选项是编码不进去的，需要关闭；另外SYN-ACK会无法重发，因为服务器并不保存状态。</li>
 <li>SYN cache：把每个连接部分信息放到一个bucket（hashtable），cache entry可能比full TCB少好几倍</li>
+<li>混合模式(SYN cookies + SYN cache)：如果cache的哈希表满了，就执行SYN cookies模式</li>
 <li>过滤：这个要依赖ISP，ISP过滤掉伪造了IP地址的包，抵御SYN flood能力很强，然而这个机制并没有称为ISP的标准。</li>
 <li>increase backlog</li>
 <li>缩短SYN RECV 定时器</li>
 <li>顶掉最老的半开连接</li>
 <li>防火墙和代理：大意就是在客户端和服务器之间架设一个代理机器，客户端要先和代理机器三次握手成功后，才会把三次握手“转发”到服务器</li>
+<li>monitor：监听器能识别哪些IP地址是攻击者，从而屏蔽掉来自攻击者的syn。</li>
 </ul>
 
 <h2>14章 TCP超时和重传</h2>
