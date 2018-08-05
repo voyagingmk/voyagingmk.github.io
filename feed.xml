@@ -84,6 +84,10 @@
 
 &lt;h3&gt;merging&lt;/h3&gt;
 
+&lt;p&gt;就是把pixel shading的输出合并到color buffer。&lt;/p&gt;
+
+&lt;p&gt;这个阶段不可编程，但可以配置。&lt;/p&gt;
+
 &lt;h1&gt;资料&lt;/h1&gt;
 
 &lt;p&gt;偶然google到了2份很不错的管线图：&lt;/p&gt;
