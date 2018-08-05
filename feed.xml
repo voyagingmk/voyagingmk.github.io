@@ -8,7 +8,7 @@
     
       <item>
         <title>Graphics Pipeline</title>
-        <description>&lt;p&gt;本文梳理了实时渲染管线的流程细节，主要参考了《RTR》3rd的内容。&lt;/p&gt;
+        <description>&lt;p&gt;本文简单梳理了实时渲染管线过程。主要参考了《RTR》3rd。&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -87,6 +87,8 @@
 &lt;p&gt;就是把pixel shading的输出合并到color buffer。&lt;/p&gt;
 
 &lt;p&gt;这个阶段不可编程，但可以配置。&lt;/p&gt;
+
+&lt;p&gt;其中要注意，depth test和stencil test发生在这个阶段。&lt;/p&gt;
 
 &lt;h1&gt;资料&lt;/h1&gt;
 
