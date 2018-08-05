@@ -93,7 +93,7 @@
 
 <ol>
 <li>Application：CPU负责，把各种几何体信息输送到Geometry阶段，如点、线、三角形。</li>
-<li>Geometry：</li>
+<li>Geometry</li>
 <li>Rasterizer</li>
 </ol>
 
@@ -136,6 +136,18 @@
 <p>x、y会被缩放到(x1, y1)和(x2,y2)范围，而z坐标不变。这样转换后的x、y、z会被送往光栅化阶段。</p>
 
 <p>(x1,y1)和(x2,y2)是像素坐标了，但像素坐标是整数，浮点数转换到整数有个取整问题。一般认为像素中心是在0.5的地方，例如假设(x1,y1)和(x2,y2）不小于0，那么最左像素的左边界是0，中心是0.5，右边界是1。</p>
+
+<h2>Rasterizer阶段</h2>
+
+<p>细分：</p>
+
+<h3>triangle setup</h3>
+
+<h3>triangle traversal</h3>
+
+<h3>pixel shading</h3>
+
+<h3>and merging</h3>
 
 <h1>资料</h1>
 
