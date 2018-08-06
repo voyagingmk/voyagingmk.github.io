@@ -484,7 +484,7 @@
 
 <ol>
 <li><p>SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能并不是很理想；</p></li>
-<li><p>自顶向下地构造BVH，很难应用并行计算来优先性能。</p></li>
+<li><p>自顶向下地构造BVH，很难应用并行计算来优化性能。</p></li>
 </ol>
 
 <p>于是作者又发明了更复杂的HLBVHBuild，即 Hierarchical Linear Bounding Volume Hierarchy。</p>
@@ -505,7 +505,7 @@
 
 <p>BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。</p>
 
-<p>下面先以静态场景为例，讲解BVH的生成算法。</p>
+<p>下面先以静态场景为例，讲解BVH的生成算法。Note：演示代码是用pbrt源码改的测试版，这是为了理解代码和方便调试。</p>
 
       </div>
 
