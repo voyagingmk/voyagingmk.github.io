@@ -152,9 +152,11 @@
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">SkeletonPose</span> <span class="p">{</span>
     <span class="kt">size_t</span> <span class="n">jointCount</span><span class="p">;</span> <span class="c1">// 关节数量</span>
     <span class="n">JointPose</span><span class="o">*</span> <span class="n">localPoses</span><span class="p">;</span> <span class="c1">// 多个局部关节姿势 JointPose</span>
-    <span class="n">Matrix44</span><span class="o">*</span> <span class="n">globalPoses</span><span class="p">;</span> <span class="c1">// 多个全局关节姿势 全局关节姿势的存储，并不只限定于用RTS，而是既可以用RTS也可以用矩阵。因为实时渲染里矩阵更通用快速，所以得存成矩阵。</span>
+    <span class="n">Matrix44</span><span class="o">*</span> <span class="n">globalPoses</span><span class="p">;</span> <span class="c1">// 多个全局关节姿势</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>全局关节姿势的存储，并不只限定于用RTS，而是既可以用RTS也可以用矩阵。因为实时渲染里矩阵更通用快速，所以得存成矩阵。</p>
+
 <h3>绑定姿势矩阵、绑定姿势逆矩阵 Bind Poses Matrix 、Inversed Bind Poses Matrix</h3>
 
 <p>定义矩阵 \( B_{j\to M} \)为关节j在模型空间的<strong>全局绑定姿势矩阵</strong>。根据上文， \( \mathbf v B_{j\to M} \) 可以把\(  \mathbf v \)从关节j的局部空间变换到模型空间。</p>
