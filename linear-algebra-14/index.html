@@ -125,13 +125,15 @@
 
 <p>\[ \vec v_{\parallel } = (\vec v\cdot \vec n) \vec n \]</p>
 
-<ul>
-<li><p>上一步已经解决了\( \vec v_{\parallel } \)，剩下的就是求\( \vec v&#39;_{\perp } \)。求\( \vec v&#39;_{\perp } \)之前需要先求出\( \vec v_{\perp } \)，而显然\( \vec v_{\perp } = v - \vec v_{\parallel} \) </p></li>
-<li><p>接着，需要计算一个新的向量\(\vec w \)，\( \vec w = \vec n \times \vec v_{\perp } \) （注意叉乘的顺序不能错），所以\(\vec w \)是一个垂直于\(  \vec n \)、\( \vec v_{\perp } \)所构成平面的向量。</p></li>
-<li><p>把\( \vec v_{\perp }\)、\(\vec w \) 分别当做是垂直于\(  \vec n \)的平面的x、y轴(2D坐标系)，那么\( \vec v&#39;_{\perp } \)的含义就是指\( \vec v_{\perp } \)在这个2D坐标系下绕原点旋转\(\theta \)度。从而得到等式：</p></li>
-</ul>
+<p>上一步已经解决了\( \vec v_{\parallel } \)，剩下的就是求\( \vec v&#39;_{\perp } \)。求\( \vec v&#39;_{\perp } \)之前需要先求出\( \vec v_{\perp } \)，而显然\( \vec v_{\perp } = v - \vec v_{\parallel} \) </p>
+
+<p>接着，需要计算一个新的向量\(\vec w \)，\( \vec w = \vec n \times \vec v_{\perp } \) （注意叉乘的顺序不能错），所以\(\vec w \)是一个垂直于\(  \vec n \)、\( \vec v_{\perp } \)所构成平面的向量。</p>
+
+<p>把\( \vec v_{\perp }\)、\(\vec w \) 分别当做是垂直于\(  \vec n \)的2D平面的x、y轴（因为已经有正交关系），那么\( \vec v&#39;_{\perp } \)的含义就是指\( \vec v_{\perp } \)在这个2D坐标系下绕原点旋转\(\theta \)度（<a href="https://en.wikipedia.org/wiki/Rotation_of_axes">Rotation of axes</a>）。从而得到等式：</p>
 
 <p>\[ \vec v&#39;_{\perp } =  cos\theta \vec v_{\perp } + sin\theta \vec w \]</p>
+
+<p>可以这么理解：首先因为 \(\vec w = \vec n \times \vec v_{\perp }\)，可知 \(\vec w \)和\(  \vec v_{\perp } \)等长，假设长度为r，那么可用极坐标表示\(\vec v&#39;_{\perp } = (r, \theta) \)，极坐标用笛卡尔坐标表示就是示\(\vec v&#39;_{\perp } = (r cos\theta, r sin\theta) = r cos\theta\vec x + r sin\theta \vec y，\vec x = (1,0)，\vec y = (0,1) \)，换成自定义的正交坐标系后就是\( cos\theta \vec v_{\perp } + sin\theta \vec w \)。</p>
 
 <p>好了，所有变量都得到了，总结下最终的公式：</p>
 
@@ -178,6 +180,8 @@
 <h1>资料</h1>
 
 <p><a href="https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula">Rodrigues&#39; rotation formula</a></p>
+
+<p><a href="https://en.wikipedia.org/wiki/Rotation_of_axes">Rotation of axes</a></p>
 
     </div>
     <div class="entry">
