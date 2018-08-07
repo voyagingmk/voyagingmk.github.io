@@ -121,14 +121,14 @@
 
 <p>\[ \vec A\cdot \vec B = |\vec A||\vec B|cos\alpha  \]</p>
 
-<p>代入\(\vec v\)、\(\vec n\)后，得到：\( \vec v\cdot \vec n = |\vec v||\vec n|cos\alpha = |\vec v|cos\alpha = |\vec v_{\parallel }| \)，即算出了\( \vec v_{\parallel } \)的长度，又因为\vec v_{\parallel } \)和\(\vec n\)方向一致、\(\vec n\)长度为1，所以有:</p>
+<p>代入\(\vec v\)、\(\vec n\)后，得到：\( \vec v\cdot \vec n = |\vec v||\vec n|cos\alpha = |\vec v|cos\alpha = |\vec v_{\parallel }| \)，即算出了\( \vec v_{\parallel } \)的长度，又因为\( \vec v_{\parallel } \)和\(\vec n\)方向一致、\(\vec n\)长度为1，所以有:</p>
 
 <p>\[ \vec v_{\parallel } = (\vec v\cdot \vec n) \vec n \]</p>
 
 <ul>
 <li><p>上一步已经解决了\( \vec v_{\parallel } \)，剩下的就是求\( \vec v&#39;_{\perp } \)。求\( \vec v&#39;_{\perp } \)之前需要先求出\( \vec v_{\perp } \)，而显然\( \vec v_{\perp } = v - \vec v_{\parallel} \) </p></li>
 <li><p>接着，需要计算一个新的向量\(\vec w \)，\( \vec w = \vec n \times \vec v_{\perp } \) （注意叉乘的顺序不能错），所以\(\vec w \)是一个垂直于\(  \vec n \)、\( \vec v_{\perp } \)所构成平面的向量。</p></li>
-<li><p>把\( \vec v_{\perp }\)、\(\vec w \) 分别当做是\(  \vec n \)、\( \vec v_{\perp } \)平面的x、y轴(2D坐标系)，那么\( \vec v&#39;_{\perp } \)的含义就是指\( \vec v_{\perp } \)在这个2D坐标系下旋转\(\theta \)度。从而得到等式：</p></li>
+<li><p>把\( \vec v_{\perp }\)、\(\vec w \) 分别当做是垂直于\(  \vec n \)的平面的x、y轴(2D坐标系)，那么\( \vec v&#39;_{\perp } \)的含义就是指\( \vec v_{\perp } \)在这个2D坐标系下绕原点旋转\(\theta \)度。从而得到等式：</p></li>
 </ul>
 
 <p>\[ \vec v&#39;_{\perp } =  cos\theta \vec v_{\perp } + sin\theta \vec w \]</p>
@@ -143,7 +143,7 @@
 
 <p>\( = \vec n \times (\vec v - \vec v_{\parallel}) \) </p>
 
-<p>\( = \vec n \times \vec v - \vec n \times \vec v_{\parallel}) \) </p>
+<p>\( = \vec n \times \vec v - \vec n \times \vec v_{\parallel} \) </p>
 
 <p>\( = \vec n \times \vec v \) </p>
 
@@ -151,15 +151,17 @@
 
 <p>\( =  cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v)  \)</p>
 
-<p>\( \vec v&#39; = \vec v&#39;_{\perp } + \vec v_{\parallel } \)</p>
+<p>\( \vec v&#39; = \vec v&#39;_{\perp } + \vec v&#39;_{\parallel } = \vec v&#39;_{\perp } + \vec v_{\parallel } \)</p>
 
-<p>\( = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \)</p>
+<p>\( = cos\theta (\vec v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \)</p>
+
+<p>\( = cos\theta \vec v + (1 - cos\theta)(\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) \)</p>
 
 <p>加粗并居中：</p>
 
-<p><strong>\[ \vec v&#39; = cos\theta (v - (\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) + (\vec v\cdot \vec n) \vec n \]</strong></p>
+<p><strong>\[ \vec v&#39; = cos\theta \vec v + (1 - cos\theta)(\vec v\cdot \vec n) \vec n) + sin\theta (\vec n \times \vec v) \]</strong></p>
 
-<p>这就是绕任意轴的旋转公式了。</p>
+<p>这就是绕任意轴的旋转公式了。 可以在这个<a href="https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula">wiki</a>看到这条公式，一模一样。</p>
 
 <p>接下来是把这个公式转换成矩阵的形式。方法是，把\(v_{x} = (1,0,0) \)、\(v_{y} = (0,1,0) \)、\(v_{z} = (0,0,1) \)，分别代入上面的公式，分别得到：</p>
 
@@ -172,6 +174,10 @@
 <p>最终的旋转矩阵为:</p>
 
 <p>\[ R(\vec n, \theta ) =  \left[ \begin{matrix} n_{x}^{2}(1-cos\theta )+cos\theta &amp;  n_{x}n_{y}(1-cos\theta )+n_{z}sin\theta &amp;  n_{x}n_{z}(1-cos\theta )-n_{y}sin\theta &amp;0\\      n_{x}n_{y}(1-cos\theta )-n_{z}sin\theta &amp;n_{y}^{2}(1-cos\theta )+cos\theta &amp;n_{y}n_{z}(1-cos\theta )+n_{x}sin\theta &amp;0\\     n_{x}n_{z}(1-cos\theta )+n_{y}sin\theta &amp;n_{y}n_{z}(1-cos\theta )-n_{x}sin\theta &amp;n_{z}^{2}(1-cos\theta )+cos\theta &amp;0\\    0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
+
+<h1>资料</h1>
+
+<p><a href="https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula">Rodrigues&#39; rotation formula</a></p>
 
     </div>
     <div class="entry">
