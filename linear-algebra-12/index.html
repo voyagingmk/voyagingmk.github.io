@@ -196,7 +196,7 @@
 
 <p>\[ ax + by + cz + dw = x_{p} = \frac { x } {  -z * ar * tan(\frac {\alpha } { 2 } ) } \]</p>
 
-<p>这是M矩阵第一行和V的点积等式。求解这个等式的话，会发现可以让b=0、d=0，从而等式简化成:</p>
+<p>这是M矩阵第一行和V的点积等式。求解这个等式的话，会发现可以让b=0、d=0（因为右式没有y、w），从而等式简化成:</p>
 
 <p>\[ ax + cz = \frac { x } { -z * ar * tan(\frac {\alpha } { 2 } ) } \]</p>
 
@@ -210,7 +210,13 @@
 
 <p>\[ a = \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }  \]</p>
 
-<p>对于M矩阵的f，用同样的做法可以得到:</p>
+<p>对于M矩阵的f，用同样的做法:</p>
+
+<p>\[ ex + fy + gz + hw = y_{p} = \frac { y } { -z * tan(\frac {\alpha } { 2 } ) } \]</p>
+
+<p>\[ fy + gz = \frac { y } { -z * tan(\frac {\alpha } { 2 } ) } \]</p>
+
+<p>\[ fy  = \frac { y } { -z * tan(\frac {\alpha } { 2 } ) } \]</p>
 
 <p>\[ f = \frac { 1 } { tan(\frac {\alpha } { 2 } ) }   \]</p>
 
@@ -226,7 +232,7 @@
 
 <p>\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0&amp;0\\ 0&amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0\\ 0&amp;0&amp;0&amp;0\\ 0&amp;0&amp;-1&amp;0\\ \end{matrix} \right] \]</p>
 
-<p>然而，事情还没有结束。现在用这个新的M去做透视变换后，得不到规范化的z分量。规范化的，可以使得后续的渲染步骤不需要知道near Z和far Z。为了完成这个事情，需要对M做改进，着手点就是row 3，全为0的第三行。</p>
+<p>然而，事情还没有结束。现在用这个新的M去做透视变换后，得不到规范化的z分量。规范化的z，可以使得后续的渲染步骤不需要知道near Z和far Z。为了完成这个事情，需要对M做改进，着手点就是row 3，全为0的第三行。</p>
 
 <p>再阐述一下问题：我们需要求出row3=(i,j,k,l)，使得row3和V做点积运算能得到规范化的\(z_{p}\)。用公式表示：</p>
 
