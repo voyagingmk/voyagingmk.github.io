@@ -78,7 +78,7 @@
     <div id="main" role="main" class="container">
       <article class="post">
   <h1>《计算机网络-自顶向下方法》笔记</h1>
-  <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
+  <h3>Tags: <a href="/tag/network/" rel="tag">network</a></h3>
   <div class="entry">
     <!--more-->
 
@@ -111,8 +111,8 @@
 <p>四大步骤：</p>
 
 <ol>
-<li>DHCP发现报文，用UDP，端口67，src ip为0.0.0.0，dst ip为255.255.255.255，广播一个发现报文，报文里包含一个事物ID。</li>
-<li>DHCP提供报文，DHCP服务器收到广播而来的发现报文后，用一个提供报文做响应，src ip为自己的ip，dst ip为255.255.255.255，也是广播。因为DHCP服务器不一定唯一，所以客户机有选择权。提供报文包含，收到的发现报文的事物ID、向客户推荐的IP地址、IP地址的掩码、IP地址租用期（address lease time），租用期一般为几小时到几天。</li>
+<li>DHCP发现报文，用UDP，端口67，src ip为0.0.0.0，dst ip为255.255.255.255，广播一个发现报文，报文里包含一个事务ID。</li>
+<li>DHCP提供报文，DHCP服务器收到广播而来的发现报文后，用一个提供报文做响应，src ip为自己的ip，dst ip为255.255.255.255，也是广播。因为DHCP服务器不一定唯一，所以客户机有选择权。提供报文包含，收到的发现报文的事务ID、向客户推荐的IP地址、IP地址的掩码、IP地址租用期（address lease time），租用期一般为几小时到几天。</li>
 <li>DHCP请求报文，客户机从1到多个提供报文中选择一个，并向该服务器发送DHCP请求报文。</li>
 <li>DHCP ACK报文，就是第三步的响应报文，告诉客户配置参数。</li>
 </ol>
