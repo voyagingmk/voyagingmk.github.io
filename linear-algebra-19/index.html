@@ -173,7 +173,7 @@
 
 <p>\[ \mathbf v _{j} = \mathbf v _{M}^{B} B_{M\to j} = \mathbf v _{M}^{B} (B_{j\to M})^{-1}  \] </p>
 
-<p>然后再乘以当前姿势的姿势矩阵C，得到当前姿势的模型空间坐标 \(\mathbf v _{M}^{C} \)：</p>
+<p>然后再乘以<strong>当前姿势</strong>的姿势矩阵C（不是绑定姿势！），得到当前姿势的模型空间坐标 \(\mathbf v _{M}^{C} \)：</p>
 
 <p>\[ v _{M}^{C} = \mathbf v _{j} C_{j \to M}  \] </p>
 
@@ -183,7 +183,7 @@
 
 <p>\[ K_{j} = (B_{j\to M})^{-1}  C_{j \to M} \]</p>
 
-<p>\( K_{j} \) 就是关节j的蒙皮矩阵了。</p>
+<p>\( K_{j} \) 就是关节j的蒙皮矩阵了。再解释下这个矩阵干了什么：把绑定姿势模型空间下的顶点，先转换到绑定姿势关节空间，然后再转换到当前姿势模型空间。</p>
 
 <p>ozz-animation中的算K矩阵的代码片段：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">models</span><span class="p">.</span><span class="n">Count</span><span class="p">();</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
