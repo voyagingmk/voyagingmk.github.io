@@ -97,7 +97,7 @@
 <li>XYZ 和 RGB 两种CIE颜色系统以及它们之间、它们和SPD之间的转换</li>
 <li>辐射通量(Flux)</li>
 <li>立体角(Solid Angle)</li>
-<li>辐射密度(Irradiance)</li>
+<li>辐射照度(Irradiance)</li>
 <li>辐射亮度(Radiance)</li>
 </ul>
 
@@ -185,11 +185,9 @@
 
 <p><img src="../images/2016.7/4.png" alt="4.png"></p>
 
-<h2>辐射密度(Irradiance)  (或称辐射照度(Radiant Exitence))</h2>
+<h2>辐射照度(<a href="https://en.wikipedia.org/wiki/Irradiance">Irradiance</a>)</h2>
 
-<p>辐射密度也叫辐射照度。定义了辐射通量后，就可以定义辐射照度了，辐射照度指的是单位面积<strong>进入</strong>的辐射通量，单位是\(W/m^{2}\)。根据这个定义用符号E表示。</p>
-
-<p>辐射照度和辐射密度是近似的东西，辐射照度指的是单位面积<strong>离开</strong>的辐射通量，单位也是\(W/m^{2}\)。用符号M表示。</p>
+<p>Irradiance翻译成中文是辐射度/辐照度/辐射照度。定义了辐射通量后，就可以定义辐射照度了，辐射照度指的是单位面积<strong>进入</strong>的辐射通量，单位是\(W/m^{2}\)。根据这个定义用符号E表示。</p>
 
 <p>以上面的点光源来分析，可以知道上图中内圆圈的辐射照度比外圆圈的辐射照度大，这是因为内圆圈的面积更小而点光源的Flux值恒定，所以内圆圈的E值就大。</p>
 
@@ -235,7 +233,7 @@
 
 <p>立体角的介绍请访问：<a href="http://www.qiujiawei.com/solid-angle/">立体角(Solid Angle)详解</a></p>
 
-<h2>辐射亮度(Radiance)</h2>
+<h2>辐射亮度(<a href="https://en.wikipedia.org/wiki/Radiance">Radiance</a>)</h2>
 
 <p>辐射亮度是指辐射通量与单位面积(注意，是与光线方向正交的那块)单位立体角的比值。符号为L。定义式如下：</p>
 
@@ -249,7 +247,7 @@
 
 <p><img src="../images/2016.7/7.png" alt="7.png"></p>
 
-<p>辐射密度E和辐射亮度L的关系是&quot;总体&quot;和&quot;个体&quot;的区别，可以对比下两者的公式来理解：</p>
+<p>辐射照度E和辐射亮度L的关系是&quot;总体&quot;和&quot;个体&quot;的区别，可以对比下两者的公式来理解：</p>
 
 <p>\[ E = \frac { \Phi }{ A }  \]</p>
 
@@ -279,7 +277,7 @@
 
 <p>\[ L_{i}(p,\omega ) \neq L_{o}(p,\omega ) \]</p>
 
-<p>还有，上面的这个p不能简单认为真的是一个无体积的点，它也可能是一个无限小的平面块，即它是一个有面积A、有法向量n的“点”。对于这样一个“点”，我们可以求出它的上半球(沿着n的方向)的辐射密度值\( E(p, n) \)：</p>
+<p>还有，上面的这个p不能简单认为真的是一个无体积的点，它也可能是一个无限小的平面块，即它是一个有面积A、有法向量n的“点”。对于这样一个“点”，我们可以求出它的上半球(沿着n的方向)的辐射照度值\( E(p, n) \)：</p>
 
 <p>\[ E(p, n) = \int _{\Omega } L_{i} (p,\omega ) |cos\theta |d\omega \]</p>
 
@@ -361,6 +359,8 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 <li><p>\( L_{i}(x, \omega _{i}, λ, t) \)  在t时刻、沿着\( \omega _{i} \)方向进入x点的光(λ)的辐射亮度(Radiance)</p></li>
 <li><p>\(\omega _{i} \cdot n \) 是一个衰减比值(一般是0到1)，指入射光的方向和法向量的夹角\( \theta _{i} \)，这个夹角导致产生的衰减。原因请参考上面的<strong>辐射通量</strong>小节。这个参数也可以写成\( \cos \theta _{i} \)</p></li>
 </ul>
+
+<p>这个方程可以用一句话概括：出辐射亮度等于自身辐射亮度加上</p>
 
 <p>上面的可能太教科书了，下面展示一个简化的渲染方程：</p>
 
