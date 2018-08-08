@@ -86,6 +86,12 @@
 
 <!--more-->
 
+<p>2018-8-8 更新：</p>
+
+<p>经网友提醒发现sitemap的地址是localhost，研究发现是jekyll serve生成的sitemap.xml和jekyll build生成的是不一样的，提交_site文件夹时要用jekyll build的。</p>
+
+<h1>正文</h1>
+
 <p>现在我的解决方案是，用我购买的阿里云vps（在阿里云叫ecs），并把我的博客git整个放到Dropbox，并在vps上面搭建了jekyll服务器，就搞定了测试用的博客服务器了。</p>
 
 <p>写博客的流程就简单了，在win或mac下都可以写，md文件一保存，就会被dropbox同步到云端，然后vps的dropbox文件夹也会即时被更新，而jekyll serve是会自动检测文件状态的，一旦被修改就会重新generate静态网站。那么我就可以直接本地开个浏览器，进入 <a href="http://vps%E5%9C%B0%E5%9D%80:jekyll%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E5%8F%A3/%EF%BC%8C%E5%8E%BB%E9%A2%84%E8%A7%88%E4%BA%86%E3%80%82">http://vps地址:jekyll服务器端口/，去预览了。</a></p>
