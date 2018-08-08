@@ -7,8 +7,267 @@
     <atom:link href="https://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>实时渲染中的各种光照模型</title>
+        <description>&lt;!--more--&gt;
+
+&lt;p&gt;光照模型一般按照真实感和非真实感，分2大类；在真实感类里，再细分经验模型和基于物理的模型。&lt;/p&gt;
+
+&lt;p&gt;本文将不断更新关于各种光照模型的内容。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;真实感
+
+&lt;ul&gt;
+&lt;li&gt;Phong(经验模型)&lt;/li&gt;
+&lt;li&gt;Blinn-Phong(经验模型)&lt;/li&gt;
+&lt;li&gt;Lafortune&lt;/li&gt;
+&lt;li&gt;Torrance-Sparrow&lt;/li&gt;
+&lt;li&gt;Cook-Torrance（基于物理）&lt;/li&gt;
+&lt;li&gt;Ward anisotropy&lt;/li&gt;
+&lt;li&gt;Oren-Nayar&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;非真实感
+
+&lt;ul&gt;
+&lt;li&gt;Cel shading &lt;/li&gt;
+&lt;li&gt;Gooch shading&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;列表来源: &lt;a href=&quot;https://en.wikipedia.org/wiki/List_of_common_shading_algorithms&quot;&gt;List of common shading algorithms&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Phong_reflection_model&quot;&gt;Phong lighting model&lt;/a&gt; （1975年）&lt;/h1&gt;
+
+&lt;p&gt;Phong模型是针对局部光照的经验模型。先过一遍原理，从wiki给出的2条公式入手：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/phong.svg&quot; alt=&quot;a.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/r.svg&quot; alt=&quot;r.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;（第二条公式在本文最后面补充了推导过程）&lt;/p&gt;
+
+&lt;p&gt;解释下里面的各个符号：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\(k_{s} \)，镜面反射系数，常量&lt;/li&gt;
+&lt;li&gt;\(k_{d} \)，漫反射系数，常量&lt;/li&gt;
+&lt;li&gt;\(k_{\alpha } \)，环境光反射系数，常量&lt;/li&gt;
+&lt;li&gt;\(\alpha \) , 表示物体材质光滑程度，由材质决定（材质越光滑系数越大），常量&lt;/li&gt;
+&lt;li&gt;\(\hat L_{m} \)，从物体表面上的p点到某光源m的方向向量&lt;/li&gt;
+&lt;li&gt;\(\hat N \)，该点的法线&lt;/li&gt;
+&lt;li&gt;\(\hat R_{m} \)，出射(反射)光线的方向，相对于\(\hat L_{m} \)而言的。也是从物体表面出发&lt;/li&gt;
+&lt;li&gt;\(\hat V \)，摄像机的方向，也是从物体表面出发&lt;/li&gt;
+&lt;li&gt;\(i_{\alpha } \)，环境光光照，理解为RGB颜色即可（i表示illumination）&lt;/li&gt;
+&lt;li&gt;\(i_{m,d } \)，光源m的漫反射光照, RGB&lt;/li&gt;
+&lt;li&gt;\(i_{m,s } \)，光源m的镜面反射光照，RGB&lt;/li&gt;
+&lt;li&gt;\(I_{p } \)，p点的总的光照，RGB&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;直观地理解这些方向&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/phong2.png&quot; alt=&quot;r.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;公式中只有2个东西是要特别说明的：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;\(\hat L_{m}\cdot \hat N \)即\( cos \phi \)，夹角越小，cos值越大，反射光越强；&lt;/li&gt;
+&lt;li&gt;\( (\hat R_{m}\cdot V )^{\alpha }  \)即\( cos ^{\alpha } \theta \)，夹角越小，说明反射光方向和视角方向越靠近，对于光滑平面，显然越靠近越亮，Phong用了一个乘方运算来模拟亮度的急剧变化；&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;根据公式可知，Phong模型实质上是三个小模型的叠加：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ambient lighting：环境光，模拟像月光这种弱光对物体的影响&lt;/li&gt;
+&lt;li&gt;diffuse lighting：漫反射光，被(直接)光源照射后反射出来的光&lt;/li&gt;
+&lt;li&gt;specular lighting：镜面光，模拟了光滑物体或物体的部分光滑表面被光照时产生的高光现象&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;除此之外，还有一个object color的概念，是指物体自发光，一般是用纹理表示这种color。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/Phong_components_version_4.png&quot; alt=&quot;a.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(from wiki)&lt;/p&gt;
+
+&lt;p&gt;下面给出单光源下的phong shader。&lt;/p&gt;
+
+&lt;h2&gt;ambient lighting&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// fs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;objectColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragColor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;ambient+diffuse lighting&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// vs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;gl_Position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;projection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;aPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;aPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;Normal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;aNormal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// fs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;kd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lightPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;diffuse&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;kd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;diffuse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;objectColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragColor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;ambient+diffuse+specular lighting&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// vs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;gl_Position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;projection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;aPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;aPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;Normal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;aNormal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// fs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;kd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lightPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;diffuse&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;kd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ks&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;viewPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;R&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reflect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;spec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;R&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;specular&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ks&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;spec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
+
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;diffuse&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;specular&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;objectColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragColor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model&quot;&gt;Blinn-Phong&lt;/a&gt; (1977年)&lt;/h1&gt;
+
+&lt;p&gt;Blinn-Phong模型简单来说只是对Phong模型的改进。既然是改进，那么就得先搞清楚改进了什么问题：&lt;strong&gt;在Phong模型中，R和V的夹角不能超过90度，超过90度，cos就会变负数，进而会出现光照错误&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;例如说观察者站在平面上观察平面远处的某点（V会贴近地面），且同时有一个方向光源光照方向L和V接近，那么L的镜像R，就和V形成钝角，就光照错误了。例如这样：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/advanced_lighting_phong_limit.png&quot; alt=&quot;advanced_lighting_phong_limit.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(from &lt;a href=&quot;https://learnopengl.com/Advanced-Lighting/Advanced-Lighting&quot;&gt;learnopengl.com&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;既然钝角不好，那么有什么办法弄成锐角？答案是定义一个新的向量H（halfway vector）：&lt;/p&gt;
+
+&lt;p&gt;\[ \hat H = \frac {L + V}{ |L + V| } \]&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/blinn_phong.png&quot; alt=&quot;blinn_phong.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;H和高光的关系是：H越靠近法线N，镜像高光就越强。&lt;/p&gt;
+
+&lt;p&gt;另外，因为H和N的夹角会比V和R的夹角小（从图中也可以看出来），于是shineness因子（即\(\alpha \)）得变得更大，一般是Phong模型时的2到4倍。&lt;/p&gt;
+
+&lt;p&gt;总之，Blinn-Phong其实只是改进了Phong高光的模拟部分，其他部分不变。Phong公式的高光部分改动如下：&lt;/p&gt;
+
+&lt;p&gt;\[ k_{s}(\hat N\cdot \hat H)^{\alpha } i_{m,s} \]&lt;/p&gt;
+
+&lt;p&gt;对应的shader如下：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// vs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;gl_Position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;projection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;aPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;aPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;Normal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;aNormal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// fs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;kd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lightPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;diffuse&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;kd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NdotL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ks&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;viewPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;FragPos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;H&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kr&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;spec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;specular&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ks&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;spec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lightColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
+
+    &lt;span class=&quot;nx&quot;&gt;vec3&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ambient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;diffuse&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;specular&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;objectColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;FragColor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vec4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;learnopengl.com给出的前后对比图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/advanced_lighting_comparrison.png&quot; alt=&quot;1.png&quot;&gt;&lt;/p&gt;
+
+&lt;h1&gt;补充&lt;/h1&gt;
+
+&lt;h2&gt;反射公式的推导&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/r.svg&quot; alt=&quot;r.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;解释下这条公式怎么得到。首先看图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/reflection.png&quot; alt=&quot;r.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;先以切平面和法线为坐标轴，对L做投影分解。L到N的投影为：&lt;/p&gt;
+
+&lt;p&gt;\[ L_{\parallel } = (L\cdot N)N \]&lt;/p&gt;
+
+&lt;p&gt;根据向量加法可以得到：&lt;/p&gt;
+
+&lt;p&gt;\[ L_{\perp } = L - L_{\parallel } = L - (L\cdot N)N \]&lt;/p&gt;
+
+&lt;p&gt;又因为R关于N和L镜像对称，于是可以得到R的公式：&lt;/p&gt;
+
+&lt;p&gt;\[ R = -L_{\perp } + L_{\parallel } \]&lt;/p&gt;
+
+&lt;p&gt;\[ R = -(L - (L\cdot N)N) + (L\cdot N)N \]&lt;/p&gt;
+
+&lt;p&gt;\[ R = -L + 2(L\cdot N)N \]&lt;/p&gt;
+
+&lt;p&gt;\[ R =  2(L\cdot N)N - L \]&lt;/p&gt;
+
+&lt;h1&gt;参考资料&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://learnopengl.com/Lighting/Basic-Lighting&quot;&gt;https://learnopengl.com/Lighting/Basic-Lighting&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://learnopengl.com/Advanced-Lighting/Advanced-Lighting&quot;&gt;https://learnopengl.com/Advanced-Lighting/Advanced-Lighting&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector&quot;&gt;https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Specular_reflection#Direction_of_reflection&quot;&gt;https://en.wikipedia.org/wiki/Specular_reflection#Direction_of_reflection&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://maverick.inria.fr/%7ENicolas.Holzschuch/cours/Slides/1b_Materiaux.pdf&quot;&gt;http://maverick.inria.fr/~Nicolas.Holzschuch/cours/Slides/1b_Materiaux.pdf&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Wed, 08 Aug 2018 00:00:00 +0800</pubDate>
+        <link>https://www.qiujiawei.com/lighting-1/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/lighting-1/</guid>
+      </item>
+    
+      <item>
         <title>Graphics Pipeline</title>
         <description>&lt;p&gt;本文简单梳理了实时渲染管线过程。主要参考了《RTR》3rd。&lt;/p&gt;
+
+&lt;p&gt;（更新ing）&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -3780,570 +4039,6 @@ SSL-Session:
         <pubDate>Fri, 13 Jul 2018 00:00:00 +0800</pubDate>
         <link>https://www.qiujiawei.com/distributed-1/</link>
         <guid isPermaLink="true">https://www.qiujiawei.com/distributed-1/</guid>
-      </item>
-    
-      <item>
-        <title>《现代操作系统》17年第四版 阅读笔记</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2&gt;系统调用&lt;/h2&gt;
-
-&lt;h3&gt;fork&lt;/h3&gt;
-
-&lt;p&gt;创建一个原有进程的精确副本。&lt;/p&gt;
-
-&lt;p&gt;被复制的东西：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;所有的文件描述符&lt;/li&gt;
-&lt;li&gt;所有的寄存器&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;没被复制的东西：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;程序正文&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;在fork后，原有的进程和其副本（父与子）就分开了。&lt;/p&gt;
-
-&lt;p&gt;返回值，用来在进程里区分谁是父谁是子：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;在子进程中该值为0&lt;/li&gt;
-&lt;li&gt;在父进程中等于子进程的PID&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;shell为例：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;span&gt;&lt;/span&gt;while(true) {
-    type_prompt();
-    read_command(cmd, params);
-    if(fork()!=0) {
-        // 父
-        waitpid(-1, &amp;amp;status, 0);
-    } else {
-        // 子
-        execve(command, params, 0);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3&gt;waitpid&lt;/h3&gt;
-
-&lt;p&gt;参数：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;子进程PID，填-1就是任意一个子进程PID&lt;/li&gt;
-&lt;li&gt;status（statloc）子进程的返回状态码&lt;/li&gt;
-&lt;li&gt;一般为0&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;exec&lt;/h3&gt;
-
-&lt;p&gt;使得整个核心映像（core image）被一个文件所替代。&lt;/p&gt;
-
-&lt;p&gt;参数：将要执行的文件名、一个指向变量数组的指针、一个指向环境数组的指针（通常为0）&lt;/p&gt;
-
-&lt;p&gt;例子：&lt;/p&gt;
-
-&lt;p&gt;cp file1 file2&lt;/p&gt;
-
-&lt;p&gt;execve(cp, [file1, file2], 0)&lt;/p&gt;
-
-&lt;p&gt;main(argc, argv, envp)&lt;/p&gt;
-
-&lt;p&gt;argc为3，argv[0]为cp，argv[1]为file1，argv[2]为file2；没有envp。&lt;/p&gt;
-
-&lt;h3&gt;exit(status)&lt;/h3&gt;
-
-&lt;p&gt;status是用户指定的，status其实就是waitpid的staloc，子进程设定的status最终可以告诉父进程。&lt;/p&gt;
-
-&lt;h3&gt;link&lt;/h3&gt;
-
-&lt;p&gt;在unix中，每个文件都有唯一的编号（i-node）。&lt;/p&gt;
-
-&lt;p&gt;每个目录有一个i-node到文件名的表。&lt;/p&gt;
-
-&lt;p&gt;link时，是在指向目录里面创建一个新条目，i-node为原文件的i-node，文件名都link参数里指定的文件名。&lt;/p&gt;
-
-&lt;p&gt;目录和i-node是双向指向的，i-node也存有一个表，记录了指向该i-node的目录项。&lt;/p&gt;
-
-&lt;h1&gt;进程和线程&lt;/h1&gt;
-
-&lt;h2&gt;进程模型&lt;/h2&gt;
-
-&lt;h3&gt;CPU利用率&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;t1, 一个进程等待I/O操作的时间&lt;/li&gt;
-&lt;li&gt;t, 一个进程停留在内存中时间&lt;/li&gt;
-&lt;li&gt;p, 一个进程等待I/O操作的时间与其停留在内存中时间的比。&lt;/li&gt;
-&lt;li&gt;n为同时存在的进程数量&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;利用率 = \( 1 - p^{n}\)&lt;/p&gt;
-
-&lt;p&gt;这是简单模型，只适用于进程之间互相独立。例如对于单CPU，即使进程就绪，但已有一个进程正在被CPU处理，那么还是会等待。&lt;/p&gt;
-
-&lt;h3&gt;用户空间线程&lt;/h3&gt;
-
-&lt;p&gt;优缺点：&lt;/p&gt;
-
-&lt;h3&gt;内核空间线程&lt;/h3&gt;
-
-&lt;h3&gt;调度程序激活机制 和 上行调用（upcall)&lt;/h3&gt;
-
-&lt;h3&gt;IPC：信号量&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;创建信号量：sem_t *sem_open(const char *name, int oflag, 权限, 初始值)。返回值：返回一个信号量对象，若失败，则返回SEM_FAILED，并设置errno。&lt;a href=&quot;https://linux.die.net/man/3/sem_open&quot;&gt;man page&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;P(down)操作，即int sem_wait(sem_t *sem)，检查信号量的值是不是大于0，若大于0，则减1并返回；若等于0，则进程睡眠，sem_wait阻塞不返回；非阻塞版本是sem_trywait，用返回值EAGAIN代替阻塞；限时的down操作是sem_timedwait，使得阻塞不是永久的。返回值：0代表成功，-1代表失败，并设置errno。&lt;/li&gt;
-&lt;li&gt;V(up)操作，即int sem_post(sem_t *sem),对信号量加1，若是从0变1，那么那些阻塞在这个信号量的进程或线程会被唤醒。返回值同P。V操作是怎么都不会阻塞的。&lt;/li&gt;
-&lt;li&gt;本进程关闭信号量：int sem_close(sem_t *sem)。没什么特别的。&lt;/li&gt;
-&lt;li&gt;真·销毁信号量：sem_unlink，前提是open了信号量的进程已经调用了close或者已经结束了进程（调用了exit或者main函数返回），如果还没close就调用，那么没效果。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/tomasbruckner/minimalSemaphoreDemo/blob/master/semaphore_synchronization/semaphore_synchronization.c&quot;&gt;github代码实例&lt;/a&gt;，双信号量实现父进程和子进程的同步。&lt;/p&gt;
-
-&lt;p&gt;信号量2个能力：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;实现互斥量&lt;/li&gt;
-&lt;li&gt;实现计数&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;IPC：futex 快速用户空间互斥&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;linux特有&lt;/li&gt;
-&lt;li&gt;实现了基本的锁（很像互斥锁），但避免了陷入内核&lt;/li&gt;
-&lt;li&gt;内核服务：提供一个等待队列，它允许多个进程在一个锁上等待。把进程放到等待队列代价很大（系统调用）。&lt;/li&gt;
-&lt;li&gt;避免锁争用：没有争用时，futex完全在用户空间工作；加锁时，如果锁没有被锁，那么直接加锁成功，不需要陷入内核；如果已经被锁了，执行系统调用把线程放到等待队列（不自旋）。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;IPC：管程 montior&lt;/h3&gt;
-
-&lt;p&gt;原因：为了更易于编写正确的程序。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;管程是编程语言的组成部分，能不能用管程得看是什么语言，例如java&lt;/li&gt;
-&lt;li&gt;任一时刻管程中只能有一个活跃进程&lt;/li&gt;
-&lt;li&gt;进程可在任何需要的时候调用管程中的过程（procdeure)&lt;/li&gt;
-&lt;li&gt;进入管程是的互斥由编译器负责，出错的可能性要小得多&lt;/li&gt;
-&lt;li&gt;写管程的人无需关心编译器是如何实现互斥的，只需知道将所有临界区转换成管程即可&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;IPC：消息传递&lt;/h3&gt;
-
-&lt;p&gt;其实就是用socket来实现IPC。&lt;/p&gt;
-
-&lt;h3&gt;IPC：屏障 barrier&lt;/h3&gt;
-
-&lt;p&gt;概念上像是gpu渲染一帧，n个gpu核都在计算它负责的像素点，有的快有的慢，但必须全部核的任务都处理完毕，才能进入下一个阶段。&lt;/p&gt;
-
-&lt;h3&gt;IPC：无锁化，RCU（读取-复制-更新）&lt;/h3&gt;
-
-&lt;h2&gt;调度&lt;/h2&gt;
-
-&lt;h3&gt;何时进行调度&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;创建一个新进程后，需要决定是运行父进程还是运行子进程。可以任意决定。&lt;/li&gt;
-&lt;li&gt;一个进程退出时必须做出调度决策。必须从就绪进程集合选择另外某个进程。&lt;/li&gt;
-&lt;li&gt;当一个进程阻塞在I/O和信号量上或由于其他原因阻塞是，必须选择其他进程运行。&lt;strong&gt;阻塞原因会成为选择的因素，然而调度程序并不拥有做出这种相关考虑的必要信息&lt;/strong&gt;。&lt;/li&gt;
-&lt;li&gt;在一个I/O中断发生时，必须做出调度决策。可能等待I/O的进程变成就绪了，有三种可能，让新就绪进程运行；继续当前进程的运行；让别的进程运行。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;根据如何处理时钟中断，可以把调度算法分2类：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;非抢占式：进程自己释放CPU时/阻塞时，才会切换到别的进程。即时钟中断不会进行调度。&lt;/li&gt;
-&lt;li&gt;抢占式：让进程运行某个固定时段的最大值，然后挂起它，调度别的进程继续运行。前提是有时钟，不然就得用非抢占式的调度算法。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;根据环境选择算法：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;批处理。适合用非抢占式调度。一个进程需要运行长时间。也就减少了进程切换，优化了性能。&lt;/li&gt;
-&lt;li&gt;交互式。适合抢占式。&lt;/li&gt;
-&lt;li&gt;服务器。适合抢占式。&lt;/li&gt;
-&lt;li&gt;实时系统。一般是非抢占式。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;调度算法目标&lt;/h3&gt;
-
-&lt;p&gt;适用所有环境的目标：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;公平&lt;/li&gt;
-&lt;li&gt;策略强制执行。即调度进程有一些优先级策略&lt;/li&gt;
-&lt;li&gt;平衡。保证系统的所有部分都忙碌&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;批处理系统的测量指标：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;吞吐量：每小时完成的作业数量&lt;/li&gt;
-&lt;li&gt;周转时间：一个作业从提交到完成的统计平均时间&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;能够使吞吐量最大化的调度算法不一定就有最小的周转时间。例如，系统优先处理大量小作业导致长作业无法被处理，这样有做大的吞吐量但平均周转时间无限长。&lt;/p&gt;
-
-&lt;p&gt;交互式系统：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;最小响应时间。能够让所有的交互式请求首先运行的则是好服务。&lt;/li&gt;
-&lt;li&gt;均衡性。满足用户的期望（这个概念比较模糊）&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;交互式系统的调度&lt;/h3&gt;
-
-&lt;h4&gt;轮转调度(round robin)&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;每个进程被分配一个时间片（quantum)。注意，进程可在时间片花完前提前结束运行，例如阻塞了。&lt;/li&gt;
-&lt;li&gt;时间片过小，容易发生抢占，过多的切换进程，降低CPU效率；&lt;/li&gt;
-&lt;li&gt;时间片太长，则引起对短的交互请求的响应时间变长。&lt;/li&gt;
-&lt;li&gt;一般为20~50ms&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;优先级调度&lt;/h4&gt;
-
-&lt;p&gt;每个进程加一个优先级属性，优先级大的先执行完，再执行次优先的。&lt;/p&gt;
-
-&lt;p&gt;问题：只按优先级来执行进程的话，低优先级进程可能永远都不会被执行。&lt;/p&gt;
-
-&lt;p&gt;解决方法：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;被执行的进程的优先级每个时钟滴答减1，直到低于次优先级进程时切换。&lt;/li&gt;
-&lt;li&gt;最大时间片法，用完时间片就轮到次优先的进程&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;优先级的赋予：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;静态：人工分配，例如商业计算中心，高优先级的任务价格高&lt;/li&gt;
-&lt;li&gt;动态：根据 1/f公式分配优先级。例如在50ms的时间片中只使用2ms就挂起的进程，优先级为1/(2/50) = 25。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;变种：按优先级分类，然后用轮转调度，高优先级的进程组里的进程集合轮转调度，优先执行，都执行完时切换到次优先级组。&lt;/p&gt;
-
-&lt;h4&gt;多级队列&lt;/h4&gt;
-
-&lt;p&gt;基于上面的优先级分类，设计了多级队列调度。&lt;/p&gt;
-
-&lt;p&gt;原理是：属于最高优先级类的进程运行一个时间片，属于次高优先级类的进程运行2个时间片，再次一级运行4个时间片；当进程用完分配的时间片后，它被移送到下一类。&lt;/p&gt;
-
-&lt;p&gt;例子：假设一个进程要完成计算任务总共需要100个时间片。一开始被分配1个时间片，然后就被换出，下次到它时获得2个时间片，又被换出。总共经历了1、2、4、8、16、32、64个优先级类。在64优先级类的第37个时间片就完成了工作。总共用了7次进程上下文切换。要比轮转算法轮转100次要高效。&lt;/p&gt;
-
-&lt;h4&gt;最短进程优先&lt;/h4&gt;
-
-&lt;p&gt;最短路程含义是进入运行到挂起的时间间隔最短，这种进程优先处理，对实时系统挺友好。例如交互式进程，每条用户命令相当于一次短作业。&lt;/p&gt;
-
-&lt;p&gt;但如何知道这个作业将执行多久呢？方法是用过去的数据来做预测，\( T = aT_{0} + (1 - a)T_{1} \)。&lt;/p&gt;
-
-&lt;h4&gt;保证调度&lt;/h4&gt;
-
-&lt;p&gt;也是绝对公平的调度。有两种情况：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;多用户同时登录工作。每个用户可获得CPU的1/n的处理能力。&lt;/li&gt;
-&lt;li&gt;n个进程在运行的单用户系统。每个进程获得CPU的1/n的处理能力。不过这种情况需要记录每个进程从创建以来已累积获得的CPU时间。因为没有时间片的概念，所以进程实际获得的运行时间和理应获得的时间可能会不一致，此时可以算一个比值（优先级），使得较亏的进程可以先运行。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;彩票调度&lt;/h4&gt;
-
-&lt;p&gt;即给每个进程发一些彩票。调度时，随机抽一张彩票，哪个进程持有这张彩票就被执行。&lt;/p&gt;
-
-&lt;p&gt;可以给某个进程赋予比别人多的彩票数量，来提高优先级(中奖几率)。&lt;/p&gt;
-
-&lt;h4&gt;公平分享调度&lt;/h4&gt;
-
-&lt;p&gt;这个是对于多用户环境而言的。每个用户的所有进程占x%的时间。有点像上面的保证调度。&lt;/p&gt;
-
-&lt;h3&gt;调度策略参数化&lt;/h3&gt;
-
-&lt;p&gt;例如一个数据库父进程下面有多个子进程，父进程才知道怎么调度子进程才是最优。那么就可以设计一种参数化调度机制，让父进程向内核设置参数，如子进程优先级，更好地做调度。&lt;/p&gt;
-
-&lt;h3&gt;线程调度&lt;/h3&gt;
-
-&lt;p&gt;要分用户级线程和内核级线程两种情况。&lt;/p&gt;
-
-&lt;h3&gt;经典IPC问题&lt;/h3&gt;
-
-&lt;h3&gt;页面置换算法&lt;/h3&gt;
-
-&lt;h4&gt;最优页面置换算法&lt;/h4&gt;
-
-&lt;p&gt;基于2点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;当缺页中断(page fault)发生时，有些页面在内存中，其中有一个页面（包含紧接着的下一条指令的那个页面）将很快被访问，其他页面则可能要10、100、1000条指令后才会访问，这个指令数就是标记&lt;/li&gt;
-&lt;li&gt;最优页面置换，就是置换掉标记最大的页面&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;然而无法实现，因为操作系统无法知道各个页面下一次将在什么时候被访问。&lt;/p&gt;
-
-&lt;p&gt;不过可以作为性能对比工具，例如弄个仿真程序，先跟踪一遍所有页面的访问情况，然后第二次运行则可以用第一次的数据来跑出最优页面置换算法。之后再用其他算法也跑一下，从而做对比。不过此方案问题在于是针对某个特定程序而言的。&lt;/p&gt;
-
-&lt;h4&gt;最近未使用页面置换算法（NRU，not recently used）&lt;/h4&gt;
-
-&lt;p&gt;首先每个页面设置2个状态位:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;R位，被访问时设置&lt;/li&gt;
-&lt;li&gt;W位，被写入时设置&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;算法：&lt;/p&gt;
-
-&lt;p&gt;当启动一个进程时，它的所有页面的两个位都由操作系统设置成0，R位被定期地清零（比如每次时钟中断时）以区别最近没有被访问的页面和被访问的页面。&lt;/p&gt;
-
-&lt;p&gt;当发生缺页中断时，操作系统检查所有的页面并根据它们当前的R位和M位的值，把它们分为4类：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;没有被访问，没有被修改&lt;/li&gt;
-&lt;li&gt;没有被访问，被修改&lt;/li&gt;
-&lt;li&gt;被访问，没有被修改&lt;/li&gt;
-&lt;li&gt;被访问，被修改&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;本算法随机地从类编号最小的非空类中挑选一个页面淘汰。&lt;/p&gt;
-
-&lt;h4&gt;先进先出置换算法 FIFO&lt;/h4&gt;
-
-&lt;p&gt;页面按照访问时间顺序组成链表，每次发生缺页中断时直接从表头的页面干掉，并把新页面放到表尾。&lt;/p&gt;
-
-&lt;p&gt;问题在于常用页面也可能会被淘汰，&lt;/p&gt;
-
-&lt;h4&gt;第二次机会页面置换算法&lt;/h4&gt;
-
-&lt;p&gt;这个是 FIFO的改进：要淘汰时，检查最老页面的R位，如果是0，那么可以置换掉；如果是1，那么就是最近访问过的，把R位设0，并移动到链表末端。&lt;/p&gt;
-
-&lt;p&gt;如果所有页面都被访问过了，那么退化为普通的FIFO。&lt;/p&gt;
-
-&lt;h4&gt;时钟页面置换算法&lt;/h4&gt;
-
-&lt;p&gt;上面的算法的问题在于要经常在链表移动页面。改进方法：改成环形链表，一个指针指向最老的页面。&lt;/p&gt;
-
-&lt;p&gt;当发生缺页中断时：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;检查指针指向的页面，若R位为0，则淘汰该页面，把新页面放入这个位置，指针移动到下一个位置；&lt;/li&gt;
-&lt;li&gt;若R为1，则清除R位，指针还是++，重复这个过程直到找到一个R为0的页面。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;最近最少使用算法（LRU）&lt;/h4&gt;
-
-&lt;p&gt;在缺页中断发生时，置换未使用时间最长的页面。&lt;/p&gt;
-
-&lt;p&gt;假设还是用链表，要达到LRU，需要每次访问内存都更新链表：在链表中找到这个页面，删除它，然后把它移动到表头。&lt;/p&gt;
-
-&lt;p&gt;不用链表，有别的方案：&lt;/p&gt;
-
-&lt;p&gt;每个页表存一个属性：指令计数器，每条指令执行完后加1；当发生缺页中断时，检查所有页表项的计数器值，找到值最小的页面，就是最近最少使用的页面了。这是基于硬件的方案。&lt;/p&gt;
-
-&lt;h4&gt;软件实现的LRU&lt;/h4&gt;
-
-&lt;p&gt;NFU（Not Frequently Used，最不常用）算法：&lt;/p&gt;
-
-&lt;p&gt;内存里做一个表，把每个页面和一个软件计数器相关联，初值为0，每次时钟中断时，操作系统扫描内存中&lt;strong&gt;所有的页面&lt;/strong&gt;，把每个页面的R位的值加到计数器上，这个计数器大体跟踪了各个页面被访问的频繁程度。发生缺页中断时，淘汰计数器值最小的页面。&lt;/p&gt;
-
-&lt;p&gt;改进的NFU——Aging老化算法：&lt;/p&gt;
-
-&lt;p&gt;因为NFU对旧状态记忆得太深，不能应对快速变化的程序状态，有可能根据计数器淘汰了最经常访问的页面。可以修改一下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;在R位被加进计数器前，计数器右移一位（除2）；&lt;/li&gt;
-&lt;li&gt;将R位加到计数器最左端的位而不是最右端的位；&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;发生缺页中断还是淘汰计数器值最小的页面。老化算法的问题在于计数器只有有限位，限制了它对过往状态的记忆能力。&lt;/p&gt;
-
-&lt;h4&gt;基本工作集页面置换算法&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;工作集：一个进程当前正在使用的页面的集合称为它的工作集。&lt;/li&gt;
-&lt;li&gt;颠簸：如果内存太小不足以容纳整个工作集，那么每执行几条指令就会发生一次缺页中断&lt;/li&gt;
-&lt;li&gt;预先调页：在进程运行前预先装入其工作集页面&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;工作集的严格定义：在任一时刻t，都存在一个集合，它包含所有最近k次内存访问所访问过的页面，称为w(k,t)&lt;/p&gt;
-
-&lt;p&gt;w是k的单调非递减函数，且会收敛到一个稳定的范围。预先调页原理就是基于以下推测：程序上次结束时w有一个稳定范围，可预先装下这个范围的工作集。&lt;/p&gt;
-
-&lt;p&gt;实现条件：操作系统必须跟踪哪些页面在工作集中。&lt;/p&gt;
-
-&lt;p&gt;基于工作集的页面置换算法：当发生缺页中断时，淘汰一个不在工作集的页面。精确地统计工作集，就是确定一个k值。&lt;/p&gt;
-
-&lt;p&gt;问题：工作集的计算不容易。2种方案：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;按使用频率计。成本比较高。k还是按次数的k。&lt;/li&gt;
-&lt;li&gt;按执行时间计。k变成秒数r，工作集变成在过去的r秒实际运行时间(使用了CPU的时间)中进程所访问页面的集合。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;缺页中断时，需要扫描整个页表，找出适合的页面来淘汰。&lt;/p&gt;
-
-&lt;h4&gt;工作集时钟页面置换算法&lt;/h4&gt;
-
-&lt;p&gt;上面的算法问题在于需要扫描整个页表来淘汰页面。&lt;/p&gt;
-
-&lt;p&gt;改进（类似前面的时钟页面置换算法）:&lt;/p&gt;
-
-&lt;p&gt;建立一个以页框为元素的循环表。每次缺页中断时，首先检查指针指向的页面，如果R为1，则把R改为0，并把指针++，重复这个逻辑；R为0时，如果指针当前页面的生存时间大于r，并且页面是干净的（M=0），它就不在工作集中且磁盘上有一个有效的副本，置换替换掉此页框即可，如果M为1，为了避免写磁盘操作引起进程切换，指针继续++，检查下一个页。&lt;/p&gt;
-
-&lt;h4&gt;总结&lt;/h4&gt;
-
-&lt;p&gt;最好的算法是：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;老化算法（LRU）&lt;/li&gt;
-&lt;li&gt;工作集时钟算法&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;分页系统的设计问题&lt;/h3&gt;
-
-&lt;h4&gt;进程之间的内存竞争&lt;/h4&gt;
-
-&lt;p&gt;考虑多个进程的页面置换算法称为全局算法，反之就是局部算法。&lt;/p&gt;
-
-&lt;p&gt;全局算法一般是基于&lt;strong&gt;PFF&lt;/strong&gt;，page fault frequency，缺页中断率，它指出了&lt;strong&gt;何时增加或减少分配给一个进程的页面&lt;/strong&gt;，但却完全没有说明在发生缺页中断时应该替换掉哪一个页面。仅控制分配集的大小。&lt;/p&gt;
-
-&lt;p&gt;PFF的测量：PFFF = (当前1秒的PFF + 旧PFF）/ 2&lt;/p&gt;
-
-&lt;h4&gt;负载控制&lt;/h4&gt;
-
-&lt;p&gt;问题：即使是使用最优页面置换算法，也可能会发生颠簸，如内存不足的时候。&lt;/p&gt;
-
-&lt;p&gt;解决方案：将一部分进程交换到磁盘，释放他们所占有的所有页面。&lt;/p&gt;
-
-&lt;h4&gt;页面大小&lt;/h4&gt;
-
-&lt;p&gt;有公式可以算页面大小，对于平均进程大小为1MB，每个页表项为8B的系统，最优页面是4KB。一般范围是到64KB。&lt;/p&gt;
-
-&lt;h4&gt;分离指令空间和数据空间&lt;/h4&gt;
-
-&lt;p&gt;地址空间太小时，拆成2个空间就会改善情况。不过现在64位系统的地址空间很大，拆2个空间是因为别的原因了。&lt;/p&gt;
-
-&lt;h4&gt;共享页面&amp;amp;共享库&amp;amp;内存映射文件&lt;/h4&gt;
-
-&lt;p&gt;原因：避免在内存中有一个页面的两个副本。&lt;/p&gt;
-
-&lt;p&gt;策略：共享I空间。&lt;/p&gt;
-
-&lt;p&gt;还有问题：释放页面要考虑有没别的进程在使用这个页面。所以共享页面要有特殊的数据结构来记录。&lt;/p&gt;
-
-&lt;p&gt;其他问题：fork调用，理应拷贝数据段，但就会产生大量副本。解决方法是写时复制COW。&lt;/p&gt;
-
-&lt;p&gt;共享库就是DLL了，不过有个问题是地址。共享库要用相对地址，办法是编译时设置参数。&lt;/p&gt;
-
-&lt;p&gt;内存映射文件，应该就是共享内存了。&lt;/p&gt;
-
-&lt;h4&gt;清除策略&lt;/h4&gt;
-
-&lt;p&gt;弄个分页守护进程（paging daemon），定时被唤醒检查内存、看是不是要置换掉页面，如果已修改，那么要写硬盘，如果未修改且硬盘有副本，则直接清除。&lt;/p&gt;
-
-&lt;h3&gt;有关实现&lt;/h3&gt;
-
-&lt;h4&gt;缺页中断处理流程&lt;/h4&gt;
-
-&lt;ol&gt;
-&lt;li&gt;硬件陷入内核，在堆栈中保存程序计数器。大多数机器将当前指令的各种状态信息保存在特殊的CPU寄存器中。&lt;/li&gt;
-&lt;li&gt;启动一个汇编代码例程保存通用寄存器和其他易失的信息，以免被操作系统破坏。这个例程将操作系统作为一个函数来调用。&lt;/li&gt;
-&lt;li&gt;当操作系统发现一个缺页中断时，尝试发现需要哪个虚拟页面。通常一个硬件寄存器包含了这一信息，如果没有的话，操作系统必须检索程序计数器，取出这条指令，用软件分析这条指令，看看它在缺页中断时正在做什么。&lt;/li&gt;
-&lt;li&gt;一旦知道了发生缺页中断的虚拟地址，操作系统检査这个地址是否有效，并检査存取与保护是否一致。如果不一致，向进程发出一个信号或杀掉该进程(&lt;strong&gt;segment fault！&lt;/strong&gt;)。如果地址有效且没有保护错误发生，系统则检査是否有空闲页框。如果没有空闲页框，执行页面置换算法寻找一个页面来淘汰。&lt;/li&gt;
-&lt;li&gt;如果选择的页框“脏”了，安排该页写回磁盘，并发生一次上下文切换，挂起产生缺页中断的进程，&lt;strong&gt;让其他进程运行直至磁盘传输结束&lt;/strong&gt;。无论如何，该页框被&lt;strong&gt;标记为忙&lt;/strong&gt;，以免因为其他原因而&lt;strong&gt;被其他进程占用&lt;/strong&gt;。&lt;/li&gt;
-&lt;li&gt;—旦页框“干净”后（无论是立刻还是在写回磁盘后），操作系统査找所需页面在磁盘上的地址，通过磁盘播作将其装入，该页面正在被装入时，产生缺页中断的进程仍然被挂起，并且如果有其他可运行的用户进程，则选择另一个用户进程运行„&lt;/li&gt;
-&lt;li&gt;当&lt;strong&gt;磁盘中断&lt;/strong&gt;发生时，表明该页已经被装人，页表已经更新并可以反映它的位置，页框也被标记为正常状态。&lt;/li&gt;
-&lt;li&gt;恢复发生缺页中断指令以前的状态，程序计数器重新指向这条指令。&lt;/li&gt;
-&lt;li&gt;调度引发缺页中断的进程，操作系统返回调用它的汇编语言例程。&lt;/li&gt;
-&lt;li&gt;该例程恢复寄存器和其他状态信息，返回到用户空间继续执行，就好像缺页中断没有发生过一样。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h4&gt;指令备份&lt;/h4&gt;
-
-&lt;p&gt;即怎么记忆发生中断的指令位置，以及怎么恢复。方法是在执行一条指令前用一个寄存器备份这条指令。&lt;/p&gt;
-
-&lt;h4&gt;锁页面&lt;/h4&gt;
-
-&lt;p&gt;例如缺页中断时把别的进程的缓冲区的页面置换掉了，别的进程如果用DMA传输数据中，就会覆盖掉了刚被装入的页面，全乱了。解决方法是对页面加锁。&lt;/p&gt;
-
-&lt;h4&gt;后备存储&lt;/h4&gt;
-
-&lt;p&gt;即置换页面，把页面放到硬盘哪里的问题。&lt;/p&gt;
-
-&lt;p&gt;方法：设立一个交换分区，专门来做这个事情。具体而言要3个区：正文、堆栈、数据。&lt;/p&gt;
-
-&lt;h4&gt;分段&lt;/h4&gt;
-
-&lt;p&gt;现在x86-64都去掉分段机制了，目测没有学习的必要。&lt;/p&gt;
-
-&lt;h2&gt;文件系统&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;主引导记录：磁盘的0号扇区（Master Bot Record, MBR)，用来引导计算机&lt;/li&gt;
-&lt;li&gt;分区表：在MBR的末尾，给出了每个分区的起始和结束地址&lt;/li&gt;
-&lt;li&gt;活动分区：分区表的某一个分区被定为活动分区&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;启动流程：&lt;/h4&gt;
-
-&lt;ol&gt;
-&lt;li&gt;计算机被引导&lt;/li&gt;
-&lt;li&gt;BIOS读入并执行MBR&lt;/li&gt;
-&lt;li&gt;MBR确定活动分区&lt;/li&gt;
-&lt;li&gt;MBR读入活动分区的第一个块（引导块）&lt;/li&gt;
-&lt;li&gt;引导块中的程序将装在该分区中的操作系统&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Note：为统一起见，每个分区都从一个引导块开始，即使它不含有一个可启动的操作系统&lt;/p&gt;
-
-&lt;h4&gt;文件的实现&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;连续分配。读取速度快，但容易产生碎片。存储时就需要知道文件大小。&lt;/li&gt;
-&lt;li&gt;链表分配。随机读取速度慢。指针占用一些字节，导致一些效率问题。&lt;/li&gt;
-&lt;li&gt;文件分配表FAT。在内存中弄一张表，用来获取磁盘块链表信息，从而避免了在磁盘块头存节点信息。随机读取速度变快。问题是如果块大小才1KB，但是磁盘空间1T，内存分配表就需要10亿个项，假设每项3个字节，就需要3GB内存。&lt;/li&gt;
-&lt;li&gt;i节点。是对FAT的改进，把链表信息存到磁盘上形成一个i节点文件，打开某个文件时把i节点文件信息载入到内存。i节点的唯一问题是定长大小的话，怎么动态扩容。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;目录的实现&lt;/h4&gt;
-
-&lt;p&gt;目录系统主要功能：把文件名映射成定位文件数据所需的信息&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;目录：一堆目录项，kv对&lt;/li&gt;
-&lt;li&gt;目录项：k是文件名，v可以随意，一般是i节点号&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;问题：文件名不定长。定长的话容易浪费空间。&lt;/p&gt;
-
-&lt;p&gt;解决方案:&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;让目录项大小不一致。问题一是如果移走一个文件会导致出现大小不定的空隙，二是目录项可能会跨页面，在读取文件名时可能会发生缺页中断。&lt;/li&gt;
-&lt;li&gt;目录项大小一致，但把文件名移出目录项，放到目录最后的堆里。但就要对堆进行管理。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h4&gt;共享文件&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;硬链接：创建直接与目标文件关联的i节点。删除文件操作会变得复杂。&lt;/li&gt;
-&lt;li&gt;符号链接：创建一个符号文件（类型link），文件中只包含&lt;strong&gt;所链接的文件的路径&lt;/strong&gt;。删除文件没什么大问题。额外开销时是要通过路径找到目标文件的i节点，以及符号文件本身还是要有一个i节点和一个磁盘块放路径，毕竟还是个文件。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;文件系统&lt;/h1&gt;
-
-&lt;h3&gt;mmap&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/hj605635529/article/details/73163513&quot;&gt;https://blog.csdn.net/hj605635529/article/details/73163513&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/luckywang1103/article/details/50619251&quot;&gt;https://blog.csdn.net/luckywang1103/article/details/50619251&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Tue, 10 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/os-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/os-1/</guid>
       </item>
     
   </channel>
