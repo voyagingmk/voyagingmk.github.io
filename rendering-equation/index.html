@@ -79,7 +79,7 @@
       <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 <article class="post">
     <h1>渲染基础理论的介绍(1)</h1>
-    <h3>Tags: <a href="/tag/math/" rel="tag">math</a>, <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
     <div class="entry">
         <!--more-->
 
@@ -350,7 +350,9 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 
 <p>\[ = L_{i} (p,\theta ,\phi ) π  \]</p>
 
-<p>注意，这个简化公式在渲染中很重要。因为若要计算一个点到摄像机的出L，可以假设出L等于入L，那么第一步就是先求这个点的入射E（求E的过程可能很复杂），当求出E之后，就可以认为这个点对任意方向的出射Radiance是均等的，也就是\( L_{o} = L_{i} = \frac {E}{\pi } \)。</p>
+<p>这个公式叫做<a href="https://en.wikipedia.org/wiki/Lambertian_reflectance">lambertian&#39;s reflectance</a>，很重要。例如若要计算一个点到摄像机的出L，可以假设已知E、且认为任意方向的出L是一致的、且能量守恒，能量守恒这个前提下可以认为\( L_{i} = L_{o} \), 就可以直接求出\( L_{o} = L_{i} = \frac {E}{\pi } \)。</p>
+
+<p>关于这个公式我找到的最佳资料是<a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/diffuse-lambertian-shading">这个</a>。</p>
 
 <h1>渲染方程 Rendering Equation</h1>
 
@@ -421,6 +423,8 @@ dE = \frac {  d\Phi  cos\theta  }{ dA^{\perp }  }
 <p><a href="https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/">https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/</a></p>
 
 <p><a href="http://www.codinglabs.net/article_physically_based_rendering.aspx">http://www.codinglabs.net/article_physically_based_rendering.aspx</a></p>
+
+<p><a href="http://www.codinglabs.net/article_physically_based_rendering_cook_torrance.aspx">http://www.codinglabs.net/article_physically_based_rendering_cook_torrance.aspx</a></p>
 
     </div>
     <div class="entry">

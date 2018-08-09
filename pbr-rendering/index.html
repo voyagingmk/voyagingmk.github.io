@@ -129,7 +129,7 @@
 
 <p>渲染方程的详细讨论已经写在<a href="http://www.qiujiawei.com/rendering-equation/">渲染基础理论的介绍</a>一文。</p>
 
-<h2>双向反射分布函数BRDF</h2>
+<h2>双向反射分布函数BRDF(Cook-Torrance)</h2>
 
 <p>在<a href="http://www.qiujiawei.com/rendering-equation/">渲染基础理论的介绍</a>一文里，没有详细讨论到的是brdf这个东西。简单地说，brdf是个控制系数，这个系数并不是常量，需要根据平面属性、光线属性计算得到，是个动态属性。基于PBR渲染，关键点就是选择合理的brdf函数。brdf函数将囊括上文提到的各个概念。</p>
 
@@ -141,7 +141,7 @@
 
 <p>\[ f_{lambert} = \frac {c}{\pi } \]</p>
 
-<p>这里的c是指平面自身的颜色值，一般就是指采样纹理贴图出来的颜色。</p>
+<p>\( f_{lambert} \)被称为lambertian&#39;s reflectance，在我的<a href="https://www.qiujiawei.com/rendering-equation/">渲染基础理论的介绍(1)</a>一文中有详细的推导过程。这里的c是指光源颜色。</p>
 
 <p>右边的镜面光部分才是最复杂的：</p>
 

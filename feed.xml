@@ -22,7 +22,7 @@
 &lt;li&gt;Blinn-Phong(经验模型)&lt;/li&gt;
 &lt;li&gt;Lafortune&lt;/li&gt;
 &lt;li&gt;Torrance-Sparrow&lt;/li&gt;
-&lt;li&gt;Cook-Torrance（基于物理）&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.qiujiawei.com/pbr-rendering/&quot;&gt;Cook-Torrance&lt;/a&gt;（基于物理）&lt;/li&gt;
 &lt;li&gt;Ward anisotropy&lt;/li&gt;
 &lt;li&gt;Oren-Nayar&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
@@ -70,7 +70,7 @@
 &lt;p&gt;公式中只有2个东西是要特别说明的：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;\(\hat L_{m}\cdot \hat N \)即\( cos \phi \)，夹角越小，cos值越大，反射光越强；&lt;/li&gt;
+&lt;li&gt;\(\hat L_{m}\cdot \hat N \)即\( cos \phi \)，夹角越小，cos值越大，反射光越强，这个N和L的点积关系式被称为&lt;a href=&quot;https://en.wikipedia.org/wiki/Lambert%27s_cosine_law&quot;&gt;Lambert&amp;#39;s Cosine Law&lt;/a&gt;；&lt;/li&gt;
 &lt;li&gt;\( (\hat R_{m}\cdot V )^{\alpha }  \)即\( cos ^{\alpha } \theta \)，夹角越小，说明反射光方向和视角方向越靠近，对于光滑平面，显然越靠近越亮，Phong用了一个乘方运算来模拟亮度的急剧变化；&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -257,6 +257,8 @@
 &lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Specular_reflection#Direction_of_reflection&quot;&gt;https://en.wikipedia.org/wiki/Specular_reflection#Direction_of_reflection&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://maverick.inria.fr/%7ENicolas.Holzschuch/cours/Slides/1b_Materiaux.pdf&quot;&gt;http://maverick.inria.fr/~Nicolas.Holzschuch/cours/Slides/1b_Materiaux.pdf&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&quot;&gt;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 08 Aug 2018 00:00:00 +0800</pubDate>
         <link>https://www.qiujiawei.com/lighting-1/</link>

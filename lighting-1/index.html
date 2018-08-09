@@ -95,7 +95,7 @@
 <li>Blinn-Phong(经验模型)</li>
 <li>Lafortune</li>
 <li>Torrance-Sparrow</li>
-<li>Cook-Torrance（基于物理）</li>
+<li><a href="https://www.qiujiawei.com/pbr-rendering/">Cook-Torrance</a>（基于物理）</li>
 <li>Ward anisotropy</li>
 <li>Oren-Nayar</li>
 </ul></li>
@@ -143,7 +143,7 @@
 <p>公式中只有2个东西是要特别说明的：</p>
 
 <ul>
-<li>\(\hat L_{m}\cdot \hat N \)即\( cos \phi \)，夹角越小，cos值越大，反射光越强；</li>
+<li>\(\hat L_{m}\cdot \hat N \)即\( cos \phi \)，夹角越小，cos值越大，反射光越强，这个N和L的点积关系式被称为<a href="https://en.wikipedia.org/wiki/Lambert%27s_cosine_law">Lambert&#39;s Cosine Law</a>；</li>
 <li>\( (\hat R_{m}\cdot V )^{\alpha }  \)即\( cos ^{\alpha } \theta \)，夹角越小，说明反射光方向和视角方向越靠近，对于光滑平面，显然越靠近越亮，Phong用了一个乘方运算来模拟亮度的急剧变化；</li>
 </ul>
 
@@ -330,6 +330,8 @@
 <p><a href="https://en.wikipedia.org/wiki/Specular_reflection#Direction_of_reflection">https://en.wikipedia.org/wiki/Specular_reflection#Direction_of_reflection</a></p>
 
 <p><a href="http://maverick.inria.fr/%7ENicolas.Holzschuch/cours/Slides/1b_Materiaux.pdf">http://maverick.inria.fr/~Nicolas.Holzschuch/cours/Slides/1b_Materiaux.pdf</a></p>
+
+<p><a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF">https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF</a></p>
 
     </div>
     <div class="entry">
