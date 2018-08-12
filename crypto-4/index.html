@@ -406,10 +406,13 @@ SSL-Session:
 
 <p>计算代码在statem_lib.c里。</p>
 
-<p>客户端收到CertificateVerify后，就启动验证程序，验证程序需要以下输入：
-- 被签名的内容，就是上面的4个组成部分
-- 上一个Certificate协议包里的公钥证书里的公钥
-- CertificateVerify里的数字签名字段</p>
+<p>客户端收到CertificateVerify后，就启动验证程序，验证程序需要以下输入：</p>
+
+<ul>
+<li>被签名的内容，就是上面的4个组成部分</li>
+<li>上一个Certificate协议包里的公钥证书里的公钥</li>
+<li>CertificateVerify里的数字签名字段</li>
+</ul>
 
 <p>如果验证失败，就终止握手。</p>
 

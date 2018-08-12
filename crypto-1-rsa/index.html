@@ -161,6 +161,26 @@ RSA算法原理（二）
 
 <p>\[ \phi (pq) = ( p - 1 ) ( q - 1 )   \]</p>
 
+<p>实例：</p>
+
+<p>\(  \phi (1) = 0 \)</p>
+
+<p>\(  \phi (2) = 2 ( 1 -  \frac{ 1 }{ 2 } ) = 1，互质数为：1 \)</p>
+
+<p>\(  \phi (3) = 3 ( 1 -  \frac{ 1 }{ 3 } ) = 2，互质数为：1、2 \)</p>
+
+<p>\(  \phi (4) = 4 ( 1 -  \frac{ 1 }{ 2 } ) = 2，互质数为：1、3 \)</p>
+
+<p>\(  \phi (5) = 5 ( 1 -  \frac{ 1 }{ 5 } ) = 4，互质数为：1、2、3、4 \)</p>
+
+<p>\(  \phi (6) = 6 ( 1 -  \frac{ 1 }{ 2 } )( 1 -  \frac{ 1 }{ 3 } ) = 2，互质数为：1、5 \)</p>
+
+<p>\(  \phi (7) = 7 ( 1 -  \frac{ 1 }{ 7 } ) = 6，互质数为：1、2、3、4、5、6 \)</p>
+
+<p>\(  \phi (8) = 8 ( 1 -  \frac{ 1 }{ 2 } ) = 4，互质数为：1、3、5、7 \)</p>
+
+<p>\(  \phi (9) = 9 ( 1 -  \frac{ 1 }{ 3 } ) = 6，互质数为：1、2、4、5、7、8 \)</p>
+
 <p>资料：</p>
 
 <p><a href="https://artofproblemsolving.com/wiki/index.php?title=Euler%27s_totient_function">https://artofproblemsolving.com/wiki/index.php?title=Euler%27s_totient_function</a></p>
@@ -175,7 +195,7 @@ RSA算法原理（二）
 
 <h3><a href="https://en.wikipedia.org/wiki/Fermat%27s_little_theorem">费马小定理(Fermat&#39;s little theorem)</a></h3>
 
-<p>这个是欧拉定理的特殊情况：若正整数n还是个质数，把n记为p，那么有：</p>
+<p>这个是欧拉定理的特殊情况1的应用：若正整数n还是个质数，把n记为p，那么有：</p>
 
 <p>\[ \phi (p) = p - 1 \]</p>
 
@@ -191,7 +211,7 @@ RSA算法原理（二）
 
 <p>\[ ax \equiv 1 (mod \ n) \]</p>
 
-<p>x就是所谓的模逆元。另外限定x取值范围为[0, n-1]，就使得<strong>模逆元x是唯一的</strong>。</p>
+<p>x就是所谓的模逆元。另外限定x取值范围为(0, n-1]，就使得<strong>模逆元x是唯一的</strong>。</p>
 
 <p>x的存在性证明：</p>
 
