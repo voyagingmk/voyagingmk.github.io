@@ -314,6 +314,67 @@ appendonly yes
 </code></pre></div>
 <p>和预期的一样，都是先算出槽号并找出对应的目标节点，重定向到目标节点上执行。</p>
 
+<h2>sentinel的基础：raft算法</h2>
+
+<p>脱离sentinel，简单地介绍下raft：</p>
+
+<h3>节点状态</h3>
+
+<p>有且只有三种，任一时刻处于其中之一：</p>
+
+<ul>
+<li>Follower</li>
+<li>Candidate</li>
+<li>Leader</li>
+</ul>
+
+<p>初始状态为follower。</p>
+
+<h3>从follower变成candidate</h3>
+
+<p>如果follower节点一段时间内（election timeout，150ms到300ms）都没有收到leader节点的心跳包（heartbeat timeout，不带数据的AppendEntry协议），那么自动把自己升级成candidate节点。</p>
+
+<p>candidate节点做的第一件事是，向其他和自己相连的节点广播一个叫RequestVote的协议，收到该协议的节点会自己做决策，决定是否给这个candidate节点投票，同一个term只能投一次，投票后会重置自己的timer。</p>
+
+<h3>Leader election</h3>
+
+<p>接着，如果一个candidate节点获得了大多数节点的投票（majority of nodes，超过二分之一），那么这个candidate节点升级成leader节点。</p>
+
+<p>leader节点的责任是：所有对raft节点集群的写操作，都要交给leader节点处理。</p>
+
+<h3>log entry和log replication</h3>
+
+<p>每条写操作被称为log entry。</p>
+
+<p>log entry刚被添加到（leader节点的）log列表时，状态是uncommited。意味着这个写操作未产生实际作用。</p>
+
+<p>为了让log entry变成commited状态，leader节点会向其他节点广播AppendEntry协议，然后等待它们的写完成回复，但只需要等其中的大多数节点（majority of nodes)，而不是所有节点。</p>
+
+<p>当确实收到大多数节点的写完成回复时，此时leader节点会把这个log entry改为commited状态，并应用log entry，改变节点的值（数据库状态变更）。还有就是回复客户端。</p>
+
+<p>leader节点还广播告诉其他节点，“这个log entry已经commited了，你们也可以commit它了”。</p>
+
+<p>其他节点都commit这个log entry后，此时集群就达成了一致状态。</p>
+
+<h3>term</h3>
+
+<p>只要leader存在，leader一直能够给其他节点发心跳包，那么term是不会增加的。</p>
+
+<p>换leader才会导致term增加。</p>
+
+<h3>同时获得相同数量投票的问题</h3>
+
+<p>假设有4个节点，其中有2个节点A、B同时变成候选人并同时发出了3个RequestVote：</p>
+
+<ol>
+<li>A收到B的RequestVote，B收到A的RequestVote</li>
+<li>C收到A的RequestVote，D收到B的RequestVote</li>
+<li>B投票给A，A投票给B，A有1票(1/4)，B有1票(1/4)</li>
+<li>C投票给A，D投票给B，A有2票(2/4)，B有2票(2/4)</li>
+<li>已经没人可以投票了，因为A和B都不能获得大多数节点的投票（起码要3票），于是重新开了一轮选举</li>
+<li>此时只要增加时间随机性，就可以使得有一个节点先获得大部分选票，称为leader，结束”死锁状态“</li>
+</ol>
+
 <h2>sentinel</h2>
 
 <p>sentinel是用来自动化管理的：</p>
