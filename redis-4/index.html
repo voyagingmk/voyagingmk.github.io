@@ -391,6 +391,8 @@ appendonly yes
 
 <p>从节点升级到主节点后，如果旧的主节点恢复，那么并不会恢复成主节点，而只是个从节点。</p>
 
+<p>raft算法中的投票方，对应的是sentinel节点集群，而不是redis集群。但master节点、follower节点、log复制，却是redis节点集群之间的。个中区别只能看redis源码来了解。</p>
+
 <h2>资料</h2>
 
 <p><a href="http://www.redis.cn/topics/cluster-tutorial.html">http://www.redis.cn/topics/cluster-tutorial.html</a></p>
