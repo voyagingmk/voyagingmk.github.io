@@ -26,7 +26,13 @@
 
 &lt;p&gt;(from &lt;a href=&quot;https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation&quot;&gt;wiki&lt;/a&gt;)&lt;/p&gt;
 
-&lt;p&gt;这个做法超简单，也意味着很不安全。&lt;/p&gt;
+&lt;p&gt;这个做法超简单，也意味着很不安全，尤其是原文会重复的情况。&lt;/p&gt;
+
+&lt;p&gt;用一张图解释为什么ECB不安全：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/ecb_problem.jpg&quot; alt=&quot;ecb_problem.jpg&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;(from &lt;a href=&quot;https://students.cs.byu.edu/%7Ecs465ta/homework/ECBReview.html&quot;&gt;here&lt;/a&gt;)&lt;/p&gt;
 
 &lt;h2&gt;CBC&lt;/h2&gt;
 
@@ -46,6 +52,20 @@
 &lt;li&gt;块原文和iv异或&lt;/li&gt;
 &lt;li&gt;块原文加密，输出块密文&lt;/li&gt;
 &lt;li&gt;把iv设为块密文&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;优点：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;安全性优于ECB&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;缺点：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;多了一个初始化向量IV的问题&lt;/li&gt;
+&lt;li&gt;因为块与块之间耦合，误差会传递&lt;/li&gt;
+&lt;li&gt;不能并行计算、随机读取&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3&gt;CBC加密代码&lt;/h3&gt;
@@ -129,6 +149,8 @@
 &lt;span class=&quot;err&quot;&gt;···&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;CFB的加解密几乎一致，有微小区别，于是就用了enc变量来判断是加密还是解密，从而用一个函数搞定CFB。&lt;/p&gt;
+
 &lt;h2&gt;OFB&lt;/h2&gt;
 
 &lt;h3&gt;OFB加密流程图&lt;/h3&gt;
@@ -181,6 +203,8 @@
 &lt;span class=&quot;err&quot;&gt;···&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;OFB只需要一个CRYPTO_ofb128_encrypt，解密也是用这个函数，加解密的流程是完全对称的。&lt;/p&gt;
+
 &lt;h2&gt;CTR&lt;/h2&gt;
 
 &lt;h3&gt;CTR加密流程图&lt;/h3&gt;
@@ -188,6 +212,8 @@
 &lt;p&gt;&lt;img src=&quot;../images/2018.8/ctr.png&quot; alt=&quot;ctr.png&quot;&gt;&lt;/p&gt;
 
 &lt;p&gt;(from &lt;a href=&quot;https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation&quot;&gt;wiki&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;从图中就可以看出，CTR模式每个块之间的加密是解耦的，于是就有了并行计算的可能性。&lt;/p&gt;
 
 &lt;h3&gt;CTR加密代码&lt;/h3&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;CRYPTO_ctr128_encrypt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
@@ -209,8 +235,11 @@
                 &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
             &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
             &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;// 先加密IV，输出到ecount_buf&lt;/span&gt;
                 &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ivec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ecount_buf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;// IV加1&lt;/span&gt;
                 &lt;span class=&quot;n&quot;&gt;ctr128_inc_aligned&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ivec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;// 用ecount_buf去和块原文异或，输出块密文&lt;/span&gt;
                 &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
                     &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;out&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
                         &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ecount_buf&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;

@@ -99,7 +99,13 @@
 
 <p>(from <a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation">wiki</a>)</p>
 
-<p>这个做法超简单，也意味着很不安全。</p>
+<p>这个做法超简单，也意味着很不安全，尤其是原文会重复的情况。</p>
+
+<p>用一张图解释为什么ECB不安全：</p>
+
+<p><img src="../images/2018.8/ecb_problem.jpg" alt="ecb_problem.jpg"></p>
+
+<p>(from <a href="https://students.cs.byu.edu/%7Ecs465ta/homework/ECBReview.html">here</a>)</p>
 
 <h2>CBC</h2>
 
@@ -119,6 +125,20 @@
 <li>块原文和iv异或</li>
 <li>块原文加密，输出块密文</li>
 <li>把iv设为块密文</li>
+</ol>
+
+<p>优点：</p>
+
+<ol>
+<li>安全性优于ECB</li>
+</ol>
+
+<p>缺点：</p>
+
+<ol>
+<li>多了一个初始化向量IV的问题</li>
+<li>因为块与块之间耦合，误差会传递</li>
+<li>不能并行计算、随机读取</li>
 </ol>
 
 <h3>CBC加密代码</h3>
@@ -202,6 +222,8 @@
 <span class="err">···</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>CFB的加解密几乎一致，有微小区别，于是就用了enc变量来判断是加密还是解密，从而用一个函数搞定CFB。</p>
+
 <h2>OFB</h2>
 
 <h3>OFB加密流程图</h3>
@@ -254,6 +276,8 @@
 <span class="err">···</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>OFB只需要一个CRYPTO_ofb128_encrypt，解密也是用这个函数，加解密的流程是完全对称的。</p>
+
 <h2>CTR</h2>
 
 <h3>CTR加密流程图</h3>
@@ -261,6 +285,8 @@
 <p><img src="../images/2018.8/ctr.png" alt="ctr.png"></p>
 
 <p>(from <a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation">wiki</a>)</p>
+
+<p>从图中就可以看出，CTR模式每个块之间的加密是解耦的，于是就有了并行计算的可能性。</p>
 
 <h3>CTR加密代码</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">CRYPTO_ctr128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
@@ -282,8 +308,11 @@
                 <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">16</span><span class="p">;</span>
             <span class="p">}</span>
             <span class="k">while</span> <span class="p">(</span><span class="n">len</span> <span class="o">&gt;=</span> <span class="mi">16</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// 先加密IV，输出到ecount_buf</span>
                 <span class="p">(</span><span class="o">*</span><span class="n">block</span><span class="p">)</span> <span class="p">(</span><span class="n">ivec</span><span class="p">,</span> <span class="n">ecount_buf</span><span class="p">,</span> <span class="n">key</span><span class="p">);</span>
+                <span class="c1">// IV加1</span>
                 <span class="n">ctr128_inc_aligned</span><span class="p">(</span><span class="n">ivec</span><span class="p">);</span>
+                <span class="c1">// 用ecount_buf去和块原文异或，输出块密文</span>
                 <span class="k">for</span> <span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> <span class="n">n</span> <span class="o">+=</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">size_t</span><span class="p">))</span>
                     <span class="o">*</span><span class="p">(</span><span class="kt">size_t</span> <span class="o">*</span><span class="p">)(</span><span class="n">out</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span>
                         <span class="o">*</span><span class="p">(</span><span class="kt">size_t</span> <span class="o">*</span><span class="p">)(</span><span class="n">in</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="o">^</span> <span class="o">*</span><span class="p">(</span><span class="kt">size_t</span> <span class="o">*</span><span class="p">)(</span><span class="n">ecount_buf</span> <span class="o">+</span> <span class="n">n</span><span class="p">);</span>
