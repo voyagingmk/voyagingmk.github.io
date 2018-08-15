@@ -3,8 +3,8 @@
   <channel>
     <title>Wyman的原创技术博客</title>
     <description>恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</description>
-    <link>http://localhost:4000</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
+    <link>https://www.qiujiawei.com</link>
+    <atom:link href="https://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
         <title>漫谈网络通讯加密（5）AES</title>
@@ -277,13 +277,37 @@
 
 &lt;p&gt;&lt;img src=&quot;../images/2018.8/xex_formula.svg&quot; alt=&quot;xts.png&quot;&gt;&lt;/p&gt;
 
+&lt;p&gt;可以看到，用来加密原文的X，和三个参数有关：I(IV)、α、j，其中j相当于数组下标，另外2个是常量。因此这个算法是支持随机解密的，只需要知道块的编号j。适合做硬盘数据加密。&lt;/p&gt;
+
 &lt;p&gt;XTS：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;../images/2018.8/xts.png&quot; alt=&quot;xts.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;XEX或XTS的特点还有双key双加密算法，下面是openSSL关于XTS的代码：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xts128_context&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;block128_f&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;block1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;block2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Galois/Counter_Mode&quot;&gt;GCM&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/2018.8/gcm.png&quot; alt=&quot;xts.png&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;GCM有多牛，牛到有人专门录教学来介绍GCM：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.cryptologie.net/article/277/what-is-gcm-galois-counter-mode/&quot;&gt;https://www.cryptologie.net/article/277/what-is-gcm-galois-counter-mode/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;根据wiki介绍，GCM实质是在CTR模式基础上增加一个Galois Mode，这个mode就是做认证用的（密文完整性）。&lt;/p&gt;
+
+&lt;p&gt;看上图也可以发现，前三行和前文的CTR流程图是一样的。&lt;/p&gt;
+
+&lt;p&gt;参考资料：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/mrpre/article/details/79324505&quot;&gt;https://blog.csdn.net/mrpre/article/details/79324505&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 14 Aug 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/crypto-5/</link>
-        <guid isPermaLink="true">http://localhost:4000/crypto-5/</guid>
+        <link>https://www.qiujiawei.com/crypto-5/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-5/</guid>
       </item>
     
       <item>
@@ -541,8 +565,8 @@
 &lt;p&gt;&lt;a href=&quot;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&quot;&gt;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 08 Aug 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/lighting-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/lighting-1/</guid>
+        <link>https://www.qiujiawei.com/lighting-1/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/lighting-1/</guid>
       </item>
     
       <item>
@@ -643,8 +667,8 @@
 &lt;p&gt;（来源：&lt;a href=&quot;http://www.g-truc.net/post-0637.html#menu&quot;&gt;http://www.g-truc.net/post-0637.html#menu&lt;/a&gt; )&lt;/p&gt;
 </description>
         <pubDate>Sun, 05 Aug 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/pipeline-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/pipeline-1/</guid>
+        <link>https://www.qiujiawei.com/pipeline-1/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/pipeline-1/</guid>
       </item>
     
       <item>
@@ -964,8 +988,8 @@ appendonly yes
 &lt;p&gt;&lt;a href=&quot;http://www.redis.cn/topics/cluster-tutorial.html&quot;&gt;http://www.redis.cn/topics/cluster-tutorial.html&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/redis-4/</link>
-        <guid isPermaLink="true">http://localhost:4000/redis-4/</guid>
+        <link>https://www.qiujiawei.com/redis-4/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/redis-4/</guid>
       </item>
     
       <item>
@@ -2440,8 +2464,8 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 &lt;p&gt;所以写python程序切勿写出这样子的代码，不然GC都帮不了你。&lt;/p&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/python-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/python-1/</guid>
+        <link>https://www.qiujiawei.com/python-1/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/python-1/</guid>
       </item>
     
       <item>
@@ -2563,8 +2587,8 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 &lt;h1&gt;第三方内存分配器&lt;/h1&gt;
 </description>
         <pubDate>Fri, 27 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/redis-3/</link>
-        <guid isPermaLink="true">http://localhost:4000/redis-3/</guid>
+        <link>https://www.qiujiawei.com/redis-3/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/redis-3/</guid>
       </item>
     
       <item>
@@ -2955,8 +2979,8 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 &lt;p&gt;单个元素超过64字节时，就得转成hashtable&lt;/p&gt;
 </description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/redis-2/</link>
-        <guid isPermaLink="true">http://localhost:4000/redis-2/</guid>
+        <link>https://www.qiujiawei.com/redis-2/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/redis-2/</guid>
       </item>
     
       <item>
@@ -3647,8 +3671,8 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/z69183787/article/details/81121779&quot;&gt;https://blog.csdn.net/z69183787/article/details/81121779&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 24 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/redis-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/redis-1/</guid>
+        <link>https://www.qiujiawei.com/redis-1/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/redis-1/</guid>
       </item>
     
       <item>
@@ -4085,8 +4109,8 @@ SSL-Session:
 &lt;/ul&gt;
 </description>
         <pubDate>Wed, 18 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/crypto-4/</link>
-        <guid isPermaLink="true">http://localhost:4000/crypto-4/</guid>
+        <link>https://www.qiujiawei.com/crypto-4/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-4/</guid>
       </item>
     
       <item>
@@ -4229,8 +4253,8 @@ SSL-Session:
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;okm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
         <pubDate>Tue, 17 Jul 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/crypto-3/</link>
-        <guid isPermaLink="true">http://localhost:4000/crypto-3/</guid>
+        <link>https://www.qiujiawei.com/crypto-3/</link>
+        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-3/</guid>
       </item>
     
   </channel>

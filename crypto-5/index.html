@@ -350,9 +350,33 @@
 
 <p><img src="../images/2018.8/xex_formula.svg" alt="xts.png"></p>
 
+<p>可以看到，用来加密原文的X，和三个参数有关：I(IV)、α、j，其中j相当于数组下标，另外2个是常量。因此这个算法是支持随机解密的，只需要知道块的编号j。适合做硬盘数据加密。</p>
+
 <p>XTS：</p>
 
 <p><img src="../images/2018.8/xts.png" alt="xts.png"></p>
+
+<p>XEX或XTS的特点还有双key双加密算法，下面是openSSL关于XTS的代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">xts128_context</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">key1</span><span class="p">,</span> <span class="o">*</span><span class="n">key2</span><span class="p">;</span>
+    <span class="n">block128_f</span> <span class="n">block1</span><span class="p">,</span> <span class="n">block2</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<h2><a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode">GCM</a></h2>
+
+<p><img src="../images/2018.8/gcm.png" alt="xts.png"></p>
+
+<p>GCM有多牛，牛到有人专门录教学来介绍GCM：</p>
+
+<p><a href="https://www.cryptologie.net/article/277/what-is-gcm-galois-counter-mode/">https://www.cryptologie.net/article/277/what-is-gcm-galois-counter-mode/</a></p>
+
+<p>根据wiki介绍，GCM实质是在CTR模式基础上增加一个Galois Mode，这个mode就是做认证用的（密文完整性）。</p>
+
+<p>看上图也可以发现，前三行和前文的CTR流程图是一样的。</p>
+
+<p>参考资料：</p>
+
+<p><a href="https://blog.csdn.net/mrpre/article/details/79324505">https://blog.csdn.net/mrpre/article/details/79324505</a></p>
 
     </div>
     <div class="entry">
