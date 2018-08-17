@@ -462,15 +462,106 @@
 <li>x最高位为0：(x&lt;&lt;1) ^ 0x00（式2）</li>
 </ul>
 
-<p>其中的0x1b也是一个多项式系数，写成二进制就是0b00011011，写成多项式就是：</p>
+<p>(x&lt;&lt;1)又是什么含义呢？x左移1位，即x乘以2。这可以有2种思路来理解：</p>
+
+<ul>
+<li>x用二进制表示，每一bit就是最高次为7的多项式的系数(这个系数要么0要么1)，x乘以2，系数都左移1位，即多项式乘以x；那么如果最高位为1，就会导致\(x^{7} \)变成\(x^{8} \)，超出了多项式的范围</li>
+<li>x不用想成多项式，仅需要变成二进制，那么显然8bits的二进制左移1位，就有最高位溢出的可能</li>
+</ul>
+
+<p>所以，xtime是在算一个项的系数的2倍，而后面的<sup>0x1b操作，是用来处理溢出问题的。</sup></p>
+
+<p>为什么<sup>0x1b能使得2x不超出GF(256)呢，这又是用到了GF(256)的乘约运算。0x1b是一个不可约多项式的系数，写成二进制就是0b00011011，写成多项式就是：</sup></p>
 
 <p>\[ x^{4} + x^{3} + x + 1 \]</p>
 
-<p>(x&lt;&lt;1)又是什么含义呢，因为x也是个多项式的系数，x左移1位，相当于2x（x + x）。</p>
+<p>（注意这个多项式和前面的\( P(x) = x^{4} + 1 \) 是不一样的。这个多项式的各个系数取值是0或1；而P(x)的系数取值范围是GF(256)。）</p>
 
-<p>因为在GF(256)里，异或操作就意味着多项式的同次数项的相加，所以上面的式1和式2其实就是GF的多项式加法：</p>
+<p>在GF里，异或操作就意味着多项式加法，所以上面的式1和式2其实就是GF下的多项式加法。设xtime(x)的参数x为F(x)：</p>
 
-<p>\[ x \]</p>
+<ul>
+<li>F(x)最高位为1：\( (2F(x)表示的多项式去掉溢出项) + (x^{4} + x^{3} + x + 1) \)（式1）</li>
+<li>F(x)最高位为0：\( (2F(x)表示的多项式) \)（式2）</li>
+</ul>
+
+<p>这就是xtime的逻辑了。xtime搞懂后，就可以看MixColumn了，也就是前面贴的MDS矩阵相乘运算。</p>
+
+<p>前面给出的MixColumns函数很复杂，用伪代码简化下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+  <span class="p">{</span>  
+    <span class="n">t</span>   <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="n">Tmp</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">;</span>
+    <span class="n">Tm</span>  <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">;</span> <span class="n">Tm</span> <span class="o">=</span> <span class="n">xtime</span><span class="p">(</span><span class="n">Tm</span><span class="p">);</span>  <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^=</span> <span class="n">Tm</span> <span class="o">^</span> <span class="n">Tmp</span> <span class="p">;</span>
+    <span class="n">Tm</span>  <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">;</span> <span class="n">Tm</span> <span class="o">=</span> <span class="n">xtime</span><span class="p">(</span><span class="n">Tm</span><span class="p">);</span>  <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^=</span> <span class="n">Tm</span> <span class="o">^</span> <span class="n">Tmp</span> <span class="p">;</span>
+    <span class="n">Tm</span>  <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">;</span> <span class="n">Tm</span> <span class="o">=</span> <span class="n">xtime</span><span class="p">(</span><span class="n">Tm</span><span class="p">);</span>  <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^=</span> <span class="n">Tm</span> <span class="o">^</span> <span class="n">Tmp</span> <span class="p">;</span>
+    <span class="n">Tm</span>  <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">t</span> <span class="p">;</span> <span class="n">Tm</span> <span class="o">=</span> <span class="n">xtime</span><span class="p">(</span><span class="n">Tm</span><span class="p">);</span>  <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^=</span> <span class="n">Tm</span> <span class="o">^</span> <span class="n">Tmp</span> <span class="p">;</span>
+  <span class="p">}</span>
+</code></pre></div>
+<p>接下来推导这些代码，证明它就是上面的矩阵相乘运算。</p>
+
+<p>这6行代码可以改写成5行公式：</p>
+
+<ul>
+<li>\( Tmp = a_{0} \oplus a_{1} \oplus a_{2} \oplus a_{3} \)</li>
+<li>\( a_{0} = a_{0} \oplus ((a_{0} \oplus a_{1})2) \oplus Tmp \)</li>
+<li>\( a_{1} = a_{1} \oplus ((a_{1} \oplus a_{2})2) \oplus Tmp \)</li>
+<li>\( a_{2} = a_{2} \oplus ((a_{2} \oplus a_{3})2) \oplus Tmp \)</li>
+<li>\( a_{3} = a_{3} \oplus ((a_{3} \oplus a_{0})2) \oplus Tmp \)</li>
+</ul>
+
+<p>去掉Tmp：</p>
+
+<ul>
+<li>\( a_{0} = a_{0} \oplus (2a_{0} \oplus 2a_{1}) \oplus a_{0} \oplus a_{1} \oplus a_{2} \oplus a_{3} \)</li>
+<li>\( a_{1} = a_{1} \oplus (2a_{1} \oplus 2a_{2}) \oplus a_{0} \oplus a_{1} \oplus a_{2} \oplus a_{3} \)</li>
+<li>\( a_{2} = a_{2} \oplus (2a_{2} \oplus 2a_{3}) \oplus a_{0} \oplus a_{1} \oplus a_{2} \oplus a_{3} \)</li>
+<li>\( a_{3} = a_{3} \oplus (2a_{3} \oplus 2a_{0}) \oplus a_{0} \oplus a_{1} \oplus a_{2} \oplus a_{3} \)</li>
+</ul>
+
+<p>因为一个数异或自己等于0，所以有：</p>
+
+<ul>
+<li>\( a_{0} = (2a_{0} \oplus 2a_{1}) \oplus a_{1} \oplus a_{2} \oplus a_{3} \)</li>
+<li>\( a_{1} = (2a_{1} \oplus 2a_{2}) \oplus a_{0} \oplus a_{2} \oplus a_{3} \)</li>
+<li>\( a_{2} = (2a_{2} \oplus 2a_{3}) \oplus a_{0} \oplus a_{1} \oplus a_{3} \)</li>
+<li>\( a_{3} = (2a_{3} \oplus 2a_{0}) \oplus a_{0} \oplus a_{1} \oplus a_{2} \)</li>
+</ul>
+
+<p>这时，需要把异或换成用GF多项式加法表示：</p>
+
+<ul>
+<li>\( a_{0} = (2a_{0} + 2a_{1}) + a_{1} + a_{2} + a_{3} \)</li>
+<li>\( a_{1} = (2a_{1} + 2a_{2}) + a_{0} + a_{2} + a_{3} \)</li>
+<li>\( a_{2} = (2a_{2} + 2a_{3}) + a_{0} + a_{1} + a_{3} \)</li>
+<li>\( a_{3} = (2a_{3} + 2a_{0}) + a_{0} + a_{1} + a_{2} \)</li>
+</ul>
+
+<p>然后就能合并同类项了：</p>
+
+<ul>
+<li>\( a_{0} = 2a_{0} + 3a_{1} + a_{2} + a_{3} \)</li>
+<li>\( a_{1} = 2a_{1} + 3a_{2} + a_{0} + a_{3} \)</li>
+<li>\( a_{2} = 2a_{2} + 3a_{3} + a_{0} + a_{1} \)</li>
+<li>\( a_{3} = 2a_{3} + 3a_{0} + a_{1} + a_{2} \)</li>
+</ul>
+
+<p>整理顺序：</p>
+
+<ul>
+<li>\( a_{0} = 2a_{0} + 3a_{1} +\ a_{2} +\ a_{3} \)</li>
+<li>\( a_{1} =\ a_{0} + 2a_{1} + 3a_{2} +\ a_{3} \)</li>
+<li>\( a_{2} =\ a_{0} +\ a_{1} + 2a_{2} + 3a_{3} \)</li>
+<li>\( a_{3} = 3a_{0} +\ a_{1} +\ a_{2} + 2a_{3} \)</li>
+</ul>
+
+<p>各行的系数：</p>
+
+<ul>
+<li>2 3 1 1</li>
+<li>1 2 3 1</li>
+<li>1 1 2 3</li>
+<li>3 1 1 2</li>
+</ul>
 
 <h2>资料：</h2>
 
