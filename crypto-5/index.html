@@ -563,6 +563,32 @@
 <li>3 1 1 2</li>
 </ul>
 
+<p>所以这份代码和MDS矩阵相乘公式一致。</p>
+
+<p>再补充下：wiki里的mixColumns实现其实更容易理解：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="cm">/* 2 * a0 + a3 + a2 + 3 * a1 */</span>
+<span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="cm">/* 2 * a1 + a0 + a3 + 3 * a2 */</span>
+<span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span> <span class="cm">/* 2 * a2 + a1 + a0 + 3 * a3 */</span>
+<span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="cm">/* 2 * a3 + a2 + a1 + 3 * a0 */</span>
+</code></pre></div>
+<p>b[i]相当于2a[i]（xtime函数），所以上面4行代码相当于：</p>
+
+<ul>
+<li>\( 2 a_{0}  + a_{3}  + a_{2}  + 3  a_{1} \)</li>
+<li>\( 2 a_{1}  + a_{0}  + a_{3}  + 3  a_{2} \) </li>
+<li>\( 2 a_{2}  + a_{1}  + a_{0}  + 3  a_{3} \) </li>
+<li>\( 2 a_{3}  + a_{2}  + a_{1}  + 3  a_{0} \) </li>
+</ul>
+
+<p>排序：</p>
+
+<ul>
+<li>\( 2 a_{0}  + 3 a_{1} +   a_{2} +   a_{3} \)</li>
+<li>\(   a_{0}  + 2 a_{1} + 3 a_{2} +   a_{3} \) </li>
+<li>\(   a_{0}  +   a_{1} + 2 a_{2} + 3 a_{3} \) </li>
+<li>\( 3 a_{0}  +   a_{1}  +  a_{2} + 2 a_{3} \) </li>
+</ul>
+
 <h2>资料：</h2>
 
 <p><a href="https://github.com/kokke/tiny-AES-c">https://github.com/kokke/tiny-AES-c</a></p>
