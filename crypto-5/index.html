@@ -409,6 +409,69 @@
 
 <p>\[  \left[ \begin{matrix} b_{0}\\ b_{1}\\ b_{2}\\ b_{3}\\ \end{matrix} \right] =  \left[ \begin{matrix} 2&amp;3&amp;1&amp;1\\ 1&amp;2&amp;3&amp;1\\ 1&amp;1&amp;2&amp;3\\ 3&amp;1&amp;1&amp;2\\ \end{matrix} \right]  \left[ \begin{matrix} a_{0}\\ a_{1}\\ a_{2}\\ a_{3}\\ \end{matrix} \right] \]</p>
 
+<p>现在分析对比下源码里的xtime函数和<a href="https://en.wikipedia.org/wiki/Rijndael_MixColumns">wiki</a>给出的等价代码:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">uint8_t</span> <span class="nf">xtime</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">x</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(((</span><span class="n">x</span><span class="o">&gt;&gt;</span><span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mh">0x1b</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="c1">// 整理过的：</span>
+<span class="k">static</span> <span class="kt">uint8_t</span> <span class="nf">xtime2</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span> 
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">x</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)((</span><span class="kt">signed</span> <span class="kt">char</span><span class="p">)</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1b</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="cm">/*</span>
+<span class="cm">    原始代码段：</span>
+<span class="cm">    h = (unsigned char)((signed char)r[c] &gt;&gt; 7); // arithmetic right shift, thus shifting in either zeros or ones </span>
+<span class="cm">    b[c] = r[c] &lt;&lt; 1; // implicitly removes high bit because b[c] is an 8-bit char, so we xor by 0x1b and not 0x11b in the next line </span>
+<span class="cm">    b[c] ^= 0x1B &amp; h; // Rijndael&#39;s Galois field </span>
+<span class="cm">*/</span>
+
+<span class="c1">// 测试通过：</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="kt">uint8_t</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">xtime</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">xtime2</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>经过以上测试，发现只是写法不同，那么xtime是什么意思呢？逐步分析下：</p>
+
+<ul>
+<li>第一种：((x&lt;<1) ^ (((x>&gt;7) &amp; 1) * 0x1b));</li>
+<li>第二种：((x&lt;<1) ^ ((unsigned char)((signed char)x >&gt; 7) &amp; 0x1b));</li>
+</ul>
+
+<p>观察发现是后半段有差异，后半段的差异在于有无显式类型转化、有无&amp;1，*0x1b还是&amp;0x1b。根据x最高位是否为1，可分2种情况：</p>
+
+<p>第一种：</p>
+
+<ul>
+<li>x最高位为1：((x&gt;&gt;7) &amp; 1)等于1，(((x&gt;&gt;7) &amp; 1) * 0x1b))等于0x1b</li>
+<li>x最高位为0：((x&gt;&gt;7) &amp; 1)等于0，(((x&gt;&gt;7) &amp; 1) * 0x1b))等于0x00</li>
+</ul>
+
+<p>第二种：</p>
+
+<ul>
+<li>x最高位为1：(unsigned char)((signed char)x &gt;&gt; 7)等于0xff，&amp;0x1b后等于0x1b</li>
+<li>x最高位为0：(unsigned char)((signed char)x &gt;&gt; 7)等于0x00，&amp;0x1b后等于0x00</li>
+</ul>
+
+<p>经过枚举后，就知道了xtime其实可以化简成：</p>
+
+<ul>
+<li>x最高位为1：(x&lt;&lt;1) ^ 0x1b（式1）</li>
+<li>x最高位为0：(x&lt;&lt;1) ^ 0x00（式2）</li>
+</ul>
+
+<p>其中的0x1b也是一个多项式系数，写成二进制就是0b00011011，写成多项式就是：</p>
+
+<p>\[ x^{4} + x^{3} + x + 1 \]</p>
+
+<p>(x&lt;&lt;1)又是什么含义呢，因为x也是个多项式的系数，x左移1位，相当于2x（x + x）。</p>
+
+<p>因为在GF(256)里，异或操作就意味着多项式的同次数项的相加，所以上面的式1和式2其实就是GF的多项式加法：</p>
+
+<p>\[ x \]</p>
+
 <h2>资料：</h2>
 
 <p><a href="https://github.com/kokke/tiny-AES-c">https://github.com/kokke/tiny-AES-c</a></p>
