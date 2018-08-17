@@ -471,7 +471,7 @@
 
 <p>所以，xtime是在算一个项的系数的2倍，而后面的<sup>0x1b操作，是用来处理溢出问题的。</sup></p>
 
-<p>为什么<sup>0x1b能使得2x不超出GF(256)呢，这又是用到了GF(256)的乘约运算。0x1b是一个不可约多项式的系数，写成二进制就是0b00011011，写成多项式就是：</sup></p>
+<p>为什么<sup>0x1b能使得2x不超出GF(256)呢，这又是用到了GF(256)的乘约运算。0x1b是一个<a href="https://en.wikipedia.org/wiki/Irreducible_polynomial">不可约多项式</a>的系数，写成二进制就是0b00011011，写成多项式就是：</sup></p>
 
 <p>\[ x^{4} + x^{3} + x + 1 \]</p>
 
@@ -613,6 +613,8 @@
 <p><a href="https://www.cnblogs.com/luop/p/4334160.html">https://www.cnblogs.com/luop/p/4334160.html</a></p>
 
 <p><a href="https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/aes-development/rijndael-ammended.pdf#page=3">https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/aes-development/rijndael-ammended.pdf#page=3</a></p>
+
+<p><a href="http://www.mesacc.edu/%7Escotz47781/mat120/notes/divide_poly/long_division/long_division.html">http://www.mesacc.edu/~scotz47781/mat120/notes/divide_poly/long_division/long_division.html</a></p>
 
 <h1>各种加密模式</h1>
 
