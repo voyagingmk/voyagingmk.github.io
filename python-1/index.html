@@ -1350,7 +1350,7 @@
         <span class="k">else</span> <span class="p">{</span>
             <span class="n">next</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
             <span class="n">gc_list_move</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">unreachable</span><span class="p">);</span>
-            <span class="c1">// gc_refs不一定就是不可达，因为可能是只有一个root object引用了它</span>
+            <span class="c1">// gc_refs等于0不一定就是不可达，因为可能是只有一个root object引用了它</span>
             <span class="c1">// 于是标记为”暂时“不可达</span>
             <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_refs</span> <span class="o">=</span> <span class="n">GC_TENTATIVELY_UNREACHABLE</span><span class="p">;</span>
         <span class="p">}</span>
