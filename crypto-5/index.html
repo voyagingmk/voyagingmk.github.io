@@ -600,6 +600,135 @@
 
 <p>也符合MDS矩阵乘法公式。</p>
 
+<h2><a href="https://en.wikipedia.org/wiki/Rijndael_key_schedule">KeyExpansion 密钥扩展</a></h2>
+
+<p>KeyExpansion也叫Rijndael key schedule，就是把用户给出的16字节的密钥扩展到16*11=176字节。</p>
+
+<p>可以把用户密钥Key理解为伪随机数生成器的种子，RoundKey就是随机出来的176字节的随机值。</p>
+
+<p>wiki给出的流程图：</p>
+
+<p><img src="../images/2018.8/Key_Schedule.png" alt="Key_Schedule.png"></p>
+
+<p>蓝色的4小块，其实就是一个4字节的字word：</p>
+
+<p><img src="../images/2018.8/word.png" alt="word.png"></p>
+
+<p>其中的这段特殊的操作，被称为g函数：</p>
+
+<p><img src="../images/2018.8/g.png" alt="g.png"></p>
+
+<p>如果去掉g函数，其实这个图表达的是这么一条公式：</p>
+
+<p>\[ w_{i} = w_{i - 4} \oplus w_{i-1}， 4 \le i \le 43 \]</p>
+
+<p>下面看tiny-AES-c源码剖析：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define AES_BLOCKLEN 16 </span><span class="c1">//Block length in bytes AES is 128b block only</span>
+
+<span class="cp">#if defined(AES256) &amp;&amp; (AES256 == 1)</span>
+    <span class="cp">#define AES_KEYLEN 32</span>
+    <span class="cp">#define AES_keyExpSize 240</span>
+<span class="cp">#elif defined(AES192) &amp;&amp; (AES192 == 1)</span>
+    <span class="cp">#define AES_KEYLEN 24</span>
+    <span class="cp">#define AES_keyExpSize 208</span>
+<span class="cp">#else</span>
+    <span class="cp">#define AES_KEYLEN 16   </span><span class="c1">// Key length in bytes</span>
+    <span class="cp">#define AES_keyExpSize 176</span>
+<span class="cp">#endif</span>
+
+<span class="k">struct</span> <span class="n">AES_ctx</span>
+<span class="p">{</span>
+  <span class="kt">uint8_t</span> <span class="n">RoundKey</span><span class="p">[</span><span class="n">AES_keyExpSize</span><span class="p">];</span>
+<span class="cp">#if (defined(CBC) &amp;&amp; (CBC == 1)) || (defined(CTR) &amp;&amp; (CTR == 1))</span>
+  <span class="kt">uint8_t</span> <span class="n">Iv</span><span class="p">[</span><span class="n">AES_BLOCKLEN</span><span class="p">];</span>
+<span class="cp">#endif</span>
+<span class="p">};</span>
+
+<span class="c1">// The round constant word array, Rcon[i], contains the values given by </span>
+<span class="c1">// x to the power (i-1) being powers of x (x is denoted as {02}) in the field GF(2^8)</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">Rcon</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="mh">0x8d</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="mh">0x1b</span><span class="p">,</span> <span class="mh">0x36</span> <span class="p">};</span>
+
+<span class="c1">// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states. </span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">KeyExpansion</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">,</span> <span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">Key</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
+  <span class="kt">uint8_t</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span> <span class="c1">// Used for the column/row operations</span>
+
+  <span class="c1">// AES_keyExpSize = 176 = 16 * 11，所以总共要做11轮</span>
+  <span class="c1">// 第0轮，直接复制到RoundKey</span>
+  <span class="c1">// AES-128的Nk为4，这里复制了16个字节，即把整个Key都复制进RoundKey了</span>
+  <span class="c1">// RoundKey[0] ... RoundKey[15] 即头4个字w0、w1、w2、w3（words）</span>
+  <span class="c1">// RoundKey总共有 176/4 = 44个words（w0到w43）</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">Nk</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">RoundKey</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Key</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="p">];</span>
+    <span class="n">RoundKey</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Key</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="n">RoundKey</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Key</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">];</span>
+    <span class="n">RoundKey</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Key</span><span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="c1">// All other round keys are found from the previous round keys.</span>
+  <span class="c1">// for( i = 4; i &lt; 4 * (10 + 1); ++i)</span>
+  <span class="c1">// 从w4遍历到w43，i就是word的下标</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">Nk</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">Nb</span> <span class="o">*</span> <span class="p">(</span><span class="n">Nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="p">{</span>
+      <span class="c1">// 这段代码是把上一个word（i-1) 写进tempa</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">;</span>
+      <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">0</span><span class="p">];</span>
+      <span class="n">tempa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+      <span class="n">tempa</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">];</span>
+      <span class="n">tempa</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">=</span><span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">3</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 这个if代码段就是g函数</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">Nk</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 每4个字的第一个：w4、w8、w12···</span>
+    <span class="p">{</span>
+      <span class="c1">// Function RotWord()</span>
+      <span class="p">{</span>
+        <span class="c1">// 也可以叫shift操作</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="c1">// Function SubWord()</span>
+      <span class="p">{</span>
+        <span class="c1">// sbox变换</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">getSBoxValue</span><span class="p">(</span><span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">getSBoxValue</span><span class="p">(</span><span class="n">tempa</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">getSBoxValue</span><span class="p">(</span><span class="n">tempa</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+        <span class="n">tempa</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">getSBoxValue</span><span class="p">(</span><span class="n">tempa</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+      <span class="p">}</span>
+      <span class="c1">// Function Rcon()</span>
+      <span class="c1">// 这个word的第一个字节，做RC异或变换</span>
+      <span class="c1">// Rcon[i/Nk]相当于Rcon[轮编号]，Rcon有11个值</span>
+      <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">Rcon</span><span class="p">[</span><span class="n">i</span><span class="o">/</span><span class="n">Nk</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">4</span><span class="p">;</span> <span class="n">k</span><span class="o">=</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">Nk</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="c1">// 例如如果i=4，那么tempa是w3，i-Nk是w0</span>
+    <span class="c1">// 下面四行就是w4 = w0^w3</span>
+    <span class="n">RoundKey</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="n">RoundKey</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="n">RoundKey</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="n">RoundKey</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">RoundKey</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>其中新出现的Rcon全称叫Round constant，其实是GF(256)下的多项式系数\( 2^{i - 1}\)模了\( x^{4} + x^{3} + x + 1 \)，其中i是轮数，范围[1,10]:</p>
+
+<p><img src="../images/2018.8/rcon.svg" alt="rcon.svg"></p>
+
+<p>模数的存在使得rcon的值不超过一个字节的范围。而i范围是[1,10]，所以有2个rcon会被模约: rcon[9]和rcon[10]。</p>
+
+<p>rcon[0]到rcon[10]：0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36</p>
+
+<p>其中，rcon[8]是0x80（128），rcon[9]是0x1b（27），rcon[10]是0x36（54），显然后2个被模约了。</p>
+
+<p>其中还要注意，rcon[0]是忽略的，i取值也不会有0。</p>
+
 <h2>资料：</h2>
 
 <p><a href="https://github.com/kokke/tiny-AES-c">https://github.com/kokke/tiny-AES-c</a></p>
