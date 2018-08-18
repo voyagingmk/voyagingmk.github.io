@@ -737,6 +737,36 @@
 
 <p>其中还要注意，rcon[0]是忽略的，i取值也不会有0。</p>
 
+<h2><a href="https://en.wikipedia.org/wiki/Rijndael_S-box">S-Box和Inv-S-Box</a></h2>
+
+<p>先搞懂S-Box的构造。S-Box其实是一个lookup函数，输入一个字节a，输出一个字节b。a到b的映射过程就是查一张预计算的sbox表：</p>
+
+<p><img src="../images/2018.8/sbox.png" alt="sbox.png"></p>
+
+<p>在c/c++中，sbox会实现为一个长度256的uint8_t数组，查表的过程非常简单，就是一次下标索引：b = sbox[a]。毕竟a的取值是[0,255]，没毛病。上面的sbox二维图和sbox一维数组，也是一样的。举2个例子：</p>
+
+<ul>
+<li>a=0x0f时，sbox[0x0f]，就是找sbox数组的第0x0f=15个元素，即图中的第一行的最后一个元素0x76，坐标(0，f）</li>
+<li>a=0x53时，sbox[0x53]，找第0x53个元素，纵坐标0x53/16 = 5，横坐标0x53%16 = 3，第5行第3个元素0xed，坐标（5，3）</li>
+</ul>
+
+<p>从中可见，a的低4bits代表横坐标（第几列），高4bits代表纵坐标（第几行）；在代码里甚至不需要知道坐标，直接把a当下标去索引sbox数组即可，很方便。</p>
+
+<p>剩下的问题就是，S-Box是怎么构造出来的？为什么sbox[0x0f]就得等于0x76？</p>
+
+<p>先给出构造算法：</p>
+
+<ol>
+<li>求a的GF乘法逆元：a = gmul_inverse(a)</li>
+<li>r = a</li>
+<li>a = rot(a); r<sup>=</sup> a </li>
+<li>a = rot(a); r<sup>=</sup> a </li>
+<li>a = rot(a); r<sup>=</sup> a </li>
+<li>a = rot(a); r<sup>=</sup> a </li>
+<li>r <sup>=</sup> 0x63;</li>
+<li>r就是sbox[a]了</li>
+</ol>
+
 <h2>资料：</h2>
 
 <p><a href="https://github.com/kokke/tiny-AES-c">https://github.com/kokke/tiny-AES-c</a></p>
