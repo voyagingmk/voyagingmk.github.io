@@ -618,6 +618,12 @@
 
 <p><img src="../images/2018.8/g.png" alt="g.png"></p>
 
+<p>更具体的g函数处理过程：</p>
+
+<p><img src="../images/2018.8/g_detail.png" alt="g_detail.png"></p>
+
+<p>(from <a href="http://spi.unob.cz/papers/2017/2017-05.pdf">here</a>)</p>
+
 <p>如果去掉g函数，其实这个图表达的是这么一条公式：</p>
 
 <p>\[ w_{i} = w_{i - 4} \oplus w_{i-1}， 4 \le i \le 43 \]</p>
@@ -720,6 +726,8 @@
 <p>其中新出现的Rcon全称叫Round constant，其实是GF(256)下的多项式系数\( 2^{i - 1}\)模了\( x^{4} + x^{3} + x + 1 \)，其中i是轮数，范围[1,10]:</p>
 
 <p><img src="../images/2018.8/rcon.svg" alt="rcon.svg"></p>
+
+<p>(from <a href="https://en.wikipedia.org/wiki/Rijndael_key_schedule#Common_operations">wiki</a>)</p>
 
 <p>模数的存在使得rcon的值不超过一个字节的范围。而i范围是[1,10]，所以有2个rcon会被模约: rcon[9]和rcon[10]。</p>
 
