@@ -255,6 +255,33 @@
         <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">tp_free</span><span class="p">((</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span><span class="n">v</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
+<h2>PyBoolObject</h2>
+
+<p>bool其实就是int:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="n">PyIntObject</span> <span class="n">PyBoolObject</span><span class="p">;</span>
+</code></pre></div>
+<p>不过True和False不会有多个实例，而是各一个，然而重复使用：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Py_False and Py_True are the only two bools in existence.</span>
+<span class="cm">Don&#39;t forget to apply Py_INCREF() when returning either!!! */</span>
+
+<span class="cm">/* Don&#39;t use these directly */</span>
+<span class="n">PyAPI_DATA</span><span class="p">(</span><span class="n">PyIntObject</span><span class="p">)</span> <span class="n">_Py_ZeroStruct</span><span class="p">,</span> <span class="n">_Py_TrueStruct</span><span class="p">;</span>
+
+<span class="cm">/* Use these macros */</span>
+<span class="cp">#define Py_False ((PyObject *) &amp;_Py_ZeroStruct)</span>
+<span class="cp">#define Py_True ((PyObject *) &amp;_Py_TrueStruct)</span>
+
+<span class="cm">/* Named Zero for link-level compatibility */</span>
+<span class="n">PyIntObject</span> <span class="n">_Py_ZeroStruct</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">PyObject_HEAD_INIT</span><span class="p">(</span><span class="o">&amp;</span><span class="n">PyBool_Type</span><span class="p">)</span>
+    <span class="mi">0</span>
+<span class="p">};</span>
+
+<span class="n">PyIntObject</span> <span class="n">_Py_TrueStruct</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">PyObject_HEAD_INIT</span><span class="p">(</span><span class="o">&amp;</span><span class="n">PyBool_Type</span><span class="p">)</span>
+    <span class="mi">1</span>
+<span class="p">};</span>
+</code></pre></div>
 <h2>PyLongObject 任意大整数</h2>
 
 <p>文件：</p>
@@ -568,6 +595,63 @@
     <span class="k">return</span> <span class="n">dictresize</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">&gt;</span> <span class="mi">50000</span> <span class="o">?</span> <span class="mi">2</span> <span class="o">:</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
+<h2>PySetObject</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_setobject</span> <span class="n">PySetObject</span><span class="p">;</span>
+<span class="k">struct</span> <span class="n">_setobject</span> <span class="p">{</span>
+    <span class="n">PyObject_HEAD</span>
+
+    <span class="n">Py_ssize_t</span> <span class="n">fill</span><span class="p">;</span>  <span class="cm">/* # Active + # Dummy */</span>
+    <span class="n">Py_ssize_t</span> <span class="n">used</span><span class="p">;</span>  <span class="cm">/* # Active */</span>
+
+    <span class="cm">/* The table contains mask + 1 slots, and that&#39;s a power of 2.</span>
+<span class="cm">     * We store the mask instead of the size because the mask is more</span>
+<span class="cm">     * frequently needed.</span>
+<span class="cm">     */</span>
+    <span class="n">Py_ssize_t</span> <span class="n">mask</span><span class="p">;</span>
+
+    <span class="cm">/* table points to smalltable for small tables, else to</span>
+<span class="cm">     * additional malloc&#39;ed memory.  table is never NULL!  This rule</span>
+<span class="cm">     * saves repeated runtime null-tests.</span>
+<span class="cm">     */</span>
+    <span class="n">setentry</span> <span class="o">*</span><span class="n">table</span><span class="p">;</span>
+    <span class="n">setentry</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">lookup</span><span class="p">)(</span><span class="n">PySetObject</span> <span class="o">*</span><span class="n">so</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">);</span>
+    <span class="n">setentry</span> <span class="n">smalltable</span><span class="p">[</span><span class="n">PySet_MINSIZE</span><span class="p">];</span>
+
+    <span class="kt">long</span> <span class="n">hash</span><span class="p">;</span>                  <span class="cm">/* only used by frozenset objects */</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">weakreflist</span><span class="p">;</span>      <span class="cm">/* List of weak references */</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>看定义，和dict是很像的。</p>
+
+<h2>PyTupleObject</h2>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">PyObject_VAR_HEAD</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">ob_item</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+    <span class="cm">/* ob_item contains space for &#39;ob_size&#39; elements.</span>
+<span class="cm">     * Items must normally not be NULL, except during construction when</span>
+<span class="cm">     * the tuple is not yet visible outside the function that builds it.</span>
+<span class="cm">     */</span>
+<span class="p">}</span> <span class="n">PyTupleObject</span><span class="p">;</span>
+</code></pre></div>
+<p>tuple的PyTuple_New仅分配空间，这是因为tuple是不可变长的对象，长度一开始就知道了：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">PyTuple_New</span><span class="p">(</span><span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="n">size</span><span class="p">);</span>
+</code></pre></div>
+<p>奇怪的是，如果有初始化列表，是执行abstract.c里的PySequence_Tuple来创建tuple，参数就是初始化列表。</p>
+
+<p>set的特性是key不重复（tuple也是基于dict的实现）。</p>
+
+<p>tuple元素的长度、获取和设置，基于宏和下标访问：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Macro, trading safety for speed */</span>
+<span class="cp">#define PyTuple_GET_ITEM(op, i) (((PyTupleObject *)(op))-&gt;ob_item[i])</span>
+<span class="cp">#define PyTuple_GET_SIZE(op)    Py_SIZE(op)</span>
+
+<span class="cm">/* Macro, *only* to be used to fill in brand new tuples */</span>
+<span class="cp">#define PyTuple_SET_ITEM(op, i, v) (((PyTupleObject *)(op))-&gt;ob_item[i] = v)</span>
+</code></pre></div>
+<p>当然在python解释器里是不能修改tuple的元素的。</p>
+
 <h1>内存管理策略</h1>
 
 <h2>第一层</h2>
@@ -1114,7 +1198,14 @@
 
 <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">_PyGC_generation0</span> <span class="o">=</span> <span class="n">GEN_HEAD</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </code></pre></div>
-<p>定义三个代，阈值分别为700、10、10，</p>
+<p>定义了三个代，阈值分别为700、10、10.</p>
+
+<p>注意count的含义有2种：</p>
+
+<ul>
+<li>0代的count：属于该代的对象的数量</li>
+<li>1、2代的count：上一代（1的上一代是0，2的上一代是1）已经collect了多少次，不是对象数量了</li>
+</ul>
 
 <h3>collect_generations</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="n">Py_ssize_t</span>
@@ -1127,8 +1218,12 @@
     <span class="c1">// 那么收集&lt;=i代的对象</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">NUM_GENERATIONS</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">generations</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">generations</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">threshold</span><span class="p">)</span> <span class="p">{</span>
-            <span class="c1">// 如果连最老的一代超过阈值，且pending数还不到long_lived_total的四分之一</span>
-            <span class="c1">// 就不collect了</span>
+            <span class="c1">// 第i代的count已经超过阈值了</span>
+
+            <span class="c1">// (long_lived_pending/long_lived_total) &lt; 25%时，是不做回收的</span>
+            <span class="c1">// 这是为了减少回收调用次数，从而尽量减少GC开销</span>
+            <span class="c1">// pending是指回收第i=1代时，转入i=2代的对象的数量的累加</span>
+            <span class="c1">// total是指回收第i=2代时，当前2代的对象数量，更新total时会同时把pending置0</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">NUM_GENERATIONS</span> <span class="o">-</span> <span class="mi">1</span>
                 <span class="o">&amp;&amp;</span> <span class="n">long_lived_pending</span> <span class="o">&lt;</span> <span class="n">long_lived_total</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
                 <span class="k">continue</span><span class="p">;</span>
