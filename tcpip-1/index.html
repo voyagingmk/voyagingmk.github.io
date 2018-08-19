@@ -242,7 +242,7 @@
 <li>Seq：序列号，32位无符号整数，到达2<sup>32-1后回到0</sup></li>
 <li>ACK：确认号，确认号表示的是该确认号的发送方期待接收的下一个序列号</li>
 <li>SACK：Seletive地ACK，要比普通ACK高效，因为可以对次序杂乱的报文先ACK。前提是发送方有<strong>选择重发</strong>能力</li>
-<li>头部长度自表示：虽然只有4位，但是单位是word（32bits），所以可表示(2<sup>4</sup> - 1)* 4bytes = 60字节的头部长度。</li>
+<li>头部长度自表示：虽然只有4位，但是单位是word（32bits），所以可表示\( (2^{4} - 1) \cdot 4 \) bytes = 60字节的头部长度。</li>
 <li>窗口大小：占2字节，单位是字节，所以最大窗口大小字节数为2<sup>16</sup> - 1 = 65535字节</li>
 <li>ISN：发送SYN的报文段里的Seq就是ISN，随机选定，第一个数据字节的Seq是ISN+1。因为SYN消耗一个序列号，所以SYN是可靠传输的（FIN也是），而ACK不是</li>
 <li>ISN是双向的：双方都要随机一个ISN</li>
@@ -464,7 +464,7 @@
 
 <ul>
 <li>SYN cookies：把连接信息编码到ISN，因为第三次握手会发ISN+1给服务器，于是可以解码出连接信息。不过tcp选项是编码不进去的，需要关闭；另外SYN-ACK会无法重发，因为服务器并不保存状态。</li>
-<li>SYN cache：把每个连接部分信息放到一个bucket（hashtable），cache entry可能比full TCB少好几倍</li>
+<li>SYN cache：把每个连接重要信息放到一个bucket（hashtable）（迷你TCB），cache entry可能比full TCB少好几倍。就是从syn抽一些bits当做密钥，然后和IP地址、port一起hash成一个哈希值，用这个哈希值来决定迷你TCB放在哈希表的哪里。</li>
 <li>混合模式(SYN cookies + SYN cache)：如果cache的哈希表满了，就执行SYN cookies模式</li>
 <li>过滤：这个要依赖ISP，ISP过滤掉伪造了IP地址的包，抵御SYN flood能力很强，然而这个机制并没有称为ISP的标准。</li>
 <li>increase backlog</li>
@@ -716,7 +716,7 @@ RTO = srtt + 4(rttvar)</p>
 <li>实现了自时钟控制（self-clocking）。ACK返回越快，数据传输也越快。</li>
 </ul>
 
-<p>在高延迟网络中，需要减少🛰报文数。算法使得单位时间内发送的报文段数目更少。</p>
+<p>在高延迟（拥塞）网络中，需要减少报文数。算法使得单位时间内发送的报文段数目更少。</p>
 
 <h3>延时ACK和Nagle算法结合：</h3>
 
