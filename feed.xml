@@ -3,8 +3,8 @@
   <channel>
     <title>Wyman的原创技术博客</title>
     <description>恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</description>
-    <link>https://www.qiujiawei.com</link>
-    <atom:link href="https://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
+    <link>http://localhost:4000</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
         <title>漫谈网络通讯加密（5）AES</title>
@@ -1004,8 +1004,8 @@
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/mrpre/article/details/79324505&quot;&gt;https://blog.csdn.net/mrpre/article/details/79324505&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 14 Aug 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/crypto-5/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-5/</guid>
+        <link>http://localhost:4000/crypto-5/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-5/</guid>
       </item>
     
       <item>
@@ -1263,8 +1263,8 @@
 &lt;p&gt;&lt;a href=&quot;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&quot;&gt;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 08 Aug 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/lighting-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/lighting-1/</guid>
+        <link>http://localhost:4000/lighting-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/lighting-1/</guid>
       </item>
     
       <item>
@@ -1367,8 +1367,8 @@
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/wenzhilu/article/details/72356320&quot;&gt;https://blog.csdn.net/wenzhilu/article/details/72356320&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 05 Aug 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/pipeline-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/pipeline-1/</guid>
+        <link>http://localhost:4000/pipeline-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/pipeline-1/</guid>
       </item>
     
       <item>
@@ -1688,8 +1688,8 @@ appendonly yes
 &lt;p&gt;&lt;a href=&quot;http://www.redis.cn/topics/cluster-tutorial.html&quot;&gt;http://www.redis.cn/topics/cluster-tutorial.html&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/redis-4/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-4/</guid>
+        <link>http://localhost:4000/redis-4/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-4/</guid>
       </item>
     
       <item>
@@ -3259,8 +3259,8 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 &lt;p&gt;所以写python程序切勿写出这样子的代码，不然GC都帮不了你。&lt;/p&gt;
 </description>
         <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/python-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/python-1/</guid>
+        <link>http://localhost:4000/python-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/python-1/</guid>
       </item>
     
       <item>
@@ -3382,8 +3382,8 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 &lt;h1&gt;第三方内存分配器&lt;/h1&gt;
 </description>
         <pubDate>Fri, 27 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/redis-3/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-3/</guid>
+        <link>http://localhost:4000/redis-3/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-3/</guid>
       </item>
     
       <item>
@@ -3774,8 +3774,8 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 &lt;p&gt;单个元素超过64字节时，就得转成hashtable&lt;/p&gt;
 </description>
         <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/redis-2/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-2/</guid>
+        <link>http://localhost:4000/redis-2/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-2/</guid>
       </item>
     
       <item>
@@ -4466,8 +4466,8 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/z69183787/article/details/81121779&quot;&gt;https://blog.csdn.net/z69183787/article/details/81121779&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 24 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/redis-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-1/</guid>
+        <link>http://localhost:4000/redis-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-1/</guid>
       </item>
     
       <item>
@@ -4908,8 +4908,8 @@ SSL-Session:
 &lt;/ul&gt;
 </description>
         <pubDate>Wed, 18 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/crypto-4/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-4/</guid>
+        <link>http://localhost:4000/crypto-4/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-4/</guid>
       </item>
     
       <item>
@@ -5052,8 +5052,8 @@ SSL-Session:
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;okm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
         <pubDate>Tue, 17 Jul 2018 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/crypto-3/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-3/</guid>
+        <link>http://localhost:4000/crypto-3/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-3/</guid>
       </item>
     
   </channel>
