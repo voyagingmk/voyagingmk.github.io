@@ -83,11 +83,13 @@
     <div class="entry">
         <!--more-->
 
-<p>本文主要目的是剖析AES(Rijndael)的来龙去脉，包括源码实现。</p>
+<p>本文主要目的是剖析AES(Rijndael)算法的来龙去脉，包括源码实现。</p>
 
 <h1><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES</a></h1>
 
-<p>下面以源码剖析的形式来介绍AES。本来打算剖析openSSL里的AES，结果发现代码是高度优化的，很难阅读理解。索性找了个更适合剖析的实现: <a href="https://github.com/kokke/tiny-AES-c">tiny-AES-c</a>。1000多stars，想必也很靠谱了。</p>
+<p>下面以源码剖析的形式来介绍AES。</p>
+
+<p>本来打算剖析openSSL里的AES，结果发现代码是高度优化的，很难阅读理解。索性找了个更适合剖析的实现: <a href="https://github.com/kokke/tiny-AES-c">tiny-AES-c</a>。1000多stars，想必也很靠谱了。</p>
 
 <h2>流程</h2>
 
