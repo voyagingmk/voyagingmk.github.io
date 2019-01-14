@@ -114,6 +114,8 @@ cmake --build .</p>
 
 <h1>LunarG draw cube学习笔记</h1>
 
+<p><a href="https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html">https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html</a></p>
+
 <h2>1. 创建必要的VkInstance对象（vkCreateInstance）</h2>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkResult</span> <span class="n">VKAPI_CALL</span> <span class="nf">vkCreateInstance</span><span class="p">(</span>
     <span class="k">const</span> <span class="n">VkInstanceCreateInfo</span><span class="o">*</span>                 <span class="n">pCreateInfo</span><span class="p">,</span>
@@ -498,33 +500,30 @@ cmake --build .</p>
 <span class="c1">// 3. 把内存绑定给info.depth.image对象</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">vkBindImageMemory</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">depth</span><span class="p">.</span><span class="n">image</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">depth</span><span class="p">.</span><span class="n">mem</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
-
-
-<span class="err">最后一步创建</span><span class="n">image</span> <span class="n">view</span> <span class="err">：</span>
 </code></pre></div>
-<p>VkImageViewCreateInfo view_info = {};
-view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-view_info.pNext = NULL;
-view_info.image = VK_NULL_HANDLE;
-view_info.format = depth_format;// VK_FORMAT_D16_UNORM
-view_info.components.r = VK_COMPONENT_SWIZZLE_R;
-view_info.components.g = VK_COMPONENT_SWIZZLE_G;
-view_info.components.b = VK_COMPONENT_SWIZZLE_B;
-view_info.components.a = VK_COMPONENT_SWIZZLE_A;
-view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-view_info.subresourceRange.baseMipLevel = 0;
-view_info.subresourceRange.levelCount = 1;
-view_info.subresourceRange.baseArrayLayer = 0;
-view_info.subresourceRange.layerCount = 1;
-view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-view_info.flags = 0;</p>
+<p>最后一步创建image view ：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkImageViewCreateInfo</span> <span class="n">view_info</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">VK_NULL_HANDLE</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">format</span> <span class="o">=</span> <span class="n">depth_format</span><span class="p">;</span><span class="c1">// VK_FORMAT_D16_UNORM</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">components</span><span class="p">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">VK_COMPONENT_SWIZZLE_R</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">components</span><span class="p">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">VK_COMPONENT_SWIZZLE_G</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">components</span><span class="p">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">VK_COMPONENT_SWIZZLE_B</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">components</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">VK_COMPONENT_SWIZZLE_A</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">subresourceRange</span><span class="p">.</span><span class="n">aspectMask</span> <span class="o">=</span> <span class="n">VK_IMAGE_ASPECT_DEPTH_BIT</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">subresourceRange</span><span class="p">.</span><span class="n">baseMipLevel</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">subresourceRange</span><span class="p">.</span><span class="n">levelCount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">subresourceRange</span><span class="p">.</span><span class="n">baseArrayLayer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">subresourceRange</span><span class="p">.</span><span class="n">layerCount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">viewType</span> <span class="o">=</span> <span class="n">VK_IMAGE_VIEW_TYPE_2D</span><span class="p">;</span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-<p>// 4. 创建image view 
-view_info.image = info.depth.image;
-res = vkCreateImageView(info.device, &amp;view_info, NULL, &amp;info.depth.view);
-assert(res == VK_SUCCESS);
-```</p>
-
+<span class="c1">// 4. 创建image view </span>
+<span class="n">view_info</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">depth</span><span class="p">.</span><span class="n">image</span><span class="p">;</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">vkCreateImageView</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">view_info</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">depth</span><span class="p">.</span><span class="n">view</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
+</code></pre></div>
 <h2>7. Uniform Buffer (VkBuffer)</h2>
 
 <p>这个uniform buffer的uniform，就是指glsl的uniform，同个东西。glsl只需要调用api直接set uniform即可，而vulkan则需要自己分配内存并填充数据来实现。</p>

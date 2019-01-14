@@ -3,8 +3,8 @@
   <channel>
     <title>Wyman的原创技术博客</title>
     <description>恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</description>
-    <link>https://www.qiujiawei.com</link>
-    <atom:link href="https://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
+    <link>http://localhost:4000</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
         <title>入门vulkan</title>
@@ -41,6 +41,8 @@ cmake --build .&lt;/p&gt;
 &lt;p&gt;这个不需要安装LunarG的SDK就可以编译运行，很傻瓜化（但应该需要安装新的NVidia驱动）。实质是直接把LunarG的vulkan include目录嵌进去了。&lt;/p&gt;
 
 &lt;h1&gt;LunarG draw cube学习笔记&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html&quot;&gt;https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2&gt;1. 创建必要的VkInstance对象（vkCreateInstance）&lt;/h2&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VkResult&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VKAPI_CALL&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;vkCreateInstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
@@ -426,33 +428,30 @@ cmake --build .&lt;/p&gt;
 &lt;span class=&quot;c1&quot;&gt;// 3. 把内存绑定给info.depth.image对象&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vkBindImageMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;device&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_SUCCESS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-
-&lt;span class=&quot;err&quot;&gt;最后一步创建&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;：&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;VkImageViewCreateInfo view_info = {};
-view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-view_info.pNext = NULL;
-view_info.image = VK_NULL_HANDLE;
-view_info.format = depth_format;// VK_FORMAT_D16_UNORM
-view_info.components.r = VK_COMPONENT_SWIZZLE_R;
-view_info.components.g = VK_COMPONENT_SWIZZLE_G;
-view_info.components.b = VK_COMPONENT_SWIZZLE_B;
-view_info.components.a = VK_COMPONENT_SWIZZLE_A;
-view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-view_info.subresourceRange.baseMipLevel = 0;
-view_info.subresourceRange.levelCount = 1;
-view_info.subresourceRange.baseArrayLayer = 0;
-view_info.subresourceRange.layerCount = 1;
-view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-view_info.flags = 0;&lt;/p&gt;
+&lt;p&gt;最后一步创建image view ：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VkImageViewCreateInfo&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pNext&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_NULL_HANDLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;depth_format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;// VK_FORMAT_D16_UNORM&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;components&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_COMPONENT_SWIZZLE_R&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;components&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_COMPONENT_SWIZZLE_G&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;components&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_COMPONENT_SWIZZLE_B&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;components&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_COMPONENT_SWIZZLE_A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subresourceRange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aspectMask&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_IMAGE_ASPECT_DEPTH_BIT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subresourceRange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;baseMipLevel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subresourceRange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;levelCount&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subresourceRange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;baseArrayLayer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subresourceRange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layerCount&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;viewType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_IMAGE_VIEW_TYPE_2D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;flags&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;p&gt;// 4. 创建image view 
-view_info.image = info.depth.image;
-res = vkCreateImageView(info.device, &amp;amp;view_info, NULL, &amp;amp;info.depth.view);
-assert(res == VK_SUCCESS);
-```&lt;/p&gt;
-
+&lt;span class=&quot;c1&quot;&gt;// 4. 创建image view &lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vkCreateImageView&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;device&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;view_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;depth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VK_SUCCESS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2&gt;7. Uniform Buffer (VkBuffer)&lt;/h2&gt;
 
 &lt;p&gt;这个uniform buffer的uniform，就是指glsl的uniform，同个东西。glsl只需要调用api直接set uniform即可，而vulkan则需要自己分配内存并填充数据来实现。&lt;/p&gt;
@@ -598,9 +597,9 @@ assert(res == VK_SUCCESS);
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;pipeline layout将会被用来创建图形管线(graphics pipeline)&lt;/p&gt;
 </description>
-        <pubDate>Sat, 20 Oct 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/vulkan-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/vulkan-1/</guid>
+        <pubDate>Sat, 20 Oct 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/vulkan-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/vulkan-1/</guid>
       </item>
     
       <item>
@@ -623,9 +622,9 @@ assert(res == VK_SUCCESS);
 
 &lt;p&gt;英文：&lt;a href=&quot;http://dev.cra0kalo.com/?p=213&quot;&gt;http://dev.cra0kalo.com/?p=213&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Wed, 17 Oct 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/gpa/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/gpa/</guid>
+        <pubDate>Wed, 17 Oct 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/gpa/</link>
+        <guid isPermaLink="true">http://localhost:4000/gpa/</guid>
       </item>
     
       <item>
@@ -1625,9 +1624,9 @@ assert(res == VK_SUCCESS);
 
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/mrpre/article/details/79324505&quot;&gt;https://blog.csdn.net/mrpre/article/details/79324505&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Tue, 14 Aug 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/crypto-5/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/crypto-5/</guid>
+        <pubDate>Tue, 14 Aug 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/crypto-5/</link>
+        <guid isPermaLink="true">http://localhost:4000/crypto-5/</guid>
       </item>
     
       <item>
@@ -1884,9 +1883,9 @@ assert(res == VK_SUCCESS);
 
 &lt;p&gt;&lt;a href=&quot;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&quot;&gt;https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Wed, 08 Aug 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/lighting-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/lighting-1/</guid>
+        <pubDate>Wed, 08 Aug 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/lighting-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/lighting-1/</guid>
       </item>
     
       <item>
@@ -1988,9 +1987,9 @@ assert(res == VK_SUCCESS);
 
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/wenzhilu/article/details/72356320&quot;&gt;https://blog.csdn.net/wenzhilu/article/details/72356320&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Sun, 05 Aug 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/pipeline-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/pipeline-1/</guid>
+        <pubDate>Sun, 05 Aug 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/pipeline-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/pipeline-1/</guid>
       </item>
     
       <item>
@@ -2309,9 +2308,9 @@ appendonly yes
 
 &lt;p&gt;&lt;a href=&quot;http://www.redis.cn/topics/cluster-tutorial.html&quot;&gt;http://www.redis.cn/topics/cluster-tutorial.html&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Sat, 28 Jul 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/redis-4/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-4/</guid>
+        <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/redis-4/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-4/</guid>
       </item>
     
       <item>
@@ -3880,9 +3879,9 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 
 &lt;p&gt;所以写python程序切勿写出这样子的代码，不然GC都帮不了你。&lt;/p&gt;
 </description>
-        <pubDate>Sat, 28 Jul 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/python-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/python-1/</guid>
+        <pubDate>Sat, 28 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/python-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/python-1/</guid>
       </item>
     
       <item>
@@ -4003,9 +4002,9 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 
 &lt;h1&gt;第三方内存分配器&lt;/h1&gt;
 </description>
-        <pubDate>Fri, 27 Jul 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/redis-3/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-3/</guid>
+        <pubDate>Fri, 27 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/redis-3/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-3/</guid>
       </item>
     
       <item>
@@ -4395,9 +4394,9 @@ gc: uncollectable &amp;lt;dict 0x11891f280&amp;gt;
 
 &lt;p&gt;单个元素超过64字节时，就得转成hashtable&lt;/p&gt;
 </description>
-        <pubDate>Thu, 26 Jul 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/redis-2/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-2/</guid>
+        <pubDate>Thu, 26 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/redis-2/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-2/</guid>
       </item>
     
       <item>
@@ -5087,9 +5086,9 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 &lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/z69183787/article/details/81121779&quot;&gt;https://blog.csdn.net/z69183787/article/details/81121779&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Tue, 24 Jul 2018 00:00:00 +0000</pubDate>
-        <link>https://www.qiujiawei.com/redis-1/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/redis-1/</guid>
+        <pubDate>Tue, 24 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/redis-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/redis-1/</guid>
       </item>
     
   </channel>
