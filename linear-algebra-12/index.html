@@ -344,7 +344,7 @@
 
 <p>\[  A = \frac {NearZ}{NearZ - FarZ} \]</p>
 
-<p>得到右手坐标系的01范围投影z的透视矩阵：</p>
+<p>得到右手坐标系的01范围投影的透视矩阵：</p>
 
 <p>\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0&amp;0\\ 0&amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0\\ 0&amp;0&amp;\frac {NearZ}{NearZ - FarZ}&amp;\frac {FarZ * NearZ}{NearZ - FarZ}\\ 0&amp;0&amp;-1&amp;0\\ \end{matrix} \right] \]</p>
 
@@ -366,7 +366,7 @@
 
 <p>\[  A = \frac {-FarZ}{NearZ - FarZ} = \frac {FarZ}{FarZ - NearZ} \]</p>
 
-<p>得到左手坐标系的01范围投影z的透视矩阵：</p>
+<p>得到左手坐标系的01范围投影的透视矩阵：</p>
 
 <p>\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0&amp;0\\ 0&amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0\\ 0&amp;0&amp;\frac {FarZ}{FarZ - NearZ}&amp;\frac {FarZ * NearZ}{NearZ - FarZ}\\ 0&amp;0&amp;1&amp;0\\ \end{matrix} \right] \]</p>
 
@@ -531,7 +531,7 @@
     <span class="p">)</span>
 <span class="p">{</span> <span class="p">}</span>
 </code></pre></div>
-<p>发现和上文的<strong>左手坐标系的01范围投影z的透视矩阵</strong>对得上：</p>
+<p>发现和上文的<strong>左手坐标系的01范围投影的透视矩阵</strong>对得上：</p>
 
 <p>\[ M =  \left[ \begin{matrix} \frac { 1 } { ar * tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0&amp;0\\ 0&amp;\frac { 1 } { tan(\frac {\alpha } { 2 } ) }&amp;0&amp;0\\ 0&amp;0&amp;\frac {FarZ}{FarZ - NearZ}&amp;\frac {FarZ * NearZ}{NearZ - FarZ}\\ 0&amp;0&amp;1&amp;0\\ \end{matrix} \right] \]</p>
 
