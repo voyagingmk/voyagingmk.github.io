@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,17 +74,26 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>蒙特卡罗积分和重要性采样</h1>
+ <h3>Tags: <a href="/tag/montecarlo/" rel="tag">montecarlo</a></h3>
 <article class="post">
-    <h1>蒙特卡罗积分和重要性采样</h1>
-    <h3>Tags: <a href="/tag/montecarlo/" rel="tag">montecarlo</a></h3>
+    
     <div class="entry">
         <!--more-->
 
 <p>本文是 <a href="https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#mcintegrationonthesphereofdirections">Ray Tracing: The Rest of Your Life</a> 的学习总结。</p>
 
-<h1>用撒点法估算PI的值</h1>
+<h2>用撒点法估算PI的值</h2>
 
 <p>正方形和正方形内接圆的面积比是固定的：</p>
 
@@ -361,17 +369,19 @@
 
 <p>pdf不可能小于0，因为定积分上界减上界必然是正数。</p>
 
-<h2>球面蒙特卡罗积分</h2>
+<h2>球面蒙特卡罗积分 + uniform pdf</h2>
 
-<p>以单位球心为原点，往球面发射任意光线，因为是全随机，那么任意方向的概率密度是一样的，即小p是常量，等于1/球面面积，即1/(4π)。</p>
+<p>以单位球心为原点，往球面发射任意光线，假设是全随机，那么任意方向的概率密度是一样的，unifrom分布，即小p是常量，等于1/球面面积，即1/(4π)。</p>
 
 <p>假设有一个要积分的函数：</p>
 
 <p>\[ \int cos^{2}(\theta ) \]</p>
 
-<p>要对整个球面做蒙特卡罗积分，小p已有，大P没有，但其实大P是不需要的，因为限定了是均匀分布。</p>
+<p>要对整个球面做蒙特卡罗积分的话，此时我们已经知道有两种办法，一种是算解析解，一种是用蒙特卡罗积分。</p>
 
-<p>但被积函数使用的是球极坐标，首先要把完整的式子写出来：</p>
+<p>蒙特卡罗积分+重要性采样的话，此时我们已经知道了是均匀分布以及小p的值，但大P不知道。其实大P是不需要的，因为限定了是均匀分布，回忆上面的def uniform_pdf，for循环里直接用random即可。</p>
+
+<p>解析解的话，要做一番推导。因为被积函数使用的是球极坐标，首先要把完整的式子写出来：</p>
 
 <p>\[ \int_{0}^{2\pi} \int_{0}^{\pi}   cos^{2}(\theta ) sin\theta d\theta d\phi \]</p>
 
@@ -389,7 +399,7 @@
 
 <p>\[ = \frac {4\pi }{3} \]</p>
 
-<p>用蒙特卡罗和pdf求解的代码如下：</p>
+<p>两种方法都跑一下对比看看。用蒙特卡罗和pdf求解的代码如下：</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">sphere</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
@@ -407,6 +417,10 @@
 <span class="c1">#sphere I =  4.18595873614        </span>
 <span class="c1">#sphere 4 * pi /3 =  4.18879020479</span>
 </code></pre></div>
+<h2>球面蒙特卡罗积分 + non-uniform pdf</h2>
+
+<p>在渲染中，根据材质的不同，对某些球面方向我们希望采样多一些，某些方向少一些，这就需要non-uniform pdf。</p>
+
     </div>
     <div class="entry">
         (未经授权禁止转载)
@@ -439,6 +453,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

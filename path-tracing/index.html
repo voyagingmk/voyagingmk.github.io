@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>路径追踪算法 – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
+    <title>路径追踪渲染器 – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
 
         <meta charset="utf-8" />
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
@@ -15,8 +15,8 @@
     <meta name="author" content="Wyman的原创技术博客" />
 
     
-    <meta property="og:title" content="路径追踪算法" />
-    <meta property="twitter:title" content="路径追踪算法" />
+    <meta property="og:title" content="路径追踪渲染器" />
+    <meta property="twitter:title" content="路径追踪渲染器" />
     
 
     <!--[if lt IE 9]>
@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -37,7 +36,7 @@
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/path-tracing/',
-		  'title': '路径追踪算法'
+		  'title': '路径追踪渲染器'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -75,13 +74,37 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>路径追踪渲染器</h1>
+ <h3>Tags: <a href="/tag/path-tracing/" rel="tag">path tracing</a></h3>
 <article class="post">
-    <h1>路径追踪算法</h1>
-    <h3>Tags: <a href="/tag/path-tracing/" rel="tag">path tracing</a></h3>
+    
     <div class="entry">
         <!--more-->
+
+<p>学习离线渲染最好从这99行代码开始：</p>
+
+<p><a href="http://www.kevinbeason.com/smallpt/">smallpt: Global Illumination in 99 lines of C++</a></p>
+
+<p>但这份代码有些小问题：</p>
+
+<ul>
+<li>所有对象都是sphere。如果场景基于mesh的话，代码要改不少。</li>
+<li>为了压缩行数，一些代码的理解不太直观。</li>
+</ul>
+
+<p>进阶一点的话看：</p>
+
+<p><a href="https://raytracing.github.io/">Ray Tracing in One Weekend</a></p>
 
 <h1>为什么叫路径追踪<a href="https://en.wikipedia.org/wiki/Path_tracing">Path tracing</a></h1>
 
@@ -102,6 +125,98 @@
 </ul>
 
 <h1>算法关键点</h1>
+
+<p>假设开发一个基于path tracing积分器、输入为mesh模型、包含几种基本材质的离线渲染器，下面是需要掌握的点。</p>
+
+<h2>每个像素的光线发射流程</h2>
+
+<ol>
+<li>根据该像素的屏幕坐标、摄像机空间位置，算出Ray的o和d</li>
+<li>初始化Li为Color::Black。Li是指这根光线最终返回时收集到的Radiance，因为假设场景中没有光源（自发光物体认为是区域光源），那么场景必然是黑的。</li>
+<li>初始化pathThroughput为Color::White。pathThroughput大概就是指反射率，但是是要累乘的，每次光线反弹，要不断乘以材质的反射率。</li>
+<li>开始进入无限递归Loop（物理上也可认为光线能无限弹射）
+
+<ol>
+<li>Scene.Intersect(ray)，光线和场景做相交判定。</li>
+<li>如果不相交，那么 Li += pathThroughput * 环境贴图的Radiance（非必要功能，且这里面很复杂），并退出循环，否则继续后续步骤</li>
+<li>Li += pathThroughput * 相交点的自发光Radiance（区域光）</li>
+<li>根据相交点的BSDF是不是specular</li>
+</ol></li>
+</ol>
+
+<h2>空间加速结构</h2>
+
+<p>现在显卡从硬件上支持了空间加速结构，软渲的话直接找个BVH的开源实现比较省事，也方便后面直接移植GPU。不过要注意传给BVH的ray的起点坐标，要沿着ray的朝向偏移一点点，不然可能会自相交。</p>
+
+<h2>几何数学</h2>
+
+<h3>Barycentric Coordinates 和 Cramer&#39;s rule</h3>
+
+<p>bvh intersect的结果如果只返回了距离t，那么只能知道碰撞点P在ray.o + t * ray.d，并不能知道P点的法线。</p>
+
+<p>法线有两种情况：</p>
+
+<ol>
+<li>mesh没有顶点法线。这种可以根据3个顶点坐标，叉积算出面法线，P点的法线和面法线一样。</li>
+<li>mesh有顶点法线。此时需要根据P点的Barycentric Coordinates，插值得到P点法线。</li>
+</ol>
+
+<p>Barycentric Coordinates，除了用面积法算之外，还可以用Cramer&#39;s rule（克莱姆法则）算（更快）：</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="nf">Barycentric</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3</span><span class="o">&amp;</span> <span class="n">hitPoint</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">u</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">w</span><span class="p">)</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="cm">/*</span>
+<span class="cm">    P_hit = p_1 + u * (p_2 - p_1) + v * (p_3 - p_1)</span>
+<span class="cm">    u * (p_2 - p_1) + v * (p_3 - p_1) = P_hit - p_1</span>
+<span class="cm">    B = p_2 - p_1</span>
+<span class="cm">    C = p_3 - p_1</span>
+<span class="cm">    A = P_hit - p_1</span>
+<span class="cm">    =&gt;</span>
+<span class="cm">    u * B + v * C = A   （it is vector！）</span>
+<span class="cm">    convert to linear system =&gt;</span>
+<span class="cm">    (u * B + v * C)·B = A·B       （it is scalar！）</span>
+<span class="cm">    (u * B + v * C)·C = A·C</span>
+
+<span class="cm">    u * B·B  +  v * C·B = A·B</span>
+<span class="cm">    u * B·C  +  v * C·C = A·C</span>
+
+<span class="cm">    【 B·B  C·B 】 【 u 】   A·B</span>
+<span class="cm">    【 B·C  C·C 】 【 v 】 = A·C</span>
+
+<span class="cm">    【 d00  d01 】 【 u 】   d20</span>
+<span class="cm">    【 d01  d11 】 【 v 】 = d21</span>
+
+<span class="cm">    det   = | d00  d01 |</span>
+<span class="cm">            | d01  d11 |</span>
+
+<span class="cm">    det_u = | d20  d01 |</span>
+<span class="cm">            | d21  d11 |</span>
+
+<span class="cm">    det_v = | d00  d20 |</span>
+<span class="cm">            | d01  d21 |</span>
+<span class="cm">    */</span>
+    <span class="n">Vector3</span> <span class="n">B</span> <span class="o">=</span> <span class="n">point_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">point_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">C</span> <span class="o">=</span> <span class="n">point_</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">point_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">A</span> <span class="o">=</span> <span class="n">hitPoint</span> <span class="o">-</span> <span class="n">point_</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="kt">float</span> <span class="n">d00</span> <span class="o">=</span> <span class="n">B</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">d01</span> <span class="o">=</span> <span class="n">C</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">d11</span> <span class="o">=</span> <span class="n">C</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">C</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">d20</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">d21</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">C</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">denom</span> <span class="o">=</span> <span class="n">d00</span> <span class="o">*</span> <span class="n">d11</span> <span class="o">-</span> <span class="n">d01</span> <span class="o">*</span> <span class="n">d01</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">denom_u</span> <span class="o">=</span> <span class="n">d20</span> <span class="o">*</span> <span class="n">d11</span> <span class="o">-</span> <span class="n">d01</span> <span class="o">*</span> <span class="n">d21</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">denom_v</span> <span class="o">=</span> <span class="n">d00</span> <span class="o">*</span> <span class="n">d21</span> <span class="o">-</span> <span class="n">d20</span> <span class="o">*</span> <span class="n">d01</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">inv_denom</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">denom</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">u1</span> <span class="o">=</span> <span class="n">denom_u</span> <span class="o">*</span> <span class="n">inv_denom</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">v1</span> <span class="o">=</span> <span class="n">denom_v</span> <span class="o">*</span> <span class="n">inv_denom</span><span class="p">;</span>
+    <span class="c1">// P_hit = p_1 + u * (p_2 - p_1) + v * (p_3 - p_1)</span>
+    <span class="c1">// =&gt;</span>
+    <span class="c1">// P_hit = (1 - u - v) * p_1 + u * p_2 + v * p_3 </span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">u1</span> <span class="o">-</span> <span class="n">v1</span><span class="p">;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">u1</span><span class="p">;</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">v1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>（参考：<a href="https://ceng2.ktu.edu.tr/%7Ecakir/files/grafikler/Texture_Mapping.pdf">https://ceng2.ktu.edu.tr/~cakir/files/grafikler/Texture_Mapping.pdf</a> ）</p>
+
+<p>这个一般的</p>
 
 <h2>用俄罗斯轮盘赌算法（Russian Roulette）终止递归</h2>
 
@@ -125,11 +240,23 @@
 
 <p>因为P是递归的概率，只要P小于1，那么就不可能无限递归。</p>
 
-<h2>光源远或面积过小时，采样不足</h2>
+<h2>光源</h2>
+
+<h3>光源数据结构问题</h3>
+
+<p>光源是point light（无体积）。</p>
+
+<p>光源是一个三角面片模型，那么采样光源时，需要随机采样光源投影后的面积上的点，比较复杂。</p>
+
+<p>光源是area light，即一个quad面片，做采样也不会太复杂。</p>
+
+<p>光源是方向光，Emmm。</p>
+
+<h3>光源远或面积过小时，采样不足</h3>
 
 <p>均匀随机的光线，很难命中过小的光源，就会产生很强烈的噪点。解决该问题的办法叫<strong>emitter sampling</strong>，即从intersection point直接发射一条到光源的光线。因为光源有面积，所以目标点不是光源原点，而是需要在光源面积范围上随机出一个目标点，从而得到随机化的光线方向。</p>
 
-<h2>光源被遮挡问题</h2>
+<h3>光源被遮挡问题</h3>
 
 <p>上面说的emitter sampling，是假设了intersection point和光源之间无遮挡。如果存在遮挡，那么不应该直接采样获得光源的Radiance。为了避免这个问题，需要搜索下BVH，判断是否有遮挡，有的话终止。</p>
 
@@ -139,9 +266,25 @@
 
 <h2>材质问题</h2>
 
-<h3>材质分类</h3>
+<h3>dielectrics</h3>
 
-<p>基本材质类型:</p>
+<p>即电介质， 或称 non-metallic surfaces</p>
+
+<p>电介质大部分是固体，包括：瓷器，玻璃，塑料，氧化后的金属；液体包括：水、油；气体包括：空气、氮。</p>
+
+<p>纯水是电介质，不纯的水可以导电（变成了导体）。</p>
+
+<p>电介质（dielectrics）不完全等于绝缘体（insulators）。</p>
+
+<p>电介质和绝缘体之间的区别在于，在电场中存储或保存电能的材料是电介质材料，而在另一方面，阻止电场中电子流动的材料是绝缘体。</p>
+
+<p><img src="../images/2022.1/6.png" alt="6.png"></p>
+
+<h3>conductors</h3>
+
+<p>即导体，或称 metallic surfaces </p>
+
+<h3>材质细分</h3>
 
 <ul>
 <li>粗糙材质（LambertianDiffuse）</li>
@@ -155,7 +298,10 @@
 <li>粗糙导体（RoughConductor)</li>
 <li>粗糙电介质（RoughDielectric)</li>
 <li>迪士尼材质（Disney）</li>
+<li>次表面材质</li>
 </ul>
+
+<p>材质的不同，不止是参数不同，往往代码都是差了十万八千里。</p>
 
 <h3>BSDF、BRDF、BTDF</h3>
 
@@ -163,81 +309,6 @@
 
 <p>BSDF这个东西其实就是个系数。</p>
 
-<h3>Lambertian Diffuse</h3>
-
-<p>例如假设有一束光达到一个白色木板上，并且该白色木板不吸收热辐射，那么白色木板应该反射多少光（能量）出去？显然是100%，因为假定了白色木板不吸收能量，并且木板也不是电介质，没有产生折射，
-光必然100%反射到各个方向去了。此时BSDF是多少呢？这就要看白色模板的材质。</p>
-
-<p>假设白色木板是用的Lambertian Diffuse材质，即一束光会均匀地散射到所有方向。</p>
-
-<p>直接搬出Lambertian Diffuse BSDF公式：</p>
-
-<p>\[ f = \frac {ρ_{albedo}}{\pi } \]</p>
-
-<p>其中的\(ρ_{albedo}\)是指diffuse物体的<strong>反射率</strong>。</p>
-
-<p>这个其实就是3D模型基本都会有的albedo纹理，是同个东西。例如如果给白色木板画个纹理，那就是一张纯白色的图片，反射率为(1.0, 1.0, 1.0)，表示打到木板上的光线全部反射，不吸收。</p>
-
-<p>当albedo不等于(1.0, 1.0, 1.0)时，例如(0.5, 0.5, 0.5)，说明木板吸收了光束一半的辐射；当albedo等于(0,0,0)时，木板完全不反射，光的能量全部吸收掉。</p>
-
-<p>至于为什么要除以π才是diffuse物体的BSDF，得从渲染方程说起。</p>
-
-<p>（在我的这篇 <a href="https://www.qiujiawei.com/rendering-equation/">渲染基础理论的介绍</a> 文章中有介绍相关的公式推导 ）</p>
-
-<p>先看下wiki里的渲染方程：</p>
-
-<p><img src="../images/2016.7/18.png" alt="18.png"></p>
-
-<p>这公式是在说，已知出射方向\(w_o\)，那么把被渲染的点(shading point)自身沿着\(w_o\)方向发射的radiance部分、以及接收到的radiance并且要反射出去的部分，通通加起来，就是总共的要沿着\(w_o\)发射出去的radiance。</p>
-
-<p>再看我的无伤大雅的简化版（去掉了波长变量以及时间变量）：</p>
-
-<p>\[ L_{o}(p, \omega _{o}) = L_{e}(p, \omega _{o})  + \int _{\Omega }f(p, \omega _{o}, \omega _{i}) L_{i}(p, \omega _{i}) |cos \theta _{i}|d\omega _{i} \]</p>
-
-<p>因为现在讨论的是diffuse材质，没有自发光，可以去掉自发光项；另外把公式改成用spherical angle表达（需要一点<a href="http://127.0.0.1:4000/solid-angle/">立体角</a>的知识），结果如下：</p>
-
-<p>\[ L_{o} = \int _{0 }^{ 2π } \int _{0 }^{ \frac {π}{2} } f(p, \theta ,\phi ) L_{i} (p,\theta ,\phi ) cos\theta sin\theta d\theta d\phi \]</p>
-
-<p>再因为diffuse材质会吧把收到的光线均匀地散射出去，即\(L_i\)不影响后面的反射，同时因为均匀性，f也是个常数，所以右边的积分里，可以把\(L_i\)、f当成常量提到外面去，只关注剩下的积分式：</p>
-
-<p>\[  \int _{0 }^{ 2π } \int _{0 }^{ \frac {π}{2} }   cos\theta sin\theta d\theta d\phi \]</p>
-
-<p>这是个可以算出来的式子，结果等于π。于是有：</p>
-
-<p>\[ L_{o} =  L_{i} \cdot f \cdot π \]</p>
-
-<p>因为能量要守恒，所以 f必须等于 \( \frac {1}{\pi } \)。但在渲染里既然要模拟光被吸收，使得物体呈现不同的颜色，能量应该是允许不守恒的，那么f应该等于多少呢？答案在上文其实已经给出了：</p>
-
-<p>\[ f = \frac {ρ_{albedo}}{\pi } \]</p>
-
-<p>再搬出那块白色木板，它百分百反射所有光，\(ρ_{albedo} \)为1，所以它的f为 \( \frac {1}{\pi } \)。</p>
-
-<p>（这篇文章也很好地解释了diffuse BSDF公式的推导：
-<a href="https://sakibsaikia.github.io/graphics/2019/09/10/Deriving-Lambertian-BRDF-From-First-Principles.html">Deriving Lambertian BRDF from first principles</a> ）</p>
-
-<h3>非Lambertian Diffuse</h3>
-
-<p>Lambertian Diffuse直接认为Diffuse材质时完全均匀反射所有光线，然而这个假设过于笼统了。Disney研究了现实世界Diffuse材质后发现，可以用一种更复杂的公式模拟Diffuse，使得Diffuse材质更真实。</p>
-
-<p>它的公式如下：</p>
-
-<p><img src="../images/2022.1/4.png" alt="4.png"></p>
-
-<p>(from disney的论文)</p>
-
-<p>其中\(\theta _l \)和\(\theta _v \)分别是光线l、视线v与法线n的夹角，\(\theta _d \)是光线l和半程向量h的夹角（h一般为0.5*(v + l) ）。</p>
-
-<p>baseColor就是上一节的\(ρ_{albedo} \)，可见disney的这个公式还是没有脱离上一节的推导的，只是在Lambertian Diffuse的f后面加了一坨计算。</p>
-
-<p>相应代码如下：</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="n">float3</span> <span class="nf">Diffuse_Burley_Disney</span><span class="p">(</span> <span class="n">float3</span> <span class="n">DiffuseColor</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">,</span> <span class="kt">float</span> <span class="n">VoH</span> <span class="p">)</span> 
-<span class="p">{</span> 
-       <span class="kt">float</span> <span class="n">FD90</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">VoH</span> <span class="o">*</span> <span class="n">VoH</span> <span class="o">*</span> <span class="n">Roughness</span><span class="p">;</span> 
-       <span class="kt">float</span> <span class="n">FdV</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">FD90</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pow5</span><span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">NoV</span> <span class="p">);</span> 
-       <span class="kt">float</span> <span class="n">FdL</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">FD90</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pow5</span><span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">NoL</span> <span class="p">);</span> 
-       <span class="k">return</span> <span class="n">DiffuseColor</span> <span class="o">*</span> <span class="p">(</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">PI</span><span class="p">)</span> <span class="o">*</span> <span class="n">FdV</span> <span class="o">*</span> <span class="n">FdL</span> <span class="p">);</span> 
-<span class="p">}</span> 
-</code></pre></div>
 <h3>电介材质问题</h3>
 
 <h4>折射率 Refractive index （IOR）</h4>
@@ -280,9 +351,9 @@
 
 <p>上面只解决了光通过电介质时的折射方向，但是究竟多少能量被折射（以及剩下多少能量反射），是不知道的。</p>
 
-<p>假定折射率为x，那么根据能量守恒可以知道反射率为1-x。</p>
+<p>假定反射率为x，那么根据能量守恒可以知道折射率为1-x。</p>
 
-<p>折射率一般用近似公式算(<a href="https://en.wikipedia.org/wiki/Schlick%27s_approximation">Schlick&#39;s approximation</a>)。</p>
+<p>反射率一般用近似公式算(<a href="https://en.wikipedia.org/wiki/Schlick%27s_approximation">Schlick&#39;s approximation</a>)。</p>
 
 <h4>用俄罗斯轮盘赌算法（Russian Roulette）算期望</h4>
 
@@ -322,6 +393,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">
