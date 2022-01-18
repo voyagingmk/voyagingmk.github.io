@@ -318,22 +318,22 @@ footer {
 }
 
 .nav2 {
-  width: 300px;
+  width: 330px;
   position: fixed;
   top: 220px;
   left: 50%;
-  margin-left: -700px;
+  margin-left: -730px;
   text-align: right;
 }
 .nav2 ul {
   list-style: none;
   list-style-image: none;
   font-size: 14px;
-  line-height: 24px;
+  line-height: 26px;
 }
 .nav2 ul li {
   padding: 5px 0px;
-  line-height: 16px;
+  line-height: 20px;
 }
 .nav2 ul li.tag-h1 {
   font-size: 1.2em;
@@ -341,6 +341,7 @@ footer {
 .nav2 ul li.tag-h1 a {
   font-weight: bold;
   color: #333;
+  line-height: 20px;
 }
 .nav2 ul li.tag-h2 + .tag-h1 {
   margin-top: 10px;
