@@ -49,7 +49,6 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -99,11 +98,20 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>Bounding Volume Hierachy of pbrt 解析(2) HLBVH</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
 <article class="post">
-    <h1>Bounding Volume Hierachy of pbrt 解析(2) HLBVH</h1>
-    <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    
     <div class="entry">
         <h2>HLBVH</h2>
 
@@ -137,16 +145,16 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
 <p>（from pbrt v3)</p>
 
 <p>实现代码如下，用了位运算技巧，需要慢慢理解（看注释，每一轮变换都是一次分隔，变换后都给出了有效位的新位置）：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="nf">LeftShift3</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="n">LeftShift3</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Assert</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">))</span> <span class="o">--</span><span class="n">x</span><span class="p">;</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00000011000000000000000011111111</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mb">0b00000011000000000000000011111111</span><span class="p">;</span>
     <span class="c1">// x = ---- --98 ---- ---- ---- ---- 7654 3210</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00000011000000001111000000001111</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mb">0b00000011000000001111000000001111</span><span class="p">;</span>
     <span class="c1">// x = ---- --98 ---- ---- 7654 ---- ---- 3210</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00000011000011000011000011000011</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mb">0b00000011000011000011000011000011</span><span class="p">;</span>
     <span class="c1">// x = ---- --98 ---- 76-- --54 ---- 32-- --10</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b00001001001001001001001001001001</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mb">0b00001001001001001001001001001001</span><span class="p">;</span>
     <span class="c1">// x = ---- 9--8 --7- -6-- 5--4 --3- -2-- 1--0</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
 <span class="p">}</span>
@@ -160,7 +168,7 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
 <p>调用了三次LeftShift3，分别输入了向量v的x、y、z分量。因为LeftShift3作用是用2个0bit分割有效位，所以EncodeMorton3里，LeftShift3(v.y) 需要整体左移1个bit，LeftShift3(v.z)则是2个bit，填满了总共3 * 10 = 30个bit（还有2个0bit可不管）。</p>
 
 <p>实现代码如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="nf">EncodeMorton3</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="n">EncodeMorton3</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Assert</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="p">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
     <span class="n">Assert</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="p">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
     <span class="n">Assert</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">z</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="p">.</span><span class="n">z</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">));</span>
@@ -207,7 +215,7 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
     <span class="c1">// 因为有3个维度，所以单维度上是2^4=16个grid</span>
     <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">LBVHTreelet</span><span class="o">&gt;</span> <span class="n">treeletsToBuild</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">end</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">mortonObjs</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">end</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kt">uint32_t</span> <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b00111111111111000000000000000000</span><span class="p">;</span>
+        <span class="kt">uint32_t</span> <span class="n">mask</span> <span class="o">=</span> <span class="mb">0b00111111111111000000000000000000</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">end</span> <span class="o">==</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">mortonObjs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">||</span>
             <span class="p">((</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">start</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">!=</span>
             <span class="p">(</span><span class="n">mortonObjs</span><span class="p">[</span><span class="n">end</span><span class="p">].</span><span class="n">mortonCode</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)))</span> <span class="p">{</span>
@@ -249,7 +257,7 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
 <span class="p">}</span>
 </code></pre></div>
 <h3>RadixSort</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">RadixSort</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">RadixSort</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MortonObj</span><span class="o">&gt;</span> <span class="n">tempVector</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">());</span>
     <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">bitsPerPass</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
     <span class="n">constexpr</span> <span class="kt">int</span> <span class="n">nBits</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
@@ -301,7 +309,7 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
     <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ObjectID</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">orderedObjs</span><span class="p">,</span>
     <span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">orderedObjsOffset</span><span class="p">,</span> <span class="kt">int</span> <span class="n">bitIndex</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Assert</span><span class="p">(</span><span class="n">nObjs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">bitIndex</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">||</span> <span class="n">nObjs</span> <span class="o">&lt;</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">maxObjsInNode</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">bitIndex</span> <span class="o">==</span> <span class="mi">-1</span> <span class="o">||</span> <span class="n">nObjs</span> <span class="o">&lt;</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">maxObjsInNode</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Create and return leaf node of LBVH treelet</span>
         <span class="p">(</span><span class="o">*</span><span class="n">totalNodes</span><span class="p">)</span><span class="o">++</span><span class="p">;</span>
         <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">node</span> <span class="o">=</span> <span class="n">buildNodes</span><span class="o">++</span><span class="p">;</span>
@@ -501,6 +509,7 @@ SAH的计算是\(O(n^{2}) \)的，且几乎每一个节点都要做SAH，性能�
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

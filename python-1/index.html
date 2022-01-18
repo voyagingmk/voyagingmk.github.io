@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,10 +74,19 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>python源码复习笔记</h1>
-  <h3>Tags: <a href="/tag/python/" rel="tag">python</a></h3>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>python源码复习笔记</h1>
+<h3>Tags: <a href="/tag/python/" rel="tag">python</a></h3>
+<article class="post">
   <div class="entry">
     <!--more-->
 
@@ -208,13 +216,13 @@
 
 <span class="c1">// 连续存放多个PyIntObject的内存块</span>
 <span class="c1">// 块与块之间用next指针串起来</span>
-<span class="k">struct</span> <span class="n">_intblock</span> <span class="p">{</span>
-    <span class="k">struct</span> <span class="n">_intblock</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nc">_intblock</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="nc">_intblock</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
     <span class="n">PyIntObject</span> <span class="n">objects</span><span class="p">[</span><span class="n">N_INTOBJECTS</span><span class="p">];</span>
 <span class="p">};</span>
 
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">_intblock</span> <span class="n">PyIntBlock</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_intblock</span> <span class="n">PyIntBlock</span><span class="p">;</span>
 
 <span class="c1">// 当前int内存块的头节点</span>
 <span class="k">static</span> <span class="n">PyIntBlock</span> <span class="o">*</span><span class="n">block_list</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -222,7 +230,7 @@
 <span class="k">static</span> <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">free_list</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
 <span class="k">static</span> <span class="n">PyIntObject</span> <span class="o">*</span>
-<span class="nf">fill_free_list</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="n">fill_free_list</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
     <span class="cm">/* Python&#39;s object allocator isn&#39;t appropriate for large blocks. */</span>
@@ -238,17 +246,17 @@
     <span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">((</span><span class="n">PyIntBlock</span> <span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">objects</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">N_INTOBJECTS</span><span class="p">;</span>
     <span class="k">while</span> <span class="p">(</span><span class="o">--</span><span class="n">q</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">)</span>
-        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_typeobject</span> <span class="o">*</span><span class="p">)(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="nc">_typeobject</span> <span class="o">*</span><span class="p">)(</span><span class="n">q</span><span class="mi">-1</span><span class="p">);</span>
     <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">p</span> <span class="o">+</span> <span class="n">N_INTOBJECTS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>每次一个PyIntObject被回收，就会放进free_list的头：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">int_dealloc</span><span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="n">int_dealloc</span><span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">PyInt_CheckExact</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="p">{</span>
-        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_typeobject</span> <span class="o">*</span><span class="p">)</span><span class="n">free_list</span><span class="p">;</span>
+        <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="nc">_typeobject</span> <span class="o">*</span><span class="p">)</span><span class="n">free_list</span><span class="p">;</span>
         <span class="n">free_list</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">else</span>
@@ -293,14 +301,14 @@
 </ul>
 
 <p>这个longObject反而不是用long实现了，而是用了复杂的大数运算技巧。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">_longobject</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">_longobject</span> <span class="p">{</span>
     <span class="n">PyObject_VAR_HEAD</span>
     <span class="n">digit</span> <span class="n">ob_digit</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
 <span class="p">};</span>
 
 <span class="k">typedef</span> <span class="n">PY_UINT32_T</span> <span class="n">digit</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">_longobject</span> <span class="n">PyLongObject</span><span class="p">;</span> <span class="cm">/* Revealed in longintrepr.h */</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_longobject</span> <span class="n">PyLongObject</span><span class="p">;</span> <span class="cm">/* Revealed in longintrepr.h */</span>
 </code></pre></div>
 <p>PyLongObject的创建和销毁都是直接在堆内存中发生，没有什么复杂优化：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// _PyLong_New是根据数字digit的数量来创建的，而不是数值上的大小</span>
@@ -320,7 +328,7 @@
 
 
 <span class="k">static</span> <span class="kt">void</span>
-<span class="nf">long_dealloc</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="n">long_dealloc</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">Py_TYPE</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">tp_free</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
 <span class="p">}</span>
@@ -452,8 +460,8 @@
 <span class="cm">To avoid slowing down lookups on a near-full table, we resize the table when</span>
 <span class="cm">it&#39;s two-thirds full.</span>
 <span class="cm">*/</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">_dictobject</span> <span class="n">PyDictObject</span><span class="p">;</span>
-<span class="k">struct</span> <span class="n">_dictobject</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_dictobject</span> <span class="n">PyDictObject</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nc">_dictobject</span> <span class="p">{</span>
     <span class="n">PyObject_HEAD</span>
     <span class="n">Py_ssize_t</span> <span class="n">ma_fill</span><span class="p">;</span>  <span class="cm">/* # Active + # Dummy */</span>
     <span class="n">Py_ssize_t</span> <span class="n">ma_used</span><span class="p">;</span>  <span class="cm">/* # Active */</span>
@@ -535,7 +543,7 @@
 
 <p>insert接口：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
-<span class="nf">insertdict_by_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span>
+<span class="n">insertdict_by_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span>
                     <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">old_value</span><span class="p">;</span>
@@ -567,7 +575,7 @@
 </code></pre></div>
 <p>调用insertdict_by_entry的主要入口：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
-<span class="nf">dict_set_item_by_hash_or_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
+<span class="n">dict_set_item_by_hash_or_entry</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
                                <span class="kt">long</span> <span class="n">hash</span><span class="p">,</span> <span class="n">PyDictEntry</span> <span class="o">*</span><span class="n">ep</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">register</span> <span class="n">PyDictObject</span> <span class="o">*</span><span class="n">mp</span><span class="p">;</span>
@@ -580,11 +588,11 @@
     <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ep</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">insertdict</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">insertdict_by_entry</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">hash</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="c1">// 这里有个控制是否resize的规则：</span>
     <span class="c1">// 如果插入了新元素且填充率（fill / (mask+1））大于2/3 那么要resize</span>
@@ -592,12 +600,12 @@
         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
     <span class="c1">// resize，新的size和used数有关</span>
     <span class="c1">// Note: 这里可能是发生收缩的</span>
-    <span class="k">return</span> <span class="n">dictresize</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">&gt;</span> <span class="mi">50000</span> <span class="o">?</span> <span class="mi">2</span> <span class="o">:</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nf">dictresize</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="p">(</span><span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span> <span class="o">&gt;</span> <span class="mi">50000</span> <span class="o">?</span> <span class="mi">2</span> <span class="o">:</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">mp</span><span class="o">-&gt;</span><span class="n">ma_used</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2>PySetObject</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_setobject</span> <span class="n">PySetObject</span><span class="p">;</span>
-<span class="k">struct</span> <span class="n">_setobject</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_setobject</span> <span class="n">PySetObject</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nc">_setobject</span> <span class="p">{</span>
     <span class="n">PyObject_HEAD</span>
 
     <span class="n">Py_ssize_t</span> <span class="n">fill</span><span class="p">;</span>  <span class="cm">/* # Active + # Dummy */</span>
@@ -744,19 +752,19 @@
 
 <p>然后是pool_header：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Pool for small blocks. */</span>
-<span class="k">struct</span> <span class="n">pool_header</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nc">pool_header</span> <span class="p">{</span>
     <span class="k">union</span> <span class="p">{</span> <span class="n">block</span> <span class="o">*</span><span class="n">_padding</span><span class="p">;</span> <span class="c1">// 没有被使用的，只是为了让count也是按8字节对齐</span>
             <span class="n">uint</span> <span class="n">count</span><span class="p">;</span> <span class="p">}</span> <span class="n">ref</span><span class="p">;</span>  <span class="c1">// 每次取用freeblock加1，在PyObject_Free里可能会减1</span>
     <span class="n">block</span> <span class="o">*</span><span class="n">freeblock</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">nextpool</span><span class="p">;</span>       
-    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">prevpool</span><span class="p">;</span>       
+    <span class="k">struct</span> <span class="nc">pool_header</span> <span class="o">*</span><span class="n">nextpool</span><span class="p">;</span>       
+    <span class="k">struct</span> <span class="nc">pool_header</span> <span class="o">*</span><span class="n">prevpool</span><span class="p">;</span>       
     <span class="n">uint</span> <span class="n">arenaindex</span><span class="p">;</span>                   
     <span class="n">uint</span> <span class="n">szidx</span><span class="p">;</span>                         
     <span class="n">uint</span> <span class="n">nextoffset</span><span class="p">;</span>  <span class="c1">// 相当于指向pool内的下一个未曾用过的block的地址</span>
     <span class="n">uint</span> <span class="n">maxnextoffset</span><span class="p">;</span>  <span class="c1">// nextoffset的最大有效值</span>
 <span class="p">};</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">poolp</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">pool_header</span> <span class="o">*</span><span class="n">poolp</span><span class="p">;</span>
 </code></pre></div>
 <ul>
 <li>pool是一块4KB的内存块，pool_header是这块内存块的地址头。</li>
@@ -809,7 +817,7 @@
 
 <p>先看arena_object:</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Record keeping for arenas. */</span>
-<span class="k">struct</span> <span class="n">arena_object</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nc">arena_object</span> <span class="p">{</span>
     <span class="n">uptr</span> <span class="n">address</span><span class="p">;</span>
 
     <span class="n">block</span><span class="o">*</span> <span class="n">pool_address</span><span class="p">;</span> <span class="c1">// 指向这个arena的第一个pool</span>
@@ -818,14 +826,14 @@
 
     <span class="n">uint</span> <span class="n">ntotalpools</span><span class="p">;</span> <span class="c1">// 总pool数</span>
 
-    <span class="k">struct</span> <span class="n">pool_header</span><span class="o">*</span> <span class="n">freepools</span><span class="p">;</span> <span class="c1">// 可用free pool的单向链表</span>
+    <span class="k">struct</span> <span class="nc">pool_header</span><span class="o">*</span> <span class="n">freepools</span><span class="p">;</span> <span class="c1">// 可用free pool的单向链表</span>
 
-    <span class="k">struct</span> <span class="n">arena_object</span><span class="o">*</span> <span class="n">nextarena</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">arena_object</span><span class="o">*</span> <span class="n">prevarena</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">arena_object</span><span class="o">*</span> <span class="n">nextarena</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">arena_object</span><span class="o">*</span> <span class="n">prevarena</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
 <p>arena_object的实例不是随便存放的，而是用一个数组来组织：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="k">struct</span> <span class="n">arena_object</span><span class="o">*</span> <span class="n">arenas</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="k">struct</span> <span class="nc">arena_object</span><span class="o">*</span> <span class="n">arenas</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="k">static</span> <span class="n">uint</span> <span class="n">maxarenas</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="c1">// 初始化默认创建16个arena_object 总共占16*256KB = 4MB内存</span>
 <span class="cp">#define INITIAL_ARENA_OBJECTS 16</span>
@@ -841,7 +849,7 @@
             <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>                <span class="c1">// 溢出判断</span>
 <span class="cp">#endif</span>
         <span class="n">nbytes</span> <span class="o">=</span> <span class="n">numarenas</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">arenas</span><span class="p">);</span> <span class="c1">// arenas数组总共占多少字节</span>
-        <span class="n">arenaobj</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">arena_object</span> <span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">arenas</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">);</span>
+        <span class="n">arenaobj</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="nc">arena_object</span> <span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">arenas</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">arenaobj</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
         <span class="n">arenas</span> <span class="o">=</span> <span class="n">arenaobj</span><span class="p">;</span><span class="c1">// 指向该内存块首地址</span>
@@ -946,12 +954,12 @@
 <p>更一般地说，PT(x)使得usedpools[2 * x]和usedpools[2 * x + 1]存了(&amp;usedpools[2 * x] - 2)的地址。</p>
 
 <p>这么折腾，是和pool_header有关：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">pool_header</span> <span class="p">{</span> <span class="c1">// (&amp;usedpools[2 * x] - 2)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">pool_header</span> <span class="p">{</span> <span class="c1">// (&amp;usedpools[2 * x] - 2)</span>
     <span class="k">union</span> <span class="p">{</span> <span class="n">block</span> <span class="o">*</span><span class="n">_padding</span><span class="p">;</span>
             <span class="n">uint</span> <span class="n">count</span><span class="p">;</span> <span class="p">}</span> <span class="n">ref</span><span class="p">;</span>     
     <span class="n">block</span> <span class="o">*</span><span class="n">freeblock</span><span class="p">;</span> 
-    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">nextpool</span><span class="p">;</span> <span class="c1">// 这个就是 usedpools[2 * x]</span>
-    <span class="k">struct</span> <span class="n">pool_header</span> <span class="o">*</span><span class="n">prevpool</span><span class="p">;</span> <span class="c1">// 这个就是 usedpools[2 * x + 1]</span>
+    <span class="k">struct</span> <span class="nc">pool_header</span> <span class="o">*</span><span class="n">nextpool</span><span class="p">;</span> <span class="c1">// 这个就是 usedpools[2 * x]</span>
+    <span class="k">struct</span> <span class="nc">pool_header</span> <span class="o">*</span><span class="n">prevpool</span><span class="p">;</span> <span class="c1">// 这个就是 usedpools[2 * x + 1]</span>
     <span class="err">···</span>
 <span class="p">};</span>
 </code></pre></div>
@@ -1138,15 +1146,15 @@
 </code></pre></div>
 <p>出现一个未知的结构PyGC_Head：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* GC information is stored BEFORE the object structure. */</span>
-<span class="k">typedef</span> <span class="k">union</span> <span class="n">_gc_head</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">union</span> <span class="nc">_gc_head</span> <span class="p">{</span>
     <span class="k">struct</span> <span class="p">{</span>
         <span class="c1">// 上文说的双向链表</span>
-        <span class="k">union</span> <span class="n">_gc_head</span> <span class="o">*</span><span class="n">gc_next</span><span class="p">;</span>
-        <span class="k">union</span> <span class="n">_gc_head</span> <span class="o">*</span><span class="n">gc_prev</span><span class="p">;</span>
+        <span class="k">union</span> <span class="nc">_gc_head</span> <span class="o">*</span><span class="n">gc_next</span><span class="p">;</span>
+        <span class="k">union</span> <span class="nc">_gc_head</span> <span class="o">*</span><span class="n">gc_prev</span><span class="p">;</span>
         <span class="n">Py_ssize_t</span> <span class="n">gc_refs</span><span class="p">;</span> <span class="c1">// gc专用的引用计数</span>
     <span class="p">}</span> <span class="n">gc</span><span class="p">;</span>
     <span class="kt">double</span> <span class="n">dummy</span><span class="p">;</span> <span class="cm">/* Force at least 8-byte alignment. */</span>
-    <span class="kt">char</span> <span class="n">dummy_padding</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="k">union</span> <span class="n">_gc_head_old</span><span class="p">)];</span>
+    <span class="kt">char</span> <span class="n">dummy_padding</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="k">union</span> <span class="nc">_gc_head_old</span><span class="p">)];</span>
 <span class="p">}</span> <span class="n">PyGC_Head</span><span class="p">;</span>
 </code></pre></div>
 <p>忽略那些对齐的东西，其实就是让这个object多了几个字段，用来做GC。gc_next和gc_prev是通过_PyObject_GC_TRACK和_PyObject_GC_UNTRACK控制的，这2个接口在创建完对象、即将返回对象前才调用，因为要确保被track的对象真的被成功创建了。gc_refs下文再解释。</p>
@@ -1178,7 +1186,7 @@
 <p>和代有关的代码：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/*** Global GC state ***/</span>
 
-<span class="k">struct</span> <span class="n">gc_generation</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nc">gc_generation</span> <span class="p">{</span>
     <span class="n">PyGC_Head</span> <span class="n">head</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">threshold</span><span class="p">;</span> <span class="cm">/* collection threshold */</span>
     <span class="kt">int</span> <span class="n">count</span><span class="p">;</span> <span class="cm">/* count of allocations or collections of younger</span>
@@ -1189,7 +1197,7 @@
 <span class="cp">#define GEN_HEAD(n) (&amp;generations[n].head)</span>
 
 <span class="cm">/* linked lists of container objects */</span>
-<span class="k">static</span> <span class="k">struct</span> <span class="n">gc_generation</span> <span class="n">generations</span><span class="p">[</span><span class="n">NUM_GENERATIONS</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="k">static</span> <span class="k">struct</span> <span class="nc">gc_generation</span> <span class="n">generations</span><span class="p">[</span><span class="n">NUM_GENERATIONS</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="cm">/* PyGC_Head,                               threshold,      count */</span>
     <span class="p">,</span>           <span class="mi">700</span><span class="p">,</span>            <span class="mi">0</span><span class="p">},</span>
     <span class="p">,</span>           <span class="mi">10</span><span class="p">,</span>             <span class="mi">0</span><span class="p">},</span>
@@ -1209,14 +1217,14 @@
 
 <h3>collect_generations</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="n">Py_ssize_t</span>
-<span class="nf">collect_generations</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="n">collect_generations</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
     <span class="n">Py_ssize_t</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
     <span class="c1">// 从最老的代遍历到最年轻的代，如果发现哪一代的count大于threshold</span>
     <span class="c1">// 那么收集&lt;=i代的对象</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">NUM_GENERATIONS</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">NUM_GENERATIONS</span><span class="mi">-1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">generations</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">generations</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">threshold</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// 第i代的count已经超过阈值了</span>
 
@@ -1248,7 +1256,7 @@
 
 <p>于是，需要另外弄一个gc_ref来做这件事情:</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">update_refs</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">containers</span><span class="p">)</span>
+<span class="n">update_refs</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">containers</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">containers</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(;</span> <span class="n">gc</span> <span class="o">!=</span> <span class="n">containers</span><span class="p">;</span> <span class="n">gc</span> <span class="o">=</span> <span class="n">gc</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">)</span> <span class="p">{</span>
@@ -1260,7 +1268,7 @@
 </code></pre></div>
 <p>update_refs，遍历链表的每个对象，把ob_refcnt复制到gc_refs，以备后续的subtract_refs使用：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">subtract_refs</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">containers</span><span class="p">)</span>
+<span class="n">subtract_refs</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">containers</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">traverseproc</span> <span class="n">traverse</span><span class="p">;</span>
     <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">containers</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
@@ -1278,7 +1286,7 @@
 
 <p>意思是遍历该对象引用的所有对象，对每个对象调用visit_decref，附加参数为NULL：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
-<span class="nf">visit_decref</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="n">visit_decref</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">op</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">PyObject_IS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">))</span> <span class="p">{</span>
@@ -1294,7 +1302,7 @@
 
 <p>看一个dict的traverse例子：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
-<span class="nf">dict_traverse</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">visitproc</span> <span class="n">visit</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+<span class="n">dict_traverse</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">visitproc</span> <span class="n">visit</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">Py_ssize_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">pk</span><span class="p">;</span>
@@ -1326,7 +1334,7 @@
 </code></pre></div>
 <p>这2行意图是把链表（young就是链表头）中的不可达对象都放进unreachable链表里，之后young里面就都是可达对象了。</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">move_unreachable</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">young</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">unreachable</span><span class="p">)</span>
+<span class="n">move_unreachable</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">young</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">unreachable</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">young</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
     <span class="k">while</span> <span class="p">(</span><span class="n">gc</span> <span class="o">!=</span> <span class="n">young</span><span class="p">)</span> <span class="p">{</span>
@@ -1359,7 +1367,7 @@
 <span class="p">}</span>
 
 <span class="k">static</span> <span class="kt">int</span>
-<span class="nf">visit_reachable</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">reachable</span><span class="p">)</span>
+<span class="n">visit_reachable</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">reachable</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">PyObject_IS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">))</span> <span class="p">{</span>
         <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">AS_GC</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
@@ -1393,7 +1401,7 @@
 <span class="cm"> * objects may be freed.  It is possible I screwed something up here.</span>
 <span class="cm"> */</span>
 <span class="k">static</span> <span class="kt">void</span>
-<span class="nf">delete_garbage</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">collectable</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">old</span><span class="p">)</span>
+<span class="n">delete_garbage</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">collectable</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">old</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">inquiry</span> <span class="n">clear</span><span class="p">;</span>
 
@@ -1432,13 +1440,13 @@
 <p>假设现在有1个循环引用的list：</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">a</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">a</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div>
 <p>a = None后，这个列表对象[]就没有外部引用了。但[]里存了一个元素，这个元素是[]自己，于是就形成了循环引用，且[]的引用计数为1。</p>
 
 <p>当delete_garbage开始处理这个[]时，第一步使得[]的引用计数+1，变成2，然后调用list_clear：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">int</span>
-<span class="nf">list_clear</span><span class="p">(</span><span class="n">PyListObject</span> <span class="o">*</span><span class="n">a</span><span class="p">)</span>
+<span class="n">list_clear</span><span class="p">(</span><span class="n">PyListObject</span> <span class="o">*</span><span class="n">a</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">Py_ssize_t</span> <span class="n">i</span><span class="p">;</span>
     <span class="n">PyObject</span> <span class="o">**</span><span class="n">item</span> <span class="o">=</span> <span class="n">a</span><span class="o">-&gt;</span><span class="n">ob_item</span><span class="p">;</span>
@@ -1477,40 +1485,40 @@
         <span class="k">pass</span>
 
 <span class="k">def</span> <span class="nf">generate</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">T</span><span class="p">()</span>
         <span class="c1"># print(sys.getrefcount(a)) 输出 3</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_STATS</span><span class="o">|</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_LEAK</span><span class="p">)</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to generate garbages&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;running...&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to generate garbages&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;running...&quot;</span><span class="p">)</span>
 <span class="n">generate</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
 
 <span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_STATS</span><span class="o">|</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_LEAK</span><span class="p">)</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to gc.collect again&quot;</span><span class="p">)</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;press to exit&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;exit&quot;</span><span class="p">)</span>
+<span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;press to exit&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exit&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>输出：</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>$python test_gc.py 
@@ -1598,7 +1606,7 @@ gc: uncollectable &lt;dict 0x11891f280&gt;
 
 <p>T实例因为有<strong>del</strong>，has_finalizer会返回true，于是被放进finializer链表：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">move_finalizers</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">unreachable</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">finalizers</span><span class="p">)</span>
+<span class="n">move_finalizers</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">unreachable</span><span class="p">,</span> <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">finalizers</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span><span class="p">;</span>
     <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
@@ -1617,7 +1625,7 @@ gc: uncollectable &lt;dict 0x11891f280&gt;
 </code></pre></div>
 <p>move_finalizers之后会执行move_finalizer_reachable：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">move_finalizer_reachable</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">finalizers</span><span class="p">)</span>
+<span class="n">move_finalizer_reachable</span><span class="p">(</span><span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">finalizers</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">traverseproc</span> <span class="n">traverse</span><span class="p">;</span>
     <span class="n">PyGC_Head</span> <span class="o">*</span><span class="n">gc</span> <span class="o">=</span> <span class="n">finalizers</span><span class="o">-&gt;</span><span class="n">gc</span><span class="p">.</span><span class="n">gc_next</span><span class="p">;</span>
@@ -1675,6 +1683,7 @@ gc: uncollectable &lt;dict 0x11891f280&gt;
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

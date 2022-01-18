@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,10 +74,19 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>select和epoll多路复用用法总结</h1>
-  <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>select和epoll多路复用用法总结</h1>
+<h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
+<article class="post">
   <div class="entry">
     <!--more-->
 
@@ -108,7 +116,7 @@
 <span class="cm">writefds：  要监听写事件的fd集合   /    有写事件的fd集合</span>
 <span class="cm">errorfds：  错误事件，一般传null即可</span>
 <span class="cm">*/</span>
-<span class="kt">int</span> <span class="nf">select</span><span class="p">(</span><span class="kt">int</span> <span class="n">maxfdp</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">readfds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">writefds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">errorfds</span><span class="p">,</span> <span class="k">struct</span> <span class="n">timeval</span> <span class="o">*</span><span class="n">timeout</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">select</span><span class="p">(</span><span class="kt">int</span> <span class="n">maxfdp</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">readfds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">writefds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">errorfds</span><span class="p">,</span> <span class="k">struct</span> <span class="nc">timeval</span> <span class="o">*</span><span class="n">timeout</span><span class="p">);</span>
 </code></pre></div>
 <p>用法要点：</p>
 
@@ -151,7 +159,7 @@
 <p>需要注意的是，即使是删除监听事件，epoll_ctl一个参数都不能少。</p>
 
 <h3>轮询</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="nf">epoll_wait</span><span class="p">(</span><span class="kt">int</span> <span class="n">epfd</span><span class="p">,</span> <span class="k">struct</span> <span class="n">epoll_event</span> <span class="o">*</span><span class="n">events</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="nf">epoll_wait</span><span class="p">(</span><span class="kt">int</span> <span class="n">epfd</span><span class="p">,</span> <span class="k">struct</span> <span class="nc">epoll_event</span> <span class="o">*</span><span class="n">events</span><span class="p">,</span>
                <span class="kt">int</span> <span class="n">maxevents</span><span class="p">,</span> <span class="kt">int</span> <span class="n">timeout</span><span class="p">);</span>
 </code></pre></div>
 <p>timeout：-1，永久阻塞；0，立即返回，不阻塞； &gt;0，阻塞多少毫秒后返回
@@ -172,12 +180,12 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 <p>eventpoll可理解为存了2个数据结构的头部指针，一个指向一个红黑树的根，一个指向双向链表的头。</p>
 
 <p>只要某个fd的某个事件被监听中，就会存在和这个fd关联的一个epitem:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">epitem</span><span class="p">{</span>  
-    <span class="k">struct</span> <span class="n">rb_node</span>  <span class="n">rbn</span><span class="p">;</span><span class="c1">//红黑树节点  </span>
-    <span class="k">struct</span> <span class="n">list_head</span>    <span class="n">rdllink</span><span class="p">;</span><span class="c1">//双向链表节点  </span>
-    <span class="k">struct</span> <span class="n">epoll_filefd</span>  <span class="n">ffd</span><span class="p">;</span>  <span class="c1">//事件句柄信息  </span>
-    <span class="k">struct</span> <span class="n">eventpoll</span> <span class="o">*</span><span class="n">ep</span><span class="p">;</span>    <span class="c1">//指向其所属的eventpoll对象  </span>
-    <span class="k">struct</span> <span class="n">epoll_event</span> <span class="n">event</span><span class="p">;</span> <span class="c1">//期待发生的事件类型  </span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">epitem</span><span class="p">{</span>  
+    <span class="k">struct</span> <span class="nc">rb_node</span>  <span class="n">rbn</span><span class="p">;</span><span class="c1">//红黑树节点  </span>
+    <span class="k">struct</span> <span class="nc">list_head</span>    <span class="n">rdllink</span><span class="p">;</span><span class="c1">//双向链表节点  </span>
+    <span class="k">struct</span> <span class="nc">epoll_filefd</span>  <span class="n">ffd</span><span class="p">;</span>  <span class="c1">//事件句柄信息  </span>
+    <span class="k">struct</span> <span class="nc">eventpoll</span> <span class="o">*</span><span class="n">ep</span><span class="p">;</span>    <span class="c1">//指向其所属的eventpoll对象  </span>
+    <span class="k">struct</span> <span class="nc">epoll_event</span> <span class="n">event</span><span class="p">;</span> <span class="c1">//期待发生的事件类型  </span>
 <span class="p">}</span>  
 </code></pre></div>
 <p>红黑树中的每个节点都等同于某个epitem的rbn对象指针；双向链表的每个节点都等同于某个epitem的rdllink指针。</p>
@@ -230,6 +238,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>redis5.0源码学习笔记（2）对象实现</h1>
+ <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
 <article class="post">
-    <h1>redis5.0源码学习笔记（2）对象实现</h1>
-    <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
+    
     <div class="entry">
         <p>Note：本文实际绑定的版本是branch5.0（2018-7-25）。</p>
 
@@ -119,7 +127,7 @@
 <span class="cp">#define OBJ_ENCODING_STREAM 10 </span><span class="cm">/* radix tree of listpacks */</span><span class="cp"></span>
 </code></pre></div>
 <h2>对象结构体</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">redisObject</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">redisObject</span> <span class="p">{</span>
     <span class="kt">unsigned</span> <span class="nl">type</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span> <span class="c1">// 上文已介绍</span>
     <span class="kt">unsigned</span> <span class="nl">encoding</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span> <span class="c1">// 上文已介绍</span>
     <span class="kt">unsigned</span> <span class="nl">lru</span><span class="p">:</span><span class="n">LRU_BITS</span><span class="p">;</span> <span class="c1">// 计时的</span>
@@ -169,7 +177,7 @@
 <h1>redisCommand</h1>
 
 <h2>结构</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">redisCommand</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">redisCommand</span> <span class="p">{</span>
     <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="c1">// 即暴露给客户端的指令名</span>
     <span class="n">redisCommandProc</span> <span class="o">*</span><span class="n">proc</span><span class="p">;</span> <span class="c1">// 接口</span>
     <span class="kt">int</span> <span class="n">arity</span><span class="p">;</span> <span class="c1">// 参数数量</span>
@@ -222,7 +230,7 @@
 <h2>createEmbeddedStringObject</h2>
 
 <p>这个和createRawStringObject的最大区别是，只做一次内存分配：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="nc">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
 </code></pre></div>
 <p>encoding是OBJ_ENCODING_EMBSTR。</p>
 
@@ -337,7 +345,7 @@
 
         <span class="k">if</span> <span class="p">(</span><span class="n">diff_algo</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">setnum</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// 按照包含元素数量 降序排序 方便尽快找到重复元素</span>
-            <span class="n">qsort</span><span class="p">(</span><span class="n">sets</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">setnum</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">),</span>
+            <span class="n">qsort</span><span class="p">(</span><span class="n">sets</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">setnum</span><span class="mi">-1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">),</span>
                 <span class="n">qsortCompareSetsByRevCardinality</span><span class="p">);</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -500,6 +508,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,11 +74,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>漫谈网络通讯加密（4）用openSSL学习TLS1.3</h1>
+ <h3>Tags: <a href="/tag/crypto/" rel="tag">crypto</a></h3>
 <article class="post">
-    <h1>漫谈网络通讯加密（4）用openSSL学习TLS1.3</h1>
-    <h3>Tags: <a href="/tag/crypto/" rel="tag">crypto</a></h3>
+    
     <div class="entry">
         <!--more-->
 
@@ -103,7 +111,7 @@
 <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">OPENSSL_init_ssl</span><span class="p">(</span><span class="n">OPENSSL_INIT_ENGINE_ALL_BUILTIN</span>
                           <span class="o">|</span> <span class="n">OPENSSL_INIT_LOAD_CONFIG</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">))</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;init success</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -548,6 +556,7 @@ SSL-Session:
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

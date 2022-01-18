@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>《Effective Modern C++》读书笔记</h1>
+ <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
 <article class="post">
-    <h1>《Effective Modern C++》读书笔记</h1>
-    <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
+    
     <div class="entry">
         <p>Note：为避免各种侵权问题，本文并没有复制原书任意文字(代码除外，作者已经声明代码可以被使用)。需要原书完整中文翻译的读者请等待官方译本的发布。</p>
 
@@ -187,7 +195,7 @@
 <p>用= delete还有一个高端的好处：在class内部的函数模板，它的访问类型只能是public、protected、private其中一种，不能又有public又有private的实例化，所以c++98的&quot;delete&quot;方案对函数模板没辙。还好，C++11解决了这个问题，用= delete即可：</p>
 <div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
-    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
     <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">T</span><span class="o">*</span> <span class="n">ptr</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
 
 <span class="p">};</span>
@@ -228,16 +236,16 @@
 <div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">Base</span> <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf2</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf3</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span>
     <span class="kt">void</span> <span class="nf">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">();</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span>
     <span class="kt">void</span> <span class="nf">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
@@ -247,9 +255,9 @@
 <div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">()</span> <span class="k">override</span><span class="p">;</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="k">override</span><span class="p">;</span>
-    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">mf4</span><span class="p">()</span> <span class="k">const</span> <span class="k">override</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="k">override</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf4</span><span class="p">()</span> <span class="k">const</span> <span class="k">override</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
 <p>Derived的mf1、mf2、mf3这3个覆盖函数无法编译通过，因为编译器在Base中找不到对应的函数。</p>
@@ -265,7 +273,7 @@
 <p>注意，cbegin和cend是成员函数。在c++11中，有非成员函数的begin和end，但没有非成员函数的cbegin和cend(c++14才有)。</p>
 
 <p>所以要写泛型函数时，c++14这么写:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">C</span><span class="p">,</span> <span class="k">typename</span> <span class="n">V</span><span class="o">&gt;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">C</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">V</span><span class="o">&gt;</span>
 <span class="kt">void</span> <span class="n">findAndInsert</span><span class="p">(</span><span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">,</span> <span class="k">const</span> <span class="n">V</span><span class="o">&amp;</span> <span class="n">targetVal</span><span class="p">,</span> <span class="k">const</span> <span class="n">V</span><span class="o">&amp;</span> <span class="n">insertVal</span><span class="p">)</span>
     <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">cbegin</span><span class="p">;</span>
     <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">cend</span><span class="p">;</span>
@@ -303,8 +311,8 @@
 <span class="kt">void</span> <span class="n">swap</span><span class="p">(</span><span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">a</span><span class="p">)[</span><span class="n">N</span><span class="p">],</span> <span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="p">)[</span><span class="n">N</span><span class="p">])</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">b</span><span class="p">)));</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T1</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T2</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="n">pair</span> <span class="p">{</span>
-    <span class="kt">void</span> <span class="n">swap</span><span class="p">(</span><span class="n">pair</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
+<span class="k">struct</span> <span class="nc">pair</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="nf">swap</span><span class="p">(</span><span class="n">pair</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
                                   <span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">second</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">second</span><span class="p">)));</span>
 <span class="p">};</span>
 </code></pre></div>
@@ -325,12 +333,12 @@
 </ul>
 
 <p>具体怎么玩？看下面的代码：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">constexpr</span> <span class="kt">int</span> <span class="nf">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++11</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">constexpr</span> <span class="kt">int</span> <span class="n">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++11</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">times</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="k">constexpr</span> <span class="kt">int</span> <span class="nf">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++14</span>
+<span class="k">constexpr</span> <span class="kt">int</span> <span class="n">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++14</span>
 <span class="p">{</span>
     <span class="k">auto</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> 
@@ -338,7 +346,7 @@
     <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">;</span>
     <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">times</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
@@ -410,6 +418,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

@@ -35,7 +35,6 @@ Given a list of non-negative integers representing the amount of money of each h
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -85,10 +84,19 @@ Given a list of non-negative integers representing the amount of money of each h
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>leetcode题解 problem198 House Robber</h1>
-  <h3>Tags: <a href="/tag/leetcode/" rel="tag">leetcode</a></h3>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>leetcode题解 problem198 House Robber</h1>
+<h3>Tags: <a href="/tag/leetcode/" rel="tag">leetcode</a></h3>
+<article class="post">
   <div class="entry">
     <blockquote>
 <p>You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.</p>
@@ -98,11 +106,11 @@ Given a list of non-negative integers representing the amount of money of each h
 
 <!--more-->
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno">1 </span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-<span class="lineno">2 </span><span class="k">public</span><span class="o">:</span>
-<span class="lineno">3 </span>    <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">4 </span>    <span class="p">}</span>
-<span class="lineno">5 </span><span class="p">};</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="linenos">2</span><span class="k">public</span><span class="o">:</span>
+<span class="linenos">3</span>    <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">4</span>    <span class="p">}</span>
+<span class="linenos">5</span><span class="p">};</span></code></pre></figure>
 
 <h3>题意：</h3>
 
@@ -141,43 +149,43 @@ Given a list of non-negative integers representing the amount of money of each h
 
 <p>代码如下(leetcode RunTime 0ms)：</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-<span class="lineno"> 2 </span><span class="k">public</span><span class="o">:</span>
-<span class="lineno"> 3 </span> <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno"> 4 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<span class="lineno"> 5 </span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 6 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-<span class="lineno"> 7 </span>         <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="lineno"> 8 </span>     <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-<span class="lineno"> 9 </span>     <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno">10 </span>     <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="lineno">11 </span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-<span class="lineno">12 </span>         <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="err">，</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]);</span>
-<span class="lineno">13 </span>     <span class="p">}</span>
-<span class="lineno">14 </span>     <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()];</span>
-<span class="lineno">15 </span> <span class="p">}</span>
-<span class="lineno">16 </span><span class="p">};</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="linenos"> 2</span><span class="k">public</span><span class="o">:</span>
+<span class="linenos"> 3</span> <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos"> 4</span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="linenos"> 5</span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 6</span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="linenos"> 7</span>         <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="linenos"> 8</span>     <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+<span class="linenos"> 9</span>     <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">10</span>     <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="linenos">11</span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="linenos">12</span>         <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="err">，</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]);</span>
+<span class="linenos">13</span>     <span class="p">}</span>
+<span class="linenos">14</span>     <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()];</span>
+<span class="linenos">15</span> <span class="p">}</span>
+<span class="linenos">16</span><span class="p">};</span></code></pre></figure>
 
 <p>又因为，我们只需要求f[n]，并不需要输出整个F数组，那么可以改下代码，降低空间复杂度。</p>
 
 <p>代码如下(leetcode RunTime 0ms)：</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="lineno"> 1 </span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-<span class="lineno"> 2 </span><span class="k">public</span><span class="o">:</span>
-<span class="lineno"> 3 </span> <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno"> 4 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<span class="lineno"> 5 </span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="lineno"> 6 </span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-<span class="lineno"> 7 </span>         <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="lineno"> 8 </span>     <span class="kt">int</span> <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="lineno"> 9 </span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
-<span class="lineno">10 </span>         <span class="n">temp</span> <span class="o">=</span> <span class="n">cur</span><span class="p">;</span>
-<span class="lineno">11 </span>         <span class="n">cur</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pre</span><span class="p">,</span> <span class="n">cur</span><span class="p">);</span>
-<span class="lineno">12 </span>         <span class="n">pre</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
-<span class="lineno">13 </span>     <span class="p">}</span>
-<span class="lineno">14 </span>     <span class="k">return</span> <span class="n">cur</span><span class="p">;</span>
-<span class="lineno">15 </span> <span class="p">}</span>
-<span class="lineno">16 </span><span class="p">};</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="linenos"> 2</span><span class="k">public</span><span class="o">:</span>
+<span class="linenos"> 3</span> <span class="kt">int</span> <span class="n">rob</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos"> 4</span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="linenos"> 5</span>         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 6</span>     <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="linenos"> 7</span>         <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="linenos"> 8</span>     <span class="kt">int</span> <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 9</span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+<span class="linenos">10</span>         <span class="n">temp</span> <span class="o">=</span> <span class="n">cur</span><span class="p">;</span>
+<span class="linenos">11</span>         <span class="n">cur</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pre</span><span class="p">,</span> <span class="n">cur</span><span class="p">);</span>
+<span class="linenos">12</span>         <span class="n">pre</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
+<span class="linenos">13</span>     <span class="p">}</span>
+<span class="linenos">14</span>     <span class="k">return</span> <span class="n">cur</span><span class="p">;</span>
+<span class="linenos">15</span> <span class="p">}</span>
+<span class="linenos">16</span><span class="p">};</span></code></pre></figure>
 
   </div>
   <div class="entry">
@@ -210,6 +218,7 @@ Given a list of non-negative integers representing the amount of money of each h
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

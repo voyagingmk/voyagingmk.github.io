@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>redis5.0源码学习笔记（4）分布式相关</h1>
+ <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
 <article class="post">
-    <h1>redis5.0源码学习笔记（4）分布式相关</h1>
-    <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
+    
     <div class="entry">
         <p>Note：本文实际绑定的版本是branch5.0（2018-7-25）。</p>
 
@@ -157,11 +165,11 @@ appendonly yes
 <span class="o">&gt;&gt;&gt;</span> <span class="n">Trying</span> <span class="n">to</span> <span class="n">optimize</span> <span class="n">slaves</span> <span class="n">allocation</span> <span class="k">for</span> <span class="n">anti</span><span class="o">-</span><span class="n">affinity</span>
 <span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="n">Some</span> <span class="n">slaves</span> <span class="n">are</span> <span class="n">in</span> <span class="n">the</span> <span class="n">same</span> <span class="n">host</span> <span class="n">as</span> <span class="n">their</span> <span class="n">master</span>
 <span class="nl">M</span><span class="p">:</span> <span class="mi">10921696574</span><span class="n">cc509be40ae48d704ef6ca67b4171</span> <span class="mf">127.0.0.1</span><span class="o">:</span><span class="mi">7000</span>
-   <span class="nl">slots</span><span class="p">:[</span><span class="mi">0</span><span class="o">-</span><span class="mi">5460</span><span class="p">]</span> <span class="p">(</span><span class="mi">5461</span> <span class="n">slots</span><span class="p">)</span> <span class="n">master</span>
+   <span class="nl">slots</span><span class="p">:[</span><span class="mi">0-5460</span><span class="p">]</span> <span class="p">(</span><span class="mi">5461</span> <span class="n">slots</span><span class="p">)</span> <span class="n">master</span>
 <span class="nl">M</span><span class="p">:</span> <span class="n">c1f776cd30527cffb9046e01ca30031e1d5bc578</span> <span class="mf">127.0.0.1</span><span class="o">:</span><span class="mi">7001</span>
-   <span class="nl">slots</span><span class="p">:[</span><span class="mi">5461</span><span class="o">-</span><span class="mi">10922</span><span class="p">]</span> <span class="p">(</span><span class="mi">5462</span> <span class="n">slots</span><span class="p">)</span> <span class="n">master</span>
+   <span class="nl">slots</span><span class="p">:[</span><span class="mi">5461-10922</span><span class="p">]</span> <span class="p">(</span><span class="mi">5462</span> <span class="n">slots</span><span class="p">)</span> <span class="n">master</span>
 <span class="nl">M</span><span class="p">:</span> <span class="mi">77001</span><span class="n">d974c1f5f6db0256622b276293ec36359fb</span> <span class="mf">127.0.0.1</span><span class="o">:</span><span class="mi">7002</span>
-   <span class="nl">slots</span><span class="p">:[</span><span class="mi">10923</span><span class="o">-</span><span class="mi">16383</span><span class="p">]</span> <span class="p">(</span><span class="mi">5461</span> <span class="n">slots</span><span class="p">)</span> <span class="n">master</span>
+   <span class="nl">slots</span><span class="p">:[</span><span class="mi">10923-16383</span><span class="p">]</span> <span class="p">(</span><span class="mi">5461</span> <span class="n">slots</span><span class="p">)</span> <span class="n">master</span>
 <span class="nl">S</span><span class="p">:</span> <span class="mi">235238</span><span class="n">c0774c50721e8f8f0fad6ca8efb13a6f19</span> <span class="mf">127.0.0.1</span><span class="o">:</span><span class="mi">7003</span>
    <span class="n">replicates</span> <span class="mi">10921696574</span><span class="n">cc509be40ae48d704ef6ca67b4171</span>
 <span class="nl">S</span><span class="p">:</span> <span class="mi">248661</span><span class="n">b074edd363e91d151391577c4ac0c43bdf</span> <span class="mf">127.0.0.1</span><span class="o">:</span><span class="mi">7004</span>
@@ -429,6 +437,7 @@ appendonly yes
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

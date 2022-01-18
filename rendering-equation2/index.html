@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,11 +74,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>渲染基础理论的介绍(2)——工程实现</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
 <article class="post">
-    <h1>渲染基础理论的介绍(2)——工程实现</h1>
-    <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    
     <div class="entry">
         <!--more-->
 
@@ -140,7 +148,7 @@
 
 <p>先贴上pbrt的实现代码：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">//pbrt-v2</span>
-<span class="k">static</span> <span class="n">RGBSpectrum</span> <span class="nf">FromSampled</span><span class="p">(</span><span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">lambda</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">static</span> <span class="n">RGBSpectrum</span> <span class="n">FromSampled</span><span class="p">(</span><span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">lambda</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">//part I</span>
     <span class="kt">float</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">};</span>
     <span class="kt">float</span> <span class="n">yint</span> <span class="o">=</span> <span class="mf">0.f</span><span class="p">;</span>
@@ -157,7 +165,7 @@
     <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">yint</span><span class="p">;</span>
     <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="n">yint</span><span class="p">;</span>
     <span class="c1">//part III</span>
-    <span class="k">return</span> <span class="n">FromXYZ</span><span class="p">(</span><span class="n">xyz</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nf">FromXYZ</span><span class="p">(</span><span class="n">xyz</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>该函数的参数分别是SPD曲线的λ值、v值、λ-v对数(即采样次数)，这3者确定了一条离散的SPD曲线；该函数的返回值就是一个RGB值。</p>
@@ -183,9 +191,9 @@
 <p><img src="../images/2016.7/17.png" alt="17.png"></p>
 
 <p>对应的代码如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">void</span> <span class="nf">XYZToRGB</span><span class="p">(</span><span class="k">const</span> <span class="n">Float</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">Float</span> <span class="n">rgb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">void</span> <span class="n">XYZToRGB</span><span class="p">(</span><span class="k">const</span> <span class="n">Float</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">Float</span> <span class="n">rgb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="p">{</span>
     <span class="n">rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.240479f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.537150f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.498535f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-    <span class="n">rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.969256f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.875991f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.041556f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="n">rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">-0.969256f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.875991f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.041556f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
     <span class="n">rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.055648f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.204043f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.057311f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -195,14 +203,14 @@
 
 <p>gamma校正应放在【线性空间】到【非线性空间】的转换时做，也就是最后输出时。</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">//gamma校正</span>
-<span class="kr">inline</span> <span class="n">Float</span> <span class="nf">GammaCorrect</span><span class="p">(</span><span class="n">Float</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+<span class="kr">inline</span> <span class="n">Float</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">Float</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">0.0031308f</span><span class="p">)</span> <span class="k">return</span> <span class="mf">12.92f</span> <span class="o">*</span> <span class="n">value</span><span class="p">;</span>
     <span class="k">return</span> <span class="mf">1.055f</span> <span class="o">*</span> <span class="n">std</span><span class="o">::</span><span class="n">pow</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Float</span><span class="p">)(</span><span class="mf">1.f</span> <span class="o">/</span> <span class="mf">2.4f</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055f</span><span class="p">;</span>
 <span class="p">}</span>
 
 
 <span class="c1">//Clamp函数</span>
-<span class="n">template</span> <span class="o">&lt;</span><span class="kr">typename</span> <span class="n">T</span><span class="p">,</span> <span class="kr">typename</span> <span class="n">U</span><span class="p">,</span> <span class="kr">typename</span> <span class="n">V</span><span class="o">&gt;</span>
+<span class="n">template</span> <span class="o">&lt;</span><span class="n">typename</span> <span class="n">T</span><span class="p">,</span> <span class="n">typename</span> <span class="n">U</span><span class="p">,</span> <span class="n">typename</span> <span class="n">V</span><span class="o">&gt;</span>
 <span class="kr">inline</span> <span class="n">T</span> <span class="n">Clamp</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">,</span> <span class="n">U</span> <span class="n">low</span><span class="p">,</span> <span class="n">V</span> <span class="n">high</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">low</span><span class="p">;</span>
@@ -254,6 +262,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

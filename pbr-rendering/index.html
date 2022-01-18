@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>PBR渲染原理</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
 <article class="post">
-    <h1>PBR渲染原理</h1>
-    <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    
     <div class="entry">
         <p>基于PBR做渲染，需要涉及到很多物理学、几何学、热辐射学概念，本文将逐一介绍每个关键概念，并给出相关重要公式。</p>
 
@@ -181,7 +189,7 @@
 
 <p>\[ F_{Schlick}(n, v, F_{0}) = F_{0} + (1 - F_{0})( 1- (n\cdot v))^{5} \]</p>
 
-<p>\( F_{0} \)就是垂直观察平面时的<strong>基本反射率</strong>，一般要用一个vec3表示。注意，这条公式其实只适用于绝缘体（dielectric），对于金属/导体（metal/conductor）是不适用的。这时就有了些取巧的做法。</p>
+<p>\( F_{0} \)就是垂直观察平面时的<strong>基本反射率</strong>，一般要用一个vec3表示。注意，这条公式其实只适用于电介质（dielectric），对于金属/导体（metal/conductor）是不适用的。这时就有了些取巧的做法。</p>
 
 <p>一是先预计算出各种常见材质的基本反射率，汇总成一个表，然后需要的时候查表即可。</p>
 
@@ -284,6 +292,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

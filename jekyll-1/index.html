@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,10 +76,19 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>我是这样用jekyll搭建个人博客的</h1>
-  <h3>Tags: <a href="/tag/jekyll/" rel="tag">jekyll</a></h3>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>我是这样用jekyll搭建个人博客的</h1>
+<h3>Tags: <a href="/tag/jekyll/" rel="tag">jekyll</a></h3>
+<article class="post">
   <div class="entry">
     <p>好几年前就尝试用github pages服务来搭建github博客，当时也已经用了jekyll，不过由于那时候主要是在windows下工作学习（学图形学），手头也只有一台电脑，在win环境弄jekyll实在是不方便，要装ruby啊gem啊，都感觉没有linux环境顺手，最后还是转去了csdn博客。不过csdn博客在我毕业后也是荒废了。</p>
 
@@ -141,6 +149,13 @@
 <p>gem install wdm</p>
 
 <p>gem install webrick</p>
+
+<p>gem install github-pages  (主题)</p>
+
+<p>gem install jekyll-remote-theme  (主题)</p>
+
+<p>主题要加：
+remote_theme: pages-themes/<a href="mailto:leap-day@v0.2.0">leap-day@v0.2.0</a></p>
 
 <p>然后就可以在Blog目录执行：jekyll <em>3.9.1</em> serve 了：</p>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="nl">D</span><span class="p">:</span><span class="err">\</span><span class="n">wyman_blog</span><span class="o">&gt;</span><span class="n">jekyll</span> <span class="n">_3</span><span class="mf">.9.1</span><span class="n">_</span> <span class="n">serve</span>
@@ -204,6 +219,7 @@
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

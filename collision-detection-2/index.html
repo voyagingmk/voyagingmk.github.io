@@ -121,7 +121,6 @@ GJK各种实现
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -171,11 +170,20 @@ GJK各种实现
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>碰撞检测算法(二)：原始GJK详解</h1>
+ <h3>Tags: <a href="/tag/collision-detection/" rel="tag">collision detection</a></h3>
 <article class="post">
-    <h1>碰撞检测算法(二)：原始GJK详解</h1>
-    <h3>Tags: <a href="/tag/collision-detection/" rel="tag">collision detection</a></h3>
+    
     <div class="entry">
         <p>GJK，全称<a href="https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm">Gilbert–Johnson–Keerthi distance algorithm</a>，是非常常用的碰撞检测算法。</p>
 
@@ -336,7 +344,7 @@ GJK各种实现
     <span class="nx">D</span> <span class="o">=</span> <span class="o">-</span><span class="nx">A</span>
     <span class="nx">loop</span><span class="o">:</span>
         <span class="nx">A</span> <span class="o">=</span> <span class="nx">Support</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">-</span> <span class="nx">Support</span><span class="p">(</span><span class="nx">q</span><span class="p">,</span> <span class="o">-</span><span class="nx">D</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nx">dot</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">:</span>
+        <span class="k">if</span> <span class="nx">dot</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0</span><span class="o">:</span>
           <span class="nx">reject</span>
         <span class="nx">s</span> <span class="o">=</span> <span class="nx">s</span> <span class="err">∪</span> <span class="nx">A</span>
         <span class="nx">s</span><span class="p">,</span> <span class="nx">D</span><span class="p">,</span> <span class="nx">contains_origin</span> <span class="o">=</span> <span class="nx">NearestSimplex</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
@@ -640,24 +648,24 @@ GJK各种实现
 
 <p>理解2D叉积后，GetSearchDirection理解起来就轻松了：</p>
 <div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="c1">// 2D叉积公式</span>
-<span class="kr">inline</span> <span class="n">float32</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span>
+<span class="kr">inline</span> <span class="n">float32</span> <span class="n">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">b</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">b</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="c1">// 这2条公式其实是为了得到和a正交的向量，s的值一般为1</span>
 <span class="c1">// b2Cross(a, 1.0)返回一个在a右侧的正交向量</span>
-<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="n">float32</span> <span class="n">s</span><span class="p">)</span>
+<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="n">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="n">float32</span> <span class="n">s</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">return</span> <span class="n">b2Vec2</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nf">b2Vec2</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="c1">// b2Cross(1.0, a)返回一个在a左侧的正交向量</span>
-<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="n">float32</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
+<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">float32</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">return</span> <span class="n">b2Vec2</span><span class="p">(</span><span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nf">b2Vec2</span><span class="p">(</span><span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="n">b2Vec2</span> <span class="nf">GetSearchDirection</span><span class="p">()</span> <span class="k">const</span>
+<span class="n">b2Vec2</span> <span class="n">GetSearchDirection</span><span class="p">()</span> <span class="k">const</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">m_count</span><span class="p">)</span>
   <span class="p">{</span>
@@ -673,12 +681,12 @@ GJK各种实现
       <span class="k">if</span> <span class="p">(</span><span class="n">sgn</span> <span class="o">&gt;</span> <span class="mf">0.0f</span><span class="p">)</span>
       <span class="p">{</span> 
         <span class="c1">// -m_v1.w在e12左侧，即原点也在左侧</span>
-        <span class="k">return</span> <span class="n">b2Cross</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
       <span class="p">}</span>
       <span class="k">else</span>
       <span class="p">{</span>
         <span class="c1">// -m_v1.w在e12右侧，即原点也在右侧</span>
-        <span class="k">return</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
 
@@ -1063,6 +1071,7 @@ Minkowski difference</a></p>
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

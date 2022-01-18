@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>碰撞检测算法</h1>
+ <h3>Tags: <a href="/tag/collision-detection/" rel="tag">collision detection</a></h3>
 <article class="post">
-    <h1>碰撞检测算法</h1>
-    <h3>Tags: <a href="/tag/collision-detection/" rel="tag">collision detection</a></h3>
+    
     <div class="entry">
         <p>碰撞检测算法，暴力解决是一个\( O(n^{2}) \)的过程：对于场景中的每一个obj都和所有其他的obj做相交测试。2个for循环解决问题，所以时间复杂度是\( O(n^{2}) \)，这是最坏情况了。于是可以说，现在流传的各种碰撞检测算法的存在意义都是为了降低这个复杂度\( O(n^{2}) \)。</p>
 
@@ -189,6 +197,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

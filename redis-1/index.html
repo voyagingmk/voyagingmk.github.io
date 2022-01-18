@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>redis5.0源码学习笔记（1）基础数据结构</h1>
+ <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
 <article class="post">
-    <h1>redis5.0源码学习笔记（1）基础数据结构</h1>
-    <h3>Tags: <a href="/tag/redis/" rel="tag">redis</a></h3>
+    
     <div class="entry">
         <p>Note：本文实际绑定的版本是branch5.0（2018-7-25）。</p>
 
@@ -251,18 +259,18 @@
 <h3>结构定义</h3>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Node, List, and Iterator are the only data structures used currently. */</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">listNode</span> <span class="p">{</span>
-    <span class="k">struct</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">listNode</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="nc">listNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">listNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">listNode</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">listIter</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">listIter</span> <span class="p">{</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">direction</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">listIter</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">list</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">list</span> <span class="p">{</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
     <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">dup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">);</span>
@@ -315,7 +323,7 @@
 </ul>
 
 <h3>结构定义</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictEntry</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">dictEntry</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span>
     <span class="k">union</span> <span class="p">{</span>
         <span class="kt">void</span> <span class="o">*</span><span class="n">val</span><span class="p">;</span>
@@ -323,11 +331,11 @@
         <span class="kt">int64_t</span> <span class="n">s64</span><span class="p">;</span>
         <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
     <span class="p">}</span> <span class="n">v</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">dictEntry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">dictEntry</span><span class="p">;</span>
 
 <span class="c1">// dictType实现泛型，在server.c里有各种dictType的定义</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictType</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">dictType</span> <span class="p">{</span>
     <span class="kt">uint64_t</span> <span class="p">(</span><span class="o">*</span><span class="n">hashFunction</span><span class="p">)(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
     <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">keyDup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
     <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">valDup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">);</span>
@@ -336,14 +344,14 @@
     <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">valDestructor</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">);</span>
 <span class="p">}</span> <span class="n">dictType</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictht</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">dictht</span> <span class="p">{</span>
     <span class="n">dictEntry</span> <span class="o">**</span><span class="n">table</span><span class="p">;</span> <span class="c1">// 表项</span>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">size</span><span class="p">;</span>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">sizemask</span><span class="p">;</span>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">used</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">dictht</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dict</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">dict</span> <span class="p">{</span>
     <span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">;</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">;</span>
     <span class="n">dictht</span> <span class="n">ht</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
@@ -352,7 +360,7 @@
 <span class="p">}</span> <span class="n">dict</span><span class="p">;</span>
 
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictIterator</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">dictIterator</span> <span class="p">{</span>
     <span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">;</span>
     <span class="kt">long</span> <span class="n">index</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">table</span><span class="p">,</span> <span class="n">safe</span><span class="p">;</span>
@@ -402,7 +410,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
         <span class="n">zfree</span><span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">);</span>
         <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
         <span class="n">_dictReset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-        <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -436,18 +444,18 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 </ul>
 
 <h3>结构定义</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">zskiplistNode</span> <span class="p">{</span>
     <span class="n">sds</span> <span class="n">ele</span><span class="p">;</span>
     <span class="kt">double</span> <span class="n">score</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">backward</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">zskiplistLevel</span> <span class="p">{</span>
-        <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">forward</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">zskiplistNode</span> <span class="o">*</span><span class="n">backward</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">zskiplistLevel</span> <span class="p">{</span>
+        <span class="k">struct</span> <span class="nc">zskiplistNode</span> <span class="o">*</span><span class="n">forward</span><span class="p">;</span>
         <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">span</span><span class="p">;</span>
     <span class="p">}</span> <span class="n">level</span><span class="p">[];</span>
 <span class="p">}</span> <span class="n">zskiplistNode</span><span class="p">;</span>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplist</span> <span class="p">{</span>
-    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">zskiplist</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="nc">zskiplistNode</span> <span class="o">*</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">level</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">zskiplist</span><span class="p">;</span>
@@ -481,7 +489,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 </ul>
 
 <h3>结构定义</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">intset</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">intset</span> <span class="p">{</span>
     <span class="kt">uint32_t</span> <span class="n">encoding</span><span class="p">;</span>
     <span class="kt">uint32_t</span> <span class="n">length</span><span class="p">;</span>
     <span class="kt">int8_t</span> <span class="n">contents</span><span class="p">[];</span>
@@ -545,7 +553,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 </ul>
 
 <h3>结构定义</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zlentry</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">zlentry</span> <span class="p">{</span>
     <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlensize</span><span class="p">;</span> <span class="c1">// 上一节点头部长度</span>
     <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">prevrawlen</span><span class="p">;</span>    <span class="c1">// 上一节点内容部分的长度</span>
     <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lensize</span><span class="p">;</span>       <span class="c1">// 当前节点头部长度</span>
@@ -744,7 +752,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 </ul>
 
 <h3>quicklistLZF</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklistLZF</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">quicklistLZF</span> <span class="p">{</span>
     <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">sz</span><span class="p">;</span> <span class="cm">/* LZF size in bytes*/</span>
     <span class="kt">char</span> <span class="n">compressed</span><span class="p">[];</span>
 <span class="p">}</span> <span class="n">quicklistLZF</span><span class="p">;</span>
@@ -755,7 +763,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 </ul>
 
 <h3>quicklist</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklist</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">quicklist</span> <span class="p">{</span>
     <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
     <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">count</span><span class="p">;</span> <span class="c1">// 总entry个数</span>
@@ -800,6 +808,7 @@ dictRehashMilliseconds里调用dictRehash(d,100)，超时了就结束迭代。di
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

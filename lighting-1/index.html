@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,11 +74,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>实时渲染中的各种光照模型</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
 <article class="post">
-    <h1>实时渲染中的各种光照模型</h1>
-    <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    
     <div class="entry">
         <!--more-->
 
@@ -221,7 +229,7 @@
     <span class="nx">vec3</span> <span class="nx">diffuse</span> <span class="o">=</span> <span class="nx">kd</span> <span class="o">*</span> <span class="nx">NdotL</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
     <span class="kr">float</span> <span class="nx">ks</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
-    <span class="kr">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
+    <span class="kr">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mf">32</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">V</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">viewPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">R</span> <span class="o">=</span> <span class="nx">reflect</span><span class="p">(</span><span class="o">-</span><span class="nx">L</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span> 
     <span class="kr">float</span> <span class="nx">spec</span> <span class="o">=</span> <span class="nx">pow</span><span class="p">(</span><span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">V</span><span class="p">,</span> <span class="nx">R</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="nx">alpha</span><span class="p">);</span>
@@ -277,7 +285,7 @@
     <span class="nx">vec3</span> <span class="nx">diffuse</span> <span class="o">=</span> <span class="nx">kd</span> <span class="o">*</span> <span class="nx">NdotL</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
     <span class="kr">float</span> <span class="nx">ks</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
-    <span class="kr">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
+    <span class="kr">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mf">32</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">V</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">viewPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">H</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">L</span> <span class="o">+</span> <span class="nx">V</span><span class="p">);</span>
     <span class="kr">float</span> <span class="nx">spec</span> <span class="o">=</span> <span class="nx">pow</span><span class="p">(</span><span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">H</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="nx">alpha</span><span class="p">);</span>
@@ -365,6 +373,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

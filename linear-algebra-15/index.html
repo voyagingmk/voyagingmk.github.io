@@ -49,7 +49,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -99,11 +98,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>最小二乘估计(Least Squares Estimator)的公式的推导</h1>
+ <h3>Tags: <a href="/tag/math/" rel="tag">math</a></h3>
 <article class="post">
-    <h1>最小二乘估计(Least Squares Estimator)的公式的推导</h1>
-    <h3>Tags: <a href="/tag/math/" rel="tag">math</a></h3>
+    
     <div class="entry">
         <p>最近在学习ML(Machine Learning)，注意到了一个有趣的东西：<a href="https://en.wikipedia.org/wiki/Linear_least_squares_(mathematics)">Least Squares Estimator</a>。</p>
 
@@ -371,24 +379,24 @@
 <span class="mf">230.480</span>     <span class="mf">108.190</span>     <span class="mf">182.580</span>     <span class="mf">62.220</span>
 
 
-<span class="p">(</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span> <span class="o">=</span> 
-<span class="mf">0.541034</span>    <span class="o">-</span><span class="mf">0.573805</span>   <span class="o">-</span><span class="mf">0.641245</span>   <span class="mf">0.875298</span>
-<span class="o">-</span><span class="mf">0.573805</span>   <span class="mf">0.633743</span>    <span class="mf">0.631976</span>    <span class="o">-</span><span class="mf">0.830927</span>
-<span class="o">-</span><span class="mf">0.641245</span>   <span class="mf">0.631976</span>    <span class="mf">0.920228</span>    <span class="o">-</span><span class="mf">1.42389</span>
-<span class="mf">0.875298</span>    <span class="o">-</span><span class="mf">0.830927</span>   <span class="o">-</span><span class="mf">1.42389</span>    <span class="mf">2.396868</span>
+<span class="p">(</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^</span><span class="mi">-1</span> <span class="o">=</span> 
+<span class="mf">0.541034</span>    <span class="mf">-0.573805</span>   <span class="mf">-0.641245</span>   <span class="mf">0.875298</span>
+<span class="mf">-0.573805</span>   <span class="mf">0.633743</span>    <span class="mf">0.631976</span>    <span class="mf">-0.830927</span>
+<span class="mf">-0.641245</span>   <span class="mf">0.631976</span>    <span class="mf">0.920228</span>    <span class="mf">-1.42389</span>
+<span class="mf">0.875298</span>    <span class="mf">-0.830927</span>   <span class="mf">-1.42389</span>    <span class="mf">2.396868</span>
 
 
-<span class="p">((</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="p">)</span><span class="n">X</span><span class="err">`</span> <span class="o">=</span> 
-<span class="mf">0.028273</span>    <span class="mf">0.206968</span>    <span class="mf">0.048125</span>    <span class="o">-</span><span class="mf">0.076847</span>   <span class="o">-</span><span class="mf">0.083211</span>   <span class="o">-</span><span class="mf">0.056253</span>   <span class="o">-</span><span class="mf">0.097334</span>   <span class="o">-</span><span class="mf">0.032575</span>   <span class="o">-</span><span class="mf">0.006168</span>   <span class="o">-</span><span class="mf">0.002067</span>   <span class="mf">0.162628</span>    <span class="mf">0.053786</span>    <span class="mf">0.125186</span>    <span class="mf">0.228843</span>    <span class="mf">0.273287</span>    <span class="o">-</span><span class="mf">0.270475</span>   <span class="o">-</span><span class="mf">0.098417</span>   <span class="mf">0.033124</span>    <span class="mf">0.094950</span>    <span class="o">-</span><span class="mf">0.011335</span>   <span class="o">-</span><span class="mf">0.144267</span>   <span class="o">-</span><span class="mf">0.018560</span>   <span class="mf">0.174707</span>    <span class="o">-</span><span class="mf">0.270956</span>   <span class="mf">0.001741</span>    <span class="o">-</span><span class="mf">0.003648</span>   <span class="o">-</span><span class="mf">0.181042</span>   <span class="o">-</span><span class="mf">0.178793</span>   <span class="mf">0.046731</span>    <span class="mf">0.106397</span>
-<span class="mf">0.010276</span>    <span class="o">-</span><span class="mf">0.191835</span>   <span class="o">-</span><span class="mf">0.013523</span>   <span class="mf">0.106879</span>    <span class="mf">0.131031</span>    <span class="mf">0.115039</span>    <span class="mf">0.150711</span>    <span class="mf">0.067480</span>    <span class="mf">0.031694</span>    <span class="mf">0.017830</span>    <span class="o">-</span><span class="mf">0.181668</span>   <span class="o">-</span><span class="mf">0.046873</span>   <span class="o">-</span><span class="mf">0.144359</span>   <span class="o">-</span><span class="mf">0.250620</span>   <span class="o">-</span><span class="mf">0.294553</span>   <span class="mf">0.267479</span>    <span class="mf">0.117184</span>    <span class="o">-</span><span class="mf">0.036068</span>   <span class="o">-</span><span class="mf">0.122374</span>   <span class="mf">0.028729</span>    <span class="mf">0.190919</span>    <span class="mf">0.027353</span>    <span class="o">-</span><span class="mf">0.189075</span>   <span class="mf">0.26628</span> <span class="mf">0.008918</span>    <span class="o">-</span><span class="mf">0.033594</span>   <span class="mf">0.204029</span>    <span class="mf">0.134858</span>    <span class="o">-</span><span class="mf">0.090344</span>   <span class="o">-</span><span class="mf">0.072185</span>
-<span class="o">-</span><span class="mf">0.054892</span>   <span class="o">-</span><span class="mf">0.242631</span>   <span class="o">-</span><span class="mf">0.080010</span>   <span class="mf">0.104963</span>    <span class="mf">0.072430</span>    <span class="o">-</span><span class="mf">0.003185</span>   <span class="mf">0.060144</span>    <span class="mf">0.038057</span>    <span class="mf">0.014794</span>    <span class="mf">0.054978</span>    <span class="o">-</span><span class="mf">0.134766</span>   <span class="o">-</span><span class="mf">0.076454</span>   <span class="o">-</span><span class="mf">0.092183</span>   <span class="o">-</span><span class="mf">0.243448</span>   <span class="o">-</span><span class="mf">0.301346</span>   <span class="mf">0.404405</span>    <span class="mf">0.092525</span>    <span class="o">-</span><span class="mf">0.012496</span>   <span class="o">-</span><span class="mf">0.017495</span>   <span class="o">-</span><span class="mf">0.032696</span>   <span class="mf">0.007320</span>    <span class="o">-</span><span class="mf">0.025114</span>   <span class="o">-</span><span class="mf">0.217735</span>   <span class="mf">0.383162</span>    <span class="o">-</span><span class="mf">0.067400</span>   <span class="mf">0.105802</span>    <span class="mf">0.158253</span>    <span class="mf">0.386076</span>    <span class="mf">0.057919</span>    <span class="o">-</span><span class="mf">0.288185</span>
-<span class="mf">0.041703</span>    <span class="mf">0.282107</span>    <span class="mf">0.083251</span>    <span class="o">-</span><span class="mf">0.205964</span>   <span class="o">-</span><span class="mf">0.12892</span>    <span class="mf">0.024128</span>    <span class="o">-</span><span class="mf">0.073167</span>   <span class="o">-</span><span class="mf">0.105123</span>   <span class="o">-</span><span class="mf">0.072449</span>   <span class="o">-</span><span class="mf">0.183062</span>   <span class="mf">0.131452</span>    <span class="mf">0.130738</span>    <span class="mf">0.081924</span>    <span class="mf">0.323375</span>    <span class="mf">0.408249</span>    <span class="o">-</span><span class="mf">0.628974</span>   <span class="o">-</span><span class="mf">0.084976</span>   <span class="o">-</span><span class="mf">0.007234</span>   <span class="o">-</span><span class="mf">0.066687</span>   <span class="mf">0.110491</span>    <span class="mf">0.221148</span>    <span class="mf">0.125436</span>    <span class="mf">0.354307</span>    <span class="o">-</span><span class="mf">0.554733</span>   <span class="mf">0.211204</span>    <span class="o">-</span><span class="mf">0.204767</span>   <span class="o">-</span><span class="mf">0.121187</span>   <span class="o">-</span><span class="mf">0.676157</span>   <span class="o">-</span><span class="mf">0.157020</span>   <span class="mf">0.617249</span>
+<span class="p">((</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^</span><span class="mi">-1</span><span class="p">)</span><span class="n">X</span><span class="err">`</span> <span class="o">=</span> 
+<span class="mf">0.028273</span>    <span class="mf">0.206968</span>    <span class="mf">0.048125</span>    <span class="mf">-0.076847</span>   <span class="mf">-0.083211</span>   <span class="mf">-0.056253</span>   <span class="mf">-0.097334</span>   <span class="mf">-0.032575</span>   <span class="mf">-0.006168</span>   <span class="mf">-0.002067</span>   <span class="mf">0.162628</span>    <span class="mf">0.053786</span>    <span class="mf">0.125186</span>    <span class="mf">0.228843</span>    <span class="mf">0.273287</span>    <span class="mf">-0.270475</span>   <span class="mf">-0.098417</span>   <span class="mf">0.033124</span>    <span class="mf">0.094950</span>    <span class="mf">-0.011335</span>   <span class="mf">-0.144267</span>   <span class="mf">-0.018560</span>   <span class="mf">0.174707</span>    <span class="mf">-0.270956</span>   <span class="mf">0.001741</span>    <span class="mf">-0.003648</span>   <span class="mf">-0.181042</span>   <span class="mf">-0.178793</span>   <span class="mf">0.046731</span>    <span class="mf">0.106397</span>
+<span class="mf">0.010276</span>    <span class="mf">-0.191835</span>   <span class="mf">-0.013523</span>   <span class="mf">0.106879</span>    <span class="mf">0.131031</span>    <span class="mf">0.115039</span>    <span class="mf">0.150711</span>    <span class="mf">0.067480</span>    <span class="mf">0.031694</span>    <span class="mf">0.017830</span>    <span class="mf">-0.181668</span>   <span class="mf">-0.046873</span>   <span class="mf">-0.144359</span>   <span class="mf">-0.250620</span>   <span class="mf">-0.294553</span>   <span class="mf">0.267479</span>    <span class="mf">0.117184</span>    <span class="mf">-0.036068</span>   <span class="mf">-0.122374</span>   <span class="mf">0.028729</span>    <span class="mf">0.190919</span>    <span class="mf">0.027353</span>    <span class="mf">-0.189075</span>   <span class="mf">0.26628</span> <span class="mf">0.008918</span>    <span class="mf">-0.033594</span>   <span class="mf">0.204029</span>    <span class="mf">0.134858</span>    <span class="mf">-0.090344</span>   <span class="mf">-0.072185</span>
+<span class="mf">-0.054892</span>   <span class="mf">-0.242631</span>   <span class="mf">-0.080010</span>   <span class="mf">0.104963</span>    <span class="mf">0.072430</span>    <span class="mf">-0.003185</span>   <span class="mf">0.060144</span>    <span class="mf">0.038057</span>    <span class="mf">0.014794</span>    <span class="mf">0.054978</span>    <span class="mf">-0.134766</span>   <span class="mf">-0.076454</span>   <span class="mf">-0.092183</span>   <span class="mf">-0.243448</span>   <span class="mf">-0.301346</span>   <span class="mf">0.404405</span>    <span class="mf">0.092525</span>    <span class="mf">-0.012496</span>   <span class="mf">-0.017495</span>   <span class="mf">-0.032696</span>   <span class="mf">0.007320</span>    <span class="mf">-0.025114</span>   <span class="mf">-0.217735</span>   <span class="mf">0.383162</span>    <span class="mf">-0.067400</span>   <span class="mf">0.105802</span>    <span class="mf">0.158253</span>    <span class="mf">0.386076</span>    <span class="mf">0.057919</span>    <span class="mf">-0.288185</span>
+<span class="mf">0.041703</span>    <span class="mf">0.282107</span>    <span class="mf">0.083251</span>    <span class="mf">-0.205964</span>   <span class="mf">-0.12892</span>    <span class="mf">0.024128</span>    <span class="mf">-0.073167</span>   <span class="mf">-0.105123</span>   <span class="mf">-0.072449</span>   <span class="mf">-0.183062</span>   <span class="mf">0.131452</span>    <span class="mf">0.130738</span>    <span class="mf">0.081924</span>    <span class="mf">0.323375</span>    <span class="mf">0.408249</span>    <span class="mf">-0.628974</span>   <span class="mf">-0.084976</span>   <span class="mf">-0.007234</span>   <span class="mf">-0.066687</span>   <span class="mf">0.110491</span>    <span class="mf">0.221148</span>    <span class="mf">0.125436</span>    <span class="mf">0.354307</span>    <span class="mf">-0.554733</span>   <span class="mf">0.211204</span>    <span class="mf">-0.204767</span>   <span class="mf">-0.121187</span>   <span class="mf">-0.676157</span>   <span class="mf">-0.157020</span>   <span class="mf">0.617249</span>
 
-<span class="n">a</span> <span class="o">=</span> <span class="p">((</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="p">)</span><span class="n">X</span><span class="err">`</span><span class="n">y</span> <span class="o">=</span> 
-<span class="o">-</span><span class="mf">0.291</span>   
+<span class="n">a</span> <span class="o">=</span> <span class="p">((</span><span class="n">X</span><span class="err">`</span><span class="n">X</span><span class="p">)</span><span class="o">^</span><span class="mi">-1</span><span class="p">)</span><span class="n">X</span><span class="err">`</span><span class="n">y</span> <span class="o">=</span> 
+<span class="mf">-0.291</span>   
 <span class="mf">0.441</span>   
 <span class="mf">0.637</span>   
-<span class="o">-</span><span class="mf">0.094</span>  
+<span class="mf">-0.094</span>  
 </code></pre></div>
 <p>a的值为：</p>
 
@@ -682,6 +690,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

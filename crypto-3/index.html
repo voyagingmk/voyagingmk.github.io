@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,11 +76,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>漫谈网络通讯加密（3）HKDF</h1>
+ <h3>Tags: <a href="/tag/crypto/" rel="tag">crypto</a></h3>
 <article class="post">
-    <h1>漫谈网络通讯加密（3）HKDF</h1>
-    <h3>Tags: <a href="/tag/crypto/" rel="tag">crypto</a></h3>
+    
     <div class="entry">
         <p>本文将简单介绍<a href="https://tools.ietf.org/html/rfc5869">rfc5869</a>提出的HKDF。</p>
 
@@ -112,7 +120,7 @@
         <span class="nx">key</span> <span class="o">=</span> <span class="nx">hash</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="c1">// Where &#39;hash&#39; is the underlying hash function</span>
     <span class="nx">end</span> <span class="k">if</span>
 
-    <span class="k">for</span> <span class="nx">i</span> <span class="nx">from</span> <span class="mi">0</span> <span class="nx">to</span> <span class="nx">length</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="nx">from</span> <span class="mf">0</span> <span class="nx">to</span> <span class="nx">length</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1</span>
         <span class="nx">ipad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ipad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="nx">XOR</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
         <span class="nx">opad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">opad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="nx">XOR</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
     <span class="nx">end</span> <span class="k">for</span>
@@ -252,6 +260,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

@@ -31,7 +31,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -81,11 +80,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>曲线数学之贝塞尔曲线Bézier Curves</h1>
+ <h3>Tags: <a href="/tag/math/" rel="tag">math</a>, <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
 <article class="post">
-    <h1>曲线数学之贝塞尔曲线Bézier Curves</h1>
-    <h3>Tags: <a href="/tag/math/" rel="tag">math</a>, <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    
     <div class="entry">
         <p>本文主要关注的是公式的推导。</p>
 
@@ -483,8 +491,8 @@
 
     <span class="n">Matrix3x3</span> <span class="n">B</span> <span class="o">=</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
-        <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
-        <span class="mi">1</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="mi">-2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>  <span class="mi">-2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
     <span class="p">};</span>
 
     <span class="n">Matrix3x3</span> <span class="n">BP</span> <span class="o">=</span> <span class="n">B</span> <span class="o">*</span> <span class="n">P</span><span class="p">;</span>
@@ -542,6 +550,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

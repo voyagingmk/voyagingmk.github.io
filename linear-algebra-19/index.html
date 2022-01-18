@@ -31,7 +31,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -81,11 +80,20 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <h2>Tags: </h2>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>骨骼动画与蒙皮矩阵</h1>
+ <h3>Tags: <a href="/tag/matrix/" rel="tag">matrix</a>, <a href="/tag/linear-algebra/" rel="tag">linear algebra</a>, <a href="/tag/math/" rel="tag">math</a></h3>
 <article class="post">
-    <h1>骨骼动画与蒙皮矩阵</h1>
-    <h3>Tags: <a href="/tag/matrix/" rel="tag">matrix</a>, <a href="/tag/linear-algebra/" rel="tag">linear algebra</a>, <a href="/tag/math/" rel="tag">math</a></h3>
+    
     <div class="entry">
         <p>《Game Engine Architecture》这本书里最让我欣喜的就是动画相关的章节了，非常详细，比中文搜索引擎能搜到的资料都要系统、全面。据说作者以前就是做动画的。其他章节相对的只是抛砖引玉，例如阴影，只写了几页。</p>
 
@@ -106,7 +114,7 @@
 <p>关节姿势分为<strong>局部</strong>关节姿势和<strong>全局</strong>关节姿势。先从局部关节姿势说起。</p>
 
 <p>局部关节姿势是相对直属父关节而言的，可以用一个strcut表示:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">JointPose</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">JointPose</span> <span class="p">{</span>
     <span class="n">Quaternion</span> <span class="n">rot</span><span class="p">;</span> <span class="c1">// R 关节旋转信息</span>
     <span class="n">Vector3</span> <span class="n">trans</span><span class="p">;</span>  <span class="c1">// T 关节位移信息</span>
     <span class="n">Vector3</span> <span class="n">scale</span><span class="p">;</span>  <span class="c1">// S 关节缩放信息</span>
@@ -123,7 +131,7 @@
 <p>\[ P^{skel} = { P_{j} } | _{j=0}^{N-1} \]</p>
 
 <p>即：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">SkeletonPose</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">SkeletonPose</span> <span class="p">{</span>
     <span class="kt">size_t</span> <span class="n">jointCount</span><span class="p">;</span> <span class="c1">// 关节数量</span>
     <span class="n">JointPose</span><span class="o">*</span> <span class="n">localPoses</span><span class="p">;</span> <span class="c1">// 多个局部关节姿势</span>
 <span class="p">}</span>
@@ -149,7 +157,7 @@
 <p>\[ P_{j\to M} = \prod _{i=j}^{0} P_{i\to p(i)} \]</p>
 
 <p>对每个关节都做一遍这个公式，就能得到一个全局关节姿势数组。然后就可以写入SkeletonPose：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="n">SkeletonPose</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">SkeletonPose</span> <span class="p">{</span>
     <span class="kt">size_t</span> <span class="n">jointCount</span><span class="p">;</span> <span class="c1">// 关节数量</span>
     <span class="n">JointPose</span><span class="o">*</span> <span class="n">localPoses</span><span class="p">;</span> <span class="c1">// 多个局部关节姿势 JointPose</span>
     <span class="n">Matrix44</span><span class="o">*</span> <span class="n">globalPoses</span><span class="p">;</span> <span class="c1">// 多个全局关节姿势</span>
@@ -228,6 +236,7 @@
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">
