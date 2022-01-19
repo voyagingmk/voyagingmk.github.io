@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,10 +74,18 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>多线程网络库开发笔记</h1>
-  <h3>Tags: <a href="/tag/synchronize/" rel="tag">synchronize</a></h3>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>多线程网络库开发笔记</h1>
+<h3>Tags: <a href="/tag/synchronize/" rel="tag">synchronize</a></h3>
+<article class="post">
   <div class="entry">
     <!--more-->
 
@@ -102,9 +109,9 @@
 <p>To check the status of the socket w.r.t. the congestion window, then try this:</p>
 </blockquote>
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#include</span> <span class="cpf">&lt;netinet/tcp.h&gt;</span><span class="cp"></span>
-<span class="k">static</span> <span class="kt">void</span> <span class="nf">print_tcp_cwnd</span><span class="p">(</span><span class="kt">int</span> <span class="n">socket</span><span class="p">)</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="n">print_tcp_cwnd</span><span class="p">(</span><span class="kt">int</span> <span class="n">socket</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">struct</span> <span class="n">tcp_info</span> <span class="n">tcp_info</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">tcp_info</span> <span class="n">tcp_info</span><span class="p">;</span>
     <span class="n">uint</span> <span class="n">tcp_info_length</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">tcp_info</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span> <span class="n">getsockopt</span><span class="p">(</span> <span class="n">socket</span><span class="p">,</span> <span class="n">SOL_TCP</span><span class="p">,</span> <span class="n">TCP_INFO</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">tcp_info</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tcp_info_length</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> 
     <span class="p">{</span>
@@ -189,13 +196,13 @@
 <span class="p">};</span>
 </code></pre></div>
 <p>然后是BlockingQueue：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">BlockingQueue</span>
 <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
     <span class="kt">void</span> <span class="n">put</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">MutexLockGuard</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="n">MutexLockGuard</span> <span class="nf">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
         <span class="n">m_queue</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
         <span class="n">m_notEmpty</span><span class="p">.</span><span class="n">notify</span><span class="p">();</span> <span class="c1">// wait morphing</span>
         <span class="c1">// 注意，lock是在退出本函数时才销毁，所以顺序是：cond signal -&gt; unlock</span>
@@ -203,7 +210,7 @@
 
     <span class="n">T</span> <span class="n">pop</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="n">MutexLockGuard</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="n">MutexLockGuard</span> <span class="nf">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">m_queue</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
         <span class="p">{</span>
             <span class="n">m_notEmpty</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
@@ -487,6 +494,7 @@
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

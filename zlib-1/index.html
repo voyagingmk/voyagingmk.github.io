@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -77,10 +76,18 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>无损压缩算法：deflate</h1>
-  <h3>Tags: <a href="/tag/deflate/" rel="tag">deflate</a></h3>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>无损压缩算法：deflate</h1>
+<h3>Tags: <a href="/tag/deflate/" rel="tag">deflate</a></h3>
+<article class="post">
   <div class="entry">
     <p>本文目标是搞清楚zlib库的deflate算法实现。</p>
 
@@ -225,7 +232,7 @@ cmake .. -G &#39;Xcode&#39;
 <span class="cp">#define Z_DEFAULT_COMPRESSION  (-1)</span>
 
 <span class="c1">// 这个结构大概相当于一个压缩控制器</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">z_stream_s</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">z_stream_s</span> <span class="p">{</span>
     <span class="n">z_const</span> <span class="n">Bytef</span> <span class="o">*</span><span class="n">next_in</span><span class="p">;</span>     <span class="cm">/* 指向待压缩数据的第一个字节 */</span>
     <span class="n">uInt</span>     <span class="n">avail_in</span><span class="p">;</span>  <span class="cm">/* 待压缩数据next_in的长度 */</span>
     <span class="n">uLong</span>    <span class="n">total_in</span><span class="p">;</span>  <span class="cm">/* 当前已读取多少输入字节 */</span>
@@ -235,7 +242,7 @@ cmake .. -G &#39;Xcode&#39;
     <span class="n">uLong</span>    <span class="n">total_out</span><span class="p">;</span> <span class="cm">/* 当前已输出多少输入字节*/</span>
 
     <span class="n">z_const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">;</span>  <span class="cm">/* 错误信息 */</span>
-    <span class="k">struct</span> <span class="n">internal_state</span> <span class="n">FAR</span> <span class="o">*</span><span class="n">state</span><span class="p">;</span> <span class="cm">/* 暂时不用管这个 */</span>
+    <span class="k">struct</span> <span class="nc">internal_state</span> <span class="n">FAR</span> <span class="o">*</span><span class="n">state</span><span class="p">;</span> <span class="cm">/* 暂时不用管这个 */</span>
 
     <span class="n">alloc_func</span> <span class="n">zalloc</span><span class="p">;</span>  <span class="cm">/* 压缩过程会分配新内存（internal state），用户可以设置自己的alloc函数给z_stream */</span>
     <span class="n">free_func</span>  <span class="n">zfree</span><span class="p">;</span>   <span class="cm">/* 释放内存 */</span>
@@ -437,6 +444,7 @@ cmake .. -G &#39;Xcode&#39;
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

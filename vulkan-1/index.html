@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -75,10 +74,18 @@
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <article class="post">
-  <h1>入门vulkan</h1>
-  <h3>Tags: <a href="/tag/vulkan/" rel="tag">vulkan</a></h3>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+
+<h1>入门vulkan</h1>
+<h3>Tags: <a href="/tag/vulkan/" rel="tag">vulkan</a></h3>
+<article class="post">
   <div class="entry">
     <!--more-->
 
@@ -117,12 +124,12 @@ cmake --build .</p>
 <p><a href="https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html">https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html</a></p>
 
 <h2>1. 创建必要的VkInstance对象（vkCreateInstance）</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkResult</span> <span class="n">VKAPI_CALL</span> <span class="nf">vkCreateInstance</span><span class="p">(</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkResult</span> <span class="n">VKAPI_CALL</span> <span class="n">vkCreateInstance</span><span class="p">(</span>
     <span class="k">const</span> <span class="n">VkInstanceCreateInfo</span><span class="o">*</span>                 <span class="n">pCreateInfo</span><span class="p">,</span>
     <span class="k">const</span> <span class="n">VkAllocationCallbacks</span><span class="o">*</span>                <span class="n">pAllocator</span><span class="p">,</span>
     <span class="n">VkInstance</span><span class="o">*</span>                                 <span class="n">pInstance</span><span class="p">);</span>
 
-<span class="kt">void</span> <span class="n">VKAPI_CALL</span> <span class="nf">vkDestroyInstance</span><span class="p">(</span>
+<span class="kt">void</span> <span class="n">VKAPI_CALL</span> <span class="n">vkDestroyInstance</span><span class="p">(</span>
     <span class="n">VkInstance</span>                                  <span class="n">instance</span><span class="p">,</span>
     <span class="k">const</span> <span class="n">VkAllocationCallbacks</span><span class="o">*</span>                <span class="n">pAllocator</span><span class="p">);</span>
 </code></pre></div>
@@ -159,7 +166,7 @@ cmake --build .</p>
 <p>vkGetPhysicalDeviceQueueFamilyProperties的用法和vkEnumeratePhysicalDevices非常相似。</p>
 
 <p>vkGetPhysicalDeviceQueueFamilyProperties的用途是获取这个gpu的queue_family_count和queue_props。queue_props则是一个VkQueueFamilyProperties数组。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">VkQueueFamilyProperties</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">VkQueueFamilyProperties</span> <span class="p">{</span>
     <span class="n">VkQueueFlags</span>    <span class="n">queueFlags</span><span class="p">;</span>
     <span class="kt">uint32_t</span>        <span class="n">queueCount</span><span class="p">;</span>
     <span class="kt">uint32_t</span>        <span class="n">timestampValidBits</span><span class="p">;</span>
@@ -248,7 +255,7 @@ cmake --build .</p>
 <h3>extension</h3>
 
 <p>首先要在创建instance之前插个步骤，设置instance_extension_names：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">init_instance_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="n">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">init_instance_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="nc">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
 <span class="cp">#ifdef __ANDROID__</span>
     <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_ANDROID_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
@@ -266,7 +273,7 @@ cmake --build .</p>
 <span class="p">}</span>
 </code></pre></div>
 <p>还有device的extension：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">init_device_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="n">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">init_device_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="nc">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">info</span><span class="p">.</span><span class="n">device_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_SWAPCHAIN_EXTENSION_NAME</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -376,7 +383,7 @@ cmake --build .</p>
 <p>image view大概意思是用来管理image的内存的，有很多关于image的元信息。</p>
 
 <p>创建image view就比较直白了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_swap_chain_buffers</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_swap_chain_buffers</span> <span class="p">{</span>
     <span class="n">VkImage</span> <span class="n">image</span><span class="p">;</span>
     <span class="n">VkImageView</span> <span class="n">view</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">swap_chain_buffer</span><span class="p">;</span>
@@ -437,7 +444,7 @@ cmake --build .</p>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="cm">/* Try other depth formats? */</span>
         <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;VK_FORMAT_D16_UNORM Unsupported.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span>
     <span class="p">}</span>
 </code></pre></div>
 <p>创建depth buffer：</p>
@@ -599,7 +606,7 @@ cmake --build .</p>
 <span class="n">info</span><span class="p">.</span><span class="n">uniform_data</span><span class="p">.</span><span class="n">buffer_info</span><span class="p">.</span><span class="n">range</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">MVP</span><span class="p">);</span> <span class="c1">// 在这里确定了内存范围</span>
 </code></pre></div>
 <p>buffer_info结构：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">VkDescriptorBufferInfo</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">VkDescriptorBufferInfo</span> <span class="p">{</span>
     <span class="n">VkBuffer</span>        <span class="n">buffer</span><span class="p">;</span>
     <span class="n">VkDeviceSize</span>    <span class="n">offset</span><span class="p">;</span>
     <span class="n">VkDeviceSize</span>    <span class="n">range</span><span class="p">;</span>
@@ -700,6 +707,7 @@ cmake --build .</p>
 
 </article>
 
+      </section>
     </div>
 
     <div class="wrapper-footer">

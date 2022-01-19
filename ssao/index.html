@@ -39,7 +39,6 @@ SSAO，screen-space ambient occlusion
 
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
-
     
 	<!-- Google Analytics -->
 	<script>
@@ -89,11 +88,19 @@ SSAO，screen-space ambient occlusion
       </div>
     </div>
 
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
     <div id="main" role="main" class="container">
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>ssao介绍</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
 <article class="post">
-    <h1>ssao介绍</h1>
-    <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+    
     <div class="entry">
         <h2>AO，ambient occlusion</h2>
 
@@ -130,12 +137,12 @@ SSAO，screen-space ambient occlusion
 <h3>采样点的生成算法</h3>
 
 <p>然后就是采样点的生成问题。采样点需要在tangent space下计算，即默认normal向量指向z轴正方向。所以每一个采样点只需要随机在x、y轴上做一点偏移即可：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">generateSampleKernel</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Vector3dF</span><span class="o">&gt;&amp;</span> <span class="n">ssaoKernel</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">generateSampleKernel</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Vector3dF</span><span class="o">&gt;&amp;</span> <span class="n">ssaoKernel</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">64</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="c1">// 随机分布采样点，x、y在[-1.0, 1.0]随机，而z在[0.0, 1.0]范围随机</span>
         <span class="c1">// 确保采样点落在normal向量同一侧，即z必须大于0</span>
-        <span class="n">Vector3dF</span> <span class="n">sample</span><span class="p">(</span>
+        <span class="n">Vector3dF</span> <span class="nf">sample</span><span class="p">(</span>
             <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> 
             <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> 
             <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span>
@@ -309,6 +316,7 @@ SSAO，screen-space ambient occlusion
 
 
 
+      </section>
     </div>
 
     <div class="wrapper-footer">
