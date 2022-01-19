@@ -329,6 +329,126 @@
 
 <p>\( 4 (n \cdot v)(n \cdot l) \)被放进了V项中了。</p>
 
+<h2>D项</h2>
+
+<p>Filament里只有GGX一种（说明够用）:</p>
+
+<p><img src="../images/2022.1/D.png" alt="7.png"></p>
+
+<p>做一些变换，方便和代码对应：</p>
+
+<p>\[ D = \frac {1}{\pi } \cdot (\frac {\alpha  } { (n\cdot h)^ 2(\alpha ^ 2 - 1) + 1 })^ 2 \]</p>
+
+<p>\[  = \frac {1}{\pi }  (\frac {\alpha  } { (n\cdot h)^ 2 \alpha ^ 2 - (n\cdot h)^ 2 + 1 })^ 2 \]</p>
+
+<p>\[  = \frac {1}{\pi }  (\frac {\alpha  } { ( (n\cdot h) \alpha) ^ 2 + (1 - (n\cdot h)^ 2)  })^ 2 \]</p>
+
+<p>代码如下：</p>
+<div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span></span><span class="kt">float</span> <span class="n">D_GGX</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoH</span><span class="p">,</span> <span class="k">const</span> <span class="kt">vec3</span> <span class="n">h</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">float</span> <span class="n">oneMinusNoHSquared</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">NoH</span> <span class="o">*</span> <span class="n">NoH</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">a</span> <span class="o">=</span> <span class="n">NoH</span> <span class="o">*</span> <span class="n">roughness</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">k</span> <span class="o">=</span> <span class="n">roughness</span> <span class="o">/</span> <span class="p">(</span><span class="n">oneMinusNoHSquared</span> <span class="o">+</span> <span class="n">a</span> <span class="o">*</span> <span class="n">a</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">d</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">PI</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">saturateMediump</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">float</span> <span class="n">distribution</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoH</span><span class="p">,</span> <span class="k">const</span> <span class="kt">vec3</span> <span class="n">h</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#if BRDF_SPECULAR_D == SPECULAR_D_GGX</span>
+    <span class="k">return</span> <span class="n">D_GGX</span><span class="p">(</span><span class="n">roughness</span><span class="p">,</span> <span class="n">NoH</span><span class="p">,</span> <span class="n">h</span><span class="p">);</span>
+<span class="cp">#endif</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>G项（V项）</h2>
+
+<p>G项的话，Filament用了这篇论文里的equation 99： <a href="https://jcgt.org/published/0003/02/03/paper.pdf">Understanding the Masking-Shadowing Function
+in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接用即可。</p>
+
+<p><img src="../images/2022.1/G.png" alt="G.png"></p>
+
+<p>里面的符号的解释：</p>
+
+<p>\(\omega _o\), \(\omega _i\), \(\omega _m\)分别表示出射方向、入射方向、微平面法线方向。</p>
+
+<p>\(\chi ^+ \) 是指heaviside function，也叫unit step function，单位阶跃函数，值要么是0要么是1。</p>
+
+<p><img src="../images/2022.1/X.png" alt="X.png"></p>
+
+<p>因为specular只考虑反射光，所以出入射方向和微平面法线夹角小于180°，分子等于1。</p>
+
+<p>另外因为\( 4 (n \cdot v)(n \cdot l) \)被合并到了G项里（所以就换了个名字叫V项）。</p>
+
+<p>最终的V公式如下：</p>
+
+<p><img src="../images/2022.1/V.png" alt="V.png"></p>
+<div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span></span><span class="kt">float</span> <span class="n">V_SmithGGXCorrelated</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">float</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">roughness</span> <span class="o">*</span> <span class="n">roughness</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">lambdaV</span> <span class="o">=</span> <span class="n">NoL</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">((</span><span class="n">NoV</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="n">NoV</span><span class="p">)</span> <span class="o">*</span> <span class="n">NoV</span> <span class="o">+</span> <span class="n">a2</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">lambdaL</span> <span class="o">=</span> <span class="n">NoV</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">((</span><span class="n">NoL</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="n">NoL</span><span class="p">)</span> <span class="o">*</span> <span class="n">NoL</span> <span class="o">+</span> <span class="n">a2</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">v</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="n">lambdaV</span> <span class="o">+</span> <span class="n">lambdaL</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">saturateMediump</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这里又有个经典技巧，牺牲精度换时间。因为开平方和平方操作都比较耗，直接干掉，公式变成：</p>
+
+<p><img src="../images/2022.1/V2.png" alt="V2.png"></p>
+
+<p>这个只是近似公式，数学上是错的，但不用深究，用就是了。</p>
+<div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span></span><span class="kt">float</span> <span class="n">V_SmithGGXCorrelated_Fast</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*</span>
+<span class="cm">    float a = roughness;</span>
+<span class="cm">    float GGXV = NoL * (NoV * (1.0 - a) + a);</span>
+<span class="cm">    float GGXL = NoV * (NoL * (1.0 - a) + a);</span>
+<span class="cm">    return 0.5 / (GGXV + GGXL);</span>
+<span class="cm">    */</span>
+    <span class="kt">float</span> <span class="n">v</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">mix</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">NoL</span> <span class="o">*</span> <span class="n">NoV</span><span class="p">,</span> <span class="n">NoL</span> <span class="o">+</span> <span class="n">NoV</span><span class="p">,</span> <span class="n">roughness</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">saturateMediump</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">float</span> <span class="n">visibility</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#if BRDF_SPECULAR_V == SPECULAR_V_SMITH_GGX</span>
+    <span class="k">return</span> <span class="n">V_SmithGGXCorrelated</span><span class="p">(</span><span class="n">roughness</span><span class="p">,</span> <span class="n">NoV</span><span class="p">,</span> <span class="n">NoL</span><span class="p">);</span>
+<span class="cp">#elif BRDF_SPECULAR_V == SPECULAR_V_SMITH_GGX_FAST</span>
+    <span class="k">return</span> <span class="n">V_SmithGGXCorrelated_Fast</span><span class="p">(</span><span class="n">roughness</span><span class="p">,</span> <span class="n">NoV</span><span class="p">,</span> <span class="n">NoL</span><span class="p">);</span>
+<span class="cp">#endif</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>F项</h2>
+
+<p><img src="../images/2022.1/F.png" alt="F.png"></p>
+
+<p>\(f_{0}\)、\(f_{90}\)上面已经分析过了，不再介绍。</p>
+
+<p>当\(f_{90}\)为1时，有以下等价公式：</p>
+
+<p>\[ f_{90} = 1\]</p>
+
+<p>\[ f = (1 - v\cdot h)^ 5 \]</p>
+
+<p>\[ F = f_{90}(1 - v\cdot h)^ 5 - f_{0}( 1 - (1 - v\cdot h)^ 5 ) \]</p>
+
+<p>\[ = (1 - v\cdot h)^ 5 - f_{0}( 1 - (1 - v\cdot h)^ 5 ) \]</p>
+
+<p>\[ = f - f_{0}( 1 - f ) \]</p>
+<div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span></span><span class="kt">vec3</span> <span class="n">F_Schlick</span><span class="p">(</span><span class="k">const</span> <span class="kt">vec3</span> <span class="n">f0</span><span class="p">,</span> <span class="kt">float</span> <span class="n">VoH</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">float</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">VoH</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">f</span> <span class="o">+</span> <span class="n">f0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">f</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">float</span> <span class="n">F_Schlick</span><span class="p">(</span><span class="kt">float</span> <span class="n">f0</span><span class="p">,</span> <span class="kt">float</span> <span class="n">f90</span><span class="p">,</span> <span class="kt">float</span> <span class="n">VoH</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">f0</span> <span class="o">+</span> <span class="p">(</span><span class="n">f90</span> <span class="o">-</span> <span class="n">f0</span><span class="p">)</span> <span class="o">*</span> <span class="n">pow5</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">VoH</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">vec3</span> <span class="n">fresnel</span><span class="p">(</span><span class="k">const</span> <span class="kt">vec3</span> <span class="n">f0</span><span class="p">,</span> <span class="kt">float</span> <span class="n">LoH</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#if FILAMENT_QUALITY == FILAMENT_QUALITY_LOW</span>
+    <span class="k">return</span> <span class="n">F_Schlick</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">LoH</span><span class="p">);</span> <span class="c1">// f90 = 1.0</span>
+<span class="cp">#else</span>
+    <span class="kt">float</span> <span class="n">f90</span> <span class="o">=</span> <span class="n">saturate</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="kt">vec3</span><span class="p">(</span><span class="mf">50.0</span> <span class="o">*</span> <span class="mf">0.33</span><span class="p">)));</span>
+    <span class="k">return</span> <span class="n">F_Schlick</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">f90</span><span class="p">,</span> <span class="n">LoH</span><span class="p">);</span>
+<span class="cp">#endif</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>代码里实现了一种更准确的F项，具体细节看这里: <a href="https://google.github.io/filament/Filament.html#toc5.6.2">Specular occlusion</a></p>
+
     </div>
     <div class="entry">
         (未经授权禁止转载)
