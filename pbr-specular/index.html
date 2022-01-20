@@ -355,7 +355,7 @@
 
 <p>\( 4 (n \cdot v)(n \cdot l) \)被放进了V项中了。</p>
 
-<h2>D项</h2>
+<h2>isotropic-D项</h2>
 
 <p>Filament里只有GGX一种（说明够用）:</p>
 
@@ -384,7 +384,7 @@
 <span class="cp">#endif
 </span><span class="p">}</span>
 </code></pre></div>
-<h2>G项</h2>
+<h2>isotropic-G项</h2>
 
 <p>G项的话，Filament用了这篇论文里的equation 99： <a href="https://jcgt.org/published/0003/02/03/paper.pdf">Understanding the Masking-Shadowing Function
 in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接用即可。</p>
@@ -438,7 +438,7 @@ in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接
 <span class="cp">#endif
 </span><span class="p">}</span>
 </code></pre></div>
-<h2>F项</h2>
+<h2>isotropic-F项</h2>
 
 <p><img src="../images/2022.1/F.png" alt="F.png"></p>
 
@@ -479,7 +479,7 @@ in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接
 
 <p>各向异性的specular，也是基于pbr公式改的。</p>
 
-<h2>D项</h2>
+<h2>anisotropic-D项</h2>
 
 <p>首先是D项发生了变化：</p>
 
@@ -542,7 +542,7 @@ in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接
     <span class="k">return</span> <span class="n">a2</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">/</span> <span class="n">PI</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2>V项</h2>
+<h2>anisotropic-V项</h2>
 
 <p>各向异性的V项公式贼复杂，就不研究了，直接套代码即可。需要的参数上面都介绍过了：</p>
 <div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span class="kt">float</span> <span class="nf">visibilityAnisotropic</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">at</span><span class="p">,</span> <span class="kt">float</span> <span class="n">ab</span><span class="p">,</span>
@@ -556,7 +556,7 @@ in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接
 </code></pre></div>
 <p>从代码里看出，可以直接用各向同性的V项。</p>
 
-<h2>F项</h2>
+<h2>anisotropic-F项</h2>
 
 <p>各向异性的F项和各向同性的F项一样。</p>
 
