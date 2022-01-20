@@ -113,7 +113,8 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
 <p>首先要确保场景里的3d对象都可以算出它的AABB盒（下面简称BBox）（模型空间），然后经过scene graph以及自身的模型矩阵，把包围盒变换到世界空间，称之为world bound。</p>
 
 <p>代码片段——找出待计算的所有3d对象：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ObjectID</span><span class="o">&gt;</span> <span class="n">objs</span><span class="p">;</span> <span class="c1">// 所有3d对象的id列表</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ObjectID</span><span class="o">&gt;</span> <span class="n">objs</span><span class="p">;</span> <span class="c1">// 所有3d对象的id列表</span>
 <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">(</span><span class="n">Object</span> <span class="n">objScene</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">filterFunc</span><span class="p">;</span>
 <span class="n">filterFunc</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="n">Object</span> <span class="n">objScene</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">objScene</span><span class="p">.</span><span class="n">hasComponent</span><span class="o">&lt;</span><span class="n">SpatialData</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">objScene</span><span class="p">.</span><span class="n">hasComponent</span><span class="o">&lt;</span><span class="n">MeshRef</span><span class="o">&gt;</span><span class="p">())</span> <span class="p">{</span>
@@ -121,15 +122,17 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
         <span class="n">objs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">objID</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">auto</span> <span class="n">sgNode</span> <span class="o">=</span> <span class="n">objScene</span><span class="p">.</span><span class="n">component</span><span class="o">&lt;</span><span class="n">SceneGraphNode</span><span class="o">&gt;</span><span class="p">();</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="nl">childObjID</span> <span class="p">:</span> <span class="n">sgNode</span><span class="o">-&gt;</span><span class="n">children</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">childObjID</span> <span class="o">:</span> <span class="n">sgNode</span><span class="o">-&gt;</span><span class="n">children</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">Object</span> <span class="n">childObj</span> <span class="o">=</span> <span class="n">m_objMgr</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">(</span><span class="n">childObjID</span><span class="p">);</span>
         <span class="n">filterFunc</span><span class="p">(</span><span class="n">childObj</span><span class="p">);</span> <span class="c1">// 树递归</span>
     <span class="p">}</span>
 <span class="p">};</span> 
 <span class="n">filterFunc</span><span class="p">(</span><span class="n">objScene</span><span class="p">);</span>
+
 </code></pre></div>
 <p>代码片段——预先算出所有物体的world bound：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHObjInfo</span><span class="o">&gt;</span> <span class="n">objInfo</span><span class="p">(</span><span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHObjInfo</span><span class="o">&gt;</span> <span class="n">objInfo</span><span class="p">(</span><span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
 <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">ObjectID</span> <span class="n">objID</span> <span class="o">=</span> <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
     <span class="n">Object</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">m_objMgr</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">(</span><span class="n">objID</span><span class="p">);</span>
@@ -140,9 +143,11 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
     <span class="k">auto</span> <span class="n">worldBound</span> <span class="o">=</span> <span class="p">(</span><span class="n">spatialData</span><span class="o">-&gt;</span><span class="n">o2w</span><span class="p">)(</span><span class="n">bound</span><span class="p">);</span>
     <span class="n">objInfo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">i</span><span class="p">,</span> <span class="n">worldBound</span> <span class="p">};</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>代码片段——BVH生成流程：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="n">totalNodes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 统计总共动态创建了多少个BVHBuildNode</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="kt">int</span> <span class="n">totalNodes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 统计总共动态创建了多少个BVHBuildNode</span>
 <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ObjectID</span><span class="o">&gt;</span> <span class="n">orderedObjs</span><span class="p">;</span>
 <span class="n">orderedObjs</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">objs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span> <span class="c1">// 分配空间 </span>
 <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">root</span><span class="p">;</span>
@@ -159,14 +164,15 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
 <span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">AllocAligned</span><span class="o">&lt;</span><span class="n">LinearBVHNode</span><span class="o">&gt;</span><span class="p">(</span><span class="n">totalNodes</span><span class="p">);</span>
 <span class="kt">int</span> <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="n">flattenBVHTree</span><span class="p">(</span><span class="n">bvhAccel</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">offset</span><span class="p">);</span>
+
 </code></pre></div>
 <p>可以发现，BVH的核心算法代码就在recursiveBuild和HLBVHBuild里面了。</p>
 
 <h3>相关数据结构</h3>
 
 <p>BVHBuildNode:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 生成BVH的过程中会用到这个struct，代表BVH的一个节点</span>
-<span class="k">struct</span> <span class="nc">BVHBuildNode</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// 生成BVH的过程中会用到这个struct，代表BVH的一个节点</span>
+<span class="k">struct</span> <span class="n">BVHBuildNode</span> <span class="p">{</span>
     <span class="n">BBox</span> <span class="n">bounds</span><span class="p">;</span> <span class="c1">// 该子树的包围盒 </span>
     <span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">children</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="c1">// 左右孩子节点</span>
     <span class="n">Axis</span> <span class="n">splitAxis</span><span class="p">;</span> <span class="c1">// 是切了哪条坐标轴</span>
@@ -191,19 +197,21 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
 <span class="p">}</span>
 </code></pre></div>
 <p>BVHObjInfo:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">BVHObjInfo</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">BVHObjInfo</span> <span class="p">{</span>
     <span class="n">BVHObjInfo</span><span class="p">()</span> <span class="p">{}</span>
     <span class="n">BVHObjInfo</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">objNumber</span><span class="p">,</span> <span class="k">const</span> <span class="n">BBox</span> <span class="o">&amp;</span><span class="n">bounds</span><span class="p">)</span>
         <span class="o">:</span> <span class="n">objNumber</span><span class="p">(</span><span class="n">objNumber</span><span class="p">),</span>
         <span class="n">bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">),</span>
-        <span class="n">centroid</span><span class="p">(</span><span class="mf">.5f</span> <span class="o">*</span> <span class="n">bounds</span><span class="p">.</span><span class="n">pMin</span> <span class="o">+</span> <span class="mf">.5f</span> <span class="o">*</span> <span class="n">bounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">)</span> <span class="p">{}</span>
+        <span class="n">centroid</span><span class="p">(.</span><span class="mi">5</span><span class="n">f</span> <span class="o">*</span> <span class="n">bounds</span><span class="p">.</span><span class="n">pMin</span> <span class="o">+</span> <span class="p">.</span><span class="mi">5</span><span class="n">f</span> <span class="o">*</span> <span class="n">bounds</span><span class="p">.</span><span class="n">pMax</span><span class="p">)</span> <span class="p">{}</span>
     <span class="kt">size_t</span> <span class="n">objNumber</span><span class="p">;</span> <span class="c1">// 记录这个3d对象在bvhAccel-&gt;objs数组的位置</span>
     <span class="n">BBox</span> <span class="n">bounds</span><span class="p">;</span>
     <span class="n">Vector3dF</span> <span class="n">centroid</span><span class="p">;</span> <span class="c1">// 包围盒中心坐标</span>
 <span class="p">};</span>
+
 </code></pre></div>
 <h3>recursiveBuild</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">BVHSystem</span><span class="o">::</span><span class="n">recursiveBuild</span><span class="p">(</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">BVHBuildNode</span> <span class="o">*</span><span class="n">BVHSystem</span><span class="o">::</span><span class="n">recursiveBuild</span><span class="p">(</span>
         <span class="n">ComponentHandle</span><span class="o">&lt;</span><span class="n">BVHAccel</span><span class="o">&gt;</span> <span class="n">bvhAccel</span><span class="p">,</span> 
         <span class="n">MemoryArena</span> <span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span>
         <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">BVHObjInfo</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">,</span> 
@@ -234,9 +242,11 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
 
     <span class="k">return</span> <span class="n">node</span><span class="p">;</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>B:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 计算[start, end)里的物体包围盒中心坐标的包围盒</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="c1">// 计算[start, end)里的物体包围盒中心坐标的包围盒</span>
 <span class="n">BBox</span> <span class="n">centroidBounds</span><span class="p">;</span>
 <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
     <span class="n">centroidBounds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">(</span><span class="n">centroidBounds</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">centroid</span><span class="p">);</span>
@@ -260,16 +270,17 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
     <span class="err">······</span>
     <span class="c1">// C</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>到了C，就真的要做<strong>空间切分</strong>了，需要根据SplitMethod选择切分算法。</p>
 
 <p>C:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 默认mid</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 默认mid</span>
 
 <span class="c1">// 这个switch的作用就是把[start,end)的物体切分开，并把切分位置记到mid</span>
 <span class="c1">// 从而可以对切出来的2个子树继续build</span>
 <span class="k">switch</span> <span class="p">(</span><span class="n">bvhAccel</span><span class="o">-&gt;</span><span class="n">splitMethod</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="n">BVHAccel</span><span class="o">::</span><span class="n">SplitMethod</span><span class="o">::</span><span class="nl">Middle</span><span class="p">:</span> <span class="p">{</span> 
+    <span class="k">case</span> <span class="n">BVHAccel</span><span class="p">:</span><span class="o">:</span><span class="n">SplitMethod</span><span class="o">::</span><span class="n">Middle</span><span class="o">:</span> <span class="p">{</span> 
         <span class="c1">// 中心切分法</span>
         <span class="c1">// pmid是最长边的边中心点</span>
         <span class="kt">float</span> <span class="n">pmid</span> <span class="o">=</span>
@@ -287,7 +298,7 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
         <span class="c1">// 所以不能break，继续进入EqualCounts切分</span>
         <span class="c1">// （但按照前面的逻辑来看，这里不应该一个都切分不出来，可能是一个保险措施）</span>
     <span class="p">}</span>
-    <span class="k">case</span> <span class="n">BVHAccel</span><span class="o">::</span><span class="n">SplitMethod</span><span class="o">::</span><span class="nl">EqualCounts</span><span class="p">:</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="n">BVHAccel</span><span class="p">:</span><span class="o">:</span><span class="n">SplitMethod</span><span class="o">::</span><span class="n">EqualCounts</span><span class="o">:</span> <span class="p">{</span>
         <span class="c1">// 按照数量对半切</span>
         <span class="c1">// nth_element是偏排序，保证比mid小的都排在mid之前，比mid大的都在mid之后，但不保证有序</span>
         <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
@@ -299,8 +310,8 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
         <span class="p">});</span>
         <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="k">case</span> <span class="n">BVHAccel</span><span class="o">::</span><span class="n">SplitMethod</span><span class="o">::</span><span class="nl">SAH</span><span class="p">:</span>
-    <span class="k">default</span><span class="o">:</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="n">BVHAccel</span><span class="p">:</span><span class="o">:</span><span class="n">SplitMethod</span><span class="o">::</span><span class="n">SAH</span><span class="o">:</span>
+    <span class="nl">default:</span> <span class="p">{</span>
         <span class="err">····</span>
         <span class="c1">// D</span>
         <span class="k">break</span><span class="p">;</span>
@@ -312,6 +323,7 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
         <span class="n">totalNodes</span><span class="p">,</span> <span class="n">orderedObjs</span><span class="p">),</span>
     <span class="n">recursiveBuild</span><span class="p">(</span><span class="n">bvhAccel</span><span class="p">,</span> <span class="n">arena</span><span class="p">,</span> <span class="n">objInfo</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span>
         <span class="n">totalNodes</span><span class="p">,</span> <span class="n">orderedObjs</span><span class="p">));</span>
+
 </code></pre></div>
 <p>D，是基于概率、表面积的启发式切分法SAH(Surface Area Heuristic)，要用到一条公式：</p>
 
@@ -336,7 +348,8 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
 <p>然后就是应用问题，因为切分的最优位置并不能直接得到，需要对所有可切分点都做这条公式算出cost，然后取那个最小值。</p>
 
 <p>显然这很暴力，所以pbrt作者设计了bucket机制，其实就是把相邻的物体捆绑打包，当作一个整体，再来遍历各个切分点算cost。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">if</span> <span class="p">(</span><span class="n">nObjs</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 如果用了SAH但这个节点只有2个物体，就没必要算SAH了，直接切</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="k">if</span> <span class="p">(</span><span class="n">nObjs</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 如果用了SAH但这个节点只有2个物体，就没必要算SAH了，直接切</span>
     <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
     <span class="n">std</span><span class="o">::</span><span class="n">nth_element</span><span class="p">(</span><span class="o">&amp;</span><span class="n">objInfo</span><span class="p">[</span><span class="n">start</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">[</span><span class="n">mid</span><span class="p">],</span>
         <span class="o">&amp;</span><span class="n">objInfo</span><span class="p">[</span><span class="n">end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
@@ -415,6 +428,7 @@ BVH是空间切分技术之一，除了BVH之外还有kdtree、octree。
         <span class="k">return</span> <span class="n">node</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
+
 </code></pre></div>
     </div>
     <div class="entry">

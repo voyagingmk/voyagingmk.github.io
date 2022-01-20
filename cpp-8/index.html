@@ -107,7 +107,7 @@
 <p>另外的问题是，容器和智能指针结合使用时的易错点。</p>
 
 <p>当元素为shared_ptr<T>包装的类实例时，直接放进(multi)set就有2个潜在问题，一是容器排序的依据是shared_ptr，而不是T，这是很容易误解的，解决这个问题的办法是声明容器时添加一个Comparator参数，例如：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">struct</span> <span class="nc">TimeEvent</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">struct</span> <span class="nc">TimeEvent</span>
 <span class="p">{</span>
     <span class="kt">long</span> <span class="kt">long</span> <span class="n">id</span><span class="p">;</span>
     <span class="kt">long</span> <span class="n">sec</span><span class="p">;</span>
@@ -117,7 +117,7 @@
 
 <span class="k">struct</span> <span class="nc">Compare</span>
 <span class="p">{</span>
-    <span class="kt">bool</span> <span class="nf">operator</span><span class="p">()(</span><span class="k">const</span> <span class="n">TimeEvent</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">TimeEvent</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">)</span>
+    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="k">const</span> <span class="n">TimeEvent</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">TimeEvent</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">return</span> <span class="o">*</span><span class="n">a</span> <span class="o">&lt;</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
     <span class="p">}</span>
@@ -136,7 +136,7 @@
 <p>对于只有单个属性的T来说，实现strict weak ordering很简单，只要operator&lt;里写一行a.x &lt; a.x就行了。</p>
 
 <p>对于一个有复合属性的类T，operator&lt;需要小心一点，但也是大同小异。例如：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="kt">bool</span> <span class="n">TimeEvent</span><span class="o">::</span><span class="k">operator</span><span class="o">&lt;</span><span class="p">(</span><span class="k">const</span> <span class="n">TimeEvent</span> <span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span> <span class="k">const</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">bool</span> <span class="n">TimeEvent</span><span class="o">::</span><span class="k">operator</span><span class="o">&lt;</span><span class="p">(</span><span class="k">const</span> <span class="n">TimeEvent</span> <span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span> <span class="k">const</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">sec</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">.</span><span class="n">sec</span><span class="p">)</span>
     <span class="p">{</span>

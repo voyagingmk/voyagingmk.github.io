@@ -283,7 +283,7 @@
 <p>然而很可惜的是，非对称加密算法，性能一般都差强人意，远不如<strong>对称加密算法</strong>。所以如果用户要发送大量隐私数据给服务器，且只用非对称加密的话，先不说客户端耗能，服务器的CPU首先就炸了。</p>
 
 <p>用指令openssl speed xxx，可以认识到各种算法的性能：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>                        sign        verify          sign/s    verify/s
+<div class="highlight"><pre><code class="language-" data-lang="">                        sign        verify          sign/s    verify/s
 rsa 2048 bits 0.000738s 0.000022s   1354.2  45918.7
 
 因为rsa是按次的，这里得换算成k bytes才能和aes比较，即乘以256再除以1000：
@@ -326,14 +326,14 @@ aes-128 cbc      99115.02k   115128.04k   122790.06k   126412.46k   126915.93k
 <p>master key是<strong>定长</strong>的。master key从pre-master key派生，是它的亲儿子。</p>
 
 <p>这个<a href="https://tools.ietf.org/html/rfc5246#section-8.1">RFC</a>里有提及如何算master key:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">master_secret</span> <span class="o">=</span> <span class="n">PRF</span><span class="p">(</span><span class="n">pre_master_secret</span><span class="p">,</span> <span class="s">&quot;master secret&quot;</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">master_secret</span> <span class="o">=</span> <span class="n">PRF</span><span class="p">(</span><span class="n">pre_master_secret</span><span class="p">,</span> <span class="s">"master secret"</span><span class="p">,</span>
                           <span class="n">ClientHello</span><span class="p">.</span><span class="n">random</span> <span class="o">+</span> <span class="n">ServerHello</span><span class="p">.</span><span class="n">random</span><span class="p">)</span>
-                          <span class="p">[</span><span class="mf">0..47</span><span class="p">];</span>
+                          <span class="p">[</span><span class="mi">0</span><span class="p">..</span><span class="mi">47</span><span class="p">];</span>
 </code></pre></div>
 <p>用本文的术语来表达的就是：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">master_key</span> <span class="o">=</span> <span class="n">PRF</span><span class="p">(</span><span class="n">pre_master_key</span><span class="p">,</span> <span class="s">&quot;master key&quot;</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">master_key</span> <span class="o">=</span> <span class="n">PRF</span><span class="p">(</span><span class="n">pre_master_key</span><span class="p">,</span> <span class="s">"master key"</span><span class="p">,</span>
                           <span class="n">nonce_client</span> <span class="o">+</span> <span class="n">nonce_server</span><span class="p">)</span>
-                          <span class="p">[</span><span class="mf">0..47</span><span class="p">];</span>
+                          <span class="p">[</span><span class="mi">0</span><span class="p">..</span><span class="mi">47</span><span class="p">];</span>
 </code></pre></div>
 <p>（PRF（Pseudo-random function），是<strong>伪随机导出函数</strong>。这段代码意思是，根据pre-master key、nonce_client、nonce_server三个参数，伪随机地，导出了一个master key，定长48字节。）</p>
 

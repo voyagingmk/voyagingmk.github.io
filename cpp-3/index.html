@@ -94,115 +94,223 @@
 
 <!--more-->
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;utility&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="k">class</span> <span class="nc">Item</span> <span class="p">{</span>
-<span class="linenos"> 6</span><span class="k">public</span><span class="o">:</span>
-<span class="linenos"> 7</span> <span class="kt">char</span> <span class="n">name</span><span class="p">;</span>
-<span class="linenos"> 8</span> <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-<span class="linenos"> 9</span><span class="k">public</span><span class="o">:</span>
-<span class="linenos">10</span> <span class="o">~</span><span class="n">Item</span><span class="p">(){</span>
-<span class="linenos">11</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[dtor called] (%c, %i) </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="linenos">12</span> <span class="p">}</span>
-<span class="linenos">13</span> <span class="n">Item</span><span class="p">()</span><span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="sc">&#39;_&#39;</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">14</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[default ctor called] </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">15</span> <span class="p">}</span>
-<span class="linenos">16</span> <span class="n">Item</span><span class="p">(</span><span class="kt">char</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v</span><span class="p">)</span><span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">17</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[ctor called] (%c, %i) </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="linenos">18</span> <span class="p">}</span>
-<span class="linenos">19</span> <span class="n">Item</span><span class="p">(</span><span class="k">const</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">20</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[copy ctor called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="linenos">21</span>     <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
-<span class="linenos">22</span>     <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
-<span class="linenos">23</span> <span class="p">}</span>
-<span class="linenos">24</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="k">operator</span> <span class="o">=</span> <span class="p">(</span><span class="k">const</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
-<span class="linenos">25</span> <span class="p">{</span>
-<span class="linenos">26</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[operator = called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="linenos">27</span>     <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
-<span class="linenos">28</span>     <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
-<span class="linenos">29</span>     <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
-<span class="linenos">30</span> <span class="p">}</span>
-<span class="linenos">31</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="k">operator</span> <span class="o">=</span> <span class="p">(</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">a</span><span class="p">)</span>
-<span class="linenos">32</span> <span class="p">{</span>
-<span class="linenos">33</span>     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[move operator = called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-<span class="linenos">34</span>     <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
-<span class="linenos">35</span>     <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
-<span class="linenos">36</span>     <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
-<span class="linenos">37</span> <span class="p">}</span>
-<span class="linenos">38</span><span class="p">};</span>
-<span class="linenos">39</span>
-<span class="linenos">40</span><span class="n">Item</span> <span class="nf">test1</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="linenos">41</span><span class="p">{</span>
-<span class="linenos">42</span> <span class="k">return</span> <span class="n">Item</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-<span class="linenos">43</span><span class="p">}</span>
-<span class="linenos">44</span>
-<span class="linenos">45</span><span class="n">Item</span> <span class="nf">test2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="linenos">46</span><span class="p">{</span>
-<span class="linenos">47</span> <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">&#39;b&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
-<span class="linenos">48</span> <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
-<span class="linenos">50</span>
-<span class="linenos">51</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="nf">test3</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="linenos">52</span><span class="p">{</span>
-<span class="linenos">53</span> <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">&#39;c&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-<span class="linenos">54</span> <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
-<span class="linenos">55</span><span class="p">}</span>
-<span class="linenos">56</span>
-<span class="linenos">57</span><span class="n">Item</span> <span class="nf">test4</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="linenos">58</span><span class="p">{</span>
-<span class="linenos">59</span> <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">&#39;d&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
-<span class="linenos">60</span> <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
-<span class="linenos">61</span><span class="p">}</span>
-<span class="linenos">62</span>
-<span class="linenos">63</span><span class="n">Item</span> <span class="nf">test5</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="linenos">64</span><span class="p">{</span>
-<span class="linenos">65</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">Item</span><span class="p">(</span><span class="sc">&#39;e&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
-<span class="linenos">66</span> <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
-<span class="linenos">67</span><span class="p">}</span>
-<span class="linenos">68</span>
-<span class="linenos">69</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos">70</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item a = test1()   --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">71</span> <span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">();</span>
-<span class="linenos">72</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item&amp;&amp; b = test2() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">73</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">();</span>
-<span class="linenos">74</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item&amp;&amp; c = test3() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">75</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">();</span>
-<span class="linenos">76</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;----------Item&amp;&amp; d = test4() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">77</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">();</span>
-<span class="linenos">78</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;--------- Item&amp;&amp; e = test5() --------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">79</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">();</span>
-<span class="linenos">80</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">----------      test end  --------------</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">81</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">82</span><span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+</pre></td><td class="code"><pre><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;utility&gt;
+</span>
+
+<span class="k">class</span> <span class="nc">Item</span> <span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">char</span> <span class="n">name</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+<span class="nl">public:</span>
+    <span class="o">~</span><span class="n">Item</span><span class="p">(){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[dtor called] (%c, %i) </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="p">()</span><span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="sc">'_'</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[default ctor called] </span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="p">(</span><span class="kt">char</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v</span><span class="p">)</span><span class="o">:</span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">val</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[ctor called] (%c, %i) </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="p">(</span><span class="k">const</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[copy ctor called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="o">&amp;</span> <span class="k">operator</span> <span class="o">=</span> <span class="p">(</span><span class="k">const</span> <span class="n">Item</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[operator = called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">Item</span><span class="o">&amp;</span> <span class="k">operator</span> <span class="o">=</span> <span class="p">(</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">a</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[move operator = called] (%c, %i) -&gt; (%c, %i)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Item</span> <span class="nf">test1</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">Item</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">Item</span> <span class="nf">test2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">'b'</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">test3</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">'c'</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">Item</span> <span class="nf">test4</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span> <span class="n">a</span><span class="p">(</span><span class="sc">'d'</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">Item</span> <span class="nf">test5</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">Item</span><span class="p">(</span><span class="sc">'e'</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"----------Item a = test1()   --------------</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"----------Item&amp;&amp; b = test2() --------------</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"----------Item&amp;&amp; c = test3() --------------</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"----------Item&amp;&amp; d = test4() --------------</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"--------- Item&amp;&amp; e = test5() --------------</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">----------      test end  --------------</span><span class="se">\n\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <p>Debug运行结果:</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span><span class="o">----------</span><span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
-<span class="linenos"> 2</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="linenos"> 3</span><span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos"> 4</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="linenos"> 5</span><span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="mi">-858993460</span><span class="p">)</span>
-<span class="linenos"> 6</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="linenos"> 7</span><span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos"> 8</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="linenos"> 9</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="linenos">10</span><span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos">11</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="linenos">12</span><span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="mi">-858993460</span><span class="p">)</span>
-<span class="linenos">13</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="linenos">14</span><span class="o">---------</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos">15</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="linenos">16</span><span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="mi">-858993460</span><span class="p">)</span>
-<span class="linenos">17</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span><span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="linenos">22</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="linenos">23</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="linenos">24</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="code"><pre><span class="o">----------</span><span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="o">---------</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="o">-</span><span class="mi">858993460</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
+
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <p>从结果可以总结出:</p>
 
@@ -215,28 +323,51 @@
 
 <p>Release运行结果:</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span><span class="o">----------</span><span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
-<span class="linenos"> 2</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="linenos"> 3</span><span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos"> 4</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="linenos"> 5</span><span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos"> 6</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="linenos"> 7</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="linenos"> 8</span><span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos"> 9</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="linenos">10</span><span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="p">,</span> <span class="mi">3805970</span><span class="p">)</span>
-<span class="linenos">11</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="linenos">12</span><span class="o">---------</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">()</span> <span class="o">--------------</span>
-<span class="linenos">13</span><span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="linenos">14</span><span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="mi">1</span><span class="p">)</span>
-<span class="linenos">15</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="linenos">16</span>
-<span class="linenos">17</span><span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="linenos">20</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="linenos">21</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="linenos">22</span><span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="code"><pre><span class="o">----------</span><span class="n">Item</span> <span class="n">a</span> <span class="o">=</span> <span class="n">test1</span><span class="p">()</span>   <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test2</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">test3</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="o">----------</span><span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">test4</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="p">,</span> <span class="mi">3805970</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="o">---------</span> <span class="n">Item</span><span class="o">&amp;&amp;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">test5</span><span class="p">()</span> <span class="o">--------------</span>
+<span class="p">[</span><span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">copy</span> <span class="n">ctor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">?</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="o">----------</span>      <span class="n">test</span> <span class="n">end</span>  <span class="o">--------------</span>
+
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">dtor</span> <span class="n">called</span><span class="p">]</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <p>对比Debug版的输出，会发现test2函数被编译优化成test1了。</p>
 

@@ -103,33 +103,33 @@
 <h2>对象类型</h2>
 
 <p>总共有7种：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* The actual Redis Object */</span>
-<span class="cp">#define OBJ_STRING 0    </span><span class="cm">/* String object. */</span><span class="cp"></span>
-<span class="cp">#define OBJ_LIST 1      </span><span class="cm">/* List object. */</span><span class="cp"></span>
-<span class="cp">#define OBJ_SET 2       </span><span class="cm">/* Set object. */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ZSET 3      </span><span class="cm">/* Sorted set object. */</span><span class="cp"></span>
-<span class="cp">#define OBJ_HASH 4      </span><span class="cm">/* Hash object. */</span><span class="cp"></span>
-<span class="cp">#define OBJ_MODULE 5    </span><span class="cm">/* Module object. */</span><span class="cp"></span>
-<span class="cp">#define OBJ_STREAM 6    </span><span class="cm">/* Stream object. */</span><span class="cp"></span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* The actual Redis Object */</span>
+<span class="cp">#define OBJ_STRING 0    </span><span class="cm">/* String object. */</span><span class="cp">
+#define OBJ_LIST 1      </span><span class="cm">/* List object. */</span><span class="cp">
+#define OBJ_SET 2       </span><span class="cm">/* Set object. */</span><span class="cp">
+#define OBJ_ZSET 3      </span><span class="cm">/* Sorted set object. */</span><span class="cp">
+#define OBJ_HASH 4      </span><span class="cm">/* Hash object. */</span><span class="cp">
+#define OBJ_MODULE 5    </span><span class="cm">/* Module object. */</span><span class="cp">
+#define OBJ_STREAM 6    </span><span class="cm">/* Stream object. */</span><span class="cp">
+</span></code></pre></div>
 <h2>对象编码</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define OBJ_ENCODING_RAW 0     </span><span class="cm">/* 什么数据结构都没用到 */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_INT 1     </span><span class="cm">/* 整数 */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_HT 2      </span><span class="cm">/* 散列表 */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_ZIPMAP 3  </span><span class="cm">/* zipmap */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_LINKEDLIST 4 </span><span class="cm">/* 已废弃 */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_ZIPLIST 5 </span><span class="cm">/* ziplist */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_INTSET 6  </span><span class="cm">/* intset */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_SKIPLIST 7  </span><span class="cm">/* skiplist */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_EMBSTR 8  </span><span class="cm">/* 嵌入式sds */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_QUICKLIST 9 </span><span class="cm">/* 由多个ziplist组成的链表（linked list） */</span><span class="cp"></span>
-<span class="cp">#define OBJ_ENCODING_STREAM 10 </span><span class="cm">/* radix tree of listpacks */</span><span class="cp"></span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#define OBJ_ENCODING_RAW 0     </span><span class="cm">/* 什么数据结构都没用到 */</span><span class="cp">
+#define OBJ_ENCODING_INT 1     </span><span class="cm">/* 整数 */</span><span class="cp">
+#define OBJ_ENCODING_HT 2      </span><span class="cm">/* 散列表 */</span><span class="cp">
+#define OBJ_ENCODING_ZIPMAP 3  </span><span class="cm">/* zipmap */</span><span class="cp">
+#define OBJ_ENCODING_LINKEDLIST 4 </span><span class="cm">/* 已废弃 */</span><span class="cp">
+#define OBJ_ENCODING_ZIPLIST 5 </span><span class="cm">/* ziplist */</span><span class="cp">
+#define OBJ_ENCODING_INTSET 6  </span><span class="cm">/* intset */</span><span class="cp">
+#define OBJ_ENCODING_SKIPLIST 7  </span><span class="cm">/* skiplist */</span><span class="cp">
+#define OBJ_ENCODING_EMBSTR 8  </span><span class="cm">/* 嵌入式sds */</span><span class="cp">
+#define OBJ_ENCODING_QUICKLIST 9 </span><span class="cm">/* 由多个ziplist组成的链表（linked list） */</span><span class="cp">
+#define OBJ_ENCODING_STREAM 10 </span><span class="cm">/* radix tree of listpacks */</span><span class="cp">
+</span></code></pre></div>
 <h2>对象结构体</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">redisObject</span> <span class="p">{</span>
-    <span class="kt">unsigned</span> <span class="nl">type</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span> <span class="c1">// 上文已介绍</span>
-    <span class="kt">unsigned</span> <span class="nl">encoding</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span> <span class="c1">// 上文已介绍</span>
-    <span class="kt">unsigned</span> <span class="nl">lru</span><span class="p">:</span><span class="n">LRU_BITS</span><span class="p">;</span> <span class="c1">// 计时的</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">redisObject</span> <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="n">type</span><span class="o">:</span><span class="mi">4</span><span class="p">;</span> <span class="c1">// 上文已介绍</span>
+    <span class="kt">unsigned</span> <span class="n">encoding</span><span class="o">:</span><span class="mi">4</span><span class="p">;</span> <span class="c1">// 上文已介绍</span>
+    <span class="kt">unsigned</span> <span class="n">lru</span><span class="o">:</span><span class="n">LRU_BITS</span><span class="p">;</span> <span class="c1">// 计时的</span>
     <span class="kt">int</span> <span class="n">refcount</span><span class="p">;</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">robj</span><span class="p">;</span>
@@ -137,7 +137,7 @@
 <h2>createObject</h2>
 
 <p>这个是最基本的创建对象接口：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="nf">createObject</span><span class="p">(</span><span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">robj</span> <span class="o">*</span><span class="nf">createObject</span><span class="p">(</span><span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">o</span><span class="p">));</span>
     <span class="n">o</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
     <span class="n">o</span><span class="o">-&gt;</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">OBJ_ENCODING_RAW</span><span class="p">;</span>
@@ -176,7 +176,7 @@
 <h1>redisCommand</h1>
 
 <h2>结构</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">redisCommand</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">redisCommand</span> <span class="p">{</span>
     <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="c1">// 即暴露给客户端的指令名</span>
     <span class="n">redisCommandProc</span> <span class="o">*</span><span class="n">proc</span><span class="p">;</span> <span class="c1">// 接口</span>
     <span class="kt">int</span> <span class="n">arity</span><span class="p">;</span> <span class="c1">// 参数数量</span>
@@ -192,22 +192,22 @@
 <p>server.c里面定义了各种指令。</p>
 
 <h2>flags解释</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/*</span>
-<span class="cm"> * w: 写指令</span>
-<span class="cm"> * r: 读指令</span>
-<span class="cm"> * m: 会增加内存使用量的指令（如果out of memory了就不要使用）</span>
-<span class="cm"> * a: 管理员指令（SAVE / SHUTDOWN / ···)</span>
-<span class="cm"> * p: 发布订阅相关指令</span>
-<span class="cm"> * f: 没有指令用到这个flag</span>
-<span class="cm"> * s: 不能在脚本中使用的指令</span>
-<span class="cm"> * R: 带有随机性的指令(SPOP / RANDOMKEY / ···）</span>
-<span class="cm"> * S: 软指令，会输出数组，有确定性（hkeys/hvals/smembers/sdiff/sunion/sinter/keys）</span>
-<span class="cm"> * l: 在加载数据库过程中允许使用的指令（select/shutdown/···)</span>
-<span class="cm"> * t: 和主从的数据同步状态有关</span>
-<span class="cm"> * M: 开启了MONITOR时不需要列入监控的指令(exec)</span>
-<span class="cm"> * k: 和cluster模式有关，只有restore-asking用到</span>
-<span class="cm"> * F: 高速指令，O(1)或O(log(N))。如果会触发del（del可能会拖时间），那么不是高速指令（如set不是高速指令，而get是）</span>
-<span class="cm"> */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/*
+ * w: 写指令
+ * r: 读指令
+ * m: 会增加内存使用量的指令（如果out of memory了就不要使用）
+ * a: 管理员指令（SAVE / SHUTDOWN / ···)
+ * p: 发布订阅相关指令
+ * f: 没有指令用到这个flag
+ * s: 不能在脚本中使用的指令
+ * R: 带有随机性的指令(SPOP / RANDOMKEY / ···）
+ * S: 软指令，会输出数组，有确定性（hkeys/hvals/smembers/sdiff/sunion/sinter/keys）
+ * l: 在加载数据库过程中允许使用的指令（select/shutdown/···)
+ * t: 和主从的数据同步状态有关
+ * M: 开启了MONITOR时不需要列入监控的指令(exec)
+ * k: 和cluster模式有关，只有restore-asking用到
+ * F: 高速指令，O(1)或O(log(N))。如果会触发del（del可能会拖时间），那么不是高速指令（如set不是高速指令，而get是）
+ */</span>
 </code></pre></div>
 <h1>t_string</h1>
 
@@ -220,7 +220,7 @@
 </ul>
 
 <h2>createRawStringObject</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="nf">createRawStringObject</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">robj</span> <span class="o">*</span><span class="nf">createRawStringObject</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">createObject</span><span class="p">(</span><span class="n">OBJ_STRING</span><span class="p">,</span> <span class="n">sdsnewlen</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span><span class="n">len</span><span class="p">));</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -229,7 +229,7 @@
 <h2>createEmbeddedStringObject</h2>
 
 <p>这个和createRawStringObject的最大区别是，只做一次内存分配：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="nc">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">robj</span> <span class="o">*</span><span class="n">o</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span><span class="o">+</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
 </code></pre></div>
 <p>encoding是OBJ_ENCODING_EMBSTR。</p>
 
@@ -294,12 +294,12 @@
 <li>添加的元素不是整数时</li>
 <li>包含元素过多时</li>
 </ul>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// set-max-intset-entries 默认 512</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// set-max-intset-entries 默认 512</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">intsetLen</span><span class="p">(</span><span class="n">subject</span><span class="o">-&gt;</span><span class="n">ptr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">server</span><span class="p">.</span><span class="n">set_max_intset_entries</span><span class="p">)</span>
     <span class="n">setTypeConvert</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="n">OBJ_ENCODING_HT</span><span class="p">);</span>
 </code></pre></div>
 <h2>交集并集运算</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">sunionDiffGenericCommand</span><span class="p">(</span><span class="n">client</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="n">robj</span> <span class="o">**</span><span class="n">setkeys</span><span class="p">,</span> <span class="kt">int</span> <span class="n">setnum</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">sunionDiffGenericCommand</span><span class="p">(</span><span class="n">client</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="n">robj</span> <span class="o">**</span><span class="n">setkeys</span><span class="p">,</span> <span class="kt">int</span> <span class="n">setnum</span><span class="p">,</span>
                               <span class="n">robj</span> <span class="o">*</span><span class="n">dstkey</span><span class="p">,</span> <span class="kt">int</span> <span class="n">op</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">robj</span> <span class="o">**</span><span class="n">sets</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">)</span><span class="o">*</span><span class="n">setnum</span><span class="p">);</span>
     <span class="n">setTypeIterator</span> <span class="o">*</span><span class="n">si</span><span class="p">;</span>
@@ -344,7 +344,7 @@
 
         <span class="k">if</span> <span class="p">(</span><span class="n">diff_algo</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">setnum</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// 按照包含元素数量 降序排序 方便尽快找到重复元素</span>
-            <span class="n">qsort</span><span class="p">(</span><span class="n">sets</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">setnum</span><span class="mi">-1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">),</span>
+            <span class="n">qsort</span><span class="p">(</span><span class="n">sets</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">setnum</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">robj</span><span class="o">*</span><span class="p">),</span>
                 <span class="n">qsortCompareSetsByRevCardinality</span><span class="p">);</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -419,13 +419,13 @@
             <span class="n">dbAdd</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">,</span><span class="n">dstset</span><span class="p">);</span>
             <span class="n">addReplyLongLong</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">setTypeSize</span><span class="p">(</span><span class="n">dstset</span><span class="p">));</span>
             <span class="n">notifyKeyspaceEvent</span><span class="p">(</span><span class="n">NOTIFY_SET</span><span class="p">,</span>
-                <span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_UNION</span> <span class="o">?</span> <span class="s">&quot;sunionstore&quot;</span> <span class="o">:</span> <span class="s">&quot;sdiffstore&quot;</span><span class="p">,</span>
+                <span class="n">op</span> <span class="o">==</span> <span class="n">SET_OP_UNION</span> <span class="o">?</span> <span class="s">"sunionstore"</span> <span class="o">:</span> <span class="s">"sdiffstore"</span><span class="p">,</span>
                 <span class="n">dstkey</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
             <span class="n">decrRefCount</span><span class="p">(</span><span class="n">dstset</span><span class="p">);</span>
             <span class="n">addReply</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">shared</span><span class="p">.</span><span class="n">czero</span><span class="p">);</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">deleted</span><span class="p">)</span>
-                <span class="n">notifyKeyspaceEvent</span><span class="p">(</span><span class="n">NOTIFY_GENERIC</span><span class="p">,</span><span class="s">&quot;del&quot;</span><span class="p">,</span>
+                <span class="n">notifyKeyspaceEvent</span><span class="p">(</span><span class="n">NOTIFY_GENERIC</span><span class="p">,</span><span class="s">"del"</span><span class="p">,</span>
                     <span class="n">dstkey</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span>
         <span class="p">}</span>
         <span class="n">signalModifiedKey</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">db</span><span class="p">,</span><span class="n">dstkey</span><span class="p">);</span>

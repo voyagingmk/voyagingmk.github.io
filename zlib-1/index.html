@@ -213,26 +213,26 @@ Byte        A    A    B    C    B    B    A    B    C
 <h3>zlib</h3>
 
 <p>zlib自带CMakeLists.txt，在Mac上可以直接生成一个Xcode project，不仅可以方便地编译zlib，还可以用来学习zlib（本文的重心）：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>cd build/
-cmake .. -G &#39;Xcode&#39;
+<div class="highlight"><pre><code class="language-" data-lang="">cd build/
+cmake .. -G 'Xcode'
 </code></pre></div>
 <p>然后打开zlib.xcodeproj，构建All，并选择运行example。能运行成功的话打开example.c，会发现有完整的zlib使用教程。</p>
 
 <p>我们重点放在deflate的最简单的使用实例：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">test_deflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">test_deflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">);</span>
 <span class="n">test_inflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">,</span> <span class="n">uncompr</span><span class="p">,</span> <span class="n">uncomprLen</span><span class="p">);</span>
 </code></pre></div>
 <p>第1行压缩，第2行解压。看懂了这两个函数代码，是理解deflate算法的第一步。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 该函数用到的外部代码片段，我搬运到这里，方便浏览</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// 该函数用到的外部代码片段，我搬运到这里，方便浏览</span>
 
 <span class="c1">// 压缩强度级别</span>
-<span class="cp">#define Z_NO_COMPRESSION         0</span>
-<span class="cp">#define Z_BEST_SPEED             1</span>
-<span class="cp">#define Z_BEST_COMPRESSION       9</span>
-<span class="cp">#define Z_DEFAULT_COMPRESSION  (-1)</span>
-
+<span class="cp">#define Z_NO_COMPRESSION         0
+#define Z_BEST_SPEED             1
+#define Z_BEST_COMPRESSION       9
+#define Z_DEFAULT_COMPRESSION  (-1)
+</span>
 <span class="c1">// 这个结构大概相当于一个压缩控制器</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">z_stream_s</span> <span class="p">{</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">z_stream_s</span> <span class="p">{</span>
     <span class="n">z_const</span> <span class="n">Bytef</span> <span class="o">*</span><span class="n">next_in</span><span class="p">;</span>     <span class="cm">/* 指向待压缩数据的第一个字节 */</span>
     <span class="n">uInt</span>     <span class="n">avail_in</span><span class="p">;</span>  <span class="cm">/* 待压缩数据next_in的长度 */</span>
     <span class="n">uLong</span>    <span class="n">total_in</span><span class="p">;</span>  <span class="cm">/* 当前已读取多少输入字节 */</span>
@@ -242,7 +242,7 @@ cmake .. -G &#39;Xcode&#39;
     <span class="n">uLong</span>    <span class="n">total_out</span><span class="p">;</span> <span class="cm">/* 当前已输出多少输入字节*/</span>
 
     <span class="n">z_const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">;</span>  <span class="cm">/* 错误信息 */</span>
-    <span class="k">struct</span> <span class="nc">internal_state</span> <span class="n">FAR</span> <span class="o">*</span><span class="n">state</span><span class="p">;</span> <span class="cm">/* 暂时不用管这个 */</span>
+    <span class="k">struct</span> <span class="n">internal_state</span> <span class="n">FAR</span> <span class="o">*</span><span class="n">state</span><span class="p">;</span> <span class="cm">/* 暂时不用管这个 */</span>
 
     <span class="n">alloc_func</span> <span class="n">zalloc</span><span class="p">;</span>  <span class="cm">/* 压缩过程会分配新内存（internal state），用户可以设置自己的alloc函数给z_stream */</span>
     <span class="n">free_func</span>  <span class="n">zfree</span><span class="p">;</span>   <span class="cm">/* 释放内存 */</span>
@@ -254,9 +254,9 @@ cmake .. -G &#39;Xcode&#39;
 <span class="p">}</span> <span class="n">z_stream</span><span class="p">;</span>
 
 <span class="c1">//待压缩的字节串</span>
-<span class="k">static</span> <span class="n">z_const</span> <span class="kt">char</span> <span class="n">hello</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;hello, hello!&quot;</span><span class="p">;</span>
+<span class="k">static</span> <span class="n">z_const</span> <span class="kt">char</span> <span class="n">hello</span><span class="p">[]</span> <span class="o">=</span> <span class="s">"hello, hello!"</span><span class="p">;</span>
 
-<span class="kt">void</span> <span class="nf">test_deflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">)</span>
+<span class="kt">void</span> <span class="n">test_deflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">)</span>
     <span class="n">Byte</span> <span class="o">*</span><span class="n">compr</span><span class="p">;</span>
     <span class="n">uLong</span> <span class="n">comprLen</span><span class="p">;</span>
 <span class="p">{</span>
@@ -269,7 +269,7 @@ cmake .. -G &#39;Xcode&#39;
     <span class="n">c_stream</span><span class="p">.</span><span class="n">opaque</span> <span class="o">=</span> <span class="p">(</span><span class="n">voidpf</span><span class="p">)</span><span class="mi">0</span><span class="p">;</span>
 
     <span class="n">err</span> <span class="o">=</span> <span class="n">deflateInit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c_stream</span><span class="p">,</span> <span class="n">Z_DEFAULT_COMPRESSION</span><span class="p">);</span>
-    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;deflateInit&quot;</span><span class="p">);</span>
+    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"deflateInit"</span><span class="p">);</span>
 
     <span class="n">c_stream</span><span class="p">.</span><span class="n">next_in</span>  <span class="o">=</span> <span class="p">(</span><span class="n">z_const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">hello</span><span class="p">;</span>
     <span class="n">c_stream</span><span class="p">.</span><span class="n">next_out</span> <span class="o">=</span> <span class="n">compr</span><span class="p">;</span>
@@ -281,18 +281,18 @@ cmake .. -G &#39;Xcode&#39;
     <span class="k">while</span> <span class="p">(</span><span class="n">c_stream</span><span class="p">.</span><span class="n">total_in</span> <span class="o">!=</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">c_stream</span><span class="p">.</span><span class="n">total_out</span> <span class="o">&lt;</span> <span class="n">comprLen</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">c_stream</span><span class="p">.</span><span class="n">avail_in</span> <span class="o">=</span> <span class="n">c_stream</span><span class="p">.</span><span class="n">avail_out</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="cm">/* 每次只处理1个字节，故意的*/</span>
         <span class="n">err</span> <span class="o">=</span> <span class="n">deflate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c_stream</span><span class="p">,</span> <span class="n">Z_NO_FLUSH</span><span class="p">);</span>
-        <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;deflate&quot;</span><span class="p">);</span>
+        <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"deflate"</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="c1">// 压缩末端的处理</span>
     <span class="k">for</span> <span class="p">(;;)</span> <span class="p">{</span>
         <span class="n">c_stream</span><span class="p">.</span><span class="n">avail_out</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 依然每次只输出一个字节</span>
         <span class="n">err</span> <span class="o">=</span> <span class="n">deflate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c_stream</span><span class="p">,</span> <span class="n">Z_FINISH</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">==</span> <span class="n">Z_STREAM_END</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span> <span class="c1">// 结束标记</span>
-        <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;deflate&quot;</span><span class="p">);</span>
+        <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"deflate"</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="n">err</span> <span class="o">=</span> <span class="n">deflateEnd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c_stream</span><span class="p">);</span>
-    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;deflateEnd&quot;</span><span class="p">);</span>
+    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"deflateEnd"</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>纵观整个压缩流程，其实就是1个变量和3个函数：</p>
@@ -305,18 +305,18 @@ cmake .. -G &#39;Xcode&#39;
 </ul>
 
 <p>这个example故意让缓冲区每次迭代都只有1个字节可用，可以去掉那2行代码，并在开始压缩之前执行：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">c_stream</span><span class="p">.</span><span class="n">avail_in</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">c_stream</span><span class="p">.</span><span class="n">avail_in</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
 <span class="n">c_stream</span><span class="p">.</span><span class="n">avail_out</span> <span class="o">=</span> <span class="n">comprLen</span><span class="p">;</span>
 </code></pre></div>
 <p>接下来是解压缩：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">test_inflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">,</span> <span class="n">uncompr</span><span class="p">,</span> <span class="n">uncomprLen</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="n">test_inflate</span><span class="p">(</span><span class="n">compr</span><span class="p">,</span> <span class="n">comprLen</span><span class="p">,</span> <span class="n">uncompr</span><span class="p">,</span> <span class="n">uncomprLen</span><span class="p">)</span>
     <span class="n">Byte</span> <span class="o">*</span><span class="n">compr</span><span class="p">,</span> <span class="o">*</span><span class="n">uncompr</span><span class="p">;</span>
     <span class="n">uLong</span> <span class="n">comprLen</span><span class="p">,</span> <span class="n">uncomprLen</span><span class="p">;</span>
 <span class="p">{</span>
     <span class="kt">int</span> <span class="n">err</span><span class="p">;</span>
     <span class="n">z_stream</span> <span class="n">d_stream</span><span class="p">;</span>
 
-    <span class="n">strcpy</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">uncompr</span><span class="p">,</span> <span class="s">&quot;garbage&quot;</span><span class="p">);</span>
+    <span class="n">strcpy</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">uncompr</span><span class="p">,</span> <span class="s">"garbage"</span><span class="p">);</span>
 
     <span class="n">d_stream</span><span class="p">.</span><span class="n">zalloc</span> <span class="o">=</span> <span class="n">zalloc</span><span class="p">;</span>
     <span class="n">d_stream</span><span class="p">.</span><span class="n">zfree</span> <span class="o">=</span> <span class="n">zfree</span><span class="p">;</span>
@@ -331,23 +331,23 @@ cmake .. -G &#39;Xcode&#39;
     <span class="c1">// d_stream.avail_out = (uInt)uncomprLen;</span>
 
     <span class="n">err</span> <span class="o">=</span> <span class="n">inflateInit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d_stream</span><span class="p">);</span>
-    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;inflateInit&quot;</span><span class="p">);</span>
+    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"inflateInit"</span><span class="p">);</span>
 
     <span class="k">while</span> <span class="p">(</span><span class="n">d_stream</span><span class="p">.</span><span class="n">total_out</span> <span class="o">&lt;</span> <span class="n">uncomprLen</span> <span class="o">&amp;&amp;</span> <span class="n">d_stream</span><span class="p">.</span><span class="n">total_in</span> <span class="o">&lt;</span> <span class="n">comprLen</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">d_stream</span><span class="p">.</span><span class="n">avail_in</span> <span class="o">=</span> <span class="n">d_stream</span><span class="p">.</span><span class="n">avail_out</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="n">err</span> <span class="o">=</span> <span class="n">inflate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d_stream</span><span class="p">,</span> <span class="n">Z_NO_FLUSH</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">==</span> <span class="n">Z_STREAM_END</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-        <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;inflate&quot;</span><span class="p">);</span>
+        <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"inflate"</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="n">err</span> <span class="o">=</span> <span class="n">inflateEnd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d_stream</span><span class="p">);</span>
-    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">&quot;inflateEnd&quot;</span><span class="p">);</span>
+    <span class="n">CHECK_ERR</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"inflateEnd"</span><span class="p">);</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">uncompr</span><span class="p">,</span> <span class="n">mytest</span><span class="p">))</span> <span class="p">{</span>
-        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;bad inflate</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"bad inflate</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
         <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;inflate(): %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">uncompr</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"inflate(): %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">uncompr</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>

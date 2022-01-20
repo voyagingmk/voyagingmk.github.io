@@ -109,15 +109,16 @@
 <p><img src="../images/2018.4/5.png" alt="5.png"></p>
 
 <p>用这个<a href="https://hub.mybinder.org/user/ipython-ipython-in-depth-qhl9ondm/notebooks/binder/Untitled1.ipynb?kernel_name=python3">在线工具</a>可以打印椭圆曲线：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="nn">pl</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="n">pl</span>
 
 <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span>  <span class="c1"># 替换掉这个方程，然后重新run</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span>  <span class="c1"># 替换掉这个方程，然后重新run
+</span>
+<span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mf">100j</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mf">100j</span><span class="p">]</span>
+<span class="n">pl</span><span class="p">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">pl</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">100</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">100</span><span class="n">j</span><span class="p">]</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
 <p><img src="../images/2018.4/7.png" alt="7.png"></p>
 

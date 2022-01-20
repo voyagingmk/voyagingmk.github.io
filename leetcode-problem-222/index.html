@@ -124,22 +124,39 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 <p>看了这道题的discuss，发现一个挺有意思的解决方案（也可能是最快的方案了），这里分析一下。</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span>    <span class="kt">int</span> <span class="nf">countNodes</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span>        <span class="kt">int</span> <span class="n">hl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hr</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos"> 6</span>
-<span class="linenos"> 7</span>        <span class="n">TreeNode</span> <span class="o">*</span><span class="n">l</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">root</span><span class="p">;</span>
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>        <span class="k">while</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span><span class="n">hl</span><span class="o">++</span><span class="p">;</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;}</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span>        <span class="k">while</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span><span class="n">hr</span><span class="o">++</span><span class="p">;</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;}</span>
-<span class="linenos">12</span>
-<span class="linenos">13</span>        <span class="k">if</span><span class="p">(</span><span class="n">hl</span><span class="o">==</span><span class="n">hr</span><span class="p">)</span> <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">hl</span><span class="p">)</span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span>        <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="code"><pre>    <span class="kt">int</span> <span class="nf">countNodes</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="kt">int</span> <span class="n">hl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hr</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+        <span class="n">TreeNode</span> <span class="o">*</span><span class="n">l</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">root</span><span class="p">;</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span><span class="n">hl</span><span class="o">++</span><span class="p">;</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;}</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span><span class="n">hr</span><span class="o">++</span><span class="p">;</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;}</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">hl</span><span class="o">==</span><span class="n">hr</span><span class="p">)</span> <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">hl</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">countNodes</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+    <span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <p>函数内第4、5行，2个while循环，获得了root的最左节点和最右节点的深度，然后判断深度是否一样，一样的话，说明root是一棵满二叉树，于是可以用公式直接返回该子树的节点个数。</p>
 

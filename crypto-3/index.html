@@ -111,21 +111,22 @@
 <p>\[ HMAC(k, m) = H ( (k \oplus opad) || H( (k \oplus ipad) || m) ) \]</p>
 
 <p>伪代码:</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="kd">function</span> <span class="nx">hmac</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">hmac</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span>
     <span class="nx">opad</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x5c</span> <span class="o">*</span> <span class="nx">blocksize</span><span class="p">]</span> <span class="c1">// Where blocksize is that of the underlying hash function</span>
     <span class="nx">ipad</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x36</span> <span class="o">*</span> <span class="nx">blocksize</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">length</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nx">blocksize</span><span class="p">)</span> <span class="nx">then</span>
-        <span class="nx">key</span> <span class="o">=</span> <span class="nx">hash</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="c1">// Where &#39;hash&#39; is the underlying hash function</span>
+        <span class="nx">key</span> <span class="o">=</span> <span class="nx">hash</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="c1">// Where 'hash' is the underlying hash function</span>
     <span class="nx">end</span> <span class="k">if</span>
 
-    <span class="k">for</span> <span class="nx">i</span> <span class="nx">from</span> <span class="mf">0</span> <span class="nx">to</span> <span class="nx">length</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">from</span> <span class="mi">0</span> <span class="nx">to</span> <span class="nx">length</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="nx">ipad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ipad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="nx">XOR</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
         <span class="nx">opad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">opad</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="nx">XOR</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
     <span class="nx">end</span> <span class="k">for</span>
 
     <span class="k">return</span> <span class="nx">hash</span><span class="p">(</span><span class="nx">opad</span> <span class="o">||</span> <span class="nx">hash</span><span class="p">(</span><span class="nx">ipad</span> <span class="o">||</span> <span class="nx">message</span><span class="p">))</span> <span class="c1">// Where || is concatenation</span>
 <span class="nx">end</span> <span class="kd">function</span>
+
 </code></pre></div>
 <p>代码逻辑和上面的公式是一致的，一共调用了2次hash函数，2次异或操作，2次concat操作。</p>
 
@@ -153,7 +154,7 @@
 <h3>extract</h3>
 
 <p>接口定义：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">HKDF_Extract</span><span class="p">(</span><span class="n">salt</span><span class="p">,</span> <span class="n">IKM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PRK</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">HKDF_Extract</span><span class="p">(</span><span class="n">salt</span><span class="p">,</span> <span class="n">IKM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PRK</span>
 </code></pre></div>
 <p>Options:
       Hash     a hash function; HashLen denotes the length of the
@@ -173,12 +174,12 @@
 </ul>
 
 <p>用HMAC_Hash(key, message)实现HKDF_Extract：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">HMAC_Hash</span><span class="p">(</span><span class="n">salt</span><span class="p">,</span> <span class="n">IKM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PRK</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">HMAC_Hash</span><span class="p">(</span><span class="n">salt</span><span class="p">,</span> <span class="n">IKM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PRK</span>
 </code></pre></div>
 <h3>expand</h3>
 
 <p>接口定义：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">HKDF_Expand</span><span class="p">(</span><span class="n">PRK</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OKM</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">HKDF_Expand</span><span class="p">(</span><span class="n">PRK</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OKM</span>
 </code></pre></div>
 <p>输入：</p>
 
@@ -195,11 +196,11 @@
 </ul>
 
 <p>HKDF_Expand的伪代码：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>   <span class="n">N</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">L</span><span class="o">/</span><span class="n">HashLen</span><span class="p">)</span> <span class="c1">// 向上取整，保证T的长度大于等于L</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">   <span class="n">N</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">L</span><span class="o">/</span><span class="n">HashLen</span><span class="p">)</span> <span class="c1">// 向上取整，保证T的长度大于等于L</span>
    <span class="n">T</span> <span class="o">=</span> <span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="p">...</span> <span class="o">|</span> <span class="n">T</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
    <span class="n">OKM</span> <span class="o">=</span> <span class="n">first</span> <span class="n">L</span> <span class="n">octets</span> <span class="n">of</span> <span class="n">T</span> <span class="c1">// 裁剪成L个字节</span>
 
-   <span class="nl">where</span><span class="p">:</span>
+   <span class="n">where</span><span class="o">:</span>
    <span class="n">T</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="n">empty</span> <span class="n">string</span> <span class="p">(</span><span class="n">zero</span> <span class="n">length</span><span class="p">)</span>
    <span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">HMAC_Hash</span><span class="p">(</span><span class="n">PRK</span><span class="p">,</span> <span class="n">T</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">||</span> <span class="n">info</span> <span class="o">||</span> <span class="mh">0x01</span><span class="p">)</span>
    <span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">HMAC_Hash</span><span class="p">(</span><span class="n">PRK</span><span class="p">,</span> <span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">||</span> <span class="n">info</span> <span class="o">||</span> <span class="mh">0x02</span><span class="p">)</span>
@@ -209,19 +210,19 @@
    <span class="c1">// 0x01 0x02 0x03是递增的单字节常量</span>
 </code></pre></div>
 <h3>python实现HKDF</h3>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="kn">import</span> <span class="nn">hashlib</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1">#!/usr/bin/env python3
+</span><span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">hmac</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
 
 <span class="n">hash_len</span> <span class="o">=</span> <span class="mi">32</span>
 <span class="k">def</span> <span class="nf">hmac_sha256</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">hmac</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha256</span><span class="p">).</span><span class="n">digest</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">hkdf</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">ikm</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">hkdf</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">ikm</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="sa">b</span><span class="s">""</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="sa">b</span><span class="s">""</span><span class="p">):</span>
     <span class="n">prk</span> <span class="o">=</span> <span class="n">hmac_sha256</span><span class="p">(</span><span class="n">salt</span><span class="p">,</span> <span class="n">ikm</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
-    <span class="n">okm</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
+    <span class="n">okm</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">hash_len</span><span class="p">)):</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">hmac_sha256</span><span class="p">(</span><span class="n">prk</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">info</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">1</span><span class="o">+</span><span class="n">i</span><span class="p">]))</span>
         <span class="n">okm</span> <span class="o">+=</span> <span class="n">t</span>

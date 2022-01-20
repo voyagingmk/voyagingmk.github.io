@@ -229,10 +229,11 @@
 <h2>3维的情况</h2>
 
 <p>理解了2维的情况，3维（甚至更高维）的情况类推就可以了。完整的算法流程是：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">bool</span> <span class="n">BBox</span><span class="o">::</span><span class="n">IsIntersectWithRay</span><span class="p">(</span><span class="k">const</span> <span class="n">Ray</span> <span class="o">&amp;</span><span class="n">ray</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">bool</span> <span class="n">BBox</span><span class="o">::</span><span class="n">IsIntersectWithRay</span><span class="p">(</span><span class="k">const</span> <span class="n">Ray</span> <span class="o">&amp;</span><span class="n">ray</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
     <span class="kt">float</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">ray</span><span class="p">.</span><span class="n">mint</span><span class="p">,</span> <span class="n">t1</span> <span class="o">=</span> <span class="n">ray</span><span class="p">.</span><span class="n">maxt</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//x y z</span>
-        <span class="kt">float</span> <span class="n">invRayDir</span> <span class="o">=</span> <span class="mf">1.f</span> <span class="o">/</span> <span class="n">ray</span><span class="p">.</span><span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="kt">float</span> <span class="n">invRayDir</span> <span class="o">=</span> <span class="mi">1</span><span class="p">.</span><span class="n">f</span> <span class="o">/</span> <span class="n">ray</span><span class="p">.</span><span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
         <span class="kt">float</span> <span class="n">tNear</span> <span class="o">=</span> <span class="p">(</span><span class="n">pMin</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ray</span><span class="p">.</span><span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">invRayDir</span><span class="p">;</span>
         <span class="kt">float</span> <span class="n">tFar</span> <span class="o">=</span> <span class="p">(</span><span class="n">pMax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ray</span><span class="p">.</span><span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">invRayDir</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">tNear</span> <span class="o">&gt;</span> <span class="n">tFar</span><span class="p">)</span>
@@ -244,6 +245,7 @@
     <span class="p">}</span>
     <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
 <span class="p">}</span>
+
 </code></pre></div>
     </div>
     <div class="entry">

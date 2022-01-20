@@ -108,14 +108,14 @@
 
 <p>To check the status of the socket w.r.t. the congestion window, then try this:</p>
 </blockquote>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#include</span> <span class="cpf">&lt;netinet/tcp.h&gt;</span><span class="cp"></span>
-<span class="k">static</span> <span class="kt">void</span> <span class="n">print_tcp_cwnd</span><span class="p">(</span><span class="kt">int</span> <span class="n">socket</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;netinet/tcp.h&gt;
+</span><span class="k">static</span> <span class="kt">void</span> <span class="nf">print_tcp_cwnd</span><span class="p">(</span><span class="kt">int</span> <span class="n">socket</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">struct</span> <span class="nc">tcp_info</span> <span class="n">tcp_info</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">tcp_info</span> <span class="n">tcp_info</span><span class="p">;</span>
     <span class="n">uint</span> <span class="n">tcp_info_length</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">tcp_info</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span> <span class="n">getsockopt</span><span class="p">(</span> <span class="n">socket</span><span class="p">,</span> <span class="n">SOL_TCP</span><span class="p">,</span> <span class="n">TCP_INFO</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">tcp_info</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tcp_info_length</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> 
     <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcpi_snd_cwnd: %u, tcpi_unacked: %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"tcpi_snd_cwnd: %u, tcpi_unacked: %u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
             <span class="n">tcp_info</span><span class="p">.</span><span class="n">tcpi_snd_cwnd</span><span class="p">,</span>
             <span class="n">tcp_info</span><span class="p">.</span><span class="n">tcpi_unacked</span>
            <span class="p">);</span>
@@ -140,12 +140,14 @@
 <p>另外，收到可写事件时，尝试write剩余字节，如果write能把所有字节都写进发送队列，那么就可以删除EPOLLOUT监听了。</p>
 
 <h2>atomic变量也会segment fault?</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#0  0x00000000004cb56b in std::atomic&lt;wynet::TcpConnection::State&gt;::load (this=0x58, </span>
-    <span class="n">_m</span><span class="o">=</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_seq_cst</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mf">4.8.2</span><span class="o">/</span><span class="nl">atomic</span><span class="p">:</span><span class="mi">209</span>
-<span class="cp">#1  0x00000000004c9a6d in std::atomic&lt;wynet::TcpConnection::State&gt;::operator wynet::TcpConnection::State</span>
-    <span class="p">(</span><span class="n">this</span><span class="o">=</span><span class="mh">0x58</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mf">4.8.2</span><span class="o">/</span><span class="nl">atomic</span><span class="p">:</span><span class="mi">176</span>
-<span class="cp">#2  0x00000000004f0fa1 in wynet::TcpConnection::shutdown (this=0x0)</span>
-    <span class="n">at</span> <span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">wynet</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">connection</span><span class="p">.</span><span class="nl">cpp</span><span class="p">:</span><span class="mi">74</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="cp">#0  0x00000000004cb56b in std::atomic&lt;wynet::TcpConnection::State&gt;::load (this=0x58, 
+</span>    <span class="n">_m</span><span class="o">=</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_seq_cst</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mi">4</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">2</span><span class="o">/</span><span class="n">atomic</span><span class="o">:</span><span class="mi">209</span>
+<span class="cp">#1  0x00000000004c9a6d in std::atomic&lt;wynet::TcpConnection::State&gt;::operator wynet::TcpConnection::State
+</span>    <span class="p">(</span><span class="n">this</span><span class="o">=</span><span class="mh">0x58</span><span class="p">)</span> <span class="n">at</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="mi">4</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">2</span><span class="o">/</span><span class="n">atomic</span><span class="o">:</span><span class="mi">176</span>
+<span class="cp">#2  0x00000000004f0fa1 in wynet::TcpConnection::shutdown (this=0x0)
+</span>    <span class="n">at</span> <span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">wynet</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">connection</span><span class="p">.</span><span class="n">cpp</span><span class="o">:</span><span class="mi">74</span>
+
 </code></pre></div>
 <p>gdb查core文件，发现日志很奇怪，在atomic的load里crash了。</p>
 
@@ -179,11 +181,11 @@
 <p>以pthread为例，在C++中使用pthread的pthread_mutex_xxx和pthread_cond_xxx，实现RAII的mutex guard类以及阻塞队列(BlockingQueue)时，会遇到wait morphing的需求。</p>
 
 <p>例如，一般会先实现2个类：MutexLock，和MutexLockGuard：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">MutexLock</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">MutexLock</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">MutexLockGuard</span> <span class="p">{</span>
     <span class="n">MutexLock</span> <span class="o">&amp;</span><span class="n">m_mutex</span><span class="p">;</span>
-<span class="k">public</span><span class="o">:</span>
+<span class="nl">public:</span>
     <span class="n">MutexLockGuard</span><span class="p">(</span><span class="n">MutexLock</span> <span class="o">&amp;</span><span class="n">mutex</span><span class="p">)</span> <span class="o">:</span> <span class="n">m_mutex</span><span class="p">(</span><span class="n">mutex</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="n">m_mutex</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
@@ -196,13 +198,13 @@
 <span class="p">};</span>
 </code></pre></div>
 <p>然后是BlockingQueue：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
 <span class="k">class</span> <span class="nc">BlockingQueue</span>
 <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
+<span class="nl">public:</span>
     <span class="kt">void</span> <span class="n">put</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">MutexLockGuard</span> <span class="nf">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="n">MutexLockGuard</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
         <span class="n">m_queue</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
         <span class="n">m_notEmpty</span><span class="p">.</span><span class="n">notify</span><span class="p">();</span> <span class="c1">// wait morphing</span>
         <span class="c1">// 注意，lock是在退出本函数时才销毁，所以顺序是：cond signal -&gt; unlock</span>
@@ -210,7 +212,7 @@
 
     <span class="n">T</span> <span class="n">pop</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="n">MutexLockGuard</span> <span class="nf">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="n">MutexLockGuard</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">m_queue</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
         <span class="p">{</span>
             <span class="n">m_notEmpty</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
@@ -380,7 +382,7 @@
 <p>指令重排保证对单线程程序没有影响。但对多线程程序来说，就惨了。</p>
 
 <p>例子（Linux 3.10.0-514.26.2.el7.x86_64，gcc 4.8.5）：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">;</span>
 
 <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span>
 <span class="p">{</span>
@@ -389,13 +391,13 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>执行 gcc -S -masm=intel test.c，得到：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>    mov eax, DWORD PTR B[rip]   // 取出B值并写入eax
+<div class="highlight"><pre><code class="language-" data-lang="">    mov eax, DWORD PTR B[rip]   // 取出B值并写入eax
     add eax, 1                  // eax = eax + 1
     mov DWORD PTR A[rip], eax   // 把eax写入A
     mov DWORD PTR B[rip], 0     // B = 0
 </code></pre></div>
 <p>执行 gcc -S -masm=intel -O2 test.c，得到：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>    mov eax, DWORD PTR B[rip]   // 取出B值并写入eax
+<div class="highlight"><pre><code class="language-" data-lang="">    mov eax, DWORD PTR B[rip]   // 取出B值并写入eax
     mov DWORD PTR B[rip], 0     // B = 0
     add eax, 1                  // eax = eax + 1
     mov DWORD PTR A[rip], eax   // 把eax写入A
@@ -405,7 +407,7 @@
 <p>单线程程序不会感知到这个区别。但考虑在多线程环境下，就容易引发一些问题。</p>
 
 <p>一是影响到了lock-free代码，考虑下面的代码，用了一个共享变量IsPublished来标志Value是否有数据：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="n">Value</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">Value</span><span class="p">;</span>
 <span class="kt">int</span> <span class="n">IsPublished</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
 <span class="kt">void</span> <span class="nf">sendValue</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>

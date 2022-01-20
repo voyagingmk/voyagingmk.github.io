@@ -161,38 +161,38 @@
 </ol>
 
 <p>Barycentric Coordinates，除了用面积法算之外，还可以用Cramer&#39;s rule（克莱姆法则）算（更快）：</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="nf">Barycentric</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3</span><span class="o">&amp;</span> <span class="n">hitPoint</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">u</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">w</span><span class="p">)</span> <span class="k">const</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="n">Barycentric</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3</span><span class="o">&amp;</span> <span class="n">hitPoint</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">u</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">float</span><span class="o">&amp;</span> <span class="n">w</span><span class="p">)</span> <span class="k">const</span>
 <span class="p">{</span>
-    <span class="cm">/*</span>
-<span class="cm">    P_hit = p_1 + u * (p_2 - p_1) + v * (p_3 - p_1)</span>
-<span class="cm">    u * (p_2 - p_1) + v * (p_3 - p_1) = P_hit - p_1</span>
-<span class="cm">    B = p_2 - p_1</span>
-<span class="cm">    C = p_3 - p_1</span>
-<span class="cm">    A = P_hit - p_1</span>
-<span class="cm">    =&gt;</span>
-<span class="cm">    u * B + v * C = A   （it is vector！）</span>
-<span class="cm">    convert to linear system =&gt;</span>
-<span class="cm">    (u * B + v * C)·B = A·B       （it is scalar！）</span>
-<span class="cm">    (u * B + v * C)·C = A·C</span>
+    <span class="cm">/*
+    P_hit = p_1 + u * (p_2 - p_1) + v * (p_3 - p_1)
+    u * (p_2 - p_1) + v * (p_3 - p_1) = P_hit - p_1
+    B = p_2 - p_1
+    C = p_3 - p_1
+    A = P_hit - p_1
+    =&gt;
+    u * B + v * C = A   （it is vector！）
+    convert to linear system =&gt;
+    (u * B + v * C)·B = A·B       （it is scalar！）
+    (u * B + v * C)·C = A·C
 
-<span class="cm">    u * B·B  +  v * C·B = A·B</span>
-<span class="cm">    u * B·C  +  v * C·C = A·C</span>
+    u * B·B  +  v * C·B = A·B
+    u * B·C  +  v * C·C = A·C
 
-<span class="cm">    【 B·B  C·B 】 【 u 】   A·B</span>
-<span class="cm">    【 B·C  C·C 】 【 v 】 = A·C</span>
+    【 B·B  C·B 】 【 u 】   A·B
+    【 B·C  C·C 】 【 v 】 = A·C
 
-<span class="cm">    【 d00  d01 】 【 u 】   d20</span>
-<span class="cm">    【 d01  d11 】 【 v 】 = d21</span>
+    【 d00  d01 】 【 u 】   d20
+    【 d01  d11 】 【 v 】 = d21
 
-<span class="cm">    det   = | d00  d01 |</span>
-<span class="cm">            | d01  d11 |</span>
+    det   = | d00  d01 |
+            | d01  d11 |
 
-<span class="cm">    det_u = | d20  d01 |</span>
-<span class="cm">            | d21  d11 |</span>
+    det_u = | d20  d01 |
+            | d21  d11 |
 
-<span class="cm">    det_v = | d00  d20 |</span>
-<span class="cm">            | d01  d21 |</span>
-<span class="cm">    */</span>
+    det_v = | d00  d20 |
+            | d01  d21 |
+    */</span>
     <span class="n">Vector3</span> <span class="n">B</span> <span class="o">=</span> <span class="n">point_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">point_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">C</span> <span class="o">=</span> <span class="n">point_</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">point_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">A</span> <span class="o">=</span> <span class="n">hitPoint</span> <span class="o">-</span> <span class="n">point_</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
     <span class="kt">float</span> <span class="n">d00</span> <span class="o">=</span> <span class="n">B</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
     <span class="kt">float</span> <span class="n">d01</span> <span class="o">=</span> <span class="n">C</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>

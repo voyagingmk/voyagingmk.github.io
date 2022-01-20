@@ -124,12 +124,12 @@ cmake --build .</p>
 <p><a href="https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html">https://vulkan.lunarg.com/doc/sdk/1.1.92.1/windows/tutorial/html/index.html</a></p>
 
 <h2>1. 创建必要的VkInstance对象（vkCreateInstance）</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkResult</span> <span class="n">VKAPI_CALL</span> <span class="n">vkCreateInstance</span><span class="p">(</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">VkResult</span> <span class="n">VKAPI_CALL</span> <span class="nf">vkCreateInstance</span><span class="p">(</span>
     <span class="k">const</span> <span class="n">VkInstanceCreateInfo</span><span class="o">*</span>                 <span class="n">pCreateInfo</span><span class="p">,</span>
     <span class="k">const</span> <span class="n">VkAllocationCallbacks</span><span class="o">*</span>                <span class="n">pAllocator</span><span class="p">,</span>
     <span class="n">VkInstance</span><span class="o">*</span>                                 <span class="n">pInstance</span><span class="p">);</span>
 
-<span class="kt">void</span> <span class="n">VKAPI_CALL</span> <span class="n">vkDestroyInstance</span><span class="p">(</span>
+<span class="kt">void</span> <span class="n">VKAPI_CALL</span> <span class="nf">vkDestroyInstance</span><span class="p">(</span>
     <span class="n">VkInstance</span>                                  <span class="n">instance</span><span class="p">,</span>
     <span class="k">const</span> <span class="n">VkAllocationCallbacks</span><span class="o">*</span>                <span class="n">pAllocator</span><span class="p">);</span>
 </code></pre></div>
@@ -138,7 +138,7 @@ cmake --build .</p>
 <h2>2. 枚举设备enumerate_devices（vkEnumeratePhysicalDevices）</h2>
 
 <p>这一步是确定本机有什么物理设备（GPU），写入到VkPhysicalDevice数组里。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">VkInstance</span>  <span class="n">inst</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">VkInstance</span>  <span class="n">inst</span><span class="p">;</span>
     <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">VkPhysicalDevice</span><span class="o">&gt;</span> <span class="n">gpus</span><span class="p">;</span>
     <span class="err">···</span>
     <span class="kt">uint32_t</span> <span class="n">gpu_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -153,7 +153,7 @@ cmake --build .</p>
 <p>因为是raw的数组指针，所以要先resize这个vector，确保有足够的空间放数据。</p>
 
 <h2>3. 创建一个（逻辑）设备对象 vkCreateDevice</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="kt">uint32_t</span> <span class="n">queue_family_count</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="kt">uint32_t</span> <span class="n">queue_family_count</span><span class="p">;</span>
     <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">VkQueueFamilyProperties</span><span class="o">&gt;</span> <span class="n">queue_props</span><span class="p">;</span>
 
     <span class="n">vkGetPhysicalDeviceQueueFamilyProperties</span><span class="p">(</span><span class="n">gpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">queue_family_count</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
@@ -166,7 +166,7 @@ cmake --build .</p>
 <p>vkGetPhysicalDeviceQueueFamilyProperties的用法和vkEnumeratePhysicalDevices非常相似。</p>
 
 <p>vkGetPhysicalDeviceQueueFamilyProperties的用途是获取这个gpu的queue_family_count和queue_props。queue_props则是一个VkQueueFamilyProperties数组。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">VkQueueFamilyProperties</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">VkQueueFamilyProperties</span> <span class="p">{</span>
     <span class="n">VkQueueFlags</span>    <span class="n">queueFlags</span><span class="p">;</span>
     <span class="kt">uint32_t</span>        <span class="n">queueCount</span><span class="p">;</span>
     <span class="kt">uint32_t</span>        <span class="n">timestampValidBits</span><span class="p">;</span>
@@ -174,7 +174,7 @@ cmake --build .</p>
 <span class="p">}</span> <span class="n">VkQueueFamilyProperties</span><span class="p">;</span>
 </code></pre></div>
 <p>注意这个是family，每个family里可以有多个queue，queue的数量看queueCount。每个family对应多个flags集合：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="n">VkQueueFlagBits</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">enum</span> <span class="n">VkQueueFlagBits</span> <span class="p">{</span>
     <span class="n">VK_QUEUE_GRAPHICS_BIT</span> <span class="o">=</span> <span class="mh">0x00000001</span><span class="p">,</span>
     <span class="n">VK_QUEUE_COMPUTE_BIT</span> <span class="o">=</span> <span class="mh">0x00000002</span><span class="p">,</span>
     <span class="n">VK_QUEUE_TRANSFER_BIT</span> <span class="o">=</span> <span class="mh">0x00000004</span><span class="p">,</span>
@@ -190,7 +190,8 @@ cmake --build .</p>
 <p>在调用这个接口前需要准备好VkDeviceQueueCreateInfo对象、VkDeviceCreateInfo对象。</p>
 
 <p>VkDeviceQueueCreateInfo对象：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkDeviceQueueCreateInfo</span> <span class="n">queue_info</span> <span class="o">=</span> <span class="p">{};</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">VkDeviceQueueCreateInfo</span> <span class="n">queue_info</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">queue_family_count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">queue_props</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">queueFlags</span> <span class="o">&amp;</span> <span class="n">VK_QUEUE_GRAPHICS_BIT</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">queue_info</span><span class="p">.</span><span class="n">queueFamilyIndex</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
@@ -198,14 +199,16 @@ cmake --build .</p>
     <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="kt">float</span> <span class="n">queue_priorities</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.0</span><span class="p">};</span>
+<span class="kt">float</span> <span class="n">queue_priorities</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">};</span>
 <span class="n">queue_info</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO</span><span class="p">;</span>
 <span class="n">queue_info</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="n">queue_info</span><span class="p">.</span><span class="n">queueCount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="n">queue_info</span><span class="p">.</span><span class="n">pQueuePriorities</span> <span class="o">=</span> <span class="n">queue_priorities</span><span class="p">;</span>
+
 </code></pre></div>
 <p>VkDeviceCreateInfo对象：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkDeviceCreateInfo</span> <span class="n">device_info</span> <span class="o">=</span> <span class="p">{};</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">VkDeviceCreateInfo</span> <span class="n">device_info</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="n">device_info</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO</span><span class="p">;</span>
 <span class="n">device_info</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="n">device_info</span><span class="p">.</span><span class="n">queueCreateInfoCount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -217,7 +220,7 @@ cmake --build .</p>
 <span class="n">device_info</span><span class="p">.</span><span class="n">pEnabledFeatures</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 </code></pre></div>
 <p>然后就：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">VkDevice</span> <span class="n">device</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">VkDevice</span> <span class="n">device</span><span class="p">;</span>
     <span class="n">VkResult</span> <span class="n">U_ASSERT_ONLY</span> <span class="n">res</span> <span class="o">=</span> <span class="n">vkCreateDevice</span><span class="p">(</span><span class="n">gpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">device_info</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">device</span><span class="p">);</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
 
@@ -226,7 +229,7 @@ cmake --build .</p>
 <h2>4. 创建VkCommandPool和VkCommandBuffer</h2>
 
 <p>vkCreateCommandPool创建池，vkAllocateCommandBuffers则从池里分配buffer：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">VkDevice</span> <span class="n">device</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">VkDevice</span> <span class="n">device</span><span class="p">;</span>
     <span class="n">VkCommandPool</span> <span class="n">cmd_pool</span><span class="p">;</span>
     <span class="n">VkCommandBuffer</span> <span class="n">cmd</span><span class="p">;</span>
 
@@ -255,25 +258,25 @@ cmake --build .</p>
 <h3>extension</h3>
 
 <p>首先要在创建instance之前插个步骤，设置instance_extension_names：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">init_instance_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="nc">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">init_instance_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="n">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#ifdef __ANDROID__</span>
-    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_ANDROID_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#elif defined(_WIN32)</span>
-    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_WIN32_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#elif defined(VK_USE_PLATFORM_IOS_MVK)</span>
-    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_MVK_IOS_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#elif defined(VK_USE_PLATFORM_MACOS_MVK)</span>
-    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_MVK_MACOS_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)</span>
-    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#else</span>
-    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_XCB_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
-<span class="cp">#endif</span>
-<span class="p">}</span>
+<span class="cp">#ifdef __ANDROID__
+</span>    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_ANDROID_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
+<span class="cp">#elif defined(_WIN32)
+</span>    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_WIN32_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
+<span class="cp">#elif defined(VK_USE_PLATFORM_IOS_MVK)
+</span>    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_MVK_IOS_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
+<span class="cp">#elif defined(VK_USE_PLATFORM_MACOS_MVK)
+</span>    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_MVK_MACOS_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
+<span class="cp">#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+</span>    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
+<span class="cp">#else
+</span>    <span class="n">info</span><span class="p">.</span><span class="n">instance_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_XCB_SURFACE_EXTENSION_NAME</span><span class="p">);</span>
+<span class="cp">#endif
+</span><span class="p">}</span>
 </code></pre></div>
 <p>还有device的extension：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">init_device_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="nc">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">init_device_extension_names</span><span class="p">(</span><span class="k">struct</span> <span class="n">sample_info</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">info</span><span class="p">.</span><span class="n">device_extension_names</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">VK_KHR_SWAPCHAIN_EXTENSION_NAME</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -284,14 +287,14 @@ cmake --build .</p>
 <h3>pSupportsPresent</h3>
 
 <p>先是查出有多少queue支持presenting，总共要遍历queue_family_count次：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="c1">// Iterate over each queue to learn whether it supports presenting:</span>
-    <span class="n">VkBool32</span> <span class="o">*</span><span class="n">pSupportsPresent</span> <span class="o">=</span> <span class="p">(</span><span class="n">VkBool32</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">queue_family_count</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">VkBool32</span><span class="p">));</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="c1">// Iterate over each queue to learn whether it supports presenting:</span>
+    <span class="n">VkBool32</span> <span class="o">*</span><span class="n">pSupportsPresent</span> <span class="o">=</span> <span class="p">(</span><span class="n">VkBool32</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">queue_family_count</span> <span class="o">*</span> <span class="nf">sizeof</span><span class="p">(</span><span class="n">VkBool32</span><span class="p">));</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">uint32_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">.</span><span class="n">queue_family_count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">vkGetPhysicalDeviceSurfaceSupportKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">gpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">surface</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pSupportsPresent</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
     <span class="p">}</span>
 </code></pre></div>
 <p>有了pSupportsPresent布尔数组后，就遍历下看看哪个queue可以作为graphics queue、present queue ：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// Search for a graphics and a present queue in the array of queue</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// Search for a graphics and a present queue in the array of queue</span>
 <span class="c1">// families, try to find one that supports both</span>
 <span class="n">info</span><span class="p">.</span><span class="n">graphics_queue_family_index</span> <span class="o">=</span> <span class="n">UINT32_MAX</span><span class="p">;</span>
 <span class="n">info</span><span class="p">.</span><span class="n">present_queue_family_index</span> <span class="o">=</span> <span class="n">UINT32_MAX</span><span class="p">;</span>
@@ -310,8 +313,8 @@ cmake --build .</p>
 <span class="p">}</span>
 </code></pre></div>
 <p>有可能找不到合适的present_queue_family_index（也意味着没有同时支持graphics和present的queue），则随便找一个pSupportsPresent[i]为VK_TRUE的queue，即让graphic queue和present queue分离：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">if</span> <span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">present_queue_family_index</span> <span class="o">==</span> <span class="n">UINT32_MAX</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// If didn&#39;t find a queue that supports both graphics and present, then</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">if</span> <span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">present_queue_family_index</span> <span class="o">==</span> <span class="n">UINT32_MAX</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// If didn't find a queue that supports both graphics and present, then</span>
     <span class="c1">// find a separate present queue.</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">.</span><span class="n">queue_family_count</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">pSupportsPresent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">VK_TRUE</span><span class="p">)</span> <span class="p">{</span>
@@ -325,7 +328,7 @@ cmake --build .</p>
 <h3>创建surface</h3>
 
 <p>这里用到了2个参数info.connection、info.window，暂时跳过；vkCreateWin32SurfaceKHR创建一个surface并放进info.surface：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">VkWin32SurfaceCreateInfoKHR</span> <span class="n">createInfo</span> <span class="o">=</span> <span class="p">{};</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">VkWin32SurfaceCreateInfoKHR</span> <span class="n">createInfo</span> <span class="o">=</span> <span class="p">{};</span>
     <span class="n">createInfo</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR</span><span class="p">;</span>
     <span class="n">createInfo</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="n">createInfo</span><span class="p">.</span><span class="n">hinstance</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">connection</span><span class="p">;</span>
@@ -333,7 +336,7 @@ cmake --build .</p>
     <span class="n">res</span> <span class="o">=</span> <span class="n">vkCreateWin32SurfaceKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">inst</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">createInfo</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">surface</span><span class="p">);</span>
 </code></pre></div>
 <h3>初始化 VkSwapchainCreateInfoKHR</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">VkSwapchainCreateInfoKHR</span> <span class="n">swapchain_ci</span> <span class="o">=</span> <span class="p">{};</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">VkSwapchainCreateInfoKHR</span> <span class="n">swapchain_ci</span> <span class="o">=</span> <span class="p">{};</span>
     <span class="n">swapchain_ci</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR</span><span class="p">;</span>
     <span class="n">swapchain_ci</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="n">swapchain_ci</span><span class="p">.</span><span class="n">surface</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">surface</span><span class="p">;</span> <span class="c1">// 上一节刚创建的</span>
@@ -364,16 +367,16 @@ cmake --build .</p>
     <span class="p">}</span>
 </code></pre></div>
 <p>准备了一大堆的信息，然后就可以调用vkCreateSwapchainKHR:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">res</span> <span class="o">=</span> <span class="n">vkCreateSwapchainKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">swapchain_ci</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">swap_chain</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">res</span> <span class="o">=</span> <span class="n">vkCreateSwapchainKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">swapchain_ci</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">swap_chain</span><span class="p">);</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
 </code></pre></div>
 <p>这个操作创建了一个images集合，组成了swapchain。</p>
 
 <p>有了swapchain对象后，就可以取出swapchainImages对象，很经典的先获得count再获得指针的操作：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">res</span> <span class="o">=</span> <span class="n">vkGetSwapchainImagesKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">swap_chain</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">swapchainImageCount</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">res</span> <span class="o">=</span> <span class="n">vkGetSwapchainImagesKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">swap_chain</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">swapchainImageCount</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
 
-    <span class="n">VkImage</span> <span class="o">*</span><span class="n">swapchainImages</span> <span class="o">=</span> <span class="p">(</span><span class="n">VkImage</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">swapchainImageCount</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">VkImage</span><span class="p">));</span>
+    <span class="n">VkImage</span> <span class="o">*</span><span class="n">swapchainImages</span> <span class="o">=</span> <span class="p">(</span><span class="n">VkImage</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">swapchainImageCount</span> <span class="o">*</span> <span class="nf">sizeof</span><span class="p">(</span><span class="n">VkImage</span><span class="p">));</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">swapchainImages</span><span class="p">);</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">vkGetSwapchainImagesKHR</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">swap_chain</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">swapchainImageCount</span><span class="p">,</span> <span class="n">swapchainImages</span><span class="p">);</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
@@ -383,7 +386,7 @@ cmake --build .</p>
 <p>image view大概意思是用来管理image的内存的，有很多关于image的元信息。</p>
 
 <p>创建image view就比较直白了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_swap_chain_buffers</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_swap_chain_buffers</span> <span class="p">{</span>
     <span class="n">VkImage</span> <span class="n">image</span><span class="p">;</span>
     <span class="n">VkImageView</span> <span class="n">view</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">swap_chain_buffer</span><span class="p">;</span>
@@ -434,21 +437,21 @@ cmake --build .</p>
 </ol>
 
 <p>首先查询VK_FORMAT_D16_UNORM是否支持：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="k">const</span> <span class="n">VkFormat</span> <span class="n">depth_format</span> <span class="o">=</span> <span class="n">VK_FORMAT_D16_UNORM</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="k">const</span> <span class="n">VkFormat</span> <span class="n">depth_format</span> <span class="o">=</span> <span class="n">VK_FORMAT_D16_UNORM</span><span class="p">;</span>
     <span class="n">VkFormatProperties</span> <span class="n">props</span><span class="p">;</span>
     <span class="n">vkGetPhysicalDeviceFormatProperties</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">gpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">depth_format</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">props</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">props</span><span class="p">.</span><span class="n">linearTilingFeatures</span> <span class="o">&amp;</span> <span class="n">VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">image_info</span><span class="p">.</span><span class="n">tiling</span> <span class="o">=</span> <span class="n">VK_IMAGE_TILING_LINEAR</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">props</span><span class="p">.</span><span class="n">optimalTilingFeatures</span> <span class="o">&amp;</span> <span class="n">VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">props</span><span class="p">.</span><span class="n">optimalTilingFeatures</span> <span class="o">&amp;</span> <span class="n">VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">image_info</span><span class="p">.</span><span class="n">tiling</span> <span class="o">=</span> <span class="n">VK_IMAGE_TILING_OPTIMAL</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="cm">/* Try other depth formats? */</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;VK_FORMAT_D16_UNORM Unsupported.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"VK_FORMAT_D16_UNORM Unsupported.</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
     <span class="p">}</span>
 </code></pre></div>
 <p>创建depth buffer：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="p">{</span>
     <span class="n">VkImageCreateInfo</span> <span class="n">image_info</span> <span class="o">=</span> <span class="p">{};</span>
     <span class="n">image_info</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO</span><span class="p">;</span>
     <span class="n">image_info</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -483,7 +486,7 @@ cmake --build .</p>
 <span class="p">}</span> <span class="n">depth</span><span class="p">;</span>
 </code></pre></div>
 <p>这样就完成了第一步创建depth buffer对象。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 等下给vkAllocateMemory用的参数</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// 等下给vkAllocateMemory用的参数</span>
 <span class="n">VkMemoryAllocateInfo</span> <span class="n">mem_alloc</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="n">mem_alloc</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO</span><span class="p">;</span>
 <span class="n">mem_alloc</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -509,7 +512,7 @@ cmake --build .</p>
 <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
 </code></pre></div>
 <p>最后一步创建image view ：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">VkImageViewCreateInfo</span> <span class="n">view_info</span> <span class="o">=</span> <span class="p">{};</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">VkImageViewCreateInfo</span> <span class="n">view_info</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="n">view_info</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO</span><span class="p">;</span>
 <span class="n">view_info</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="n">view_info</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">VK_NULL_HANDLE</span><span class="p">;</span>
@@ -542,7 +545,7 @@ cmake --build .</p>
 <li>Allocating the Uniform Buffer Memory</li>
 <li>Mapping and Setting the Uniform Buffer Memory</li>
 </ol>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="p">{</span>
     <span class="n">VkBuffer</span> <span class="n">buf</span><span class="p">;</span>
     <span class="n">VkDeviceMemory</span> <span class="n">mem</span><span class="p">;</span>
     <span class="n">VkDescriptorBufferInfo</span> <span class="n">buffer_info</span><span class="p">;</span>
@@ -564,7 +567,7 @@ cmake --build .</p>
 <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
 </code></pre></div>
 <p>然后分配内存，和depth buffer的时候几乎一样：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">VkMemoryRequirements</span> <span class="n">mem_reqs</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">VkMemoryRequirements</span> <span class="n">mem_reqs</span><span class="p">;</span>
     <span class="n">vkGetBufferMemoryRequirements</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">uniform_data</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mem_reqs</span><span class="p">);</span>
 
     <span class="n">VkMemoryAllocateInfo</span> <span class="n">alloc_info</span> <span class="o">=</span> <span class="p">{};</span>
@@ -576,7 +579,7 @@ cmake --build .</p>
     <span class="n">pass</span> <span class="o">=</span> <span class="n">memory_type_from_properties</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">mem_reqs</span><span class="p">.</span><span class="n">memoryTypeBits</span><span class="p">,</span>
                                        <span class="n">VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT</span> <span class="o">|</span> <span class="n">VK_MEMORY_PROPERTY_HOST_COHERENT_BIT</span><span class="p">,</span>
                                        <span class="o">&amp;</span><span class="n">alloc_info</span><span class="p">.</span><span class="n">memoryTypeIndex</span><span class="p">);</span>
-    <span class="n">assert</span><span class="p">(</span><span class="n">pass</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;No mappable, coherent memory&quot;</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">pass</span> <span class="o">&amp;&amp;</span> <span class="s">"No mappable, coherent memory"</span><span class="p">);</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">vkAllocateMemory</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">alloc_info</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">uniform_data</span><span class="p">.</span><span class="n">mem</span><span class="p">));</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
@@ -584,7 +587,7 @@ cmake --build .</p>
 <p>VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT是让CPU（host）可以访问这块内存；The VK_MEMORY_PROPERTY_HOST_COHERENT_BIT 则让CPU写内存对设备可见且不需要刷内存缓存。所以只是一个便捷设置，避免调用vkFlushMappedMemoryRanges、vkInvalidateMappedMemoryRanges，确保数据对GPU可见。</p>
 
 <p>最后vkMapMemory：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">uint8_t</span> <span class="o">*</span><span class="n">pData</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">uint8_t</span> <span class="o">*</span><span class="n">pData</span><span class="p">;</span>
 <span class="c1">// info.uniform_data.mem已经由vkAllocateMemory分配了</span>
 <span class="c1">// pData转2维数组指针骚操作</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">vkMapMemory</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">uniform_data</span><span class="p">.</span><span class="n">mem</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mem_reqs</span><span class="p">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pData</span><span class="p">);</span>
@@ -606,7 +609,7 @@ cmake --build .</p>
 <span class="n">info</span><span class="p">.</span><span class="n">uniform_data</span><span class="p">.</span><span class="n">buffer_info</span><span class="p">.</span><span class="n">range</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">MVP</span><span class="p">);</span> <span class="c1">// 在这里确定了内存范围</span>
 </code></pre></div>
 <p>buffer_info结构：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">VkDescriptorBufferInfo</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">VkDescriptorBufferInfo</span> <span class="p">{</span>
     <span class="n">VkBuffer</span>        <span class="n">buffer</span><span class="p">;</span>
     <span class="n">VkDeviceSize</span>    <span class="n">offset</span><span class="p">;</span>
     <span class="n">VkDeviceSize</span>    <span class="n">range</span><span class="p">;</span>
@@ -635,10 +638,10 @@ cmake --build .</p>
 <p>A descriptor set layout可以描述多个descriptor sets的内容。同时，每一个descriptor set也需要自己的layout。</p>
 
 <p>先是准备好VkDescriptorSetLayoutBinding对象：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Number of descriptor sets needs to be the same at alloc,       */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* Number of descriptor sets needs to be the same at alloc,       */</span>
 <span class="cm">/* pipeline layout creation, and descriptor set layout creation   */</span>
-<span class="cp">#define NUM_DESCRIPTOR_SETS 1</span>
-
+<span class="cp">#define NUM_DESCRIPTOR_SETS 1
+</span>
 <span class="n">VkDescriptorSetLayoutBinding</span> <span class="n">layout_binding</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="n">layout_binding</span><span class="p">.</span><span class="n">binding</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 索引0？</span>
 <span class="n">layout_binding</span><span class="p">.</span><span class="n">descriptorType</span> <span class="o">=</span> <span class="n">VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER</span><span class="p">;</span> <span class="c1">// uniform buffer</span>
@@ -647,8 +650,8 @@ cmake --build .</p>
 <span class="n">layout_binding</span><span class="p">.</span><span class="n">pImmutableSamplers</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 </code></pre></div>
 <p>然后就可以初始化std::vector<VkDescriptorSetLayout> desc_layout了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Next take layout bindings and use them to create a descriptor set layout</span>
-<span class="cm">    */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* Next take layout bindings and use them to create a descriptor set layout
+    */</span>
 <span class="n">VkDescriptorSetLayoutCreateInfo</span> <span class="n">descriptor_layout</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="n">descriptor_layout</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO</span><span class="p">;</span>
 <span class="n">descriptor_layout</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -662,7 +665,7 @@ cmake --build .</p>
 <h3>Pipeline Layouts</h3>
 
 <p>一个pipeline layout包含1到多个descriptor set layout。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* Now use the descriptor layout to create a pipeline layout */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* Now use the descriptor layout to create a pipeline layout */</span>
 <span class="n">VkPipelineLayoutCreateInfo</span> <span class="n">pPipelineLayoutCreateInfo</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="n">pPipelineLayoutCreateInfo</span><span class="p">.</span><span class="n">sType</span> <span class="o">=</span> <span class="n">VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO</span><span class="p">;</span>
 <span class="n">pPipelineLayoutCreateInfo</span><span class="p">.</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -673,6 +676,7 @@ cmake --build .</p>
 
 <span class="n">res</span> <span class="o">=</span> <span class="n">vkCreatePipelineLayout</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">device</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pPipelineLayoutCreateInfo</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">.</span><span class="n">pipeline_layout</span><span class="p">);</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">VK_SUCCESS</span><span class="p">);</span>
+
 </code></pre></div>
 <p>pipeline layout将会被用来创建图形管线(graphics pipeline)</p>
 

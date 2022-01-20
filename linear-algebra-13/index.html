@@ -197,7 +197,8 @@
 <p>\[ Lookat =  \left[ \begin{matrix} r_{x}&amp;r_{y}&amp;r_{z}&amp;-(\vec r\cdot \overrightarrow {eye})\\  u_{x}&amp;u_{y}&amp;u_{z}&amp;-(\vec u\cdot \overrightarrow {eye})\\  f_{x}&amp;f_{y}&amp;f_{z}&amp;-(\vec f\cdot \overrightarrow {eye})\\  0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]</p>
 
 <h3>翻译成代码</h3>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="k">static</span> <span class="n">Matrix4x4</span> <span class="n">LookAt</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">eye</span><span class="p">,</span> <span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">target</span><span class="p">,</span> <span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">up</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="k">static</span> <span class="n">Matrix4x4</span> <span class="nf">LookAt</span><span class="p">(</span><span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">eye</span><span class="p">,</span> <span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">target</span><span class="p">,</span> <span class="k">const</span> <span class="n">Vector3dF</span> <span class="o">&amp;</span><span class="n">up</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Vector3dF</span> <span class="n">focal</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">eye</span><span class="p">).</span><span class="n">Normalize</span><span class="p">();</span>
     <span class="n">Vector3dF</span> <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">focal</span><span class="p">.</span><span class="n">Cross</span><span class="p">(</span><span class="n">up</span><span class="p">)).</span><span class="n">Normalize</span><span class="p">();</span>
     <span class="n">Vector3dF</span> <span class="n">u</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">Cross</span><span class="p">(</span><span class="n">focal</span><span class="p">);</span>
@@ -209,6 +210,7 @@
         <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>    <span class="mi">1</span>
     <span class="p">};</span>
 <span class="p">}</span>
+
 </code></pre></div>
     </div>
     <div class="entry">

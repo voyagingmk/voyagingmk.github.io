@@ -448,7 +448,7 @@
 <p>最后一种情况TIME_WAIT错误是一种需要避免的错误，TIME_WAIT状态需要忽略RST，否则就会过早地进入CLOSED。</p>
 
 <p>强制终止方法：SO_LINGER设0（socket逗留选项），含义是，不会为了确定数据是否到达另一端而逗留任何时间。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">linger</span> <span class="n">l</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">linger</span> <span class="n">l</span><span class="p">;</span>
 <span class="n">l</span><span class="p">.</span><span class="n">l_onoff</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="n">l</span><span class="p">.</span><span class="n">l_linger</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="n">sock_setsockopt</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_LINGER</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">l</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">l</span><span class="p">));</span>

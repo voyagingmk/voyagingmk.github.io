@@ -105,13 +105,13 @@
 <p>3, 执行make，等生成libcrypto.a、libssl.a；</p>
 
 <p>4, 创建一个my_demo目录，并创建一个test.c文件，代码如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#include</span> <span class="cpf">&lt;openssl/ssl.h&gt;</span><span class="cp"></span>
-
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;openssl/ssl.h&gt;
+</span>
 <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">OPENSSL_init_ssl</span><span class="p">(</span><span class="n">OPENSSL_INIT_ENGINE_ALL_BUILTIN</span>
                           <span class="o">|</span> <span class="n">OPENSSL_INIT_LOAD_CONFIG</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">))</span>
-        <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;init success</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"init success</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>5, 编译：clang（或gcc) test.c -I../include  -L../ -lcrypto -lssl</p>
@@ -127,17 +127,17 @@
 <p>因为本机Mac不好更新openSSL，所以我是在docker里测试TLS1.3。</p>
 
 <p>先搞定安装了openSSL 1.1.1的container，跑起来，然后执行：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj &#39;/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland&#39; 
+<div class="highlight"><pre><code class="language-" data-lang="">openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=www.mydom.com/O=My Dom, Inc./C=US/ST=Oregon/L=Portland' 
 </code></pre></div>
 <p>生成了自签名的公钥证书cert.pem和对应的私钥key.pem，然后启动简易服务器：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>openssl s_server -key key.pem -cert cert.pem -www  
+<div class="highlight"><pre><code class="language-" data-lang="">openssl s_server -key key.pem -cert cert.pem -www  
 </code></pre></div>
 <p>然后在浏览器打开以下地址：</p>
 
 <p><a href="https://127.0.0.1:14433/">https://127.0.0.1:14433/</a></p>
 
 <p>chrome的话会提示不是安全连接，这是因为自签名公钥证书的问题。点继续，强行打开这个地址，就能访问到docker里的s_server了：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>s_server -key key.pem -cert cert.pem -www 
+<div class="highlight"><pre><code class="language-" data-lang="">s_server -key key.pem -cert cert.pem -www 
 Secure Renegotiation IS supported
 Ciphers supported in s_server binary
 TLSv1.3    :TLS_AES_256_GCM_SHA384    TLSv1.3    :TLS_CHACHA20_POLY1305_SHA256 
@@ -196,11 +196,11 @@ no client certificate available
 <p>openssl s_client -connect localhost:14433</p>
 
 <p>返回：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>CONNECTED(00000005)
-depth=0 CN = www.mydom.com, O = &quot;My Dom, Inc.&quot;, C = US, ST = Oregon, L = Portland
+<div class="highlight"><pre><code class="language-" data-lang="">CONNECTED(00000005)
+depth=0 CN = www.mydom.com, O = "My Dom, Inc.", C = US, ST = Oregon, L = Portland
 verify error:num=18:self signed certificate
 verify return:1
-depth=0 CN = www.mydom.com, O = &quot;My Dom, Inc.&quot;, C = US, ST = Oregon, L = Portland
+depth=0 CN = www.mydom.com, O = "My Dom, Inc.", C = US, ST = Oregon, L = Portland
 verify return:1
 ---
 Certificate chain
@@ -239,7 +239,7 @@ SSL-Session:
     0030 - 0f c1 90 88 f6 30 7b 20-eb 87 f0 39 5e a6 37 fd   .....0{ ...9^.7.
     0040 - ff 5f 92 7b da 61 7e 83-30 7a 04 a8 ef ef 5b 24   ._.{.a~.0z....[$
     0050 - fa a4 b2 86 55 fd ed 42-9f e6 b7 09 ed f6 2e 3b   ....U..B.......;
-    0060 - a7 d9 89 3f 27 de d1 b8-c8 98 aa e3 32 e0 96 9c   ...?&#39;.......2...
+    0060 - a7 d9 89 3f 27 de d1 b8-c8 98 aa e3 32 e0 96 9c   ...?'.......2...
     0070 - 67 d9 69 2f 0c ed f1 d2-09 fe f8 8f 9f b1 77 67   g.i/..........wg
     0080 - f3 55 31 07 bb 4e 2e a4-df f5 1f 9d 51 df a4 35   .U1..N......Q..5
     0090 - 5c 54 71 c0 3c f6 b3 41-e7 4f 07 c4 54 dd a4 d3   \Tq.&lt;..A.O..T...
@@ -258,23 +258,23 @@ SSL-Session:
 <h2>抓包分析TLS1.3握手过程</h2>
 
 <p>首先，为了屏蔽旧协议，需要修改/include/openssl/ssl.h里的一个宏：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/*</span>
-<span class="cm"> * Enable TLSv1.3 Compatibility mode. This is on by default. A future version</span>
-<span class="cm"> * of OpenSSL may have this disabled by default.</span>
-<span class="cm"> */</span>
-<span class="cp"># define SSL_OP_ENABLE_MIDDLEBOX_COMPAT                  0x00100000U</span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/*
+ * Enable TLSv1.3 Compatibility mode. This is on by default. A future version
+ * of OpenSSL may have this disabled by default.
+ */</span>
+<span class="cp"># define SSL_OP_ENABLE_MIDDLEBOX_COMPAT                  0x00100000U
+</span></code></pre></div>
 <p>改为:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp"># define SSL_OP_ENABLE_MIDDLEBOX_COMPAT                  0x00000000U</span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp"># define SSL_OP_ENABLE_MIDDLEBOX_COMPAT                  0x00000000U
+</span></code></pre></div>
 <p>然后重新编译openssl。</p>
 
 <p>接着开一个tcpdump的进程：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>tcpdump -i lo host localhost and port 4433 -nn -vvv -X
+<div class="highlight"><pre><code class="language-" data-lang="">tcpdump -i lo host localhost and port 4433 -nn -vvv -X
 </code></pre></div>
 <p>然后开2个bash分别执行：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>openssl s_server -key key.pem -cert cert.pem -msg -state -tls1_3 -trace no_middlebox -no_ssl3 -no_tls1 -no_tls1_1 -no_tls1_2 no_comp
-</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>openssl s_client -connect localhost:4433 -msg -state -trace -tls1_3
+<div class="highlight"><pre><code class="language-" data-lang="">openssl s_server -key key.pem -cert cert.pem -msg -state -tls1_3 -trace no_middlebox -no_ssl3 -no_tls1 -no_tls1_1 -no_tls1_2 no_comp
+</code></pre></div><div class="highlight"><pre><code class="language-" data-lang="">openssl s_client -connect localhost:4433 -msg -state -trace -tls1_3
 </code></pre></div>
 <p>三个进程的输出：</p>
 
@@ -291,7 +291,7 @@ SSL-Session:
 <p>根据tcpdump.out，发现在三次握手后的第一个包是从client发到服务器的，数据长度205字节(不含IP header）。这个就是ClientHello。</p>
 
 <p>然后看client.out和server.out，发现205字节的头5个字节是独立出来的：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>16 03 01 00 c8
+<div class="highlight"><pre><code class="language-" data-lang="">16 03 01 00 c8
 </code></pre></div>
 <p>这5个字节要分成3部分：</p>
 
@@ -306,12 +306,12 @@ SSL-Session:
 <p>( <a href="https://wand.net.nz/trac/libprotoident/wiki/SSL">图片来源</a> )</p>
 
 <p>ContentType在/include/openssl/ssl3.h里定义：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp"># define SSL3_RT_CHANGE_CIPHER_SPEC      20</span>
-<span class="cp"># define SSL3_RT_ALERT                   21</span>
-<span class="cp"># define SSL3_RT_HANDSHAKE               22</span>
-<span class="cp"># define SSL3_RT_APPLICATION_DATA        23</span>
-<span class="cp"># define DTLS1_RT_HEARTBEAT              24</span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp"># define SSL3_RT_CHANGE_CIPHER_SPEC      20
+# define SSL3_RT_ALERT                   21
+# define SSL3_RT_HANDSHAKE               22
+# define SSL3_RT_APPLICATION_DATA        23
+# define DTLS1_RT_HEARTBEAT              24
+</span></code></pre></div>
 <p>然后就是正文200个字节，根据tcpdump.out，按顺序解读下：</p>
 
 <ul>

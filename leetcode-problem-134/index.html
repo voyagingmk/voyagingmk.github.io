@@ -180,24 +180,43 @@ The solution is guaranteed to be unique.</p>
     当sum &lt; 0时，说明start的gas已经少到不能走到end了，但又因为start必然是路径的起点，于是start还可以尝试往左挪，start减一，并执行 sum += gas(start) - cost(start)。（也就是把start的左边的加油站合并到start）</p></li>
 </ol>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos"> 1</span>  <span class="kt">int</span> <span class="nf">canCompleteCircuit</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">gas</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">cost</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos"> 2</span>     <span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="n">gas</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-<span class="linenos"> 3</span>     <span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos"> 4</span>     <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
-<span class="linenos"> 5</span>     <span class="k">while</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos"> 6</span>         <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos"> 7</span>             <span class="n">sum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">end</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">end</span><span class="p">];</span>
-<span class="linenos"> 8</span>             <span class="o">++</span><span class="n">end</span><span class="p">;</span>
-<span class="linenos"> 9</span>         <span class="p">}</span>
-<span class="linenos">10</span>         <span class="k">else</span> <span class="p">{</span>
-<span class="linenos">11</span>             <span class="o">--</span><span class="n">start</span><span class="p">;</span>
-<span class="linenos">12</span>             <span class="n">sum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
-<span class="linenos">13</span>         <span class="p">}</span>
-<span class="linenos">14</span>     <span class="p">}</span>
-<span class="linenos">15</span>     <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
-<span class="linenos">16</span>         <span class="k">return</span> <span class="n">start</span><span class="p">;</span>
-<span class="linenos">17</span>     <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">18</span> <span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="code"><pre>   <span class="kt">int</span> <span class="nf">canCompleteCircuit</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">gas</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">cost</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="n">gas</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">sum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">end</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">end</span><span class="p">];</span>
+                <span class="o">++</span><span class="n">end</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="o">--</span><span class="n">start</span><span class="p">;</span>
+                <span class="n">sum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">start</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
   </div>
   <div class="entry">

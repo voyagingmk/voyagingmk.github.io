@@ -102,20 +102,20 @@
 </ul>
 
 <p>核心函数：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/*</span>
-<span class="cm">返回值：</span>
-<span class="cm">&lt;0：出错</span>
-<span class="cm">0：select超时返回了，没有读、写事件</span>
-<span class="cm">&gt;0：有事件发生的fd数量</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/*
+返回值：
+&lt;0：出错
+0：select超时返回了，没有读、写事件
+&gt;0：有事件发生的fd数量
 
-<span class="cm">maxfdp：是最大的fd再加1！</span>
+maxfdp：是最大的fd再加1！
 
-<span class="cm">readfds、writefds、errorfds是值-结果参数，调用的时候作为值语义参数，函数返回的时候作为结果，所以没有const修饰</span>
-<span class="cm">readfds：   要监听读事件的fd集合   /    有读事件的fd集合</span>
-<span class="cm">writefds：  要监听写事件的fd集合   /    有写事件的fd集合</span>
-<span class="cm">errorfds：  错误事件，一般传null即可</span>
-<span class="cm">*/</span>
-<span class="kt">int</span> <span class="nf">select</span><span class="p">(</span><span class="kt">int</span> <span class="n">maxfdp</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">readfds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">writefds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">errorfds</span><span class="p">,</span> <span class="k">struct</span> <span class="nc">timeval</span> <span class="o">*</span><span class="n">timeout</span><span class="p">);</span>
+readfds、writefds、errorfds是值-结果参数，调用的时候作为值语义参数，函数返回的时候作为结果，所以没有const修饰
+readfds：   要监听读事件的fd集合   /    有读事件的fd集合
+writefds：  要监听写事件的fd集合   /    有写事件的fd集合
+errorfds：  错误事件，一般传null即可
+*/</span>
+<span class="kt">int</span> <span class="nf">select</span><span class="p">(</span><span class="kt">int</span> <span class="n">maxfdp</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">readfds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">writefds</span><span class="p">,</span> <span class="n">fd_set</span> <span class="o">*</span><span class="n">errorfds</span><span class="p">,</span> <span class="k">struct</span> <span class="n">timeval</span> <span class="o">*</span><span class="n">timeout</span><span class="p">);</span>
 </code></pre></div>
 <p>用法要点：</p>
 
@@ -158,7 +158,7 @@
 <p>需要注意的是，即使是删除监听事件，epoll_ctl一个参数都不能少。</p>
 
 <h3>轮询</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="nf">epoll_wait</span><span class="p">(</span><span class="kt">int</span> <span class="n">epfd</span><span class="p">,</span> <span class="k">struct</span> <span class="nc">epoll_event</span> <span class="o">*</span><span class="n">events</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">epoll_wait</span><span class="p">(</span><span class="kt">int</span> <span class="n">epfd</span><span class="p">,</span> <span class="k">struct</span> <span class="n">epoll_event</span> <span class="o">*</span><span class="n">events</span><span class="p">,</span>
                <span class="kt">int</span> <span class="n">maxevents</span><span class="p">,</span> <span class="kt">int</span> <span class="n">timeout</span><span class="p">);</span>
 </code></pre></div>
 <p>timeout：-1，永久阻塞；0，立即返回，不阻塞； &gt;0，阻塞多少毫秒后返回
@@ -169,7 +169,7 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 <h3>底层特点</h3>
 
 <p>epfd被创建时，会相应地创建一个eventpoll结构体：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>struct eventpoll {  
+<div class="highlight"><pre><code class="language-" data-lang="">struct eventpoll {  
     /*红黑树的根节点，这颗树中存储着所有添加到epoll中的需要监控的事件*/  
     struct rb_root  rbr;  
     /*双链表中则存放着将要通过epoll_wait返回给用户的满足条件的事件*/  
@@ -179,12 +179,12 @@ events和maxevents：就是指定一块数组用来存epoll_wait的返回结果�
 <p>eventpoll可理解为存了2个数据结构的头部指针，一个指向一个红黑树的根，一个指向双向链表的头。</p>
 
 <p>只要某个fd的某个事件被监听中，就会存在和这个fd关联的一个epitem:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">epitem</span><span class="p">{</span>  
-    <span class="k">struct</span> <span class="nc">rb_node</span>  <span class="n">rbn</span><span class="p">;</span><span class="c1">//红黑树节点  </span>
-    <span class="k">struct</span> <span class="nc">list_head</span>    <span class="n">rdllink</span><span class="p">;</span><span class="c1">//双向链表节点  </span>
-    <span class="k">struct</span> <span class="nc">epoll_filefd</span>  <span class="n">ffd</span><span class="p">;</span>  <span class="c1">//事件句柄信息  </span>
-    <span class="k">struct</span> <span class="nc">eventpoll</span> <span class="o">*</span><span class="n">ep</span><span class="p">;</span>    <span class="c1">//指向其所属的eventpoll对象  </span>
-    <span class="k">struct</span> <span class="nc">epoll_event</span> <span class="n">event</span><span class="p">;</span> <span class="c1">//期待发生的事件类型  </span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">epitem</span><span class="p">{</span>  
+    <span class="k">struct</span> <span class="n">rb_node</span>  <span class="n">rbn</span><span class="p">;</span><span class="c1">//红黑树节点  </span>
+    <span class="k">struct</span> <span class="n">list_head</span>    <span class="n">rdllink</span><span class="p">;</span><span class="c1">//双向链表节点  </span>
+    <span class="k">struct</span> <span class="n">epoll_filefd</span>  <span class="n">ffd</span><span class="p">;</span>  <span class="c1">//事件句柄信息  </span>
+    <span class="k">struct</span> <span class="n">eventpoll</span> <span class="o">*</span><span class="n">ep</span><span class="p">;</span>    <span class="c1">//指向其所属的eventpoll对象  </span>
+    <span class="k">struct</span> <span class="n">epoll_event</span> <span class="n">event</span><span class="p">;</span> <span class="c1">//期待发生的事件类型  </span>
 <span class="p">}</span>  
 </code></pre></div>
 <p>红黑树中的每个节点都等同于某个epitem的rbn对象指针；双向链表的每个节点都等同于某个epitem的rdllink指针。</p>

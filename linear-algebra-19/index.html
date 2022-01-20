@@ -113,11 +113,13 @@
 <p>关节姿势分为<strong>局部</strong>关节姿势和<strong>全局</strong>关节姿势。先从局部关节姿势说起。</p>
 
 <p>局部关节姿势是相对直属父关节而言的，可以用一个strcut表示:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">JointPose</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="k">struct</span> <span class="n">JointPose</span> <span class="p">{</span>
     <span class="n">Quaternion</span> <span class="n">rot</span><span class="p">;</span> <span class="c1">// R 关节旋转信息</span>
     <span class="n">Vector3</span> <span class="n">trans</span><span class="p">;</span>  <span class="c1">// T 关节位移信息</span>
     <span class="n">Vector3</span> <span class="n">scale</span><span class="p">;</span>  <span class="c1">// S 关节缩放信息</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>一个关节只需要存一组RTS信息。这3个信息可分别转换成3个矩阵，并且可以合并成一个矩阵。合并后的矩阵就被称为关节仿射变换矩阵\( P_{j} \)：</p>
 
@@ -130,7 +132,7 @@
 <p>\[ P^{skel} = { P_{j} } | _{j=0}^{N-1} \]</p>
 
 <p>即：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">SkeletonPose</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">SkeletonPose</span> <span class="p">{</span>
     <span class="kt">size_t</span> <span class="n">jointCount</span><span class="p">;</span> <span class="c1">// 关节数量</span>
     <span class="n">JointPose</span><span class="o">*</span> <span class="n">localPoses</span><span class="p">;</span> <span class="c1">// 多个局部关节姿势</span>
 <span class="p">}</span>
@@ -156,7 +158,7 @@
 <p>\[ P_{j\to M} = \prod _{i=j}^{0} P_{i\to p(i)} \]</p>
 
 <p>对每个关节都做一遍这个公式，就能得到一个全局关节姿势数组。然后就可以写入SkeletonPose：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">SkeletonPose</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">SkeletonPose</span> <span class="p">{</span>
     <span class="kt">size_t</span> <span class="n">jointCount</span><span class="p">;</span> <span class="c1">// 关节数量</span>
     <span class="n">JointPose</span><span class="o">*</span> <span class="n">localPoses</span><span class="p">;</span> <span class="c1">// 多个局部关节姿势 JointPose</span>
     <span class="n">Matrix44</span><span class="o">*</span> <span class="n">globalPoses</span><span class="p">;</span> <span class="c1">// 多个全局关节姿势</span>
@@ -193,9 +195,11 @@
 <p>\( K_{j} \) 就是关节j的蒙皮矩阵了。再解释下这个矩阵干了什么：把绑定姿势模型空间下的顶点，先转换到绑定姿势关节空间，然后再转换到当前姿势模型空间。</p>
 
 <p>ozz-animation中的算K矩阵的代码片段：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">models</span><span class="p">.</span><span class="n">Count</span><span class="p">();</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">models</span><span class="p">.</span><span class="n">Count</span><span class="p">();</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">skinning_matrices</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">mesh</span><span class="p">.</span><span class="n">inverse_bind_poses</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>models[j]就是当前姿势当前时刻第j个关节的\( C_{j \to M}\)。</p>
 

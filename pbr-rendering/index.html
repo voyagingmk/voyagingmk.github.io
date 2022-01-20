@@ -167,14 +167,14 @@
 <p>输入参数：平面法线n、h向量、粗糙度\( \alpha \)。</p>
 
 <p>shader：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">float</span> <span class="nf">DistributionGGX</span><span class="p">(</span><span class="n">vec3</span> <span class="n">N</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">H</span><span class="p">,</span> <span class="kt">float</span> <span class="n">a</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">float</span> <span class="nf">DistributionGGX</span><span class="p">(</span><span class="n">vec3</span> <span class="n">N</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">H</span><span class="p">,</span> <span class="kt">float</span> <span class="n">a</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="kt">float</span> <span class="n">a2</span>     <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">a</span><span class="p">;</span>
-    <span class="kt">float</span> <span class="n">NdotH</span>  <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">H</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">NdotH</span>  <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">H</span><span class="p">),</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
     <span class="kt">float</span> <span class="n">NdotH2</span> <span class="o">=</span> <span class="n">NdotH</span><span class="o">*</span><span class="n">NdotH</span><span class="p">;</span>
 
     <span class="kt">float</span> <span class="n">nom</span>    <span class="o">=</span> <span class="n">a2</span><span class="p">;</span>
-    <span class="kt">float</span> <span class="n">denom</span>  <span class="o">=</span> <span class="p">(</span><span class="n">NdotH2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a2</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">denom</span>  <span class="o">=</span> <span class="p">(</span><span class="n">NdotH2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
     <span class="n">denom</span>        <span class="o">=</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">denom</span> <span class="o">*</span> <span class="n">denom</span><span class="p">;</span>
 
     <span class="k">return</span> <span class="n">nom</span> <span class="o">/</span> <span class="n">denom</span><span class="p">;</span>
@@ -195,7 +195,7 @@
 <p>有了表之后就会发现，对于绝缘体，基本反射率基本都在0.17这个水平线以下，且rgb分量一致；而对于导体，基本反射率都在0.5到1.0之间，且rgb分量值不一致（正是这个不一致性，使得不同的金属有显著的颜色差异，如金、铜、银颜色各异）。</p>
 
 <p>综上,\( F_{0} \)的求取实际上可以做得非常简化，用shader代码可以看出：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">vec3</span> <span class="n">F0</span> <span class="o">=</span> <span class="n">vec3</span><span class="p">(</span><span class="mf">0.04</span><span class="p">);</span> 
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">vec3</span> <span class="n">F0</span> <span class="o">=</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mo">04</span><span class="p">);</span> 
 <span class="n">F0</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">surfaceColor</span><span class="p">.</span><span class="n">rgb</span><span class="p">,</span> <span class="n">metalness</span><span class="p">);</span> 
 </code></pre></div>
 <p>第一行是绝缘体基本反射率，0.04是统计了大部分绝缘体的基本反射率并取平均值得到。</p>
@@ -203,9 +203,10 @@
 <p>第二行使用了一个新的参数叫金属性metalness，这是个十分人为的控制变量，范围为0.0到1.0；surfaceColor就是反射颜色值，例如黄金反射颜色为(1.00, 0.71, 0.29)。然后就可以使用mix函数和metalness做插值，metalness越接近0，那么就越接近绝缘体，metalness越接近1，那么就越接近surfaceColor。</p>
 
 <p>有了\( F_{0} \)后，就可以代入到菲涅尔方程做运算了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">vec3</span> <span class="nf">fresnelSchlick</span><span class="p">(</span><span class="n">vec3</span> <span class="n">n</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">v</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">F0</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="n">vec3</span> <span class="nf">fresnelSchlick</span><span class="p">(</span><span class="n">vec3</span> <span class="n">n</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">v</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">F0</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">return</span> <span class="n">F0</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">F0</span><span class="p">)</span> <span class="o">*</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="mf">5.0</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">F0</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="n">F0</span><span class="p">)</span> <span class="o">*</span> <span class="n">pow</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="mi">5</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <h3>G，Geometry function，几何属性函数</h3>
@@ -231,18 +232,18 @@
 <p><img src="../images/2017.9/4.png" alt="4.png"></p>
 
 <p>shader：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">float</span> <span class="nf">GeometrySchlickGGX</span><span class="p">(</span><span class="kt">float</span> <span class="n">NdotV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">k</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">float</span> <span class="nf">GeometrySchlickGGX</span><span class="p">(</span><span class="kt">float</span> <span class="n">NdotV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">k</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="kt">float</span> <span class="n">nom</span>   <span class="o">=</span> <span class="n">NdotV</span><span class="p">;</span>
-    <span class="kt">float</span> <span class="n">denom</span> <span class="o">=</span> <span class="n">NdotV</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">denom</span> <span class="o">=</span> <span class="n">NdotV</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span><span class="p">;</span>
 
     <span class="k">return</span> <span class="n">nom</span> <span class="o">/</span> <span class="n">denom</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="kt">float</span> <span class="nf">GeometrySmith</span><span class="p">(</span><span class="n">vec3</span> <span class="n">N</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">V</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">L</span><span class="p">,</span> <span class="kt">float</span> <span class="n">k</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="kt">float</span> <span class="n">NdotV</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
-    <span class="kt">float</span> <span class="n">NdotL</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">NdotV</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">),</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">NdotL</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">),</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
     <span class="kt">float</span> <span class="n">ggx1</span> <span class="o">=</span> <span class="n">GeometrySchlickGGX</span><span class="p">(</span><span class="n">NdotV</span><span class="p">,</span> <span class="n">k</span><span class="p">);</span>
     <span class="kt">float</span> <span class="n">ggx2</span> <span class="o">=</span> <span class="n">GeometrySchlickGGX</span><span class="p">(</span><span class="n">NdotL</span><span class="p">,</span> <span class="n">k</span><span class="p">);</span>
 

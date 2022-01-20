@@ -171,10 +171,10 @@
 <p>下面给出单光源下的phong shader。</p>
 
 <h2>ambient lighting</h2>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="c1">// fs</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// fs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
-    <span class="kr">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">ambient</span> <span class="o">=</span> <span class="nx">ka</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
     <span class="nx">vec3</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">ambient</span> <span class="o">*</span> <span class="nx">objectColor</span><span class="p">;</span>
@@ -182,7 +182,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h2>ambient+diffuse lighting</h2>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="c1">// vs</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// vs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="nx">gl_Position</span> <span class="o">=</span> <span class="nx">projection</span> <span class="o">*</span> <span class="nx">view</span> <span class="o">*</span> <span class="nx">model</span> <span class="o">*</span> <span class="nx">vec4</span><span class="p">(</span><span class="nx">aPos</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
@@ -193,13 +193,13 @@
 <span class="c1">// fs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
-    <span class="kr">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">ambient</span> <span class="o">=</span> <span class="nx">ka</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
-    <span class="kr">float</span> <span class="nx">kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">N</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">Normal</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">L</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">lightPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>  
-    <span class="kr">float</span> <span class="nx">NdotL</span> <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
+    <span class="nx">float</span> <span class="nx">NdotL</span> <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">diffuse</span> <span class="o">=</span> <span class="nx">kd</span> <span class="o">*</span> <span class="nx">NdotL</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
     <span class="nx">vec3</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ambient</span> <span class="o">+</span> <span class="nx">diffuse</span><span class="p">)</span> <span class="o">*</span> <span class="nx">objectColor</span><span class="p">;</span>
@@ -207,7 +207,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h2>ambient+diffuse+specular lighting</h2>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="c1">// vs</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// vs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="nx">gl_Position</span> <span class="o">=</span> <span class="nx">projection</span> <span class="o">*</span> <span class="nx">view</span> <span class="o">*</span> <span class="nx">model</span> <span class="o">*</span> <span class="nx">vec4</span><span class="p">(</span><span class="nx">aPos</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
@@ -218,20 +218,20 @@
 <span class="c1">// fs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
-    <span class="kr">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">ambient</span> <span class="o">=</span> <span class="nx">ka</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
-    <span class="kr">float</span> <span class="nx">kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">N</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">Normal</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">L</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">lightPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>  
-    <span class="kr">float</span> <span class="nx">NdotL</span> <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
+    <span class="nx">float</span> <span class="nx">NdotL</span> <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">diffuse</span> <span class="o">=</span> <span class="nx">kd</span> <span class="o">*</span> <span class="nx">NdotL</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
-    <span class="kr">float</span> <span class="nx">ks</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
-    <span class="kr">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mf">32</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">ks</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">V</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">viewPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">R</span> <span class="o">=</span> <span class="nx">reflect</span><span class="p">(</span><span class="o">-</span><span class="nx">L</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span> 
-    <span class="kr">float</span> <span class="nx">spec</span> <span class="o">=</span> <span class="nx">pow</span><span class="p">(</span><span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">V</span><span class="p">,</span> <span class="nx">R</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="nx">alpha</span><span class="p">);</span>
+    <span class="nx">float</span> <span class="nx">spec</span> <span class="o">=</span> <span class="nx">pow</span><span class="p">(</span><span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">V</span><span class="p">,</span> <span class="nx">R</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="nx">alpha</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">specular</span> <span class="o">=</span> <span class="nx">ks</span> <span class="o">*</span> <span class="nx">spec</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>  
 
     <span class="nx">vec3</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ambient</span> <span class="o">+</span> <span class="nx">diffuse</span> <span class="o">+</span> <span class="nx">specular</span><span class="p">)</span> <span class="o">*</span> <span class="nx">objectColor</span><span class="p">;</span>
@@ -263,7 +263,7 @@
 <p>\[ k_{s}(\hat N\cdot \hat H)^{\alpha } i_{m,s} \]</p>
 
 <p>对应的shader如下：</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="c1">// vs</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// vs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="nx">gl_Position</span> <span class="o">=</span> <span class="nx">projection</span> <span class="o">*</span> <span class="nx">view</span> <span class="o">*</span> <span class="nx">model</span> <span class="o">*</span> <span class="nx">vec4</span><span class="p">(</span><span class="nx">aPos</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
@@ -274,20 +274,20 @@
 <span class="c1">// fs</span>
 <span class="k">void</span> <span class="nx">main</span><span class="p">()</span>
 <span class="p">{</span>
-    <span class="kr">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">ka</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">ambient</span> <span class="o">=</span> <span class="nx">ka</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
-    <span class="kr">float</span> <span class="nx">kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">N</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">Normal</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">L</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">lightPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>  
-    <span class="kr">float</span> <span class="nx">NdotL</span> <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
+    <span class="nx">float</span> <span class="nx">NdotL</span> <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">L</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">diffuse</span> <span class="o">=</span> <span class="nx">kd</span> <span class="o">*</span> <span class="nx">NdotL</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>
 
-    <span class="kr">float</span> <span class="nx">ks</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
-    <span class="kr">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mf">32</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">ks</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
+    <span class="nx">float</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
     <span class="nx">vec3</span> <span class="nx">V</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">viewPos</span> <span class="o">-</span> <span class="nx">FragPos</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">H</span> <span class="o">=</span> <span class="nx">normalize</span><span class="p">(</span><span class="nx">L</span> <span class="o">+</span> <span class="nx">V</span><span class="p">);</span>
-    <span class="kr">float</span> <span class="nx">spec</span> <span class="o">=</span> <span class="nx">pow</span><span class="p">(</span><span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">H</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="nx">alpha</span><span class="p">);</span>
+    <span class="nx">float</span> <span class="nx">spec</span> <span class="o">=</span> <span class="nx">pow</span><span class="p">(</span><span class="nx">max</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="nx">N</span><span class="p">,</span> <span class="nx">H</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="nx">alpha</span><span class="p">);</span>
     <span class="nx">vec3</span> <span class="nx">specular</span> <span class="o">=</span> <span class="nx">ks</span> <span class="o">*</span> <span class="nx">spec</span> <span class="o">*</span> <span class="nx">lightColor</span><span class="p">;</span>  
 
     <span class="nx">vec3</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ambient</span> <span class="o">+</span> <span class="nx">diffuse</span> <span class="o">+</span> <span class="nx">specular</span><span class="p">)</span> <span class="o">*</span> <span class="nx">objectColor</span><span class="p">;</span>

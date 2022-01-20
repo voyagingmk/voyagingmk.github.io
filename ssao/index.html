@@ -137,19 +137,19 @@ SSAO，screen-space ambient occlusion
 <h3>采样点的生成算法</h3>
 
 <p>然后就是采样点的生成问题。采样点需要在tangent space下计算，即默认normal向量指向z轴正方向。所以每一个采样点只需要随机在x、y轴上做一点偏移即可：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">generateSampleKernel</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Vector3dF</span><span class="o">&gt;&amp;</span> <span class="n">ssaoKernel</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">generateSampleKernel</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Vector3dF</span><span class="o">&gt;&amp;</span> <span class="n">ssaoKernel</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">64</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="c1">// 随机分布采样点，x、y在[-1.0, 1.0]随机，而z在[0.0, 1.0]范围随机</span>
         <span class="c1">// 确保采样点落在normal向量同一侧，即z必须大于0</span>
-        <span class="n">Vector3dF</span> <span class="nf">sample</span><span class="p">(</span>
-            <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> 
-            <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> 
+        <span class="n">Vector3dF</span> <span class="n">sample</span><span class="p">(</span>
+            <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> 
+            <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> 
             <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span>
         <span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span><span class="p">.</span><span class="n">Normalize</span><span class="p">();</span>
         <span class="n">sample</span> <span class="o">*=</span> <span class="n">random0_1</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span> <span class="c1">// 单位化后随机分配距离 </span>
-        <span class="kt">float</span> <span class="n">scale</span> <span class="o">=</span> <span class="kt">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">/</span> <span class="mf">64.0</span><span class="p">;</span> <span class="c1">// 缩放因子，初始化为i/64是为了确保每一个点不会位置重复</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="n">lerp</span><span class="p">(</span><span class="mf">0.1f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">scale</span><span class="p">);</span> <span class="c1">// 使得大部分采样点会更靠近原点</span>
+        <span class="kt">float</span> <span class="n">scale</span> <span class="o">=</span> <span class="kt">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">/</span> <span class="mi">64</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span> <span class="c1">// 缩放因子，初始化为i/64是为了确保每一个点不会位置重复</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">lerp</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">,</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">scale</span><span class="p">);</span> <span class="c1">// 使得大部分采样点会更靠近原点</span>
         <span class="n">sample</span> <span class="o">*=</span> <span class="n">scale</span><span class="p">;</span> <span class="c1">// 应用缩放因子</span>
         <span class="n">ssaoKernel</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">sample</span><span class="p">);</span>
     <span class="p">}</span>
@@ -162,10 +162,10 @@ SSAO，screen-space ambient occlusion
 <p>采样次数越多，遮蔽率就算得越准确，但性能也就下降。为了降低采样次数，为此要引入一个random noise随机化的旋转噪声贴图，使得相邻的fragment采样点差异性变大。</p>
 
 <h3>采样点的随机噪声和TBN矩阵</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="c1">// 获取随机旋转向量并单位化</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="c1">// 获取随机旋转向量并单位化</span>
     <span class="n">vec3</span> <span class="n">randomVec</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">texture</span><span class="p">(</span><span class="n">texNoise</span><span class="p">,</span> <span class="n">TexCoord</span> <span class="o">*</span> <span class="n">noiseScale</span><span class="p">).</span><span class="n">xyz</span><span class="p">);</span>
     <span class="c1">// 计算TBN，用TBN左乘samplePos就可以把samplePos从tangent space转换到view space</span>
-    <span class="n">vec3</span> <span class="n">tangent</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">randomVec</span> <span class="o">-</span> <span class="n">normal</span> <span class="o">*</span> <span class="n">dot</span><span class="p">(</span><span class="n">randomVec</span><span class="p">,</span> <span class="n">normal</span><span class="p">));</span> <span class="c1">// TBN的x方向</span>
+    <span class="n">vec3</span> <span class="n">tangent</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">randomVec</span> <span class="o">-</span> <span class="n">normal</span> <span class="o">*</span> <span class="nf">dot</span><span class="p">(</span><span class="n">randomVec</span><span class="p">,</span> <span class="n">normal</span><span class="p">));</span> <span class="c1">// TBN的x方向</span>
     <span class="n">vec3</span> <span class="n">bitangent</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">cross</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">tangent</span><span class="p">));</span> <span class="c1">// TBN的y方向</span>
     <span class="n">mat3</span> <span class="n">TBN</span> <span class="o">=</span> <span class="n">mat3</span><span class="p">(</span><span class="n">tangent</span><span class="p">,</span> <span class="n">bitangent</span><span class="p">,</span> <span class="n">normal</span><span class="p">);</span> <span class="c1">// TBN的z方向</span>
 </code></pre></div>
@@ -182,13 +182,13 @@ SSAO，screen-space ambient occlusion
 <p>cosθ就是一个投影系数，用cosθ去乘以randomVec就得到normal在randomVec上的投影（方向相同，长度不等），同理，用cosθ去乘以normal就得到randomVec在normal上的投影。</p>
 
 <p>再看一下上面的代码：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">vec3</span> <span class="n">tangent</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">randomVec</span> <span class="o">-</span> <span class="n">normal</span> <span class="o">*</span> <span class="n">dot</span><span class="p">(</span><span class="n">randomVec</span><span class="p">,</span> <span class="n">normal</span><span class="p">));</span> <span class="c1">// TBN的x方向</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">vec3</span> <span class="n">tangent</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">randomVec</span> <span class="o">-</span> <span class="n">normal</span> <span class="o">*</span> <span class="nf">dot</span><span class="p">(</span><span class="n">randomVec</span><span class="p">,</span> <span class="n">normal</span><span class="p">));</span> <span class="c1">// TBN的x方向</span>
 </code></pre></div>
 <p>可以看出normal * dot(randomVec, normal) 就是指randomVec在normal上的投影，有了这个投影点r向量后，就可以用randomVec - r，得到垂直于normal的tangent向量。记得需要再单位化。 </p>
 
 <h3>最终的遮蔽率计算</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">float</span> <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span> <span class="c1">// 可以调整的参数，控制采样半径范围</span>
-<span class="kt">float</span> <span class="n">occlusion</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">float</span> <span class="n">radius</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span> <span class="c1">// 可以调整的参数，控制采样半径范围</span>
+<span class="kt">float</span> <span class="n">occlusion</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
 <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">kernelSize</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="c1">// 把采样点从tangent space转到view space</span>
@@ -198,26 +198,26 @@ SSAO，screen-space ambient occlusion
     <span class="n">samplePos</span> <span class="o">=</span> <span class="n">fragPos</span> <span class="o">+</span> <span class="n">samplePos</span> <span class="o">*</span> <span class="n">radius</span><span class="p">;</span> 
 
     <span class="c1">// 从view space转到screen space</span>
-    <span class="n">vec4</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">samplePos</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+    <span class="n">vec4</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">samplePos</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
     <span class="n">offset</span> <span class="o">=</span> <span class="n">proj</span> <span class="o">*</span> <span class="n">offset</span><span class="p">;</span> 
 
     <span class="c1">// perspective divide，得到NDC坐标（normalized device coordinates）</span>
     <span class="n">offset</span><span class="p">.</span><span class="n">xyz</span> <span class="o">/=</span> <span class="n">offset</span><span class="p">.</span><span class="n">w</span><span class="p">;</span> 
 
     <span class="c1">// 映射NDC到[0.0, 1.0]，从而可以采样GBuffer的纹理</span>
-    <span class="n">offset</span><span class="p">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">offset</span><span class="p">.</span><span class="n">xyz</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">;</span> 
+    <span class="n">offset</span><span class="p">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">offset</span><span class="p">.</span><span class="n">xyz</span> <span class="o">*</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span> 
 
     <span class="c1">// 获得GBuffer中该位置的深度值</span>
     <span class="kt">float</span> <span class="n">sampleDepth</span> <span class="o">=</span> <span class="n">sampleGBufferPos</span><span class="p">(</span><span class="n">offset</span><span class="p">.</span><span class="n">xy</span><span class="p">).</span><span class="n">z</span><span class="p">;</span><span class="c1">// view space</span>
 
     <span class="c1">// 深度比较 bias是调整值 bias太小就会出现acne现象 建议0.025</span>
-    <span class="kt">float</span> <span class="n">_occlusion</span> <span class="o">=</span> <span class="n">sampleDepth</span> <span class="o">&gt;=</span> <span class="n">samplePos</span><span class="p">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">bias</span> <span class="o">?</span> <span class="mf">1.0</span> <span class="o">:</span> <span class="mf">0.0</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">_occlusion</span> <span class="o">=</span> <span class="n">sampleDepth</span> <span class="o">&gt;=</span> <span class="n">samplePos</span><span class="p">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">bias</span> <span class="o">?</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
 
-    <span class="kt">float</span> <span class="n">rangeCheck</span> <span class="o">=</span> <span class="n">smoothstep</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">radius</span> <span class="o">/</span> <span class="n">abs</span><span class="p">(</span><span class="n">fragPos</span><span class="p">.</span><span class="n">z</span> <span class="o">-</span> <span class="n">sampleDepth</span><span class="p">));</span>
+    <span class="kt">float</span> <span class="n">rangeCheck</span> <span class="o">=</span> <span class="n">smoothstep</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">radius</span> <span class="o">/</span> <span class="n">abs</span><span class="p">(</span><span class="n">fragPos</span><span class="p">.</span><span class="n">z</span> <span class="o">-</span> <span class="n">sampleDepth</span><span class="p">));</span>
 
     <span class="n">occlusion</span> <span class="o">+=</span> <span class="n">_occlusion</span> <span class="o">*</span> <span class="n">rangeCheck</span><span class="p">;</span>    
 <span class="p">}</span>
-<span class="n">FragColor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">occlusion</span> <span class="o">/</span> <span class="n">kernelSize</span><span class="p">);</span> <span class="c1">// occlusion越接近kernelSize，FragColor即遮蔽率就越低</span>
+<span class="n">FragColor</span> <span class="o">=</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="p">(</span><span class="n">occlusion</span> <span class="o">/</span> <span class="n">kernelSize</span><span class="p">);</span> <span class="c1">// occlusion越接近kernelSize，FragColor即遮蔽率就越低</span>
 </code></pre></div>
 <p>其中的rangeCheck步骤是比较特殊的处理，它解决的是这么个情况：对于一个物体的轮廓处的fragment，在做采样计算时会把后面的远处的fragment也拉进来测试。所以要计算fragPos.z - sampleDepth，求出当前fragment的深度以及被采样点的深度的距离，距离过大就说明不是近邻的会遮蔽自己的fragment。距离越大，rangeCheck就会越接近0，从而_occlusion值也会削弱。（注意fragPos.z - sampleDepth小于等于radius）</p>
 
@@ -259,15 +259,15 @@ SSAO，screen-space ambient occlusion
 <p>我自己是采用里第一种做法。</p>
 
 <h3>G-Buffer的position和normal具体怎么做变换？</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="c1">// position的变换</span>
-    <span class="n">vec4</span> <span class="n">WorldPos</span> <span class="o">=</span> <span class="n">model</span> <span class="o">*</span> <span class="n">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="c1">// position的变换</span>
+    <span class="n">vec4</span> <span class="n">WorldPos</span> <span class="o">=</span> <span class="n">model</span> <span class="o">*</span> <span class="nf">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">);</span>
     <span class="n">FragPos</span> <span class="o">=</span> <span class="p">(</span><span class="n">view</span> <span class="o">*</span> <span class="n">WorldPos</span><span class="p">).</span><span class="n">xyz</span><span class="p">;</span> <span class="c1">// 输出</span>
     <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">proj</span> <span class="o">*</span> <span class="n">view</span> <span class="o">*</span> <span class="n">WorldPos</span><span class="p">;</span>
 
     <span class="c1">// normal的变换</span>
     <span class="c1">// mat3 normalMatrix = mat3(view * transpose(inverse(model))); // Wrong!</span>
     <span class="c1">// mat3 normalMatrix = mat3(transpose(inverse(view * mat4(mat3(model))))); // not good</span>
-    <span class="n">mat4</span> <span class="n">normalMatrix</span> <span class="o">=</span> <span class="n">view</span> <span class="o">*</span> <span class="n">mat4</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">inverse</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">model</span><span class="p">))));</span>
+    <span class="n">mat4</span> <span class="n">normalMatrix</span> <span class="o">=</span> <span class="n">view</span> <span class="o">*</span> <span class="nf">mat4</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">inverse</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">model</span><span class="p">))));</span>
     <span class="n">Normal</span> <span class="o">=</span> <span class="n">mat3</span><span class="p">(</span><span class="n">normalMatrix</span><span class="p">)</span> <span class="o">*</span> <span class="n">normal</span><span class="p">;</span> <span class="c1">// 输出</span>
 </code></pre></div>
 <p>position的变换一目了然，没什么坑。但是normal的坑就大了。</p>
@@ -279,7 +279,7 @@ SSAO，screen-space ambient occlusion
 <p>最后再把mat3的normal matirx转成mat4，从而可以和mat4的view相乘，从而得到G-Buffer真正需要的normal matirx。</p>
 
 <h3>G-Buffer的position纹理需要设置GL_CLAMP_TO_EDGE</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">GL_TEXTURE_2D</span><span class="p">,</span> <span class="n">GL_TEXTURE_WRAP_S</span><span class="p">,</span> <span class="n">GL_CLAMP_TO_EDGE</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">GL_TEXTURE_2D</span><span class="p">,</span> <span class="n">GL_TEXTURE_WRAP_S</span><span class="p">,</span> <span class="n">GL_CLAMP_TO_EDGE</span><span class="p">);</span>
     <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">GL_TEXTURE_2D</span><span class="p">,</span> <span class="n">GL_TEXTURE_WRAP_T</span><span class="p">,</span> <span class="n">GL_CLAMP_TO_EDGE</span><span class="p">);</span>
 </code></pre></div>
 <p>这样就能限制G-Buffer之后的pass采样position纹理时，position的范围不会超出[0.0, 1.0]。</p>

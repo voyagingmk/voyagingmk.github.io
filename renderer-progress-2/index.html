@@ -120,7 +120,7 @@
 <h3>天空盒的深度值问题</h3>
 
 <p>天空盒必须渲染后到最深的位置，所以天空盒的每一个fragment的depth必须为1.0。怎么保证呢？做法就是在vertex shader里加一行这样的代码：</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>gl_Position = pos.xyww;
+<div class="highlight"><pre><code class="language-" data-lang="">gl_Position = pos.xyww;
 </code></pre></div>
 <p>因为OpenGL有一个perspective divide的过程，会在vs着色完成时，对gl_Position除以gl_Position的z值，所以x、y、w、w会变成x/w、y/w、1.0, 1.0，z值就固定1.0了。</p>
 

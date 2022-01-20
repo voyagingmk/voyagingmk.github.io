@@ -99,19 +99,19 @@
 <h2>void *zmalloc(size_t size)</h2>
 
 <p>zmalloc是redis最常用的函数之一：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="o">*</span><span class="nf">zmalloc</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="o">*</span><span class="nf">zmalloc</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">);</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ptr</span><span class="p">)</span> <span class="n">zmalloc_oom_handler</span><span class="p">(</span><span class="n">size</span><span class="p">);</span> <span class="c1">// out of memory 后的处理</span>
-<span class="cp">#ifdef HAVE_MALLOC_SIZE</span>
-    <span class="n">update_zmalloc_stat_alloc</span><span class="p">(</span><span class="n">zmalloc_size</span><span class="p">(</span><span class="n">ptr</span><span class="p">));</span>
+<span class="cp">#ifdef HAVE_MALLOC_SIZE
+</span>    <span class="n">update_zmalloc_stat_alloc</span><span class="p">(</span><span class="n">zmalloc_size</span><span class="p">(</span><span class="n">ptr</span><span class="p">));</span>
     <span class="k">return</span> <span class="n">ptr</span><span class="p">;</span>
-<span class="cp">#else</span>
-    <span class="o">*</span><span class="p">((</span><span class="kt">size_t</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="p">)</span> <span class="o">=</span> <span class="n">size</span><span class="p">;</span>
+<span class="cp">#else
+</span>    <span class="o">*</span><span class="p">((</span><span class="kt">size_t</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="p">)</span> <span class="o">=</span> <span class="n">size</span><span class="p">;</span>
     <span class="n">update_zmalloc_stat_alloc</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">);</span>
     <span class="k">return</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">;</span>
-<span class="cp">#endif</span>
-<span class="p">}</span>
+<span class="cp">#endif
+</span><span class="p">}</span>
 </code></pre></div>
 <p>HAVE_MALLOC_SIZE，2个点：</p>
 
@@ -127,8 +127,8 @@
 <p>update_zmalloc_stat_alloc是统计用。</p>
 
 <h2>zmalloc_default_oom</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">zmalloc_default_oom</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;zmalloc: Out of memory trying to allocate %zu bytes</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">zmalloc_default_oom</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"zmalloc: Out of memory trying to allocate %zu bytes</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
         <span class="n">size</span><span class="p">);</span>
     <span class="n">fflush</span><span class="p">(</span><span class="n">stderr</span><span class="p">);</span>
     <span class="n">abort</span><span class="p">();</span>
@@ -137,60 +137,60 @@
 <p>缺省的oom处理函数，是要调用abort，让redis crash掉的。crash前会输出错误信息到stderr，告诉用户最后的请求是要分配多大的内存。</p>
 
 <h2>stat相关</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define update_zmalloc_stat_alloc(__n) do { \</span>
-<span class="cp">    size_t _n = (__n); \</span>
-<span class="cp">    if (_n&amp;(sizeof(long)-1)) _n += sizeof(long)-(_n&amp;(sizeof(long)-1)); \</span>
-<span class="cp">    atomicIncr(used_memory,__n); \</span>
-<span class="cp">} while(0)</span>
-
-<span class="cp">#define update_zmalloc_stat_free(__n) do { \</span>
-<span class="cp">    size_t _n = (__n); \</span>
-<span class="cp">    if (_n&amp;(sizeof(long)-1)) _n += sizeof(long)-(_n&amp;(sizeof(long)-1)); \</span>
-<span class="cp">    atomicDecr(used_memory,__n); \</span>
-<span class="cp">} while(0)</span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#define update_zmalloc_stat_alloc(__n) do { \
+    size_t _n = (__n); \
+    if (_n&amp;(sizeof(long)-1)) _n += sizeof(long)-(_n&amp;(sizeof(long)-1)); \
+    atomicIncr(used_memory,__n); \
+} while(0)
+</span>
+<span class="cp">#define update_zmalloc_stat_free(__n) do { \
+    size_t _n = (__n); \
+    if (_n&amp;(sizeof(long)-1)) _n += sizeof(long)-(_n&amp;(sizeof(long)-1)); \
+    atomicDecr(used_memory,__n); \
+} while(0)
+</span></code></pre></div>
 <p>用zmalloc_used_memory可以拿到used_memory的值。</p>
 
 <h2>zfree</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">zfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
-<span class="cp">#ifndef HAVE_MALLOC_SIZE</span>
-    <span class="kt">void</span> <span class="o">*</span><span class="n">realptr</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">zfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#ifndef HAVE_MALLOC_SIZE
+</span>    <span class="kt">void</span> <span class="o">*</span><span class="n">realptr</span><span class="p">;</span>
     <span class="kt">size_t</span> <span class="n">oldsize</span><span class="p">;</span>
-<span class="cp">#endif</span>
-
+<span class="cp">#endif
+</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ptr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
-<span class="cp">#ifdef HAVE_MALLOC_SIZE</span>
-    <span class="n">update_zmalloc_stat_free</span><span class="p">(</span><span class="n">zmalloc_size</span><span class="p">(</span><span class="n">ptr</span><span class="p">));</span>
+<span class="cp">#ifdef HAVE_MALLOC_SIZE
+</span>    <span class="n">update_zmalloc_stat_free</span><span class="p">(</span><span class="n">zmalloc_size</span><span class="p">(</span><span class="n">ptr</span><span class="p">));</span>
     <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
-<span class="cp">#else</span>
-    <span class="n">realptr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="o">-</span><span class="n">PREFIX_SIZE</span><span class="p">;</span>
+<span class="cp">#else
+</span>    <span class="n">realptr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="o">-</span><span class="n">PREFIX_SIZE</span><span class="p">;</span>
     <span class="n">oldsize</span> <span class="o">=</span> <span class="o">*</span><span class="p">((</span><span class="kt">size_t</span><span class="o">*</span><span class="p">)</span><span class="n">realptr</span><span class="p">);</span>
     <span class="n">update_zmalloc_stat_free</span><span class="p">(</span><span class="n">oldsize</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">);</span>
     <span class="n">free</span><span class="p">(</span><span class="n">realptr</span><span class="p">);</span>
-<span class="cp">#endif</span>
-<span class="p">}</span>
+<span class="cp">#endif
+</span><span class="p">}</span>
 </code></pre></div>
 <p>仔细看，是zmalloc的逆操作，没什么特别的。</p>
 
 <h2>zrealloc</h2>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="o">*</span><span class="nf">zrealloc</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
-<span class="cp">#ifndef HAVE_MALLOC_SIZE</span>
-    <span class="kt">void</span> <span class="o">*</span><span class="n">realptr</span><span class="p">;</span>
-<span class="cp">#endif</span>
-    <span class="kt">size_t</span> <span class="n">oldsize</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="o">*</span><span class="nf">zrealloc</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#ifndef HAVE_MALLOC_SIZE
+</span>    <span class="kt">void</span> <span class="o">*</span><span class="n">realptr</span><span class="p">;</span>
+<span class="cp">#endif
+</span>    <span class="kt">size_t</span> <span class="n">oldsize</span><span class="p">;</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">newptr</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">ptr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="n">zmalloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
-<span class="cp">#ifdef HAVE_MALLOC_SIZE</span>
-    <span class="n">oldsize</span> <span class="o">=</span> <span class="n">zmalloc_size</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+<span class="cp">#ifdef HAVE_MALLOC_SIZE
+</span>    <span class="n">oldsize</span> <span class="o">=</span> <span class="n">zmalloc_size</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
     <span class="n">newptr</span> <span class="o">=</span> <span class="n">realloc</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">newptr</span><span class="p">)</span> <span class="n">zmalloc_oom_handler</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
 
     <span class="n">update_zmalloc_stat_free</span><span class="p">(</span><span class="n">oldsize</span><span class="p">);</span>
     <span class="n">update_zmalloc_stat_alloc</span><span class="p">(</span><span class="n">zmalloc_size</span><span class="p">(</span><span class="n">newptr</span><span class="p">));</span>
     <span class="k">return</span> <span class="n">newptr</span><span class="p">;</span>
-<span class="cp">#else</span>
-    <span class="n">realptr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="o">-</span><span class="n">PREFIX_SIZE</span><span class="p">;</span>
+<span class="cp">#else
+</span>    <span class="n">realptr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="o">-</span><span class="n">PREFIX_SIZE</span><span class="p">;</span>
     <span class="n">oldsize</span> <span class="o">=</span> <span class="o">*</span><span class="p">((</span><span class="kt">size_t</span><span class="o">*</span><span class="p">)</span><span class="n">realptr</span><span class="p">);</span>
     <span class="n">newptr</span> <span class="o">=</span> <span class="n">realloc</span><span class="p">(</span><span class="n">realptr</span><span class="p">,</span><span class="n">size</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">newptr</span><span class="p">)</span> <span class="n">zmalloc_oom_handler</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
@@ -199,8 +199,8 @@
     <span class="n">update_zmalloc_stat_free</span><span class="p">(</span><span class="n">oldsize</span><span class="p">);</span>
     <span class="n">update_zmalloc_stat_alloc</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">);</span>
     <span class="k">return</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newptr</span><span class="o">+</span><span class="n">PREFIX_SIZE</span><span class="p">;</span>
-<span class="cp">#endif</span>
-<span class="p">}</span>
+<span class="cp">#endif
+</span><span class="p">}</span>
 </code></pre></div>
 <p>realloc一个ptr，重新分配内存，这里并不能看出底层内存是怎么分配的，也因此代码很简单，只是做了oom和stat处理就没了。</p>
 

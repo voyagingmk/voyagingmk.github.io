@@ -101,20 +101,20 @@
 <h3>tiny-AES-C总览</h3>
 
 <p>以最简单的加密模式ECB为例，ECB的加密解密接口如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">AES_ECB_encrypt</span><span class="p">(</span><span class="k">struct</span> <span class="nc">AES_ctx</span> <span class="o">*</span><span class="n">ctx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">buf</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">AES_ECB_encrypt</span><span class="p">(</span><span class="k">struct</span> <span class="n">AES_ctx</span> <span class="o">*</span><span class="n">ctx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">buf</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// The next function call encrypts the PlainText with the Key using AES algorithm.</span>
   <span class="n">Cipher</span><span class="p">((</span><span class="n">state_t</span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">,</span> <span class="n">ctx</span><span class="o">-&gt;</span><span class="n">RoundKey</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="kt">void</span> <span class="nf">AES_ECB_decrypt</span><span class="p">(</span><span class="k">struct</span> <span class="nc">AES_ctx</span><span class="o">*</span> <span class="n">ctx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">buf</span><span class="p">)</span>
+<span class="kt">void</span> <span class="nf">AES_ECB_decrypt</span><span class="p">(</span><span class="k">struct</span> <span class="n">AES_ctx</span><span class="o">*</span> <span class="n">ctx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">buf</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// The next function call decrypts the PlainText with the Key using AES algorithm.</span>
   <span class="n">InvCipher</span><span class="p">((</span><span class="n">state_t</span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">,</span> <span class="n">ctx</span><span class="o">-&gt;</span><span class="n">RoundKey</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>可见Cipher和InvCipher才是关键，本文主要剖析Cipher：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">Cipher</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">Cipher</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">uint8_t</span> <span class="n">round</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
@@ -138,24 +138,24 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>其中的Nr是常数，AES用到的常数如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// The number of columns comprising a state in AES. This is a constant in AES. Value=4</span>
-<span class="cp">#define Nb 4</span>
-
-<span class="cp">#if defined(AES256) &amp;&amp; (AES256 == 1)</span>
-    <span class="cp">#define Nk 8</span>
-    <span class="cp">#define Nr 14</span>
-<span class="cp">#elif defined(AES192) &amp;&amp; (AES192 == 1)</span>
-    <span class="cp">#define Nk 6</span>
-    <span class="cp">#define Nr 12</span>
-<span class="cp">#else</span>
-    <span class="cp">#define Nk 4        </span><span class="c1">// The number of 32 bit words in a key.</span>
-    <span class="cp">#define Nr 10       </span><span class="c1">// The number of rounds in AES Cipher.</span>
-<span class="cp">#endif</span>
-</code></pre></div>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// The number of columns comprising a state in AES. This is a constant in AES. Value=4</span>
+<span class="cp">#define Nb 4
+</span>
+<span class="cp">#if defined(AES256) &amp;&amp; (AES256 == 1)
+</span>    <span class="cp">#define Nk 8
+</span>    <span class="cp">#define Nr 14
+#elif defined(AES192) &amp;&amp; (AES192 == 1)
+</span>    <span class="cp">#define Nk 6
+</span>    <span class="cp">#define Nr 12
+#else
+</span>    <span class="cp">#define Nk 4        // The number of 32 bit words in a key.
+</span>    <span class="cp">#define Nr 10       // The number of rounds in AES Cipher.
+#endif
+</span></code></pre></div>
 <p>可见，AES128的Nk为4，Nr为10。</p>
 
 <p>state_t其实就是原文(plaintext)：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">typedef</span> <span class="kt">uint8_t</span> <span class="n">state_t</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="kt">uint8_t</span> <span class="n">state_t</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
 </code></pre></div>
 <p>state_t是定长16字节，所以Cipher是用来加密定长块的，更长的原文就需要分块加密。</p>
 
@@ -170,7 +170,7 @@
 <p><img src="../images/2018.8/AddRoundKey.png" alt="subbytes.png"></p>
 
 <p>(from <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">wiki</a>)</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">AddRoundKey</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">round</span><span class="p">,</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">,</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">AddRoundKey</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">round</span><span class="p">,</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">,</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">uint8_t</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">;</span>
   <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
@@ -189,7 +189,7 @@
 <p><img src="../images/2018.8/subbytes.png" alt="subbytes.png"></p>
 
 <p>(from <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">wiki</a>)</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">SubBytes</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">SubBytes</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">uint8_t</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
   <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
@@ -222,7 +222,8 @@
   <span class="mh">0x8c</span><span class="p">,</span> <span class="mh">0xa1</span><span class="p">,</span> <span class="mh">0x89</span><span class="p">,</span> <span class="mh">0x0d</span><span class="p">,</span> <span class="mh">0xbf</span><span class="p">,</span> <span class="mh">0xe6</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="mh">0x68</span><span class="p">,</span> <span class="mh">0x41</span><span class="p">,</span> <span class="mh">0x99</span><span class="p">,</span> <span class="mh">0x2d</span><span class="p">,</span> <span class="mh">0x0f</span><span class="p">,</span> <span class="mh">0xb0</span><span class="p">,</span> <span class="mh">0x54</span><span class="p">,</span> <span class="mh">0xbb</span><span class="p">,</span> <span class="mh">0x16</span> <span class="p">};</span>
 
 
-<span class="cp">#define getSBoxValue(num) (sbox[(num)])</span>
+<span class="cp">#define getSBoxValue(num) (sbox[(num)])
+</span>
 </code></pre></div>
 <p>要注意，sbox是AES的常量，不可随便修改。</p>
 
@@ -240,7 +241,7 @@
 <p><img src="../images/2018.8/shiftrows.png" alt="shiftrows.png"></p>
 
 <p>(from <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">wiki</a>)</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">ShiftRows</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">ShiftRows</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">uint8_t</span> <span class="n">temp</span><span class="p">;</span>
 
@@ -276,13 +277,13 @@
 <p><img src="../images/2018.8/mixcolumns.png" alt="mixcolumns.png"></p>
 
 <p>(from <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">wiki</a>)</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">uint8_t</span> <span class="n">xtime</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">uint8_t</span> <span class="nf">xtime</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="p">((</span><span class="n">x</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(((</span><span class="n">x</span><span class="o">&gt;&gt;</span><span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mh">0x1b</span><span class="p">));</span>
 <span class="p">}</span>
 
 <span class="c1">// MixColumns function mixes the columns of the state matrix</span>
-<span class="k">static</span> <span class="kt">void</span> <span class="n">MixColumns</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">MixColumns</span><span class="p">(</span><span class="n">state_t</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">uint8_t</span> <span class="n">i</span><span class="p">;</span>
   <span class="kt">uint8_t</span> <span class="n">Tmp</span><span class="p">,</span> <span class="n">Tm</span><span class="p">,</span> <span class="n">t</span><span class="p">;</span>
@@ -417,25 +418,25 @@
 <p>\[  \left[ \begin{matrix} b_{0}\\ b_{1}\\ b_{2}\\ b_{3}\\ \end{matrix} \right] =  \left[ \begin{matrix} 2&amp;3&amp;1&amp;1\\ 1&amp;2&amp;3&amp;1\\ 1&amp;1&amp;2&amp;3\\ 3&amp;1&amp;1&amp;2\\ \end{matrix} \right]  \left[ \begin{matrix} a_{0}\\ a_{1}\\ a_{2}\\ a_{3}\\ \end{matrix} \right] \]</p>
 
 <p>现在分析对比下源码里的xtime函数和<a href="https://en.wikipedia.org/wiki/Rijndael_MixColumns">wiki</a>给出的等价代码:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">uint8_t</span> <span class="n">xtime</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">uint8_t</span> <span class="nf">xtime</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="p">((</span><span class="n">x</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(((</span><span class="n">x</span><span class="o">&gt;&gt;</span><span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mh">0x1b</span><span class="p">));</span>
 <span class="p">}</span>
 
 <span class="c1">// 整理过的：</span>
-<span class="k">static</span> <span class="kt">uint8_t</span> <span class="n">xtime2</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span> 
+<span class="k">static</span> <span class="kt">uint8_t</span> <span class="nf">xtime2</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">)</span> 
 <span class="p">{</span>
     <span class="k">return</span> <span class="p">((</span><span class="n">x</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)((</span><span class="kt">signed</span> <span class="kt">char</span><span class="p">)</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1b</span><span class="p">));</span>
 <span class="p">}</span>
-<span class="cm">/*</span>
-<span class="cm">    原始代码段：</span>
-<span class="cm">    h = (unsigned char)((signed char)r[c] &gt;&gt; 7); // arithmetic right shift, thus shifting in either zeros or ones </span>
-<span class="cm">    b[c] = r[c] &lt;&lt; 1; // implicitly removes high bit because b[c] is an 8-bit char, so we xor by 0x1b and not 0x11b in the next line </span>
-<span class="cm">    b[c] ^= 0x1B &amp; h; // Rijndael&#39;s Galois field </span>
-<span class="cm">*/</span>
+<span class="cm">/*
+    原始代码段：
+    h = (unsigned char)((signed char)r[c] &gt;&gt; 7); // arithmetic right shift, thus shifting in either zeros or ones 
+    b[c] = r[c] &lt;&lt; 1; // implicitly removes high bit because b[c] is an 8-bit char, so we xor by 0x1b and not 0x11b in the next line 
+    b[c] ^= 0x1B &amp; h; // Rijndael's Galois field 
+*/</span>
 
 <span class="c1">// 测试通过：</span>
-<span class="k">for</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="kt">uint8_t</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="kt">uint8_t</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">assert</span><span class="p">(</span><span class="n">xtime</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">xtime2</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -494,7 +495,7 @@
 <p>这就是xtime的逻辑了。xtime搞懂后，就可以看MixColumn了，也就是前面贴的MDS矩阵相乘运算。</p>
 
 <p>前面给出的MixColumns函数很复杂，用伪代码简化下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
   <span class="p">{</span>  
     <span class="n">t</span>   <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
     <span class="n">Tmp</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">;</span>
@@ -573,7 +574,7 @@
 <p>所以这份代码和MDS矩阵相乘公式一致。</p>
 
 <p>再补充下：wiki里的mixColumns实现其实更容易理解：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="cm">/* 2 * a0 + a3 + a2 + 3 * a1 */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="cm">/* 2 * a0 + a3 + a2 + 3 * a1 */</span>
 <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="cm">/* 2 * a1 + a0 + a3 + 3 * a2 */</span>
 <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span> <span class="cm">/* 2 * a2 + a1 + a0 + 3 * a3 */</span>
 <span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="cm">/* 2 * a3 + a2 + a1 + 3 * a0 */</span>
@@ -636,26 +637,26 @@
 <p>\[ w_{i} = w_{i - 4} \oplus w_{i-1}， 4 \le i \le 43 \]</p>
 
 <p>下面看tiny-AES-c源码剖析：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define AES_BLOCKLEN 16 </span><span class="c1">//Block length in bytes AES is 128b block only</span>
-
-<span class="cp">#if defined(AES256) &amp;&amp; (AES256 == 1)</span>
-    <span class="cp">#define AES_KEYLEN 32</span>
-    <span class="cp">#define AES_keyExpSize 240</span>
-<span class="cp">#elif defined(AES192) &amp;&amp; (AES192 == 1)</span>
-    <span class="cp">#define AES_KEYLEN 24</span>
-    <span class="cp">#define AES_keyExpSize 208</span>
-<span class="cp">#else</span>
-    <span class="cp">#define AES_KEYLEN 16   </span><span class="c1">// Key length in bytes</span>
-    <span class="cp">#define AES_keyExpSize 176</span>
-<span class="cp">#endif</span>
-
-<span class="k">struct</span> <span class="nc">AES_ctx</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#define AES_BLOCKLEN 16 //Block length in bytes AES is 128b block only
+</span>
+<span class="cp">#if defined(AES256) &amp;&amp; (AES256 == 1)
+</span>    <span class="cp">#define AES_KEYLEN 32
+</span>    <span class="cp">#define AES_keyExpSize 240
+#elif defined(AES192) &amp;&amp; (AES192 == 1)
+</span>    <span class="cp">#define AES_KEYLEN 24
+</span>    <span class="cp">#define AES_keyExpSize 208
+#else
+</span>    <span class="cp">#define AES_KEYLEN 16   // Key length in bytes
+</span>    <span class="cp">#define AES_keyExpSize 176
+#endif
+</span>
+<span class="k">struct</span> <span class="n">AES_ctx</span>
 <span class="p">{</span>
   <span class="kt">uint8_t</span> <span class="n">RoundKey</span><span class="p">[</span><span class="n">AES_keyExpSize</span><span class="p">];</span>
-<span class="cp">#if (defined(CBC) &amp;&amp; (CBC == 1)) || (defined(CTR) &amp;&amp; (CTR == 1))</span>
-  <span class="kt">uint8_t</span> <span class="n">Iv</span><span class="p">[</span><span class="n">AES_BLOCKLEN</span><span class="p">];</span>
-<span class="cp">#endif</span>
-<span class="p">};</span>
+<span class="cp">#if (defined(CBC) &amp;&amp; (CBC == 1)) || (defined(CTR) &amp;&amp; (CTR == 1))
+</span>  <span class="kt">uint8_t</span> <span class="n">Iv</span><span class="p">[</span><span class="n">AES_BLOCKLEN</span><span class="p">];</span>
+<span class="cp">#endif
+</span><span class="p">};</span>
 
 <span class="c1">// The round constant word array, Rcon[i], contains the values given by </span>
 <span class="c1">// x to the power (i-1) being powers of x (x is denoted as {02}) in the field GF(2^8)</span>
@@ -663,7 +664,7 @@
   <span class="mh">0x8d</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="mh">0x1b</span><span class="p">,</span> <span class="mh">0x36</span> <span class="p">};</span>
 
 <span class="c1">// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states. </span>
-<span class="k">static</span> <span class="kt">void</span> <span class="n">KeyExpansion</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">,</span> <span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">Key</span><span class="p">)</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">KeyExpansion</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">RoundKey</span><span class="p">,</span> <span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">Key</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">unsigned</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
   <span class="kt">uint8_t</span> <span class="n">tempa</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span> <span class="c1">// Used for the column/row operations</span>
@@ -847,7 +848,7 @@
 </ol>
 
 <h3>CBC加密代码</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">CRYPTO_cbc128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">CRYPTO_cbc128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
                            <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
                            <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ivec</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">block128_f</span> <span class="n">block</span><span class="p">)</span>
 <span class="p">{</span>
@@ -883,7 +884,7 @@
 <p>看公式可以发现和CBC很像。</p>
 
 <h3>CFB加密代码</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">CRYPTO_cfb128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">CRYPTO_cfb128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
                            <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
                            <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ivec</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="kt">int</span> <span class="o">*</span><span class="n">num</span><span class="p">,</span>
                            <span class="kt">int</span> <span class="n">enc</span><span class="p">,</span> <span class="n">block128_f</span> <span class="n">block</span><span class="p">)</span>
@@ -938,7 +939,7 @@
 <p>(from <a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation">wiki</a>)</p>
 
 <h3>OFB加密代码</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">CRYPTO_ofb128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">CRYPTO_ofb128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
                            <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
                            <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ivec</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="kt">int</span> <span class="o">*</span><span class="n">num</span><span class="p">,</span> <span class="n">block128_f</span> <span class="n">block</span><span class="p">)</span>
 <span class="p">{</span>
@@ -994,7 +995,7 @@
 <p>从图中就可以看出，CTR模式每个块之间的加密是解耦的，于是就有了并行计算的可能性。</p>
 
 <h3>CTR加密代码</h3>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">void</span> <span class="nf">CRYPTO_ctr128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">CRYPTO_ctr128_encrypt</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">,</span>
                            <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
                            <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ivec</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span>
                            <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ecount_buf</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span><span class="n">num</span><span class="p">,</span>
@@ -1062,7 +1063,7 @@
 <p><img src="../images/2018.8/xts.png" alt="xts.png"></p>
 
 <p>XEX或XTS的特点还有双key双加密算法，下面是openSSL关于XTS的代码：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">struct</span> <span class="nc">xts128_context</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">xts128_context</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">key1</span><span class="p">,</span> <span class="o">*</span><span class="n">key2</span><span class="p">;</span>
     <span class="n">block128_f</span> <span class="n">block1</span><span class="p">,</span> <span class="n">block2</span><span class="p">;</span>
 <span class="p">};</span>

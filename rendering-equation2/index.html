@@ -99,7 +99,7 @@
 <p><img src="../images/2016.7/14.png" alt="14.png"></p>
 
 <p>这个图怎么用到程序里呢？方法就是打表，图中有3个函数\( \hat {x}(\lambda ) 、 \hat {y}(\lambda ) 、 \hat {z}(\lambda )\)，可以建立4个数组来表示：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">//切片数</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">//切片数</span>
 <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">nCIESamples</span> <span class="o">=</span> <span class="mi">471</span><span class="p">;</span>
 
 <span class="c1">//存了λ值的数组，范围是从360到830，即可见光波段</span>
@@ -113,44 +113,47 @@
 
 <span class="c1">//hat(x)函数</span>
 <span class="k">extern</span> <span class="k">const</span> <span class="n">Float</span> <span class="n">CIE_X</span><span class="p">[</span><span class="n">nCIESamples</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mf">0.0001299000f</span><span class="p">,</span>   <span class="mf">0.0001458470f</span><span class="p">,</span>   <span class="mf">0.0001638021f</span><span class="p">,</span>   <span class="mf">0.0001840037f</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">.</span><span class="mo">00012</span><span class="mi">99000</span><span class="n">f</span><span class="p">,</span>   <span class="mi">0</span><span class="p">.</span><span class="mo">000145</span><span class="mi">8470</span><span class="n">f</span><span class="p">,</span>   <span class="mi">0</span><span class="p">.</span><span class="mo">000163</span><span class="mi">8021</span><span class="n">f</span><span class="p">,</span>   <span class="mi">0</span><span class="p">.</span><span class="mo">0001</span><span class="mi">840037</span><span class="n">f</span><span class="p">,</span>
     <span class="err">······</span>
-    <span class="mf">0.000001439440f</span><span class="p">,</span> <span class="mf">0.000001341977f</span><span class="p">,</span> <span class="mf">0.000001251141f</span>
+    <span class="mi">0</span><span class="p">.</span><span class="mo">00000143</span><span class="mi">9440</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">000001341</span><span class="mi">977</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">000001251141</span><span class="n">f</span>
 <span class="p">};</span>
 
 <span class="c1">//hat(y)函数</span>
 <span class="k">extern</span> <span class="k">const</span> <span class="n">Float</span> <span class="n">CIE_Y</span><span class="p">[</span><span class="n">nCIESamples</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mf">0.000003917000f</span><span class="p">,</span><span class="mf">0.000004393581f</span><span class="p">,</span>  <span class="mf">0.000004929604f</span><span class="p">,</span> <span class="mf">0.000005532136f</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">.</span><span class="mo">000003</span><span class="mi">917000</span><span class="n">f</span><span class="p">,</span><span class="mi">0</span><span class="p">.</span><span class="mo">0000043</span><span class="mi">93581</span><span class="n">f</span><span class="p">,</span>  <span class="mi">0</span><span class="p">.</span><span class="mo">000004</span><span class="mi">929604</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">000005532136</span><span class="n">f</span><span class="p">,</span>
     <span class="err">······</span>
-    <span class="mf">0.0000005198080f</span><span class="p">,</span> <span class="mf">0.0000004846123f</span><span class="p">,</span> <span class="mf">0.0000004518100f</span>
+    <span class="mi">0</span><span class="p">.</span><span class="mo">00000051</span><span class="mi">98080</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">0000004</span><span class="mi">846123</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">000000451</span><span class="mi">8100</span><span class="n">f</span>
 <span class="p">};</span>
 
 <span class="c1">//hat(z)函数</span>
 <span class="k">extern</span> <span class="k">const</span> <span class="n">Float</span> <span class="n">CIE_Z</span><span class="p">[</span><span class="n">nCIESamples</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mf">0.0006061000f</span><span class="p">,</span> <span class="mf">0.0006808792f</span><span class="p">,</span> <span class="mf">0.0007651456f</span><span class="p">,</span> <span class="mf">0.0008600124f</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">.</span><span class="mo">0006061000</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">0006</span><span class="mi">808792</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">0007651456</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">000</span><span class="mi">8600124</span><span class="n">f</span><span class="p">,</span>
     <span class="err">······</span>
-    <span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span>
+    <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span>
 <span class="p">};</span>
+
 </code></pre></div>
 <p>因为\( \hat {x}(\lambda ) 、 \hat {y}(\lambda ) 、 \hat {z}(\lambda )\)是常量（和万有引力常数一样的常数）,所以上面的4个数组只需要制作一次就行了，然后可以把它们硬编码到你的程序里(pbrt就是这么干的)。</p>
 
 <h2>SPD数据源</h2>
 
 <p>SPD数据源如何获得暂且不提，这里关注的是SPD数据源的存放格式：它应该是一个序列，序列中的元素是一个tuple，tuple里存了2个元素，一是λ值，二是v值，代表眼睛-光谱敏感度(spectral sensitivity)，后者一般是一个单位化的值(0.0到1.0之间):</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">//n由数据提供方给出</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="c1">//n由数据提供方给出</span>
 <span class="n">Float</span> <span class="n">SPD</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>  <span class="o">=</span> <span class="p">[</span>
     <span class="err">λ</span><span class="p">,</span> <span class="n">v</span>
     <span class="err">···</span>
 <span class="p">];</span>
+
 </code></pre></div>
 <h2>从SPD转换到XYZ到RGB</h2>
 
 <p>先贴上pbrt的实现代码：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">//pbrt-v2</span>
-<span class="k">static</span> <span class="n">RGBSpectrum</span> <span class="n">FromSampled</span><span class="p">(</span><span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">lambda</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">//pbrt-v2</span>
+<span class="k">static</span> <span class="n">RGBSpectrum</span> <span class="nf">FromSampled</span><span class="p">(</span><span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">lambda</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">//part I</span>
     <span class="kt">float</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">};</span>
-    <span class="kt">float</span> <span class="n">yint</span> <span class="o">=</span> <span class="mf">0.f</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">yint</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="n">f</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nCIESamples</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">yint</span> <span class="o">+=</span> <span class="n">CIE_Y</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
         <span class="kt">float</span> <span class="n">val</span> <span class="o">=</span> <span class="n">InterpolateSpectrumSamples</span><span class="p">(</span><span class="n">lambda</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span>
@@ -164,8 +167,9 @@
     <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">yint</span><span class="p">;</span>
     <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="n">yint</span><span class="p">;</span>
     <span class="c1">//part III</span>
-    <span class="k">return</span> <span class="nf">FromXYZ</span><span class="p">(</span><span class="n">xyz</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">FromXYZ</span><span class="p">(</span><span class="n">xyz</span><span class="p">);</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>该函数的参数分别是SPD曲线的λ值、v值、λ-v对数(即采样次数)，这3者确定了一条离散的SPD曲线；该函数的返回值就是一个RGB值。</p>
 
@@ -190,30 +194,33 @@
 <p><img src="../images/2016.7/17.png" alt="17.png"></p>
 
 <p>对应的代码如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kr">inline</span> <span class="kt">void</span> <span class="n">XYZToRGB</span><span class="p">(</span><span class="k">const</span> <span class="n">Float</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">Float</span> <span class="n">rgb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="p">{</span>
-    <span class="n">rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.240479f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.537150f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.498535f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-    <span class="n">rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">-0.969256f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.875991f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.041556f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-    <span class="n">rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.055648f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.204043f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.057311f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="kr">inline</span> <span class="kt">void</span> <span class="nf">XYZToRGB</span><span class="p">(</span><span class="k">const</span> <span class="n">Float</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">Float</span> <span class="n">rgb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="p">{</span>
+    <span class="n">rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">.</span><span class="mi">240479</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">.</span><span class="mi">537150</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mi">498535</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="n">rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">969256</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">.</span><span class="mi">875991</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mo">041556</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="n">rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mo">05564</span><span class="mi">8</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mi">204043</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">.</span><span class="mo">057311</span><span class="n">f</span> <span class="o">*</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>注意，这里得到的RGB是线性空间的RGB，并没有做gamma校正。gamma校正的公式如下:</p>
 
 <p><img src="../images/2016.7/21.png" alt="21.png"></p>
 
 <p>gamma校正应放在【线性空间】到【非线性空间】的转换时做，也就是最后输出时。</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">//gamma校正</span>
-<span class="kr">inline</span> <span class="n">Float</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">Float</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">0.0031308f</span><span class="p">)</span> <span class="k">return</span> <span class="mf">12.92f</span> <span class="o">*</span> <span class="n">value</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mf">1.055f</span> <span class="o">*</span> <span class="n">std</span><span class="o">::</span><span class="n">pow</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Float</span><span class="p">)(</span><span class="mf">1.f</span> <span class="o">/</span> <span class="mf">2.4f</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055f</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="c1">//gamma校正</span>
+<span class="kr">inline</span> <span class="n">Float</span> <span class="nf">GammaCorrect</span><span class="p">(</span><span class="n">Float</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">.</span><span class="mo">003130</span><span class="mi">8</span><span class="n">f</span><span class="p">)</span> <span class="k">return</span> <span class="mi">12</span><span class="p">.</span><span class="mi">92</span><span class="n">f</span> <span class="o">*</span> <span class="n">value</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">.</span><span class="mo">055</span><span class="n">f</span> <span class="o">*</span> <span class="n">std</span><span class="o">::</span><span class="n">pow</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Float</span><span class="p">)(</span><span class="mi">1</span><span class="p">.</span><span class="n">f</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="p">))</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mo">055</span><span class="n">f</span><span class="p">;</span>
 <span class="p">}</span>
 
 
 <span class="c1">//Clamp函数</span>
-<span class="n">template</span> <span class="o">&lt;</span><span class="n">typename</span> <span class="n">T</span><span class="p">,</span> <span class="n">typename</span> <span class="n">U</span><span class="p">,</span> <span class="n">typename</span> <span class="n">V</span><span class="o">&gt;</span>
-<span class="kr">inline</span> <span class="n">T</span> <span class="n">Clamp</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">,</span> <span class="n">U</span> <span class="n">low</span><span class="p">,</span> <span class="n">V</span> <span class="n">high</span><span class="p">)</span> <span class="p">{</span>
+<span class="n">template</span> <span class="o">&lt;</span><span class="kr">typename</span> <span class="n">T</span><span class="p">,</span> <span class="kr">typename</span> <span class="n">U</span><span class="p">,</span> <span class="kr">typename</span> <span class="n">V</span><span class="o">&gt;</span>
+<span class="kr">inline</span> <span class="n">T</span> <span class="nf">Clamp</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">,</span> <span class="n">U</span> <span class="n">low</span><span class="p">,</span> <span class="n">V</span> <span class="n">high</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">low</span><span class="p">;</span>
-    <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">)</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">high</span><span class="p">;</span>
     <span class="k">else</span>
         <span class="k">return</span> <span class="n">val</span><span class="p">;</span>
@@ -221,9 +228,10 @@
 
 
 <span class="c1">//RGB_linear转成sRGB</span>
-<span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mf">255.f</span> <span class="o">*</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="p">,</span> <span class="mf">0.f</span><span class="p">,</span> <span class="mf">255.f</span><span class="p">);</span>
-<span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mf">255.f</span> <span class="o">*</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="p">,</span> <span class="mf">0.f</span><span class="p">,</span> <span class="mf">255.f</span><span class="p">);</span>
-<span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mf">255.f</span> <span class="o">*</span> <span class="n">GammaCorrect</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="p">,</span> <span class="mf">0.f</span><span class="p">,</span> <span class="mf">255.f</span><span class="p">);</span>
+<span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mi">255</span><span class="p">.</span><span class="n">f</span> <span class="o">*</span> <span class="nf">GammaCorrect</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="n">f</span><span class="p">,</span> <span class="mi">255</span><span class="p">.</span><span class="n">f</span><span class="p">);</span>
+<span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mi">255</span><span class="p">.</span><span class="n">f</span> <span class="o">*</span> <span class="nf">GammaCorrect</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="n">f</span><span class="p">,</span> <span class="mi">255</span><span class="p">.</span><span class="n">f</span><span class="p">);</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span> <span class="n">Clamp</span><span class="p">(</span><span class="mi">255</span><span class="p">.</span><span class="n">f</span> <span class="o">*</span> <span class="nf">GammaCorrect</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="n">f</span><span class="p">,</span> <span class="mi">255</span><span class="p">.</span><span class="n">f</span><span class="p">);</span>
+
 </code></pre></div>
 <h2>参考资料</h2>
 

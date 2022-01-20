@@ -143,7 +143,7 @@ normal的变换并不能直接使用vertex的变换。如果直接使用的话�
 <p>\[ G = (M^{-1})^{T} \]</p>
 
 <p>G就是我们要求的normal matrix，相应的G变换的shader代码就是：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>    <span class="n">G</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">inverse</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">M</span><span class="p">));</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">    <span class="n">G</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">inverse</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">M</span><span class="p">));</span>
 </code></pre></div>
 <p>注意，这里先对mat4的M做了个mat3的操作。这是为了去掉M变换的translation信息（因为normal和position不同，它是个朝向向量）。</p>
 

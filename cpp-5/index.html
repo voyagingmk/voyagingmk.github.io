@@ -98,42 +98,69 @@
 <li>版本1(c++11)</li>
 </ul>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos">1</span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Container</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Index</span><span class="o">&gt;</span>
-<span class="linenos">2</span><span class="k">auto</span> <span class="n">Get</span><span class="p">(</span><span class="n">Container</span><span class="o">&amp;</span> <span class="n">c</span><span class="p">,</span> <span class="n">Index</span> <span class="n">i</span><span class="p">)</span>
-<span class="linenos">3</span><span class="o">-&gt;</span> <span class="k">decltype</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-<span class="linenos">4</span><span class="p">{</span>
-<span class="linenos">5</span>    <span class="k">return</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-<span class="linenos">6</span><span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Container</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Index</span><span class="p">&gt;</span>
+<span class="k">auto</span> <span class="nf">Get</span><span class="p">(</span><span class="n">Container</span><span class="o">&amp;</span> <span class="n">c</span><span class="p">,</span> <span class="n">Index</span> <span class="n">i</span><span class="p">)</span>
+<span class="o">-&gt;</span> <span class="k">decltype</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <ul>
 <li>版本2(c++11)</li>
 </ul>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos">1</span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Container</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Index</span><span class="o">&gt;</span>
-<span class="linenos">2</span><span class="k">auto</span> <span class="n">Get</span><span class="p">(</span><span class="n">Container</span><span class="o">&amp;</span> <span class="n">c</span><span class="p">,</span> <span class="n">Index</span> <span class="n">i</span><span class="p">)</span>
-<span class="linenos">3</span><span class="p">{</span>
-<span class="linenos">4</span>    <span class="k">return</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-<span class="linenos">5</span><span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Container</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Index</span><span class="p">&gt;</span>
+<span class="k">auto</span> <span class="nf">Get</span><span class="p">(</span><span class="n">Container</span><span class="o">&amp;</span> <span class="n">c</span><span class="p">,</span> <span class="n">Index</span> <span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <ul>
 <li>版本3(c++14)</li>
 </ul>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos">1</span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Container</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Index</span><span class="o">&gt;</span>
-<span class="linenos">2</span><span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">Get</span><span class="p">(</span><span class="n">Container</span><span class="o">&amp;</span> <span class="n">c</span><span class="p">,</span> <span class="n">Index</span> <span class="n">i</span><span class="p">)</span>
-<span class="linenos">3</span><span class="p">{</span>
-<span class="linenos">4</span>    <span class="k">return</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-<span class="linenos">5</span><span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Container</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Index</span><span class="p">&gt;</span>
+<span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">Get</span><span class="p">(</span><span class="n">Container</span><span class="o">&amp;</span> <span class="n">c</span><span class="p">,</span> <span class="n">Index</span> <span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <p>能搞懂这3者的区别吗？如果不能的话，实际编译测试下吧，用下面这段代码即可：</p>
 
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="linenos">1</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos">2</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">99</span><span class="p">;</span>
-<span class="linenos">3</span>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">arr</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span> <span class="p">};</span>
-<span class="linenos">4</span>    <span class="k">decltype</span><span class="p">(</span><span class="n">Get</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
-<span class="linenos">5</span>    <span class="n">Get</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">6</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">7</span><span class="p">}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">99</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">arr</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span> <span class="p">};</span>
+    <span class="k">decltype</span><span class="p">(</span><span class="n">Get</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+    <span class="n">Get</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></figure>
 
 <p>编译结果是：</p>
 

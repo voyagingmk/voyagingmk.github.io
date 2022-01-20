@@ -159,7 +159,8 @@
 <h2>两种Diffuse的实现代码</h2>
 
 <p>第一份是从Filament里扒的：</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">float</span> <span class="nf">Fd_Lambert</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="kt">float</span> <span class="nf">Fd_Lambert</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">PI</span><span class="p">;</span>
 <span class="p">}</span>
 
@@ -168,7 +169,7 @@
 <span class="p">}</span>
 
 <span class="kt">float</span> <span class="nf">Fd_Burley</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">,</span> <span class="kt">float</span> <span class="n">LoH</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// Burley 2012, &quot;Physically-Based Shading at Disney&quot;</span>
+    <span class="c1">// Burley 2012, "Physically-Based Shading at Disney"</span>
     <span class="kt">float</span> <span class="n">f90</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">roughness</span> <span class="o">*</span> <span class="n">LoH</span> <span class="o">*</span> <span class="n">LoH</span><span class="p">;</span>
     <span class="kt">float</span> <span class="n">lightScatter</span> <span class="o">=</span> <span class="n">F_Schlick</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">f90</span><span class="p">,</span> <span class="n">NoL</span><span class="p">);</span>
     <span class="kt">float</span> <span class="n">viewScatter</span>  <span class="o">=</span> <span class="n">F_Schlick</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">f90</span><span class="p">,</span> <span class="n">NoV</span><span class="p">);</span>
@@ -176,12 +177,12 @@
 <span class="p">}</span>
 
 <span class="kt">float</span> <span class="nf">diffuse</span><span class="p">(</span><span class="kt">float</span> <span class="n">roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">,</span> <span class="kt">float</span> <span class="n">LoH</span><span class="p">)</span> <span class="p">{</span>
-<span class="cp">#if BRDF_DIFFUSE == DIFFUSE_LAMBERT</span>
-    <span class="k">return</span> <span class="n">Fd_Lambert</span><span class="p">();</span>
-<span class="cp">#elif BRDF_DIFFUSE == DIFFUSE_BURLEY</span>
-    <span class="k">return</span> <span class="n">Fd_Burley</span><span class="p">(</span><span class="n">roughness</span><span class="p">,</span> <span class="n">NoV</span><span class="p">,</span> <span class="n">NoL</span><span class="p">,</span> <span class="n">LoH</span><span class="p">);</span>
-<span class="cp">#endif</span>
-<span class="p">}</span>
+<span class="cp">#if BRDF_DIFFUSE == DIFFUSE_LAMBERT
+</span>    <span class="k">return</span> <span class="n">Fd_Lambert</span><span class="p">();</span>
+<span class="cp">#elif BRDF_DIFFUSE == DIFFUSE_BURLEY
+</span>    <span class="k">return</span> <span class="n">Fd_Burley</span><span class="p">(</span><span class="n">roughness</span><span class="p">,</span> <span class="n">NoV</span><span class="p">,</span> <span class="n">NoL</span><span class="p">,</span> <span class="n">LoH</span><span class="p">);</span>
+<span class="cp">#endif
+</span><span class="p">}</span>
 
 <span class="c1">// diffuseLobe返回该像素点真正的diffuse color</span>
 <span class="c1">// pixel.diffuseColor即albedo</span>
@@ -190,13 +191,15 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>这个是从知乎找的精简版：</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="n">float3</span> <span class="nf">Diffuse_Burley_Disney</span><span class="p">(</span> <span class="n">float3</span> <span class="n">albedo</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">,</span> <span class="kt">float</span> <span class="n">VoH</span> <span class="p">)</span> 
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="n">float3</span> <span class="nf">Diffuse_Burley_Disney</span><span class="p">(</span> <span class="n">float3</span> <span class="n">albedo</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Roughness</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoV</span><span class="p">,</span> <span class="kt">float</span> <span class="n">NoL</span><span class="p">,</span> <span class="kt">float</span> <span class="n">VoH</span> <span class="p">)</span> 
 <span class="p">{</span> 
        <span class="kt">float</span> <span class="n">FD90</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">VoH</span> <span class="o">*</span> <span class="n">VoH</span> <span class="o">*</span> <span class="n">Roughness</span><span class="p">;</span> 
        <span class="kt">float</span> <span class="n">FdV</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">FD90</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pow5</span><span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">NoV</span> <span class="p">);</span> 
        <span class="kt">float</span> <span class="n">FdL</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">FD90</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pow5</span><span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">NoL</span> <span class="p">);</span> 
        <span class="k">return</span> <span class="n">albedo</span> <span class="o">*</span> <span class="p">(</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">PI</span><span class="p">)</span> <span class="o">*</span> <span class="n">FdV</span> <span class="o">*</span> <span class="n">FdL</span> <span class="p">);</span> 
 <span class="p">}</span> 
+
 </code></pre></div>
     </div>
     <div class="entry">

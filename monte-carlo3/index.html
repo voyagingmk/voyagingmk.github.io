@@ -101,23 +101,23 @@
 <p>于是PI的值等于内接圆面积占比乘以4。</p>
 
 <p>内接圆面积未知（不能用公式哦，PI是未知数），但根据圆的定义和半径，可以判定正方形内任意一点是不是在圆内，于是可以用撒点法估算圆面积占比。撒的点必然在正方形内，所以分母是撒点总数；点是否在圆内，需要算一下点到圆边距离是否小于半径，在圆内的点的数量作为分子，就可以估算面积比了。</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">random</span>
 
 <span class="k">def</span> <span class="nf">random_range</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">minv</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">maxv</span> <span class="o">-</span> <span class="n">minv</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">minv</span> <span class="o">+</span> <span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">maxv</span> <span class="o">-</span> <span class="n">minv</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">N</span> <span class="o">=</span> <span class="mi">10000</span>
     <span class="n">inside_circle</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">random_range</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="n">inside_circle</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="nb">print</span> <span class="s2">&quot;Estimate of Pi = &quot;</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">inside_circle</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"Estimate of Pi = "</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">inside_circle</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
 <span class="n">main</span><span class="p">()</span>
-<span class="c1"># Estimate of Pi =  3.144</span>
-</code></pre></div>
+<span class="c1"># Estimate of Pi =  3.144
+</span></code></pre></div>
 <h2>Law of Diminishing Returns 边际收益递减规律</h2>
 
 <p>上面的代码里N的值越大，估算的PI越准。但是随着撒的点越来越多，后面撒的点对PI的估算值的影响越来越小，也就是说前面撒的点对估算值影响会更大一些。价值是不等的。</p>
@@ -127,12 +127,12 @@
 <p>（学过TAA技术的话，对jitter就很熟悉了。）</p>
 
 <p>上面的代码里样本是全随机分布的，如果不采取全随机，而是用别的分布方式，是不是可以使得收敛速度加快呢？答案是肯定的。</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">sqrt_N</span> <span class="o">=</span> <span class="mi">1000</span>
     <span class="n">inside_circle</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">inside_circle_stratified</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">sqrt_N</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">sqrt_N</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">sqrt_N</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">sqrt_N</span><span class="p">):</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">random_range</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
                 <span class="n">inside_circle</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -142,13 +142,13 @@
             <span class="k">if</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
                 <span class="n">inside_circle_stratified</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="nb">print</span> <span class="s2">&quot;Estimate of Pi = &quot;</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">inside_circle</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">sqrt_N</span> <span class="o">*</span> <span class="n">sqrt_N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"Estimate of Pi = "</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">inside_circle</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">sqrt_N</span> <span class="o">*</span> <span class="n">sqrt_N</span><span class="p">)</span>
 
-    <span class="nb">print</span> <span class="s2">&quot;Stratified Estimate of Pi = &quot;</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">inside_circle_stratified</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">sqrt_N</span> <span class="o">*</span> <span class="n">sqrt_N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"Stratified Estimate of Pi = "</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">inside_circle_stratified</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">sqrt_N</span> <span class="o">*</span> <span class="n">sqrt_N</span><span class="p">)</span>
 
-<span class="c1">#Estimate of Pi =  3.142428</span>
-<span class="c1">#Stratified Estimate of Pi =  3.141412</span>
-</code></pre></div>
+<span class="c1">#Estimate of Pi =  3.142428
+#Stratified Estimate of Pi =  3.141412
+</span></code></pre></div>
 <p>可以看到，同样数量样本，分层的结果优于全随机的结果。意味着收敛速度也是更优的。</p>
 
 <p>but，这个优势会随着维度的增加而递减，例如把上面的代码应用到3D的球和正方体，用体积占比算PI。(维度的诅咒)</p>
@@ -166,7 +166,7 @@
 <p>即积分等于平均值乘以上下界之差。</p>
 
 <p>第三条公式直接翻译成代码，验证一下：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
 
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -174,14 +174,14 @@
         <span class="n">x</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;I=&#39;</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'I='</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
-<span class="c1"># I= 2.6686846395</span>
-</code></pre></div>
+<span class="c1"># I= 2.6686846395
+</span></code></pre></div>
 <p>手动推导x的平方的定积分，可以得到 8 / 3 = 2.666667，和上面代码的结果一致。</p>
 
 <p>当定义域不是[0,2]，而是任意的[a,b]时：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
 
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -189,14 +189,14 @@
         <span class="n">x</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;I=&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'I='</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
 <span class="n">main</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-<span class="c1">#I= 291.390411702</span>
-</code></pre></div>
+<span class="c1">#I= 291.390411702
+</span></code></pre></div>
 <p>根据解析式算定积分验证一下：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="mi">10</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">=</span> <span class="mf">291.66666666666663</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="mi">10</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">=</span> <span class="mf">291.66666666666663</span>
 </code></pre></div>
 <p>也是正确的。</p>
 
@@ -263,35 +263,37 @@
 <p>融入pdf后，可以对样本分布更多的区间，设置更低的采样权重。反比关系。</p>
 
 <p>重点要理解的是，<strong>样本的分布方式不会影响蒙特卡罗积分的结果</strong>。例如以下算x的平方积分的蒙特卡罗积分代码，用了2种不同的pdf，但结果是一样的：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">non_uniform_pdf</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python">
+<span class="k">def</span> <span class="nf">non_uniform_pdf</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x</span> <span class="c1"># 小p</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x</span> <span class="c1"># 小p
+</span>    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">))</span> <span class="c1">#根据小p推导出来的随机公式</span>
-        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">math</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">))</span> <span class="c1">#根据小p推导出来的随机公式
+</span>        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;non_uniform_pdf I=&#39;</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'non_uniform_pdf I='</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">uniform_pdf</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.5</span> <span class="c1"># 小p = 1/(b - a) = 1/(2.0 - 0.0) = 0.5</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="c1"># 小p = 1/(b - a) = 1/(2.0 - 0.0) = 0.5
+</span>    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="c1"># 均匀分布，和main一样纯随机</span>
-        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="c1"># 均匀分布，和main一样纯随机
+</span>        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;uniform_pdf I=&#39;</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'uniform_pdf I='</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
 
 <span class="n">non_uniform_pdf</span><span class="p">()</span>
 
 <span class="n">uniform_pdf</span><span class="p">()</span>
 
-<span class="c1">#non_uniform_pdf I= 2.67219787915</span>
-<span class="c1">#uniform_pdf I= 2.66518526348</span>
+<span class="c1">#non_uniform_pdf I= 2.67219787915
+#uniform_pdf I= 2.66518526348
+</span>
 </code></pre></div>
 <p>用non uniform的pdf分布做蒙特卡罗积分，这就是图形学中所谓的<strong>重要性采样</strong>了。</p>
 
@@ -308,7 +310,7 @@
 <p>\[ P^{-1}(x) = (8x)^{\frac{1}{3}} \]</p>
 
 <p>代码和结果如下：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">non_uniform_pdf2</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">non_uniform_pdf2</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">8</span>
     <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
@@ -317,10 +319,10 @@
         <span class="n">x</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">random_range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;non_uniform_pdf2 I=&#39;</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'non_uniform_pdf2 I='</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
-<span class="c1">#non_uniform_pdf2 I= 2.66666666666</span>
-</code></pre></div>
+<span class="c1">#non_uniform_pdf2 I= 2.66666666666
+</span></code></pre></div>
 <p>小结一下:</p>
 
 <ul>
@@ -331,39 +333,39 @@
 <h3>如果定积分范围变了呢</h3>
 
 <p>还是上面的x平方求积分的例子，但如果改变定积分范围，从[0,2]改成[0,1]，再次用蒙特卡罗积分+pdf求解时，pdf是要<strong>同步更新</strong>的，例如还是用uniform pdf：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">uniform_pdf</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">uniform_pdf</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">1.0</span> <span class="c1"># 1.0 / ( 1.0 - 0.0) = 1.0</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="c1"># 1.0 / ( 1.0 - 0.0) = 1.0
+</span>    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;uniform_pdf I=&#39;</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s1">&#39;x^3/3 =&#39;</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">**</span> <span class="mi">3</span><span class="o">/</span><span class="mf">3.0</span>
+    <span class="k">print</span> <span class="s">'uniform_pdf I='</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'x^3/3 ='</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">**</span> <span class="mi">3</span><span class="o">/</span><span class="mf">3.0</span>
 
-<span class="c1">#uniform_pdf I= 0.333199982803</span>
-<span class="c1">#x^3/3 = 0.333333333333</span>
-</code></pre></div>
+<span class="c1">#uniform_pdf I= 0.333199982803
+#x^3/3 = 0.333333333333
+</span></code></pre></div>
 <h3>pdf是否可以大于1？</h3>
 
 <p>是可以大于1的：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">uniform_pdf</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">uniform_pdf</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">2.0</span> <span class="c1"># 1.0 / ( 0.5 - 0.0) = 2.0</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
+        <span class="k">return</span> <span class="mf">2.0</span> <span class="c1"># 1.0 / ( 0.5 - 0.0) = 2.0
+</span>    <span class="n">N</span> <span class="o">=</span> <span class="mi">100000</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">random_range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-    <span class="nb">print</span> <span class="s1">&#39;uniform_pdf I=&#39;</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s1">&#39;x^3/3 =&#39;</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">**</span> <span class="mi">3</span><span class="o">/</span><span class="mf">3.0</span>
+    <span class="k">print</span> <span class="s">'uniform_pdf I='</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'x^3/3 ='</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">**</span> <span class="mi">3</span><span class="o">/</span><span class="mf">3.0</span>
 
-<span class="c1">#uniform_pdf I= 0.0418766074159</span>
-<span class="c1">#x^3/3 = 0.0416666666667</span>
-</code></pre></div>
+<span class="c1">#uniform_pdf I= 0.0418766074159
+#x^3/3 = 0.0416666666667
+</span></code></pre></div>
 <h3>pdf是否可以小于0？</h3>
 
 <p>pdf不可能小于0，因为定积分上界减上界必然是正数。</p>
@@ -399,23 +401,23 @@
 <p>\[ = \frac {4\pi }{3} \]</p>
 
 <p>两种方法都跑一下对比看看。用蒙特卡罗和pdf求解的代码如下：</p>
-<div class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="k">def</span> <span class="nf">sphere</span><span class="p">():</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">sphere</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">math</span><span class="p">.</span><span class="n">pi</span><span class="p">)</span>
     <span class="n">N</span> <span class="o">=</span> <span class="mi">1000000</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">random_unit_vector</span><span class="p">()</span>
         <span class="n">cosine_squared</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">cosine_squared</span> <span class="o">/</span> <span class="n">pdf</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s2">&quot;sphere I = &quot;</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> 
-    <span class="nb">print</span> <span class="s2">&quot;sphere 4 * pi /3 = &quot;</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> 
+    <span class="k">print</span> <span class="s">"sphere I = "</span><span class="p">,</span> <span class="nb">sum</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> 
+    <span class="k">print</span> <span class="s">"sphere 4 * pi /3 = "</span><span class="p">,</span> <span class="n">math</span><span class="p">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> 
 
 
 <span class="n">sphere</span><span class="p">()</span>
-<span class="c1">#sphere I =  4.18595873614        </span>
-<span class="c1">#sphere 4 * pi /3 =  4.18879020479</span>
-</code></pre></div>
+<span class="c1">#sphere I =  4.18595873614        
+#sphere 4 * pi /3 =  4.18879020479
+</span></code></pre></div>
 <h2>球面蒙特卡罗积分 + non-uniform pdf</h2>
 
 <p>在渲染中，根据材质的不同，对某些球面方向我们希望采样多一些，某些方向少一些，这就需要non-uniform pdf。</p>

@@ -337,17 +337,17 @@ GJK各种实现
 <h2><div id="2.1">划重点：来自wiki的GJK伪代码</div></h2>
 
 <p>经过查阅大量资料，发现还是wiki对GJK的解释一语中的，所以下面介绍下wiki给出的GJK伪代码：</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="kd">function</span> <span class="nx">GJK_intersection</span><span class="p">(</span><span class="nx">shape</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">shape</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">vector</span> <span class="nx">D</span><span class="p">)</span><span class="o">:</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">GJK_intersection</span><span class="p">(</span><span class="nx">shape</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">shape</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">vector</span> <span class="nx">D</span><span class="p">):</span>
     <span class="nx">vector</span>  <span class="nx">A</span> <span class="o">=</span> <span class="nx">Support</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">-</span> <span class="nx">Support</span><span class="p">(</span><span class="nx">q</span><span class="p">,</span> <span class="o">-</span><span class="nx">D</span><span class="p">)</span>
     <span class="nx">simplex</span> <span class="nx">s</span> <span class="o">=</span> <span class="p">{</span><span class="nx">A</span><span class="p">}</span>
     <span class="nx">D</span> <span class="o">=</span> <span class="o">-</span><span class="nx">A</span>
-    <span class="nx">loop</span><span class="o">:</span>
+    <span class="nx">loop</span><span class="p">:</span>
         <span class="nx">A</span> <span class="o">=</span> <span class="nx">Support</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">-</span> <span class="nx">Support</span><span class="p">(</span><span class="nx">q</span><span class="p">,</span> <span class="o">-</span><span class="nx">D</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nx">dot</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0</span><span class="o">:</span>
+        <span class="k">if</span> <span class="nx">dot</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">D</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
           <span class="nx">reject</span>
         <span class="nx">s</span> <span class="o">=</span> <span class="nx">s</span> <span class="err">∪</span> <span class="nx">A</span>
         <span class="nx">s</span><span class="p">,</span> <span class="nx">D</span><span class="p">,</span> <span class="nx">contains_origin</span> <span class="o">=</span> <span class="nx">NearestSimplex</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nx">contains_origin</span><span class="o">:</span>
+        <span class="k">if</span> <span class="nx">contains_origin</span><span class="p">:</span>
           <span class="nx">accept</span>
 </code></pre></div>
 <p>这份代码准确描述了<strong>原始</strong>GJK的核心逻辑：<strong>只需要输入2个shape和一个初始方向，就能告诉你这2个shape有没碰撞</strong></p>
@@ -381,7 +381,7 @@ GJK各种实现
 <p>可以把上面的第二个support改名为supprot2，方便区分。supprot2其实是对supprot的一层封装。</p>
 
 <p>先介绍support。用伪代码表示：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// wiki：returns the point on shape which has the highest dot product with d</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// wiki：returns the point on shape which has the highest dot product with d</span>
 <span class="c1">// 即找出shape里的一个点，把这个点投影到d方向向量上，它离原点的距离最大（要区分正负）</span>
 <span class="n">Point</span> <span class="nf">support</span><span class="p">(</span><span class="n">Shape</span><span class="o">&amp;</span> <span class="n">shape</span><span class="p">,</span> <span class="n">Vector</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// 具体实现可以自行设计，这里展示的是暴力遍历算法，brute-force</span>
@@ -401,7 +401,7 @@ GJK各种实现
 <p>support的返回值，就是所谓的supporting point。</p>
 
 <p>有了support，就可以实现supprot2了：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="c1">// 给定2个静态几何形状和一个方向向量，求出经过Minkowski减法运算得到的点（唯一）</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// 给定2个静态几何形状和一个方向向量，求出经过Minkowski减法运算得到的点（唯一）</span>
 <span class="n">Point</span> <span class="nf">support2</span><span class="p">(</span><span class="n">Shape</span><span class="o">&amp;</span> <span class="n">shape1</span><span class="p">,</span> <span class="n">Shape</span><span class="o">&amp;</span> <span class="n">shape2</span><span class="p">,</span> <span class="n">Vector</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// 沿着d方向找出shape1中最远的点p1</span>
   <span class="n">Point</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">support</span><span class="p">(</span><span class="n">shape1</span><span class="p">,</span> <span class="n">d</span><span class="p">);</span>
@@ -469,7 +469,7 @@ GJK各种实现
 <p>下面将精简b2Distance代码（去掉了Simplex Cache、input-&gt;useRadii等），只保留和GJK相关的，来方便读者理解b2Distance。</p>
 
 <h2><div id="3.1">b2Distance核心逻辑</div></h2>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="nf">b2Distance</span><span class="p">(</span><span class="n">b2DistanceOutput</span><span class="o">*</span> <span class="n">output</span><span class="p">,</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">b2Distance</span><span class="p">(</span><span class="n">b2DistanceOutput</span><span class="o">*</span> <span class="n">output</span><span class="p">,</span>
                 <span class="n">b2SimplexCache</span><span class="o">*</span> <span class="n">cache</span><span class="p">,</span>
                 <span class="k">const</span> <span class="n">b2DistanceInput</span><span class="o">*</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
@@ -503,18 +503,18 @@ GJK各种实现
     <span class="c1">// 根据当前的单纯形拥有的顶点数量，选择不同的处理流程</span>
         <span class="k">switch</span> <span class="p">(</span><span class="n">simplex</span><span class="p">.</span><span class="n">m_count</span><span class="p">)</span>
         <span class="p">{</span>
-        <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+        <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">break</span><span class="p">;</span>
 
-        <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+        <span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">simplex</span><span class="p">.</span><span class="n">Solve2</span><span class="p">();</span>
             <span class="k">break</span><span class="p">;</span>
 
-        <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+        <span class="k">case</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">simplex</span><span class="p">.</span><span class="n">Solve3</span><span class="p">();</span>
             <span class="k">break</span><span class="p">;</span>
 
-        <span class="k">default</span><span class="o">:</span>
+        <span class="nl">default:</span>
             <span class="n">b2Assert</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
         <span class="p">}</span>
 
@@ -646,54 +646,55 @@ GJK各种实现
 </ul>
 
 <p>理解2D叉积后，GetSearchDirection理解起来就轻松了：</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="c1">// 2D叉积公式</span>
-<span class="kr">inline</span> <span class="n">float32</span> <span class="n">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="c1">// 2D叉积公式</span>
+<span class="kr">inline</span> <span class="n">float32</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">b</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">b</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="c1">// 这2条公式其实是为了得到和a正交的向量，s的值一般为1</span>
 <span class="c1">// b2Cross(a, 1.0)返回一个在a右侧的正交向量</span>
-<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="n">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="n">float32</span> <span class="n">s</span><span class="p">)</span>
+<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="n">float32</span> <span class="n">s</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">return</span> <span class="nf">b2Vec2</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">b2Vec2</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="c1">// b2Cross(1.0, a)返回一个在a左侧的正交向量</span>
-<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">float32</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
+<span class="kr">inline</span> <span class="n">b2Vec2</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="n">float32</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">return</span> <span class="nf">b2Vec2</span><span class="p">(</span><span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">b2Vec2</span><span class="p">(</span><span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span> <span class="o">*</span> <span class="n">a</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="n">b2Vec2</span> <span class="n">GetSearchDirection</span><span class="p">()</span> <span class="k">const</span>
+<span class="n">b2Vec2</span> <span class="nf">GetSearchDirection</span><span class="p">()</span> <span class="k">const</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">m_count</span><span class="p">)</span>
   <span class="p">{</span>
-  <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+  <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
     <span class="c1">// 直接取w1的反方向就行了</span>
     <span class="k">return</span> <span class="o">-</span><span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
 
-  <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+  <span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
     <span class="p">{</span>
       <span class="n">b2Vec2</span> <span class="n">e12</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">.</span><span class="n">w</span> <span class="o">-</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
       <span class="c1">// 计算2D叉积</span>
       <span class="n">float32</span> <span class="n">sgn</span> <span class="o">=</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="o">-</span><span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">);</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">sgn</span> <span class="o">&gt;</span> <span class="mf">0.0f</span><span class="p">)</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">sgn</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
       <span class="p">{</span> 
         <span class="c1">// -m_v1.w在e12左侧，即原点也在左侧</span>
-        <span class="k">return</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">b2Cross</span><span class="p">(</span><span class="mf">1.0</span><span class="n">f</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
       <span class="p">}</span>
       <span class="k">else</span>
       <span class="p">{</span>
         <span class="c1">// -m_v1.w在e12右侧，即原点也在右侧</span>
-        <span class="k">return</span> <span class="nf">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
 
-  <span class="k">default</span><span class="o">:</span>
+  <span class="nl">default:</span>
     <span class="n">b2Assert</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
     <span class="k">return</span> <span class="n">b2Vec2_zero</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span>
+<span class="err">}</span>
 </code></pre></div>
 <h2><div id="3.3">b2Simplex::Solve2</div></h2>
 
@@ -776,7 +777,8 @@ GJK各种实现
 <p>显然不成立。</p>
 
 <p>下面展示的Box2D的Solve2，就用到了说到的这些数学知识。其中，Solve2用d12_2、d12_1的正负来等价表示\( a_1 、a_2 \)的正负。</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve2</span><span class="p">()</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve2</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="n">b2Vec2</span> <span class="n">w1</span> <span class="o">=</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
     <span class="n">b2Vec2</span> <span class="n">w2</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
@@ -784,33 +786,35 @@ GJK各种实现
 
     <span class="c1">// w1 region</span>
     <span class="n">float32</span> <span class="n">d12_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">b2Dot</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d12_2</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d12_2</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="c1">// 根据上面的公式，可知此时a2也是&lt;=0</span>
         <span class="c1">// 所以p在w1区域</span>
         <span class="c1">// 保留w1，干掉w2，单纯形退化成0-simplex</span>
-        <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// w2 region</span>
     <span class="n">float32</span> <span class="n">d12_1</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">w2</span><span class="p">,</span> <span class="n">e12</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="c1">// p在w2区域，那么保留w2，干掉w1，单纯形退化成0-simplex</span>
         <span class="c1">// p在w2区域</span>
-        <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="n">m_v1</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">;</span> <span class="c1">// 保留下来的顶点需要放到数组第一个位置</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="c1">// p必然在w1w2中间了，求出a1、a2，并分别保存进m_v1 m_v2里</span>
-    <span class="n">float32</span> <span class="n">inv_d12</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">+</span> <span class="n">d12_2</span><span class="p">);</span>
+    <span class="n">float32</span> <span class="n">inv_d12</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">+</span> <span class="n">d12_2</span><span class="p">);</span>
     <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d12_1</span> <span class="o">*</span> <span class="n">inv_d12</span><span class="p">;</span>
     <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d12_2</span> <span class="o">*</span> <span class="n">inv_d12</span><span class="p">;</span>
     <span class="n">m_count</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
 <span class="p">}</span>
+
+
 </code></pre></div>
 <h2><div id="3.4">b2Simplex::Solve3</div></h2>
 
@@ -827,7 +831,8 @@ GJK各种实现
 <p>还有就是，因为现在有3个顶点了，质心坐标公式会需要3个参数\( a_1 、a_2 、a_3\)。可以参考Solve2小节的方法，解出3个参数。</p>
 
 <p>（有空再更新解法）</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve3</span><span class="p">()</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="kt">void</span> <span class="n">b2Simplex</span><span class="o">::</span><span class="n">Solve3</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="n">b2Vec2</span> <span class="n">w1</span> <span class="o">=</span> <span class="n">m_v1</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
     <span class="n">b2Vec2</span> <span class="n">w2</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
@@ -860,17 +865,17 @@ GJK各种实现
     <span class="n">float32</span> <span class="n">d123_3</span> <span class="o">=</span> <span class="n">n123</span> <span class="o">*</span> <span class="n">b2Cross</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">);</span>
 
     <span class="c1">// w1 region</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d12_2</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d13_2</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d12_2</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d13_2</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// e12</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&gt;</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d12_2</span> <span class="o">&gt;</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d123_3</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d12_2</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d123_3</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">float32</span> <span class="n">inv_d12</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">+</span> <span class="n">d12_2</span><span class="p">);</span>
+        <span class="n">float32</span> <span class="n">inv_d12</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">+</span> <span class="n">d12_2</span><span class="p">);</span>
         <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d12_1</span> <span class="o">*</span> <span class="n">inv_d12</span><span class="p">;</span>
         <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d12_2</span> <span class="o">*</span> <span class="n">inv_d12</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
@@ -878,9 +883,9 @@ GJK各种实现
     <span class="p">}</span>
 
     <span class="c1">// e13</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d13_1</span> <span class="o">&gt;</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d13_2</span> <span class="o">&gt;</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d123_2</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d13_1</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d13_2</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d123_2</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">float32</span> <span class="n">inv_d13</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d13_1</span> <span class="o">+</span> <span class="n">d13_2</span><span class="p">);</span>
+        <span class="n">float32</span> <span class="n">inv_d13</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d13_1</span> <span class="o">+</span> <span class="n">d13_2</span><span class="p">);</span>
         <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d13_1</span> <span class="o">*</span> <span class="n">inv_d13</span><span class="p">;</span>
         <span class="n">m_v3</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d13_2</span> <span class="o">*</span> <span class="n">inv_d13</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
@@ -889,27 +894,27 @@ GJK各种实现
     <span class="p">}</span>
 
     <span class="c1">// w2 region</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d23_2</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d12_1</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d23_2</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="n">m_v1</span> <span class="o">=</span> <span class="n">m_v2</span><span class="p">;</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// w3 region</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d13_1</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d23_1</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d13_1</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d23_1</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">m_v3</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="n">m_v3</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="n">m_v1</span> <span class="o">=</span> <span class="n">m_v3</span><span class="p">;</span>
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// e23</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">d23_1</span> <span class="o">&gt;</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d23_2</span> <span class="o">&gt;</span> <span class="mf">0.0f</span> <span class="o">&amp;&amp;</span> <span class="n">d123_1</span> <span class="o">&lt;=</span> <span class="mf">0.0f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d23_1</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d23_2</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">d123_1</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">float32</span> <span class="n">inv_d23</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d23_1</span> <span class="o">+</span> <span class="n">d23_2</span><span class="p">);</span>
+        <span class="n">float32</span> <span class="n">inv_d23</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d23_1</span> <span class="o">+</span> <span class="n">d23_2</span><span class="p">);</span>
         <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d23_1</span> <span class="o">*</span> <span class="n">inv_d23</span><span class="p">;</span>
         <span class="n">m_v3</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d23_2</span> <span class="o">*</span> <span class="n">inv_d23</span><span class="p">;</span>
         <span class="n">m_count</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
@@ -918,17 +923,18 @@ GJK各种实现
     <span class="p">}</span>
 
     <span class="c1">// Must be in triangle123</span>
-    <span class="n">float32</span> <span class="n">inv_d123</span> <span class="o">=</span> <span class="mf">1.0f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d123_1</span> <span class="o">+</span> <span class="n">d123_2</span> <span class="o">+</span> <span class="n">d123_3</span><span class="p">);</span>
+    <span class="n">float32</span> <span class="n">inv_d123</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">/</span> <span class="p">(</span><span class="n">d123_1</span> <span class="o">+</span> <span class="n">d123_2</span> <span class="o">+</span> <span class="n">d123_3</span><span class="p">);</span>
     <span class="n">m_v1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d123_1</span> <span class="o">*</span> <span class="n">inv_d123</span><span class="p">;</span>
     <span class="n">m_v2</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d123_2</span> <span class="o">*</span> <span class="n">inv_d123</span><span class="p">;</span>
     <span class="n">m_v3</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">d123_3</span> <span class="o">*</span> <span class="n">inv_d123</span><span class="p">;</span>
     <span class="n">m_count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <h2><div id="3.5">b2DistanceProxy::GetSupport</div></h2>
 
 <p>b2DistanceProxy的GetSupport和上面章节给出的support伪代码，几乎是一样的：</p>
-<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span></span><span class="kr">inline</span> <span class="n">int32</span> <span class="n">b2DistanceProxy</span><span class="o">::</span><span class="n">GetSupport</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="k">const</span>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="kr">inline</span> <span class="n">int32</span> <span class="n">b2DistanceProxy</span><span class="o">::</span><span class="n">GetSupport</span><span class="p">(</span><span class="k">const</span> <span class="n">b2Vec2</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="k">const</span>
 <span class="p">{</span>
     <span class="n">int32</span> <span class="n">bestIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="n">float32</span> <span class="n">bestValue</span> <span class="o">=</span> <span class="n">b2Dot</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">);</span>

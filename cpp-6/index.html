@@ -139,21 +139,25 @@
 <h2>条款10：具有作用域的enum</h2>
 
 <p>写法如下:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">enum</span> <span class="k">class</span> <span class="nc">Color</span> <span class="p">{</span> <span class="n">black</span><span class="p">,</span> <span class="n">white</span><span class="p">,</span> <span class="n">red</span> <span class="p">};</span> <span class="c1">// black, white, red</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">enum</span> <span class="k">class</span> <span class="nc">Color</span> <span class="p">{</span> <span class="n">black</span><span class="p">,</span> <span class="n">white</span><span class="p">,</span> <span class="n">red</span> <span class="p">};</span> <span class="c1">// black, white, red</span>
 <span class="c1">// are scoped to Color</span>
 <span class="k">auto</span> <span class="n">white</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="c1">// fine, no othe</span>
 <span class="n">Color</span> <span class="n">c</span> <span class="o">=</span> <span class="n">white</span><span class="p">;</span> <span class="c1">// error! no enumerator named</span>
-<span class="c1">// &quot;white&quot; is in this scope</span>
+<span class="c1">// "white" is in this scope</span>
 <span class="n">Color</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Color</span><span class="o">::</span><span class="n">white</span><span class="p">;</span> <span class="c1">// fine</span>
 <span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Color</span><span class="o">::</span><span class="n">white</span><span class="p">;</span> <span class="c1">// also fine (and in accord</span>
-<span class="c1">// with Item 5&#39;s advice)</span>
+<span class="c1">// with Item 5's advice)</span>
+
 </code></pre></div>
 <p>我觉得主要好处是避免名空间污染。</p>
 
 <p>c++11还允许给enum指定underlying type：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">enum</span> <span class="k">class</span> <span class="nc">Status</span><span class="o">:</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">;</span> <span class="c1">// underlying type for</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">enum</span> <span class="k">class</span> <span class="nc">Status</span><span class="o">:</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">;</span> <span class="c1">// underlying type for</span>
 <span class="c1">// Status is std::uint32_t</span>
 <span class="c1">// (from &lt;cstdint&gt;)</span>
+
 </code></pre></div>
 <p>意思是，Status的每一个元素都是std::uint32_t类型。缺省类型是int。</p>
 
@@ -162,15 +166,17 @@
 <h2>条款11：新功能：在成员函数声明后面加 = delete</h2>
 
 <p>这样子写:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="nl">public:</span>
     <span class="n">A</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span> <span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
     <span class="n">A</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
 <p>想比c++98的做法(把函数声明为private，并不定义实现)：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
-<span class="k">private</span><span class="o">:</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="nl">private:</span>
     <span class="n">A</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span> <span class="p">);</span>
     <span class="n">A</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">A</span><span class="o">&amp;</span><span class="p">);</span>
 <span class="p">};</span>
@@ -180,27 +186,32 @@
 <p>注意到 = delete声明的函数，是public的，其实是为了让报错内容更准确。想一下，如果 = delete的函数是private，然后这个函数被外部调用，编译器可能只是给出&quot;不能调用private函数&quot;的错误信息。这可能会误导调用者。</p>
 
 <p>= delete的另一个特性是，它并不是只能用在类成员函数，而是任意函数。看这段代码:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="kt">bool</span> <span class="nf">isLucky</span><span class="p">(</span><span class="kt">int</span> <span class="n">number</span><span class="p">);</span> <span class="c1">// original function</span>
-<span class="kt">bool</span> <span class="nf">isLucky</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject chars</span>
-<span class="kt">bool</span> <span class="nf">isLucky</span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject bools</span>
-<span class="kt">bool</span> <span class="nf">isLucky</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject doubles and floats</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
 
-<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error! call to deleted function</span>
+<span class="kt">bool</span> <span class="nf">isLucky</span><span class="p">(</span><span class="kt">int</span> <span class="n">number</span><span class="p">);</span> <span class="c1">// original function</span>
+<span class="kt">bool</span> <span class="n">isLucky</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject chars</span>
+<span class="kt">bool</span> <span class="n">isLucky</span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject bools</span>
+<span class="kt">bool</span> <span class="n">isLucky</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// reject doubles and floats</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="sc">'a'</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error! call to deleted function</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="nb">true</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error!</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="mf">3.5f</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error!</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">isLucky</span><span class="p">(</span><span class="mf">3.5</span><span class="n">f</span><span class="p">))</span> <span class="err">…</span> <span class="c1">// error!</span>
+
 </code></pre></div>
 <p>把后3个函数重载给delete掉，保证了那3种调用方式不能被编译！也就是说，=delete可以用来阻止隐式转换陷阱。</p>
 
 <p>用= delete还有一个高端的好处：在class内部的函数模板，它的访问类型只能是public、protected、private其中一种，不能又有public又有private的实例化，所以c++98的&quot;delete&quot;方案对函数模板没辙。还好，C++11解决了这个问题，用= delete即可：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
     <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">T</span><span class="o">*</span> <span class="n">ptr</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
 
 <span class="p">};</span>
 
-<span class="k">template</span><span class="o">&lt;&gt;</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="p">&gt;</span>
 <span class="kt">void</span> <span class="n">A</span><span class="o">::</span><span class="n">foo</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span> <span class="c1">// still public, but deleted</span>
+
 </code></pre></div>
 <p>再引用下作者的一段话:</p>
 
@@ -211,48 +222,52 @@
 <h3>条款12-1：新功能：引用限定符 reference qualifiers</h3>
 
 <p>这样子玩:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="nl">public:</span>
 <span class="err">…</span>
 <span class="kt">void</span> <span class="n">doWork</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span> <span class="c1">// this version of doWork applies</span>
 <span class="c1">// only when *this is an lvalue</span>
-<span class="kt">void</span> <span class="nf">doWork</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span> <span class="c1">// this version of doWork applies</span>
+<span class="kt">void</span> <span class="n">doWork</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span> <span class="c1">// this version of doWork applies</span>
 <span class="p">};</span> <span class="c1">// only when *this is an rvalue</span>
 <span class="err">…</span>
-<span class="n">A</span> <span class="n">makeA</span><span class="p">();</span> <span class="c1">// factory function (returns rvalue)</span>
+<span class="n">A</span> <span class="nf">makeA</span><span class="p">();</span> <span class="c1">// factory function (returns rvalue)</span>
 <span class="n">A</span> <span class="n">w</span><span class="p">;</span> <span class="c1">// normal object (an lvalue)</span>
 <span class="err">…</span>
 <span class="n">w</span><span class="p">.</span><span class="n">doWork</span><span class="p">();</span> <span class="c1">// calls A::doWork for lvalues</span>
 <span class="c1">// (i.e., A::doWork &amp;)</span>
 <span class="n">makeA</span><span class="p">().</span><span class="n">doWork</span><span class="p">();</span> <span class="c1">// calls A::doWork for rvalues</span>
 <span class="c1">// (i.e., A::doWork &amp;&amp;)</span>
+
 </code></pre></div>
 <h3>条款12-2：新功能：覆盖限定符 override qualifiers</h3>
 
 <p>这个限定符是用来防止程序员粗心写错重载的。</p>
 
 <p>错误例子:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">Base</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">class</span> <span class="nc">Base</span> <span class="p">{</span>
+<span class="nl">public:</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span>
-    <span class="kt">void</span> <span class="nf">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
+<span class="nl">public:</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">();</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span>
-    <span class="kt">void</span> <span class="nf">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">mf4</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
 <span class="p">};</span>
+
 </code></pre></div>
 <p>Derived的前3个函数一点没有覆盖掉基类的实现。因为派生类函数和基类对应的函数，函数签名不完全一样。</p>
 
 <p>c++11给出了优雅的解决办法：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">Derived</span><span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
+<span class="nl">public:</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf1</span><span class="p">()</span> <span class="k">override</span><span class="p">;</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf2</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
     <span class="k">virtual</span> <span class="kt">void</span> <span class="n">mf3</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="k">override</span><span class="p">;</span>
@@ -264,34 +279,40 @@
 <h3>条款13: 尽可能使用const_iterators</h3>
 
 <p>c++11/c++14可以这么写:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">;</span>
 <span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="c1">// it是const_iterators</span>
 <span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">values</span><span class="p">.</span><span class="n">cbegin</span><span class="p">(),</span><span class="n">values</span><span class="p">.</span><span class="n">cend</span><span class="p">(),</span> <span class="mi">1983</span><span class="p">);</span>
 <span class="n">values</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="mi">1998</span><span class="p">);</span>
+
 </code></pre></div>
 <p>注意，cbegin和cend是成员函数。在c++11中，有非成员函数的begin和end，但没有非成员函数的cbegin和cend(c++14才有)。</p>
 
 <p>所以要写泛型函数时，c++14这么写:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">C</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">V</span><span class="o">&gt;</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">C</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">V</span><span class="p">&gt;</span>
 <span class="kt">void</span> <span class="n">findAndInsert</span><span class="p">(</span><span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">,</span> <span class="k">const</span> <span class="n">V</span><span class="o">&amp;</span> <span class="n">targetVal</span><span class="p">,</span> <span class="k">const</span> <span class="n">V</span><span class="o">&amp;</span> <span class="n">insertVal</span><span class="p">)</span>
     <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">cbegin</span><span class="p">;</span>
     <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">cend</span><span class="p">;</span>
     <span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">cbegin</span><span class="p">(</span><span class="n">container</span><span class="p">),</span> <span class="n">cend</span><span class="p">(</span><span class="n">container</span><span class="p">),</span> <span class="n">targetVal</span><span class="p">);</span>
     <span class="n">container</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">insertVal</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="err">}</span>
+
 </code></pre></div>
 <p>c++11则不能，但可以先定义2个函数，使得可以和c++14保持一致:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">C</span><span class="o">&gt;</span>
-<span class="k">auto</span> <span class="n">cbegin</span><span class="p">(</span><span class="k">const</span> <span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">)</span><span class="o">-&gt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">C</span><span class="p">&gt;</span>
+<span class="k">auto</span> <span class="nf">cbegin</span><span class="p">(</span><span class="k">const</span> <span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">)</span><span class="o">-&gt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
 <span class="p">{</span>
 <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">C</span><span class="o">&gt;</span>
-<span class="k">auto</span> <span class="n">cend</span><span class="p">(</span><span class="k">const</span> <span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">)</span><span class="o">-&gt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">C</span><span class="p">&gt;</span>
+<span class="k">auto</span> <span class="nf">cend</span><span class="p">(</span><span class="k">const</span> <span class="n">C</span><span class="o">&amp;</span> <span class="n">container</span><span class="p">)</span><span class="o">-&gt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
 <span class="p">{</span>
 <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">end</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <h3>条款14: 如果函数保证不会抛出异常，请给它加上 noexcept声明</h3>
 
@@ -306,14 +327,16 @@
 <p>noexcept在标准库里部有很重要的应用，具体请阅读原书。</p>
 
 <p>noexcept还是支持表达式计算的。可以这样子玩:</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">N</span><span class="o">&gt;</span>
-<span class="kt">void</span> <span class="n">swap</span><span class="p">(</span><span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">a</span><span class="p">)[</span><span class="n">N</span><span class="p">],</span> <span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="p">)[</span><span class="n">N</span><span class="p">])</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">b</span><span class="p">)));</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">N</span><span class="p">&gt;</span>
+<span class="kt">void</span> <span class="nf">swap</span><span class="p">(</span><span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">a</span><span class="p">)[</span><span class="n">N</span><span class="p">],</span> <span class="n">T</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="p">)[</span><span class="n">N</span><span class="p">])</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">b</span><span class="p">)));</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T1</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T2</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T1</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T2</span><span class="p">&gt;</span>
 <span class="k">struct</span> <span class="nc">pair</span> <span class="p">{</span>
-    <span class="kt">void</span> <span class="nf">swap</span><span class="p">(</span><span class="n">pair</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
+    <span class="kt">void</span> <span class="n">swap</span><span class="p">(</span><span class="n">pair</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">(</span><span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
                                   <span class="k">noexcept</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">second</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">second</span><span class="p">)));</span>
 <span class="p">};</span>
+
 </code></pre></div>
 <p>解释下第二个swap：一个pair对象和另一个pair对象进行swap，当前仅当swap(first, p.first)和swap(second, p.second)都是noexcept时，pair::swap才是noexcept。</p>
 
@@ -332,10 +355,11 @@
 </ul>
 
 <p>具体怎么玩？看下面的代码：</p>
-<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span></span><span class="k">constexpr</span> <span class="kt">int</span> <span class="n">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++11</span>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">
+<span class="k">constexpr</span> <span class="kt">int</span> <span class="nf">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++11</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">times</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
-<span class="p">}</span>
+<span class="err">}</span>
 
 <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">times</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="k">noexcept</span> <span class="c1">// C++14</span>
 <span class="p">{</span>
@@ -345,12 +369,13 @@
     <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">;</span>
     <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">times</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
+
 </code></pre></div>
 <p>c++11的递归版本很容易爆栈，而c++14对constexpr做了改进，允许写成迭代的形式。</p>
 
