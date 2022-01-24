@@ -70,15 +70,15 @@ normal的变换并不能直接使用vertex的变换。如果直接使用的话�
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="在对vertex做model、view、projection计算过程中，还有一个要同时考虑的东西是法向量的矩阵变换。 normal的变换并不能直接使用vertex的变换。如果直接使用的话，就会放了一个定时炸弹在你的shader里面，当哪天你的object做了一个不uniform的缩放变换时，例如x、y轴放大1.5倍，而z轴放大3倍，输出的normal就会出错，进而导致光照计算出错。 下面开始推导正确的只属于normal的变换矩阵。" />
 <meta property="og:description" content="在对vertex做model、view、projection计算过程中，还有一个要同时考虑的东西是法向量的矩阵变换。 normal的变换并不能直接使用vertex的变换。如果直接使用的话，就会放了一个定时炸弹在你的shader里面，当哪天你的object做了一个不uniform的缩放变换时，例如x、y轴放大1.5倍，而z轴放大3倍，输出的normal就会出错，进而导致光照计算出错。 下面开始推导正确的只属于normal的变换矩阵。" />
-<link rel="canonical" href="http://0.0.0.0:4000/linear-algebra-18/" />
-<meta property="og:url" content="http://0.0.0.0:4000/linear-algebra-18/" />
+<link rel="canonical" href="https://www.qiujiawei.com/linear-algebra-18/" />
+<meta property="og:url" content="https://www.qiujiawei.com/linear-algebra-18/" />
 <meta property="og:site_name" content="Wyman的原创技术博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-10-15T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="法向量矩阵" />
 <script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"http://0.0.0.0:4000/linear-algebra-18/"},"url":"http://0.0.0.0:4000/linear-algebra-18/","@type":"BlogPosting","headline":"法向量矩阵","dateModified":"2017-10-15T00:00:00+08:00","datePublished":"2017-10-15T00:00:00+08:00","description":"在对vertex做model、view、projection计算过程中，还有一个要同时考虑的东西是法向量的矩阵变换。 normal的变换并不能直接使用vertex的变换。如果直接使用的话，就会放了一个定时炸弹在你的shader里面，当哪天你的object做了一个不uniform的缩放变换时，例如x、y轴放大1.5倍，而z轴放大3倍，输出的normal就会出错，进而导致光照计算出错。 下面开始推导正确的只属于normal的变换矩阵。","@context":"https://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.qiujiawei.com/linear-algebra-18/"},"url":"https://www.qiujiawei.com/linear-algebra-18/","@type":"BlogPosting","headline":"法向量矩阵","dateModified":"2017-10-15T00:00:00+08:00","datePublished":"2017-10-15T00:00:00+08:00","description":"在对vertex做model、view、projection计算过程中，还有一个要同时考虑的东西是法向量的矩阵变换。 normal的变换并不能直接使用vertex的变换。如果直接使用的话，就会放了一个定时炸弹在你的shader里面，当哪天你的object做了一个不uniform的缩放变换时，例如x、y轴放大1.5倍，而z轴放大3倍，输出的normal就会出错，进而导致光照计算出错。 下面开始推导正确的只属于normal的变换矩阵。","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
   </head>
