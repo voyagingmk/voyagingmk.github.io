@@ -276,6 +276,38 @@
 <li>camera.getSensitivity() 是感光度ISO</li>
 </ul>
 
+<h2>Exposure value 和 luminance 的关系</h2>
+
+<p>上上节给出了一个脱离实际拍摄场景的EV公式。实际上EV还可以从场景亮度L转换得到：</p>
+
+<p>\[ EV =  log_2 \frac { L\cdot S}{ K } \]</p>
+
+<p>S是ISO，K是一个<a href="https://en.wikipedia.org/wiki/Light_meter#Calibration_constants">反光校准常数</a>。K和摄像机制造商有关，以常见的Canon、Nikon为准的话，K等于12.5。</p>
+
+<p>上一节介绍了ISO 100这个惯用标准，那么可以得到：</p>
+
+<p>\[ EV =  log_2 \frac { L\cdot 100}{ 12.5 } \]</p>
+
+<p>此时可以想象一个游戏场景：这个场景特别黑，但是又需要让玩家看得清环境，那么把玩家视角当成相机的话，此时就是要提高曝光，也就是降EV（记住，<strong>较高的EV会产生较暗的图像</strong>）。具体要降多少的EV呢，可以先算出<strong>画面平均亮度</strong>，代入上面这条公式得到。</p>
+
+<p>有时候为了测试或验证，需要根据场景的EV100（一般是查表），算出场景对应的亮度：</p>
+
+<p>\[ L =  2^{EV_{100} } \frac { 12.5 }{ 100  }  = 2^{EV_{100} } 0.125 \]</p>
+
+<p>用python求得：math.log(0.125,2) = -3，于是有：</p>
+
+<p>\[ L  = 2^{EV_{100}  - 3}\]</p>
+
+<p>翻译成代码就是：</p>
+<div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span class="n">luminance</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">EV</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">EV</span> <span class="o">=</span> <span class="n">log2</span><span class="p">(</span><span class="n">luminance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span>
+</code></pre></div>
+<h2>Exposure compensation 曝光补偿</h2>
+
+<p>EC其实很简单，是指对EV做一个人为的偏移EC：</p>
+
+<p>\[ EV_{100}&#39; = EV_{100} - EC \]</p>
+
 <h2>photometric exposure（luminous exposure）</h2>
 
 <p>前面提到的exposure还有别的定义方式：</p>
@@ -395,9 +427,66 @@
 <span class="kt">vec3</span> <span class="n">luminance</span> <span class="o">=</span> <span class="n">BSDF</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="n">illuminance</span><span class="p">;</span>
 <span class="k">return</span> <span class="n">luminance</span><span class="p">;</span>
 </code></pre></div>
+<h1>一些概念的补充</h1>
+
+<h3>白平衡</h3>
+
+<p>todo</p>
+
+<h3>sRGB和CRT</h3>
+
+<p>因为早期计算器存储数据带宽有限(8bits)，线性空间的RGB直接存到8bits的话，会导致亮度低的区域编码不足，导致色调过少，<strong>且因为人眼对颜色的感知是非线性的，对低亮度的颜色更敏感</strong>，于是发明了sRGB非线性颜色空间，使得8bits可以存储更多的低亮度色调。</p>
+
+<p>同时那时候发明的CRT显示器有个问题是，<strong>输出的亮度和输入的电压并非线性关系</strong>，即不支持输入什么颜色就显示什么颜色，有色差，并且是让颜色变暗，这就刚好可以和带宽问题互补：保存图片时提高亮度，CRT显示图片时降低亮度，使得亮度平衡。</p>
+
+<p>sRGB和linear RGB的大约换算关系：</p>
+
+<ul>
+<li>linearRGB = pow(sRGB, 2.2)</li>
+<li>sRGB = pow(linearRGB, 1/2.2)</li>
+</ul>
+
+<p>大部分美术输出的贴图都是sRGB。</p>
+
+<h3>gamma encoding</h3>
+
+<p>gamma encoding指sRGB = pow(linearRGB, 1/2.2)这个操作。</p>
+
+<h3>gamma correction</h3>
+
+<p>gamma correction指linearRGB = pow(sRGB, 2.2)这个操作。</p>
+
+<p>gamma矫正对于单位化到0到1的rgb值，显然会让颜色变暗。</p>
+
+<h3>现代显示器</h3>
+
+<p>现代显示器和CRT不一样，技术上是可以做到<strong>颜色输入是linear RGB，显示就是linear RGB</strong>。但为了兼容sRGB图片以及优化带宽（能省则省），现代显示器<strong>大部分</strong>还是有gamma的。</p>
+
+<h3>PBR和gamma</h3>
+
+<p>PBR着色是在线性空间下算的，但大部分贴图都是sRGB空间，需要在采样时或者采样前，把贴图颜色做一次gamma correction，变换到线性空间。</p>
+
+<p>至于输入到显示器前需不需要做gamma encoding，得看显示器是否有gamma。</p>
+
+<h3>tone mapping</h3>
+
+<p>pbr整个管线可以做到线性了，但是最终输出到屏幕，就还是有问题，因为显示器能显示的颜色范围有限。当亮度大于1时，要先tone mapping转到LDR，再做gamma encoding。</p>
+
+<h3><a href="https://en.wikipedia.org/wiki/Middle_gray">Middle gray</a> 和 <a href="https://en.wikipedia.org/wiki/Gray_card">Gray card</a></h3>
+
+<p>中灰，也称为18%灰，是用来描述完美曝光质量的数值。本质上是指对可见光波段18%的反射率。Gray card是一个可以买到的卡片，它的颜色就是middle gray。</p>
+
+<h3>Light meters 测光计</h3>
+
+<p>测光计会把拍摄场景转成灰度图，并算出灰度图的平均灰度值，也就是场景平均反射率。当反射率大于18%，就是过曝，小于18%就是曝光不足。</p>
+
+<p>测光计会用EV显示曝光度，当EV等于0，说明场景等于18%灰，也就是最佳曝光。</p>
+
 <h1>参考资料</h1>
 
 <p><a href="https://photographylife.com/exposure-value">https://photographylife.com/exposure-value</a></p>
+
+<p><a href="https://pixelsandwanderlust.com/what-is-middle-grey-understanding-18-grey-reflectance/">https://pixelsandwanderlust.com/what-is-middle-grey-understanding-18-grey-reflectance/</a></p>
 
     </div>
     <div class="entry">
