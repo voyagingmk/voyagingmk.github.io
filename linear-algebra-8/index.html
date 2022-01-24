@@ -79,6 +79,24 @@
 	<!-- End Baidu Analytics -->
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>线性代数之TRS分解 | Wyman的原创技术博客</title>
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="线性代数之TRS分解" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="pbrt的TRS分解 设矩阵A，假设A可以分解成T、R、S，则有A=TRS，设A: \[ A = \left[ \begin{matrix} A_{11}&amp;A_{12}&amp;A_{13}&amp;A_{14}\\ A_{21}&amp;A_{22}&amp;A_{23}&amp;A_{24}\\ A_{31}&amp;A_{32}&amp;A_{33}&amp;A_{34}\\ A_{41}&amp;A_{42}&amp;A_{43}&amp;A_{44}\\ \end{matrix} \right] \] 再设T、R、S分别为： \[ T = \left[ \begin{matrix} 1&amp;0&amp;0&amp;t_{x}\\ 0&amp;1&amp;0&amp;t_{y}\\ 0&amp;0&amp;1&amp;t_{z}\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \] \[ R = \left[ \begin{matrix} r_{11}&amp;r_{12}&amp;r_{13}&amp;0\\ r_{21}&amp;r_{22}&amp;r_{23}&amp;0\\ r_{31}&amp;r_{32}&amp;r_{33}&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \] \[ S = \left[ \begin{matrix} s_{x}&amp;0&amp;0&amp;0\\ 0&amp;s_{y}&amp;0&amp;0\\ 0&amp;0&amp;t_{y}&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]" />
+<meta property="og:description" content="pbrt的TRS分解 设矩阵A，假设A可以分解成T、R、S，则有A=TRS，设A: \[ A = \left[ \begin{matrix} A_{11}&amp;A_{12}&amp;A_{13}&amp;A_{14}\\ A_{21}&amp;A_{22}&amp;A_{23}&amp;A_{24}\\ A_{31}&amp;A_{32}&amp;A_{33}&amp;A_{34}\\ A_{41}&amp;A_{42}&amp;A_{43}&amp;A_{44}\\ \end{matrix} \right] \] 再设T、R、S分别为： \[ T = \left[ \begin{matrix} 1&amp;0&amp;0&amp;t_{x}\\ 0&amp;1&amp;0&amp;t_{y}\\ 0&amp;0&amp;1&amp;t_{z}\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \] \[ R = \left[ \begin{matrix} r_{11}&amp;r_{12}&amp;r_{13}&amp;0\\ r_{21}&amp;r_{22}&amp;r_{23}&amp;0\\ r_{31}&amp;r_{32}&amp;r_{33}&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \] \[ S = \left[ \begin{matrix} s_{x}&amp;0&amp;0&amp;0\\ 0&amp;s_{y}&amp;0&amp;0\\ 0&amp;0&amp;t_{y}&amp;0\\ 0&amp;0&amp;0&amp;1\\ \end{matrix} \right] \]" />
+<link rel="canonical" href="http://0.0.0.0:4000/linear-algebra-8/" />
+<meta property="og:url" content="http://0.0.0.0:4000/linear-algebra-8/" />
+<meta property="og:site_name" content="Wyman的原创技术博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-10-05T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="线性代数之TRS分解" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://0.0.0.0:4000/linear-algebra-8/"},"url":"http://0.0.0.0:4000/linear-algebra-8/","@type":"BlogPosting","headline":"线性代数之TRS分解","dateModified":"2015-10-05T00:00:00+08:00","datePublished":"2015-10-05T00:00:00+08:00","description":"pbrt的TRS分解 设矩阵A，假设A可以分解成T、R、S，则有A=TRS，设A: \\[ A = \\left[ \\begin{matrix} A_{11}&amp;A_{12}&amp;A_{13}&amp;A_{14}\\\\ A_{21}&amp;A_{22}&amp;A_{23}&amp;A_{24}\\\\ A_{31}&amp;A_{32}&amp;A_{33}&amp;A_{34}\\\\ A_{41}&amp;A_{42}&amp;A_{43}&amp;A_{44}\\\\ \\end{matrix} \\right] \\] 再设T、R、S分别为： \\[ T = \\left[ \\begin{matrix} 1&amp;0&amp;0&amp;t_{x}\\\\ 0&amp;1&amp;0&amp;t_{y}\\\\ 0&amp;0&amp;1&amp;t_{z}\\\\ 0&amp;0&amp;0&amp;1\\\\ \\end{matrix} \\right] \\] \\[ R = \\left[ \\begin{matrix} r_{11}&amp;r_{12}&amp;r_{13}&amp;0\\\\ r_{21}&amp;r_{22}&amp;r_{23}&amp;0\\\\ r_{31}&amp;r_{32}&amp;r_{33}&amp;0\\\\ 0&amp;0&amp;0&amp;1\\\\ \\end{matrix} \\right] \\] \\[ S = \\left[ \\begin{matrix} s_{x}&amp;0&amp;0&amp;0\\\\ 0&amp;s_{y}&amp;0&amp;0\\\\ 0&amp;0&amp;t_{y}&amp;0\\\\ 0&amp;0&amp;0&amp;1\\\\ \\end{matrix} \\right] \\]","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
   </head>
 
   <body>

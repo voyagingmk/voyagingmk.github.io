@@ -53,6 +53,24 @@
 	<!-- End Baidu Analytics -->
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Filament中的exposure和lighting | Wyman的原创技术博客</title>
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="Filament中的exposure和lighting" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" />
+<meta property="og:description" content="恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" />
+<link rel="canonical" href="http://0.0.0.0:4000/pbr-lighting/" />
+<meta property="og:url" content="http://0.0.0.0:4000/pbr-lighting/" />
+<meta property="og:site_name" content="Wyman的原创技术博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-01-20T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Filament中的exposure和lighting" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://0.0.0.0:4000/pbr-lighting/"},"url":"http://0.0.0.0:4000/pbr-lighting/","@type":"BlogPosting","headline":"Filament中的exposure和lighting","dateModified":"2022-01-20T00:00:00+08:00","datePublished":"2022-01-20T00:00:00+08:00","description":"恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
   </head>
 
   <body>
@@ -366,10 +384,17 @@
 <li>color相当于反射率albedo，表示要反射多少direct light的光</li>
 <li>light.colorIntensity.rgb是lcm.getColor(directionalLight)，这个就是美术指定的rgb而已</li>
 <li>light.colorIntensity.w是lcm.getIntensity(directionalLight) * exposure</li>
-<li>lcm.getIntensity就是直接光光源的光强度，单位是lux，美术指定</li>
+<li>lcm.getIntensity就是直接光光源的光强度，单位是lux</li>
 <li>occlusion就是visibility，要用shadow map计算得到，本文不谈这个</li>
 </ul>
 
+<p>Intensity由美术指定，也可以用光度计到目标环境测量，例如中午室外晴朗天气时是130000 lux。Intensity指的是入射角垂直于表面时的illuminance。所以公式还乘了NoL。</p>
+
+<p>假设去掉attenuation、occlusion，代码的含义会更清晰一些，如下：</p>
+<div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span class="kt">float</span> <span class="n">illuminance</span> <span class="o">=</span> <span class="n">lightIntensity</span> <span class="o">*</span> <span class="n">NoL</span><span class="p">;</span>
+<span class="kt">vec3</span> <span class="n">luminance</span> <span class="o">=</span> <span class="n">BSDF</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="n">illuminance</span><span class="p">;</span>
+<span class="k">return</span> <span class="n">luminance</span><span class="p">;</span>
+</code></pre></div>
 <h1>参考资料</h1>
 
 <p><a href="https://photographylife.com/exposure-value">https://photographylife.com/exposure-value</a></p>
