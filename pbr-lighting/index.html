@@ -431,7 +431,76 @@
 
 <h3>白平衡</h3>
 
-<p>todo</p>
+<p><a href="https://zhuanlan.zhihu.com/p/421424655">https://zhuanlan.zhihu.com/p/421424655</a></p>
+
+<p>用户设置白色温度，默认是6500K，UE4里可以翻到相关c++代码：</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="kt">float</span> <span class="n">WhiteTemp</span> <span class="o">=</span> <span class="mf">6500.0</span><span class="n">f</span><span class="p">;</span>
+</code></pre></div>
+<p>然后是shader里算CIE 1931 xy 坐标，算法来源于wiki <a href="https://en.wikipedia.org/wiki/Standard_illuminant">Standard illuminant</a>的Computation小节：</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="c1">// Accurate for 4000K &lt; Temp &lt; 25000K</span>
+<span class="c1">// in: correlated color temperature</span>
+<span class="c1">// out: CIE 1931 chromaticity</span>
+<span class="n">float2</span> <span class="nf">D_IlluminantChromaticity</span><span class="p">(</span> <span class="kt">float</span> <span class="n">Temp</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Correct for revision of Plank's law</span>
+    <span class="c1">// This makes 6500 == D65</span>
+    <span class="n">Temp</span> <span class="o">*=</span> <span class="mf">1.4388</span> <span class="o">/</span> <span class="mf">1.438</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">OneOverTemp</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">Temp</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">x</span> <span class="o">=</span>   <span class="n">Temp</span> <span class="o">&lt;=</span> <span class="mi">7000</span> <span class="o">?</span>
+                <span class="mf">0.244063</span> <span class="o">+</span> <span class="p">(</span> <span class="mf">0.09911e3</span> <span class="o">+</span> <span class="p">(</span> <span class="mf">2.9678e6</span> <span class="o">-</span> <span class="mf">4.6070e9</span> <span class="o">*</span> <span class="n">OneOverTemp</span> <span class="p">)</span> <span class="o">*</span> <span class="n">OneOverTemp</span><span class="p">)</span> <span class="o">*</span> <span class="n">OneOverTemp</span><span class="o">:</span>
+                <span class="mf">0.237040</span> <span class="o">+</span> <span class="p">(</span> <span class="mf">0.24748e3</span> <span class="o">+</span> <span class="p">(</span> <span class="mf">1.9018e6</span> <span class="o">-</span> <span class="mf">2.0064e9</span> <span class="o">*</span> <span class="n">OneOverTemp</span> <span class="p">)</span> <span class="o">*</span> <span class="n">OneOverTemp</span> <span class="p">)</span> <span class="o">*</span> <span class="n">OneOverTemp</span><span class="p">;</span>
+
+    <span class="kt">float</span> <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.87</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mf">0.275</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">float2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这个算法只能算 4000K &lt; Temp &lt; 25000K的范围。对于Temp &lt; 4000K范围，又有一套算法，来源于wiki <a href="https://en.wikipedia.org/wiki/Planckian_locus">Planckian locus</a> 的Approximation小节，uv到xy的转换来源于wiki <a href="https://en.wikipedia.org/wiki/CIE_1960_color_space">CIE 1960 color space</a> 的Relation to CIE XYZ小节：</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="c1">// Accurate for 1000K &lt; Temp &lt; 15000K</span>
+<span class="c1">// [Krystek 1985, "An algorithm to calculate correlated colour temperature"]</span>
+<span class="n">float2</span> <span class="nf">PlanckianLocusChromaticity</span><span class="p">(</span> <span class="kt">float</span> <span class="n">Temp</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">float</span> <span class="n">u</span> <span class="o">=</span> <span class="p">(</span> <span class="mf">0.860117757</span><span class="n">f</span> <span class="o">+</span> <span class="mf">1.54118254e-4</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span> <span class="o">+</span> <span class="mf">1.28641212e-7</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span><span class="o">*</span><span class="n">Temp</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">+</span> <span class="mf">8.42420235e-4</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span> <span class="o">+</span> <span class="mf">7.08145163e-7</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span><span class="o">*</span><span class="n">Temp</span> <span class="p">);</span>
+    <span class="kt">float</span> <span class="n">v</span> <span class="o">=</span> <span class="p">(</span> <span class="mf">0.317398726</span><span class="n">f</span> <span class="o">+</span> <span class="mf">4.22806245e-5</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span> <span class="o">+</span> <span class="mf">4.20481691e-8</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span><span class="o">*</span><span class="n">Temp</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mf">1.0</span><span class="n">f</span> <span class="o">-</span> <span class="mf">2.89741816e-5</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span> <span class="o">+</span> <span class="mf">1.61456053e-7</span><span class="n">f</span> <span class="o">*</span> <span class="n">Temp</span><span class="o">*</span><span class="n">Temp</span> <span class="p">);</span>
+
+    <span class="kt">float</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">u</span> <span class="o">/</span> <span class="p">(</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span> <span class="o">-</span> <span class="mi">8</span><span class="o">*</span><span class="n">v</span> <span class="o">+</span> <span class="mi">4</span> <span class="p">);</span>
+    <span class="kt">float</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">v</span> <span class="o">/</span> <span class="p">(</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span> <span class="o">-</span> <span class="mi">8</span><span class="o">*</span><span class="n">v</span> <span class="o">+</span> <span class="mi">4</span> <span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">float2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>然后就可以实现白平衡了：</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++">
+<span class="n">float3</span> <span class="nf">WhiteBalance</span><span class="p">(</span> <span class="n">float3</span> <span class="n">LinearColor</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">float2</span> <span class="n">SrcWhiteDaylight</span> <span class="o">=</span> <span class="n">D_IlluminantChromaticity</span><span class="p">(</span> <span class="n">WhiteTemp</span> <span class="p">);</span>
+    <span class="n">float2</span> <span class="n">SrcWhitePlankian</span> <span class="o">=</span> <span class="n">PlanckianLocusChromaticity</span><span class="p">(</span> <span class="n">WhiteTemp</span> <span class="p">);</span>
+
+    <span class="n">float2</span> <span class="n">SrcWhite</span> <span class="o">=</span> <span class="n">WhiteTemp</span> <span class="o">&lt;</span> <span class="mi">4000</span> <span class="o">?</span> <span class="n">SrcWhitePlankian</span> <span class="o">:</span> <span class="n">SrcWhiteDaylight</span><span class="p">;</span>
+    <span class="n">float2</span> <span class="n">D65White</span> <span class="o">=</span> <span class="n">float2</span><span class="p">(</span> <span class="mf">0.31270</span><span class="p">,</span>  <span class="mf">0.32900</span> <span class="p">);</span> 
+
+    <span class="p">{</span>
+        <span class="c1">// Offset along isotherm</span>
+        <span class="n">float2</span> <span class="n">Isothermal</span> <span class="o">=</span> <span class="n">PlanckianIsothermal</span><span class="p">(</span> <span class="n">WhiteTemp</span><span class="p">,</span> <span class="n">WhiteTint</span> <span class="p">)</span> <span class="o">-</span> <span class="n">SrcWhitePlankian</span><span class="p">;</span>
+        <span class="n">SrcWhite</span> <span class="o">+=</span> <span class="n">Isothermal</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bIsTemperatureWhiteBalance</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">float2</span> <span class="n">Temp</span> <span class="o">=</span> <span class="n">SrcWhite</span><span class="p">;</span>
+        <span class="n">SrcWhite</span> <span class="o">=</span> <span class="n">D65White</span><span class="p">;</span>
+        <span class="n">D65White</span> <span class="o">=</span> <span class="n">Temp</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">float3x3</span> <span class="n">WhiteBalanceMat</span> <span class="o">=</span> <span class="n">ChromaticAdaptation</span><span class="p">(</span> <span class="n">SrcWhite</span><span class="p">,</span> <span class="n">D65White</span> <span class="p">);</span>
+    <span class="n">WhiteBalanceMat</span> <span class="o">=</span> <span class="n">mul</span><span class="p">(</span> <span class="n">XYZ_2_sRGB_MAT</span><span class="p">,</span> <span class="n">mul</span><span class="p">(</span> <span class="n">WhiteBalanceMat</span><span class="p">,</span> <span class="n">sRGB_2_XYZ_MAT</span> <span class="p">)</span> <span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">mul</span><span class="p">(</span> <span class="n">WhiteBalanceMat</span><span class="p">,</span> <span class="n">LinearColor</span> <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>PlanckianIsothermal和PlanckianLocusChromaticity差不多，只是多了一步在uv空间下用Tint做一个便宜，再继续转到xy。</p>
+
+<p>D65White坐标来源于： <a href="https://en.wikipedia.org/wiki/Standard_illuminant">White points of standard illuminants</a>。</p>
 
 <h3>sRGB和CRT</h3>
 
