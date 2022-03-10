@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Canvas的transform函数与2D仿射变换矩阵分解 – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
+    <title>Canvas的transform函数与2D仿射变换矩阵分解 </title>
 
         <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
@@ -78,25 +79,6 @@ setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f)
 	</script>
 	<!-- End Baidu Analytics -->
 
-    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
-    <!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Canvas的transform函数与2D仿射变换矩阵分解 | Wyman的原创技术博客</title>
-<meta name="generator" content="Jekyll v3.9.1" />
-<meta property="og:title" content="Canvas的transform函数与2D仿射变换矩阵分解" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="最近偶然接触了一下canvas的2D仿射变换。和3D一样，canvas有scale、translate、rotate操作，本质上这3个函数也是矩阵乘法。 canvas应该内置了一套矩阵运算系统，并且canvas内含有一个仿射变换矩阵（大概认为是3x3=9个浮点数变量即可，2D是3x3矩阵，3D是4x4矩阵）。每次调用scale、translate、rotate就是对这个矩阵做矩阵乘法。 另外还有3个函数可以控制canvas的仿射变换： resetTransform 重置为单位矩阵 transform(a,b,c,d,e,f) 以a,b,c,d,e,f构造一个仿射变换矩阵并乘到当前canvas的仿射变换矩阵 setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f) 我遇到的需求是，如果canvas没有提供transform函数，怎么用scale、translate、rotate三个函数的组合，来模拟transform函数？" />
-<meta property="og:description" content="最近偶然接触了一下canvas的2D仿射变换。和3D一样，canvas有scale、translate、rotate操作，本质上这3个函数也是矩阵乘法。 canvas应该内置了一套矩阵运算系统，并且canvas内含有一个仿射变换矩阵（大概认为是3x3=9个浮点数变量即可，2D是3x3矩阵，3D是4x4矩阵）。每次调用scale、translate、rotate就是对这个矩阵做矩阵乘法。 另外还有3个函数可以控制canvas的仿射变换： resetTransform 重置为单位矩阵 transform(a,b,c,d,e,f) 以a,b,c,d,e,f构造一个仿射变换矩阵并乘到当前canvas的仿射变换矩阵 setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f) 我遇到的需求是，如果canvas没有提供transform函数，怎么用scale、translate、rotate三个函数的组合，来模拟transform函数？" />
-<link rel="canonical" href="https://www.qiujiawei.com/linear-algebra-20/" />
-<meta property="og:url" content="https://www.qiujiawei.com/linear-algebra-20/" />
-<meta property="og:site_name" content="Wyman的原创技术博客" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2018-02-07T00:00:00+08:00" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Canvas的transform函数与2D仿射变换矩阵分解" />
-<script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.qiujiawei.com/linear-algebra-20/"},"url":"https://www.qiujiawei.com/linear-algebra-20/","@type":"BlogPosting","headline":"Canvas的transform函数与2D仿射变换矩阵分解","dateModified":"2018-02-07T00:00:00+08:00","datePublished":"2018-02-07T00:00:00+08:00","description":"最近偶然接触了一下canvas的2D仿射变换。和3D一样，canvas有scale、translate、rotate操作，本质上这3个函数也是矩阵乘法。 canvas应该内置了一套矩阵运算系统，并且canvas内含有一个仿射变换矩阵（大概认为是3x3=9个浮点数变量即可，2D是3x3矩阵，3D是4x4矩阵）。每次调用scale、translate、rotate就是对这个矩阵做矩阵乘法。 另外还有3个函数可以控制canvas的仿射变换： resetTransform 重置为单位矩阵 transform(a,b,c,d,e,f) 以a,b,c,d,e,f构造一个仿射变换矩阵并乘到当前canvas的仿射变换矩阵 setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f) 我遇到的需求是，如果canvas没有提供transform函数，怎么用scale、translate、rotate三个函数的组合，来模拟transform函数？","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-
   </head>
 
   <body>
@@ -126,7 +108,7 @@ setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f)
       <section>  
         <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
 <script src="/main.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <h1>Canvas的transform函数与2D仿射变换矩阵分解</h1>
  <h3>Tags: <a href="/tag/matrix/" rel="tag">matrix</a>, <a href="/tag/linear-algebra/" rel="tag">linear algebra</a>, <a href="/tag/math/" rel="tag">math</a></h3>
 <article class="post">
@@ -373,7 +355,7 @@ setTransform(a,b,c,d,e,f) 重置为单位矩阵并应用transform(a,b,c,d,e,f)
     <div class="date">
         Written on February  7, 2018
     </div>
-    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <p>写作不易，您的支持是我写作的动力！</p>
     <img src="../images/dashang1.jpeg" />
     <img src="../images/dashang2.jpeg" />
     

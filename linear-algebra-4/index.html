@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><复习向>线性代数之投影矩阵 – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
+    <title>线性代数之投影矩阵 </title>
 
         <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
@@ -41,8 +42,8 @@ p = ax（p和a都是向量，x是一个值）【式子1】
     <meta name="author" content="Wyman的原创技术博客" />
 
     
-    <meta property="og:title" content="<复习向>线性代数之投影矩阵" />
-    <meta property="twitter:title" content="<复习向>线性代数之投影矩阵" />
+    <meta property="og:title" content="线性代数之投影矩阵" />
+    <meta property="twitter:title" content="线性代数之投影矩阵" />
     
 
     <!--[if lt IE 9]>
@@ -62,7 +63,7 @@ p = ax（p和a都是向量，x是一个值）【式子1】
 		ga('create', 'UA-65954265-1', 'auto');
 		ga('send', 'pageview', {
 		  'page': '/linear-algebra-4/',
-		  'title': '<复习向>线性代数之投影矩阵'
+		  'title': '线性代数之投影矩阵'
 		});
 	</script>
 	<!-- End Google Analytics -->
@@ -77,25 +78,6 @@ p = ax（p和a都是向量，x是一个值）【式子1】
 		})();
 	</script>
 	<!-- End Baidu Analytics -->
-
-    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
-    <!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>&lt;复习向&gt;线性代数之投影矩阵 | Wyman的原创技术博客</title>
-<meta name="generator" content="Jekyll v3.9.1" />
-<meta property="og:title" content="&lt;复习向&gt;线性代数之投影矩阵" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="投影矩阵是what？ 先给出结论：投影矩阵P（projection），可以把一个向量b，投影到一个“空间”上，投影点称为p，从p到b的向量称为e，e = b - p，e的含义是误差向量（error）。 再举例子帮助读者理解： 上述的“空间”为一维时 一个向量b，投影到一个一维的空间，显然，这个空间是一条直线，设直线为单位向量a，那么这个投影其实就是找到这个直线上离b最近的点p，误差向量e就是b到p的距离。因为p在a上，所以有： p = ax（p和a都是向量，x是一个值）【式子1】 然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：" />
-<meta property="og:description" content="投影矩阵是what？ 先给出结论：投影矩阵P（projection），可以把一个向量b，投影到一个“空间”上，投影点称为p，从p到b的向量称为e，e = b - p，e的含义是误差向量（error）。 再举例子帮助读者理解： 上述的“空间”为一维时 一个向量b，投影到一个一维的空间，显然，这个空间是一条直线，设直线为单位向量a，那么这个投影其实就是找到这个直线上离b最近的点p，误差向量e就是b到p的距离。因为p在a上，所以有： p = ax（p和a都是向量，x是一个值）【式子1】 然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：" />
-<link rel="canonical" href="https://www.qiujiawei.com/linear-algebra-4/" />
-<meta property="og:url" content="https://www.qiujiawei.com/linear-algebra-4/" />
-<meta property="og:site_name" content="Wyman的原创技术博客" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2015-09-26T00:00:00+08:00" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="&lt;复习向&gt;线性代数之投影矩阵" />
-<script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.qiujiawei.com/linear-algebra-4/"},"url":"https://www.qiujiawei.com/linear-algebra-4/","@type":"BlogPosting","headline":"&lt;复习向&gt;线性代数之投影矩阵","dateModified":"2015-09-26T00:00:00+08:00","datePublished":"2015-09-26T00:00:00+08:00","description":"投影矩阵是what？ 先给出结论：投影矩阵P（projection），可以把一个向量b，投影到一个“空间”上，投影点称为p，从p到b的向量称为e，e = b - p，e的含义是误差向量（error）。 再举例子帮助读者理解： 上述的“空间”为一维时 一个向量b，投影到一个一维的空间，显然，这个空间是一条直线，设直线为单位向量a，那么这个投影其实就是找到这个直线上离b最近的点p，误差向量e就是b到p的距离。因为p在a上，所以有： p = ax（p和a都是向量，x是一个值）【式子1】 然后，因为p是b在a上的投影，那么意味着，a与e成90度角，当2个向量互相垂直时，他们的点积（或 内积、 dot product）等于0，于是有：","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
 
   </head>
 
@@ -126,8 +108,8 @@ p = ax（p和a都是向量，x是一个值）【式子1】
       <section>  
         <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
 <script src="/main.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-<h1><复习向>线性代数之投影矩阵</h1>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<h1>线性代数之投影矩阵</h1>
  <h3>Tags: <a href="/tag/matrix/" rel="tag">matrix</a>, <a href="/tag/linear-algebra/" rel="tag">linear algebra</a></h3>
 <article class="post">
     
@@ -260,7 +242,7 @@ p = ax（p和a都是向量，x是一个值）【式子1】
     <div class="date">
         Written on September 26, 2015
     </div>
-    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <p>写作不易，您的支持是我写作的动力！</p>
     <img src="../images/dashang1.jpeg" />
     <img src="../images/dashang2.jpeg" />
     

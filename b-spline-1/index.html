@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>曲线数学之B样条曲线B-Spline – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
+    <title>曲线数学之B样条曲线B-Spline </title>
 
         <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
@@ -62,25 +63,6 @@ B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什�
 	</script>
 	<!-- End Baidu Analytics -->
 
-    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
-    <!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>曲线数学之B样条曲线B-Spline | Wyman的原创技术博客</title>
-<meta name="generator" content="Jekyll v3.9.1" />
-<meta property="og:title" content="曲线数学之B样条曲线B-Spline" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="上一篇文章已经介绍了贝塞尔曲线。本篇文章接着介绍B样条曲线。 B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什么这样说呢？是因为贝塞尔曲线某些情况下不实用：曲线上每个点受所有控制点影响，这会给调整曲线工作带来麻烦。可以想到的第一个优化是，把整个贝塞尔曲线变成多段贝塞尔子曲线的拼接。然而，这个方案也不好用，因为拼接工作很难做好，因为要拼接曲线显得“光滑”前提是保证相邻曲线之间的连续性。 于是，老外发明了一个算法:De Boor&#39;s algorithm，基于这个算法的曲线也被称为贝塞尔曲线的变种：B-Spline(B样条)曲线。" />
-<meta property="og:description" content="上一篇文章已经介绍了贝塞尔曲线。本篇文章接着介绍B样条曲线。 B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什么这样说呢？是因为贝塞尔曲线某些情况下不实用：曲线上每个点受所有控制点影响，这会给调整曲线工作带来麻烦。可以想到的第一个优化是，把整个贝塞尔曲线变成多段贝塞尔子曲线的拼接。然而，这个方案也不好用，因为拼接工作很难做好，因为要拼接曲线显得“光滑”前提是保证相邻曲线之间的连续性。 于是，老外发明了一个算法:De Boor&#39;s algorithm，基于这个算法的曲线也被称为贝塞尔曲线的变种：B-Spline(B样条)曲线。" />
-<link rel="canonical" href="https://www.qiujiawei.com/b-spline-1/" />
-<meta property="og:url" content="https://www.qiujiawei.com/b-spline-1/" />
-<meta property="og:site_name" content="Wyman的原创技术博客" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2015-12-29T00:00:00+08:00" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="曲线数学之B样条曲线B-Spline" />
-<script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.qiujiawei.com/b-spline-1/"},"url":"https://www.qiujiawei.com/b-spline-1/","@type":"BlogPosting","headline":"曲线数学之B样条曲线B-Spline","dateModified":"2015-12-29T00:00:00+08:00","datePublished":"2015-12-29T00:00:00+08:00","description":"上一篇文章已经介绍了贝塞尔曲线。本篇文章接着介绍B样条曲线。 B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什么这样说呢？是因为贝塞尔曲线某些情况下不实用：曲线上每个点受所有控制点影响，这会给调整曲线工作带来麻烦。可以想到的第一个优化是，把整个贝塞尔曲线变成多段贝塞尔子曲线的拼接。然而，这个方案也不好用，因为拼接工作很难做好，因为要拼接曲线显得“光滑”前提是保证相邻曲线之间的连续性。 于是，老外发明了一个算法:De Boor&#39;s algorithm，基于这个算法的曲线也被称为贝塞尔曲线的变种：B-Spline(B样条)曲线。","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-
   </head>
 
   <body>
@@ -110,7 +92,7 @@ B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什�
       <section>  
         <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
 <script src="/main.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <h1>曲线数学之B样条曲线B-Spline</h1>
  <h3>Tags: <a href="/tag/math/" rel="tag">math</a></h3>
 <article class="post">
@@ -167,7 +149,7 @@ B样条曲线，简单来说，它是对贝塞尔曲线的一个补充。为什�
     <div class="date">
         Written on December 29, 2015
     </div>
-    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <p>写作不易，您的支持是我写作的动力！</p>
     <img src="../images/dashang1.jpeg" />
     <img src="../images/dashang2.jpeg" />
     

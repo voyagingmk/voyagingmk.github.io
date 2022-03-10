@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>碰撞检测算法(二)：原始GJK详解 – Wyman的原创技术博客 – 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</title>
+    <title>碰撞检测算法(二)：原始GJK详解 </title>
 
         <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
@@ -148,25 +149,6 @@ GJK各种实现
 	</script>
 	<!-- End Baidu Analytics -->
 
-    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
-    <!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>碰撞检测算法(二)：原始GJK详解 | Wyman的原创技术博客</title>
-<meta name="generator" content="Jekyll v3.9.1" />
-<meta property="og:title" content="碰撞检测算法(二)：原始GJK详解" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="GJK，全称Gilbert–Johnson–Keerthi distance algorithm，是非常常用的碰撞检测算法。 原始GJK的功能：准确地告诉调用者2个几何体是否碰撞。 GJK的主要特性： 只适用于凸体 GJK算法与维度无关，2D、3D都可以用 不要求对顶点数组做排序 存在一些技巧可以大大优化GJK的性能 本文将详解原始GJK的来龙去脉。 目录： 数学知识点 闵可夫斯基数学 Minkowski Math 单纯形 Simplex 向量混合积 Vector Triple Product GJK算法原理 GJK伪代码 Support函数 NearestSimplex函数 二维平面的GJK算法实现 b2Distance核心逻辑 b2Simplex::GetSearchDirection b2Simplex::Solve2 b2Simplex::Solve3 b2DistanceProxy::GetSupport 其他细节 参考资料 GJK各种实现" />
-<meta property="og:description" content="GJK，全称Gilbert–Johnson–Keerthi distance algorithm，是非常常用的碰撞检测算法。 原始GJK的功能：准确地告诉调用者2个几何体是否碰撞。 GJK的主要特性： 只适用于凸体 GJK算法与维度无关，2D、3D都可以用 不要求对顶点数组做排序 存在一些技巧可以大大优化GJK的性能 本文将详解原始GJK的来龙去脉。 目录： 数学知识点 闵可夫斯基数学 Minkowski Math 单纯形 Simplex 向量混合积 Vector Triple Product GJK算法原理 GJK伪代码 Support函数 NearestSimplex函数 二维平面的GJK算法实现 b2Distance核心逻辑 b2Simplex::GetSearchDirection b2Simplex::Solve2 b2Simplex::Solve3 b2DistanceProxy::GetSupport 其他细节 参考资料 GJK各种实现" />
-<link rel="canonical" href="https://www.qiujiawei.com/collision-detection-2/" />
-<meta property="og:url" content="https://www.qiujiawei.com/collision-detection-2/" />
-<meta property="og:site_name" content="Wyman的原创技术博客" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2018-03-20T00:00:00+08:00" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="碰撞检测算法(二)：原始GJK详解" />
-<script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.qiujiawei.com/collision-detection-2/"},"url":"https://www.qiujiawei.com/collision-detection-2/","@type":"BlogPosting","headline":"碰撞检测算法(二)：原始GJK详解","dateModified":"2018-03-20T00:00:00+08:00","datePublished":"2018-03-20T00:00:00+08:00","description":"GJK，全称Gilbert–Johnson–Keerthi distance algorithm，是非常常用的碰撞检测算法。 原始GJK的功能：准确地告诉调用者2个几何体是否碰撞。 GJK的主要特性： 只适用于凸体 GJK算法与维度无关，2D、3D都可以用 不要求对顶点数组做排序 存在一些技巧可以大大优化GJK的性能 本文将详解原始GJK的来龙去脉。 目录： 数学知识点 闵可夫斯基数学 Minkowski Math 单纯形 Simplex 向量混合积 Vector Triple Product GJK算法原理 GJK伪代码 Support函数 NearestSimplex函数 二维平面的GJK算法实现 b2Distance核心逻辑 b2Simplex::GetSearchDirection b2Simplex::Solve2 b2Simplex::Solve3 b2DistanceProxy::GetSupport 其他细节 参考资料 GJK各种实现","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-
   </head>
 
   <body>
@@ -196,7 +178,7 @@ GJK各种实现
       <section>  
         <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
 <script src="/main.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <h1>碰撞检测算法(二)：原始GJK详解</h1>
  <h3>Tags: <a href="/tag/collision-detection/" rel="tag">collision detection</a></h3>
 <article class="post">
@@ -1069,7 +1051,7 @@ Minkowski difference</a></p>
     <div class="date">
         Written on March 20, 2018
     </div>
-    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <p>写作不易，您的支持是我写作的动力！</p>
     <img src="../images/dashang1.jpeg" />
     <img src="../images/dashang2.jpeg" />
     
