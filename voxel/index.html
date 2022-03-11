@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>voxelize和cone tracing </title>
+
+        <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="https://github.com/Friduric/voxel-cone-tracing 这个demo很适合入门Voxel GI，本文记录下技术细节的学习。
+" />
+    <meta property="og:description" content="https://github.com/Friduric/voxel-cone-tracing 这个demo很适合入门Voxel GI，本文记录下技术细节的学习。
+" />
+    
+    <meta name="author" content="Wyman的原创技术博客" />
+
+    
+    <meta property="og:title" content="voxelize和cone tracing" />
+    <meta property="twitter:title" content="voxelize和cone tracing" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/voxel/',
+		  'title': 'voxelize和cone tracing'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的原创技术博客</a></h1>
+            <p class="site-description">恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
+    <div id="main" role="main" class="container">
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<h1>voxelize和cone tracing</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+<article class="post">
+    
+    <div class="entry">
+        <p><a href="https://github.com/Friduric/voxel-cone-tracing">https://github.com/Friduric/voxel-cone-tracing</a> 这个demo很适合入门Voxel GI，本文记录下技术细节的学习。</p>
+
+<!--more-->
+
+<h2>概念</h2>
+
+<h3>6-separating 和 26-separating 的含义</h3>
+
+<p>在把一个三角形转成体素格子时，其实就是在做三维空间的光栅化。在2D的光栅化过程中，一条直线有保守和非保守的画法：</p>
+
+<p><img src="../images/2022.3/1.png" alt="7.png"></p>
+
+<p>（左边保守，右边不保守）</p>
+
+<p>（直线的CPU光栅化算法：<a href="https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm">Bresenham&#39;s line algorithm</a>）</p>
+
+<p>类似的，三角形体素化时，也要考虑三角形究竟要覆盖哪些格子，于是也要区分保守和非保守的做法。</p>
+
+<p>非保守的做法是，只考虑前后左右上下，6个相邻格子，这就是6-separating。</p>
+
+<p>而保守的做法，因为3D体素空间，是3x3x3个格子共27个格子，除掉中心块，那么就剩26个格子要考虑，这就是26-separating。</p>
+
+<p><a href="https://computergraphics.stackexchange.com/questions/1790/what-does-6-separating-and-26-separating-voxelization-mean/1791#1791?newreg=7bdc44740364401ea3849a51ce0bb34e">What does &quot;6-separating&quot; and &quot;26-separating&quot; voxelization mean?</a></p>
+
+<h2>从demo里学习</h2>
+
+<p>建议自行下载voxel-cone-tracing代码编译运行并截帧，不然只看本文还是会云里雾里。</p>
+
+<h3>什么是gpu体素化？</h3>
+
+<p>根据demo代码分析，其实可以抽象成几行fragment shader代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">vec3</span> <span class="nf">scaleAndBias</span><span class="p">(</span><span class="n">vec3</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span> <span class="o">*</span> <span class="n">p</span> <span class="o">+</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">);</span> <span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="n">ivec3</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">imageSize</span><span class="p">(</span><span class="n">texture3D</span><span class="p">);</span> <span class="c1">// 128x128x128</span>
+    <span class="n">vec3</span> <span class="n">voxel_pos</span> <span class="o">=</span> <span class="n">scaleAndBias</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">);</span> <span class="c1">// -1...1 to 0...1</span>
+    <span class="n">vec3</span> <span class="n">res</span><span class="p">;</span> <span class="c1">// illuminance </span>
+    <span class="n">imageStore</span><span class="p">(</span><span class="n">texture3D</span><span class="p">,</span> <span class="n">ivec3</span><span class="p">(</span><span class="n">dim</span> <span class="o">*</span> <span class="n">voxel_pos</span><span class="p">),</span> <span class="n">res</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>即根据物体单位化后的世界空间坐标，找出对应的体素离散坐标， 往3D纹理的该位置注入物体的光照信息。</p>
+
+<p>光照信息包括所有光源的直接光照（不考虑遮挡）以及自发光。</p>
+
+<p>把demo的res改成voxel_pos，可以看出体素的分布情况：</p>
+
+<p><img src="../images/2022.3/3.jpg" alt="3.jpg"></p>
+
+<p>可以看出每个体素的颜色都是单一的，没有插值效果，这是因为体素化是在fragment shader写入3D纹理，无论光栅化过程中怎么插值，最终被写入3D纹理之有一个fragment。</p>
+
+<h3>为什么需要geometry shader</h3>
+
+<p>先看代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">layout</span><span class="p">(</span><span class="n">triangles</span><span class="p">)</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">layout</span><span class="p">(</span><span class="n">triangle_strip</span><span class="p">,</span> <span class="n">max_vertices</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="n">out</span><span class="p">;</span>
+
+<span class="n">in</span> <span class="n">vec3</span> <span class="n">worldPositionGeom</span><span class="p">[];</span>
+<span class="n">in</span> <span class="n">vec3</span> <span class="n">normalGeom</span><span class="p">[];</span>
+
+<span class="n">out</span> <span class="n">vec3</span> <span class="n">worldPositionFrag</span><span class="p">;</span>
+<span class="n">out</span> <span class="n">vec3</span> <span class="n">normalFrag</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">worldPositionGeom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">worldPositionGeom</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">worldPositionGeom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">worldPositionGeom</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">p</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">cross</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">));</span> 
+    <span class="k">for</span><span class="p">(</span><span class="n">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+        <span class="n">worldPositionFrag</span> <span class="o">=</span> <span class="n">worldPositionGeom</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="n">normalFrag</span> <span class="o">=</span> <span class="n">normalGeom</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="p">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="p">){</span>
+            <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">y</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">z</span><span class="p">){</span>
+            <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">EmitVertex</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="n">EndPrimitive</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>首先因为layout(triangles) in可知，几何着色器的输入是vertex shader输出的三角面（未光栅化）。</p>
+
+<p>同时根据layout(triangle_strip, max_vertices = 3) out，可知输出也是三角面，1比1输出，再结合下面的代码可知这个几何着色器大概就是调整了每个三角面的顶点坐标。</p>
+
+<p>那究竟调整成了什么样呢？</p>
+
+<p>因为三角面有倾斜角度，三角面在xy、yz、xz三个平面上的投影是不一样大的，要找出投影面积最大的那个平面（简单理解就是让三角面变胖才能更好地体素化），可以用面法线来判断。在这个几何着色器里求面法线很简单，因为可以直接获得三个顶点的坐标，用一个cross就得到了。</p>
+
+<p>const vec3 p = abs(cross(p1, p2)); </p>
+
+<p>注意用了abs，方便后面对p.xyz大小的比较。</p>
+
+<p>然后就看这段代码：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="p">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">y</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">z</span><span class="p">){</span>
+    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">worldPositionFrag</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>如果p.z最长，那么说明法线比较偏向正负z，即投影到xy平面能使得三角面面积更大，另外2个case也是这个意思，分别是yz、xz平面。</p>
+
+<p>然后问题来了：不管哪个case，最后的逻辑都是把gl_Position.z分量设为0。那不是把所有三角面都给搞到z为0时的xy平面了？</p>
+
+<p>修改using __DEFAULT_LEVEL = CornellScene并用renderdoc截帧看，确实是这样的：</p>
+
+<p><img src="../images/2022.3/6.png" alt="6.png"></p>
+
+<p><img src="../images/2022.3/4.png" alt="4.png"></p>
+
+<p><img src="../images/2022.3/5.png" alt="5.png"></p>
+
+<p>图3看起来是不是很像三视图？没错，确实是三视图，但是是world space下的，DCC软件里的三视图一般是object space。</p>
+
+<p>图3只看到3个正方形，也是因为正方体完全对称，且摆放位置和坐标轴平行，左右面、上下面、前后面，投影后的位置就会一样，三视图就是3个正方形。</p>
+
+<p>下面继续分析这段代码。</p>
+
+<p>上一节说了体素化其实只和worldPositionFrag有关，修改gl_Position其实不会影响voxel_pos，那么改gl_Position又有什么用呢？</p>
+
+<p>首先要根据vertex shader理解gl_Position，gl_Position其实是view space坐标，最终会变成clip space坐标的。gl_Position用于做光栅化计算，修改gl_Position就是控制光栅化。</p>
+
+<p>光栅化本质是把三角形映射到屏幕上，找出三角形对应了哪些像素点。</p>
+
+<p>综合下来，就可以知道这段代码的思路了：</p>
+
+<p>1.把xy、yz、xz模拟成屏幕平面，根据三角形的法线找出最佳投影面，让三角形投到该&#39;屏幕&#39;。
+2.又因为硬件光栅化必须是在xy平面下进行，所以把yz、xz平面的&#39;图像&#39;直接&#39;复制&#39;到xy平面。即挪一下分量位置，例如yz平面的话，(0,y,z)变成(y,z,0)</p>
+
+<p>虽然三视图可能会这样子重叠：</p>
+
+<p><img src="../images/2022.3/8.png" alt="8.png"></p>
+
+<p><img src="../images/2022.3/7.png" alt="7.png"></p>
+
+<p>注意，每个视图光栅化产生的fragment并不会因为重叠问题，而被剔除的（因为关了深度测试和背面剔除）。</p>
+
+<p>于是在fragment shader中每个fragment，可能是三视图的任何一个视图的fragment，不同的fragment在屏幕空间中可能是位于同一个位置。但实际上在着色时，并不需要知道是来源于哪个视图，像素重叠与否也不影响。</p>
+
+<p>这里面要深刻理解的是，<strong>fragment的数量和体素化的精度正相关</strong>。这也是为什么要找出投影面积最大的那个平面的原因。</p>
+
+<p>可以这样思考一下，假设我偏偏不找投影面积最大的平面去投影，我找最小的，那会如何呢？比如说在三视图里挑了一个投影面积只有1个像素的平面去光栅化！<strong>那么光栅化产生的fragment也就只有一个</strong>，这一个fragment只会让fragment shader运行一次，也就是产生一个体素，这个体素代表了整个三角形！</p>
+
+<p>假设在另一个视图下这个三角形其实面积很大，可能产生了100x100个fragment，那么这个错误的投影就导致了体素的严重退化，从10000个体素退化成单一个体素，精度直线下降。</p>
+
+<p>这不是危言耸听，因为3D纹理有限，其实屏幕分辨率是非常低的，在demo里仅仅是64x64：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">GLuint</span> <span class="n">voxelTextureSize</span> <span class="o">=</span> <span class="mi">64</span><span class="p">;</span> <span class="c1">// Must be set to a power of 2.</span>
+<span class="n">glViewport</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">voxelTextureSize</span><span class="p">,</span> <span class="n">voxelTextureSize</span><span class="p">);</span>
+</code></pre></div>
+<p>稍微远离摄像机一点，物体的体素精度就很低了，无论哪个视图都可能只产生了非常少的fragment。</p>
+
+<h3>cone tracing是什么</h3>
+
+<p>这也是本文关注重点。</p>
+
+<p>上一节搞定了把场景光照信息注入到了3d纹理中，也就是体素，后面的rendering就可以采样这张3D纹理，获得环境光信息了。但是怎么采样是个大问题。</p>
+
+<p>在demo上实现的是一种叫cone tracing的算法。为啥叫cone呢，是因为在计算环境光对shading point的影响时，不能只发射一条射线（这是ray tracing），而是要往周围发射N条射线，那么问题来了，可能得发射非常多的射线、以及实现重要性采样，才能获得比较准确的结果，计算成本比较高。</p>
+
+<p>cone tracing的最大优点是把射线方向固定成<strong>9个</strong>，如下图：</p>
+
+<p><img src="../images/2022.3/9.png" alt="9.png"></p>
+
+<p>diffuse部分cone tracing代码如下：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// Returns a vector that is orthogonal to u.</span>
+<span class="n">vec3</span> <span class="nf">orthogonal</span><span class="p">(</span><span class="n">vec3</span> <span class="n">u</span><span class="p">){</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>
+    <span class="n">vec3</span> <span class="n">v</span> <span class="o">=</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">99146</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">11664</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">05</span><span class="mi">832</span><span class="p">);</span> <span class="c1">// Pick any normalized vector.</span>
+    <span class="k">return</span> <span class="n">abs</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">.</span><span class="mi">99999</span><span class="n">f</span> <span class="o">?</span> <span class="n">cross</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">:</span> <span class="n">cross</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">vec3</span> <span class="nf">indirectDiffuseLight</span><span class="p">(){</span>
+    <span class="k">const</span> <span class="kt">float</span> <span class="n">ANGLE_MIX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">;</span> <span class="c1">// Angle mix (1.0f =&gt; orthogonal direction, 0.0f =&gt; direction of normal).</span>
+    <span class="k">const</span> <span class="kt">float</span> <span class="n">w</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">};</span> <span class="c1">// Cone weights.</span>
+    <span class="c1">// Find a base for the side cones with the normal as one of its base vectors.</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">ortho</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">orthogonal</span><span class="p">(</span><span class="n">normal</span><span class="p">));</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">ortho2</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">cross</span><span class="p">(</span><span class="n">ortho</span><span class="p">,</span> <span class="n">normal</span><span class="p">));</span>
+    <span class="c1">// Find base vectors for the corner cones too.</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">corner</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="n">ortho</span> <span class="o">+</span> <span class="n">ortho2</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">corner2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="n">ortho</span> <span class="o">-</span> <span class="n">ortho2</span><span class="p">);</span>
+    <span class="err">。。。</span>
+    <span class="c1">// Accumulate indirect diffuse light.</span>
+    <span class="n">vec3</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="c1">// Trace front cone</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">+</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">normal</span><span class="p">,</span> <span class="n">normal</span><span class="p">);</span>
+
+    <span class="c1">// Trace 4 side cones.</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">ortho</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="o">-</span><span class="n">ortho</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">s3</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">ortho2</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">s4</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="o">-</span><span class="n">ortho2</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">+</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">ortho</span><span class="p">,</span> <span class="n">s1</span><span class="p">);</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">-</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">ortho</span><span class="p">,</span> <span class="n">s2</span><span class="p">);</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">+</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">ortho2</span><span class="p">,</span> <span class="n">s3</span><span class="p">);</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">-</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">ortho2</span><span class="p">,</span> <span class="n">s4</span><span class="p">);</span>
+
+    <span class="c1">// Trace 4 corner cones.</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">corner</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">c2</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="o">-</span><span class="n">corner</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">c3</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">corner2</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">vec3</span> <span class="n">c4</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="o">-</span><span class="n">corner2</span><span class="p">,</span> <span class="n">ANGLE_MIX</span><span class="p">);</span>
+
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">+</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">corner</span><span class="p">,</span> <span class="n">c1</span><span class="p">);</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">-</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">corner</span><span class="p">,</span> <span class="n">c2</span><span class="p">);</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">+</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">corner2</span><span class="p">,</span> <span class="n">c3</span><span class="p">);</span>
+    <span class="n">acc</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">traceDiffuseVoxelCone</span><span class="p">(</span><span class="n">C_ORIGIN</span> <span class="o">-</span> <span class="n">CONE_OFFSET</span> <span class="o">*</span> <span class="n">corner2</span><span class="p">,</span> <span class="n">c4</span><span class="p">);</span>
+
+    <span class="c1">// Return result.</span>
+    <span class="k">return</span> <span class="n">DIFFUSE_INDIRECT_FACTOR</span> <span class="o">*</span> <span class="n">material</span><span class="p">.</span><span class="n">diffuseReflectivity</span> <span class="o">*</span> <span class="n">acc</span> <span class="o">*</span> <span class="p">(</span><span class="n">material</span><span class="p">.</span><span class="n">diffuseColor</span> <span class="o">+</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mo">001</span><span class="n">f</span><span class="p">));</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>整体步骤如下：</p>
+
+<ol>
+<li>orthogonal里固定一个随意挑选的v，用v去和normal做叉积，获得一个和normal正交的向量ortho</li>
+<li>用第一步得到的向量，再次和normal做叉积，得到一个分别和normal、ortho正交的向量ortho2。normal、ortho、ortho2够成一个shading point的正交坐标轴</li>
+<li>再算出这个坐标系偏转45度后的新的2个基向量corner、corner2</li>
+<li>分别算出normal和4个方向+ortho、-ortho、+ortho2、-ortho2的中间向量s1、s2、s3、s4，这才是真正的射线方向，即斜45度发射射线。corner、corner2同理。</li>
+<li>traceDiffuseVoxelCone 法线方向</li>
+<li>traceDiffuseVoxelCone s1、s2、s3、s4四个斜45度方向</li>
+<li>traceDiffuseVoxelCone c1、c2、c3、c4这四个绕了normal旋转45度后，再往normal倾斜45度的方向</li>
+<li>把这9个方向的返回值算加权和，就是环境光照结果了，返回时要乘以shading point的材质的漫反射率即diffuseColor（albedo）</li>
+</ol>
+
+<p>接着看traceDiffuseVoxelCone:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// Traces a diffuse voxel cone.</span>
+<span class="n">vec3</span> <span class="nf">traceDiffuseVoxelCone</span><span class="p">(</span><span class="k">const</span> <span class="n">vec3</span> <span class="n">from</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">direction</span><span class="p">){</span>
+    <span class="n">direction</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">direction</span><span class="p">);</span>
+
+    <span class="k">const</span> <span class="kt">float</span> <span class="n">CONE_SPREAD</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">325</span><span class="p">;</span>
+
+    <span class="n">vec4</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">);</span>
+
+    <span class="c1">// Controls bleeding from close surfaces.</span>
+    <span class="c1">// Low values look rather bad if using shadow cone tracing.</span>
+    <span class="c1">// Might be a better choice to use shadow maps and lower this value.</span>
+    <span class="kt">float</span> <span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">1953125</span><span class="p">;</span>
+
+    <span class="c1">// Trace.</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">SQRT2</span> <span class="o">&amp;&amp;</span> <span class="n">acc</span><span class="p">.</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">){</span>
+        <span class="n">vec3</span> <span class="n">c</span> <span class="o">=</span> <span class="n">from</span> <span class="o">+</span> <span class="n">dist</span> <span class="o">*</span> <span class="n">direction</span><span class="p">;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">scaleAndBias</span><span class="p">(</span><span class="n">from</span> <span class="o">+</span> <span class="n">dist</span> <span class="o">*</span> <span class="n">direction</span><span class="p">);</span>
+        <span class="kt">float</span> <span class="n">l</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">CONE_SPREAD</span> <span class="o">*</span> <span class="n">dist</span> <span class="o">/</span> <span class="n">VOXEL_SIZE</span><span class="p">);</span>
+        <span class="kt">float</span> <span class="n">level</span> <span class="o">=</span> <span class="n">log2</span><span class="p">(</span><span class="n">l</span><span class="p">);</span>
+        <span class="kt">float</span> <span class="n">ll</span> <span class="o">=</span> <span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">vec4</span> <span class="n">voxel</span> <span class="o">=</span> <span class="n">textureLod</span><span class="p">(</span><span class="n">texture3D</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="n">MIPMAP_HARDCAP</span><span class="p">,</span> <span class="n">level</span><span class="p">));</span>
+        <span class="n">acc</span> <span class="o">+=</span> <span class="mi">0</span><span class="p">.</span><span class="mo">075</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">*</span> <span class="n">voxel</span> <span class="o">*</span> <span class="n">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">voxel</span><span class="p">.</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+        <span class="n">dist</span> <span class="o">+=</span> <span class="n">ll</span> <span class="o">*</span> <span class="n">VOXEL_SIZE</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">pow</span><span class="p">(</span><span class="n">acc</span><span class="p">.</span><span class="n">rgb</span> <span class="o">*</span> <span class="mi">2</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>有很多magic number，本文就不深究怎么来的了，毕竟这个demo是学生作品。</p>
+
+<p>理解下流程就好了。</p>
+
+<p>循环里先算出当前采样坐标c，其中dist是射线长度；接着c转换到3D纹理的uvw坐标系中，即0..1；然后是算lod level，这个的计算方法不是可以泛化的，这里只能理解成和射线长度相关，射线越长，lod level越大，3D纹理精度越低，即采样范围越大；接着采样3D纹理获得illuminance值，累加到acc，并迭代dist。</p>
+
+<p>最后返回前又有一条magic formula，也没注释，不知道什么含义，看起来是放大了acc值。</p>
+
+<p>总的来说，<strong>cone tracing就是利用3D纹理多层lod，实现了像圆锥一样的，越接近圆锥顶点(起点)，采样范围越小，越远离圆锥顶点，采样范围越大的效果</strong>。</p>
+
+<p>另外注意，这里面其实有考虑occlusion的问题的。不考虑遮挡的话，被遮挡物的体素值也被算进去，就不准了。关键原理在于voxel.a值，当采样到一个完全不透明的体素值，这个体素就是遮挡物，沿着这个射线继续采样也没有必要了。把射线沿路的voxel.a叠加到acc.a，并且当acc.a &gt;= 1时，采样终止。</p>
+
+<h3>如何debug体素化后的结果</h3>
+
+<p>demo里用的是一个全屏ray marching的做法：</p>
+
+<ol>
+<li>打开深度测试，正常渲染场景的正面和背面，分别写入到textureBack和textureFront2个FBO</li>
+<li>然后用一个后处理，在fragment shader里，根据textureBack、textureFront算出ray origin、ray dir（其实大可不必），然后沿着这个方向每走一步采样一下3D纹理，也是用alpha值才终止循环</li>
+</ol>
+
+<h2>参考资料</h2>
+
+<p><a href="https://www.seas.upenn.edu/%7Epcozzi/OpenGLInsights/OpenGLInsights-SparseVoxelization.pdf">https://www.seas.upenn.edu/~pcozzi/OpenGLInsights/OpenGLInsights-SparseVoxelization.pdf</a></p>
+
+<p><a href="https://github.com/otaku690/SparseVoxelOctree">https://github.com/otaku690/SparseVoxelOctree</a></p>
+
+<p><a href="https://github.com/Friduric/voxel-cone-tracing">https://github.com/Friduric/voxel-cone-tracing</a></p>
+
+    </div>
+    <div class="entry">
+        (未经授权禁止转载)
+    </div>
+    <div class="date">
+        Written on March 10, 2022
+    </div>
+    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <img src="../images/dashang1.jpeg" />
+    <img src="../images/dashang2.jpeg" />
+    
+    
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+
+      </section>
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
