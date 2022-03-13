@@ -340,11 +340,26 @@
 
 <p>\[ \sigma ^{2} = Var(x) = E[x^{2}] -  E[x]^{2} = M2 - M1^{2} \]</p>
 
-<p>到了这里，VSM的原理已经相当清楚了：先是存了原始的深度x和x平方，然后又对x和x平方做了一些坏事（对我们来说是好事）：把x和x平方稍微搅浑了，搅浑了后想恢复原始的x是不可能了，但是我们可以利用搅浑后的x和x平方（一、二阶矩），算出x的<strong>方差</strong>，再结合搅浑后的x（x的数学期望，一阶矩），就能对原始的x做概率估计。</p>
+<p>到了这里，VSM的原理已经相当清楚了：先是存了原始的深度x和x平方，然后又对x和x平方做了一些坏事：把x和x平方稍微搅浑（模糊）了，模糊了后想恢复原始的x是不可能了，但是我们可以利用模糊后的x和x平方（一、二阶矩），算出x的<strong>方差</strong>，再结合模糊后的x（x的数学期望，一阶矩），就能对原始的x做概率估计。模糊操作可以用后处理或compute shader实现。</p>
 
-<p>（深度值越大就越深，越接近1，即越白，所以靠近摄像机的深度偏白色，远处的偏黑色）</p>
+<p>在继续分析前，先暂停一下，让我们搞清楚depth buffer的平台差异问题和reverse z问题。</p>
 
-<p>但还没完，VSM还和切比雪夫不等式的one-tailed版本有关系。首先拿出该公式：</p>
+<p>根据<a href="https://docs.unity3d.com/540/Documentation/Manual/SL-PlatformDifferences.html">unity的说明文档</a>，可以知道不同的图形API，深度范围是不一样的：</p>
+
+<ol>
+<li>DX、Metal、主机平台，clip space的depth范围是[0, 1]，0是near，1是far</li>
+<li>GL、GL ES，clip space的depth范围是[-1, 1]，-1是near，1是far</li>
+</ol>
+
+<p>从这2点可见，靠近摄像机的物体深度会偏黑，远离摄像机的物体深度会偏白。</p>
+
+<p>然而，因为clip space的深度是非线性的且float是越接近0精度越高，所以存在一种叫<a href="https://zhuanlan.zhihu.com/p/75517534">reverse z</a>的优化技术，它可以减弱中远距离的z fighting问题。具体做法就是让near变成1，far变成0。但根据上述第二点，GL环境下，depth范围是[-1，1]，是不能直接应用reverse z的。所以这个技术有一定限制性。</p>
+
+<p>下文的内容仅适用于unity DX环境的VSM，即传统的depth范围[0,1]。</p>
+
+<p>那么我们继续。</p>
+
+<p>VSM的实现还需要用上切比雪夫不等式的one-tailed版本。首先拿出该公式：</p>
 
 <p>\[ P _{  X - \mu  \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + t ^{2} } ，t  &gt; 0 \] </p>
 
