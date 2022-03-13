@@ -121,6 +121,8 @@
 
 <!--more-->
 
+<h1>相关数学概念</h1>
+
 <h2>矩(Moment)</h2>
 
 <p><a href="https://en.wikipedia.org/wiki/Moment_(mathematics)">https://en.wikipedia.org/wiki/Moment_(mathematics)</a></p>
@@ -319,11 +321,50 @@
 
 <p>得证。</p>
 
+<h1>zbuffer范围问题</h1>
+
+<p>在继续分析前，先暂停一下，让我们搞清楚depth buffer的平台差异问题、reverse z问题、自定义depth问题。</p>
+
+<h2>平台差异问题</h2>
+
+<p>根据<a href="https://docs.unity3d.com/540/Documentation/Manual/SL-PlatformDifferences.html">unity的说明文档</a>，可以知道不同的图形API，深度范围是不一样的：</p>
+
+<ol>
+<li>DX、Metal、主机平台，clip space的depth范围是[0, 1]，0是near，1是far</li>
+<li>GL、GL ES，clip space的depth范围是[-1, 1]，-1是near，1是far</li>
+</ol>
+
+<p>从这2点可见，一般靠近摄像机的物体深度会偏黑，远离摄像机的物体深度会偏白。<strong>越近越黑，越远越白</strong>。</p>
+
+<h2>reverse z问题</h2>
+
+<p>在下一节使用的<a href="https://github.com/gkjohnson/unity-custom-shadow-experiments">demo</a>里，经过截帧，发现事实并不是如此：</p>
+
+<p><img src="../images/2022.3/21.png" alt="21.png"></p>
+
+<p>可见，该demo使用的是DX11，且zbufer是<strong>越近越白，越远越黑</strong>。</p>
+
+<p>这个是因为unity使用DX11时，默认开启了一种叫<a href="https://zhuanlan.zhihu.com/p/75517534">reverse z</a>的优化技术。</p>
+
+<p>因为clip space的深度是非线性的且float是越接近0精度越高，所以reverse z应运而生，reverse z可以减弱中远距离的z fighting问题。具体做法就是让near变成1，far变成0。</p>
+
+<p>（题外话一下，根据平台差异性第二点，GL环境下，depth范围是[-1，1]，是不能直接应用reverse z的。所以这个技术有一定平台限制性，还需要一些特殊处理才能用到GL中）</p>
+
+<p>reverse z开启时，depth范围变成[1, 0]，depth compare func变成Greater Equal，即新的深度大于已有深度时，才能通过深度测试并进行绘制，并把更大的深度值写入z buffer。</p>
+
+<h2>自定义depth问题</h2>
+
+<p>第三是自定义depth问题。既然默认的z buffer有平台差异，那么自定义一个depth RT，自己控制depth范围，不是很方便？确实是可以的，这个demo确实是这样做的。</p>
+
+<p>为了不引起混乱，在此总结一下：下文所讨论的代码实现，<strong>基于unity DX11环境的VSM，且打开了reverse z，默认的depth RT范围是非传统的[1, 0]，自定义VSM depth的范围是[0, 1]</strong>。</p>
+
 <h1>方差阴影贴图(VSM)</h1>
 
-<p>生成VSM，相比SSM(Standard Shadow Map)，除了把深度d存到深度图，还要多存一个d*d。似乎看起来有点蠢，明明有d了，要用d平方不就是运算的时候d*d就行了嘛。其实VSM的原理还得结合一些硬件知识来理解。相比SSM是单通道贴图，VSM则是双通道贴图，并且VSM在用于光照计算前，<strong>可以做纹理过滤或抗锯齿处理</strong>，纹理过滤，相当于纹理被模糊化（VSM能实现软阴影的关键之处）。</p>
+<p>生成VSM，相比SSM(Standard Shadow Map)，除了把深度d存到深度图，还要多存一个d*d。似乎看起来有点蠢，明明有d了，要用d平方不就是运算的时候d*d就行了嘛。其实VSM的原理还得结合一些硬件知识来理解。</p>
 
-<p>SSM并不能被模糊，而VSM能模糊化的好处就先不说了。模糊化后，d和d平方的值就在一定范围内做了偏移。那么我们可以设：</p>
+<p>相比SSM是单通道贴图，VSM则是双通道贴图，并且VSM在用于光照计算前，<strong>允许做纹理过滤</strong>，即模糊化（VSM能实现软阴影的关键之处）。而SSM是万万不能模糊的，不然做深度测试会出大问题。</p>
+
+<p>VSM把zbuffer模糊后，d和d平方的值就在一定范围内做了偏移。那么我们可以设：</p>
 
 <ul>
 <li><p>模糊前的深度d和d平方分别为x和\( x^{2} \)</p></li>
@@ -342,23 +383,6 @@
 
 <p>到了这里，VSM的原理已经相当清楚了：先是存了原始的深度x和x平方，然后又对x和x平方做了一些坏事：把x和x平方稍微搅浑（模糊）了，模糊了后想恢复原始的x是不可能了，但是我们可以利用模糊后的x和x平方（一、二阶矩），算出x的<strong>方差</strong>，再结合模糊后的x（x的数学期望，一阶矩），就能对原始的x做概率估计。模糊操作可以用后处理或compute shader实现。</p>
 
-<p>在继续分析前，先暂停一下，让我们搞清楚depth buffer的平台差异问题和reverse z问题。</p>
-
-<p>根据<a href="https://docs.unity3d.com/540/Documentation/Manual/SL-PlatformDifferences.html">unity的说明文档</a>，可以知道不同的图形API，深度范围是不一样的：</p>
-
-<ol>
-<li>DX、Metal、主机平台，clip space的depth范围是[0, 1]，0是near，1是far</li>
-<li>GL、GL ES，clip space的depth范围是[-1, 1]，-1是near，1是far</li>
-</ol>
-
-<p>从这2点可见，靠近摄像机的物体深度会偏黑，远离摄像机的物体深度会偏白。</p>
-
-<p>然而，因为clip space的深度是非线性的且float是越接近0精度越高，所以存在一种叫<a href="https://zhuanlan.zhihu.com/p/75517534">reverse z</a>的优化技术，它可以减弱中远距离的z fighting问题。具体做法就是让near变成1，far变成0。但根据上述第二点，GL环境下，depth范围是[-1，1]，是不能直接应用reverse z的。所以这个技术有一定限制性。</p>
-
-<p>下文的内容仅适用于unity DX环境的VSM，即传统的depth范围[0,1]。</p>
-
-<p>那么我们继续。</p>
-
 <p>VSM的实现还需要用上切比雪夫不等式的one-tailed版本。首先拿出该公式：</p>
 
 <p>\[ P _{  X - \mu  \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + t ^{2} } ，t  &gt; 0 \] </p>
@@ -373,23 +397,58 @@
 
 <p>（在<a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.104.2569&rep=rep1&type=pdf">Variance Shadow Maps</a> 论文中就会看到这个不等式）</p>
 
-<p>下面的就按照论文的思路讲。假定一个3d场景里有一块挡板（Occluder)，产生了阴影（VSM），然后在fragment shader里对某一个fragment做阴影计算，这时候fragment可能被遮挡，也可能没被遮挡（薛定谔的猫？）。</p>
+<p>这个公式很重要，会直接应用到shader中。</p>
 
-<p>首先把fragPos转换到light space下，从而取出过过滤后的VSM里的深度，称为\(d_{1}\)。而fragPos当前在light place的深度则称为\(d_{2} \)。 \( P _{  X \geq t } \)里的X则是VSM里未过滤前的深度。</p>
+<p>假定我们已经画出了VSM阴影贴图，此时我们要在真正的rendering pass的某个fragment shader里对某一个fragment做软阴影计算，不像SSM可以直接做深度比较，在VSM环境下，只能知道fragment <strong>有概率被遮挡</strong> 。</p>
 
-<p>把t当成\(d_{2} \)，再加上用前面的公式算出来的数学期望\(\mu \)和方差\(\sigma  ^{2} \)，就可以确定，任意X超过\(d_{2} \)的概率，不大于\( \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \)。不过，这个只是我们需要的概率的上界， \( P _{  X \geq t } \)并不能被准确算出来。</p>
+<p>此时可设：</p>
 
-<p>再设这个表示frag没有被挡板遮挡的实际概率\( P_{  X \geq t } \)为p，那么frag的d（即X）的数学期望为：</p>
+<ul>
+<li>fragment在light view space下的精确深度为t</li>
+<li>VSM里所对应的uv位置的未模糊前的深度为X（即最靠近光源的遮挡物深度）</li>
+</ul>
 
-<p>\[ \mu = E(x) = p d_{2} + (1 - p)d_{1} \]</p>
+<p>因为上文已经说了VSM自定义depth的范围是[0, 1]，那么可知：</p>
 
-<p>（这里可以这样理解：当p=1时，期望值为\(d_{2}\)，即fragPosLightSpace.z，表示frag在light space深度和在VSM的深度完全无关，即完全没有被遮挡，0%的阴影；当p=0时，期望值为\(d_{1}\)，即在light space深度绝对等于在VSM的深度，表示被完全遮挡，100%的阴影)</p>
+<ul>
+<li>当X &gt; t时，遮挡物的深度大于fragment的深度，fragment在遮挡物前面，没有阴影</li>
+<li>当X &lt; t时，遮挡物的深度小于fragment的深度，fragment在遮挡物后面，有阴影</li>
+</ul>
 
-<p>\(d^{2}\)的数学期望为：</p>
+<p>那么\( P _{  X \geq t } \)这个东西的意思就是，<strong>在light view space下，fragment没有被遮挡的概率</strong>。</p>
+
+<p>再设一个变量叫阴影强度（shadowIntensity），有以下关系式：</p>
+
+<p>\[ shadowIntensity = 1 - P _{  X \geq t } \]</p>
+
+<p>shadowIntensity的本质就是<strong>fragment被遮挡的概率</strong>。</p>
+
+<p>下面是具体算法和工程实现部分。</p>
+
+<p>首先把fragPos转换到light space下，获得clip space pos再转成uv坐标，就可以采样VSM深度图的depth值（模糊后），称为\(d_{1}\)。而fragPos当前在light place的精确深度则称为\(d_{2} \)。 </p>
+
+<p>把\(d_{2} \)代入t，就可以明确：</p>
+
+<p><strong>fragment没有被遮挡的概率</strong> \( P _{  X \geq d_{2} } \) <strong>小于等于</strong> \( \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \)</p>
+
+<p>再设\( P_{  X \geq d_{2} } \)为p，那么VSM <strong>未模糊前的d</strong> 的数学期望可等于：</p>
+
+<p>\[ \mu = E(X) = E(d) = p d_{2} + (1 - p)d_{1} \]</p>
+
+<p>这个式子可以这样理解：</p>
+
+<ul>
+<li>当p=1时，framgment 100%不被遮挡物遮挡，遮挡物深度期望值为\(d_{2}\)，即遮挡物深度必然大于等于fragment在light view space的深度</li>
+<li>当p=0时，framgment 100%被遮挡物遮挡，遮挡物深度期望值为\(d_{1}\)，即等于VSM采样深度（模糊后），VSM变成了SSM</li>
+</ul>
+
+<p>这个p虽然还不能被准确算出来，但基于这条d的数学期望公式，不等式右边的部分，即p的上界，已经可以继续化简了！这个上界究竟是什么东西呢？</p>
+
+<p>先写出\(d^{2}\)的数学期望：</p>
 
 <p>\[  E(x^{2}) = p d_{2}^{2} + (1 - p)d_{1}^{2} \]</p>
 
-<p>d的方差为：</p>
+<p>于是d的方差为：</p>
 
 <p>\[ \sigma ^{2} = E[x^{2}] -  E[x]^{2}  = p d_{2}^{2} + (1 - p)d_{1}^{2} - (p d_{2} + (1 - p)d_{1} )^{2} \]</p>
 
@@ -407,9 +466,9 @@
 
 <p>\[ = (p - p^{2})(d_{2} - d_{1})^{2} \]</p>
 
-<p>把这些参数都代入到上面的不等式，求出\(p_{max}(d_{2}) \)：</p>
+<p>设p的上界（不等式右边部分）为\( p_{max} (d_{2}) \)，并把\( \mu 、\sigma ^{2} \)代入后化简：</p>
 
-<p>\[ P _{max}(d_{2}) = \frac { \sigma ^{2} }{ \sigma ^{2} + (d_{2} - \mu) ^{2} }  \] </p>
+<p>\[ p \leq p_{max} (d_{2}) = \frac { \sigma ^{2} }{ \sigma ^{2} + (d_{2} - \mu) ^{2} }  \] </p>
 
 <p>\[ = \frac { (p - p^{2})(d_{2} - d_{1})^{2} }{ (p - p^{2})(d_{2} - d_{1})^{2} + ( p d_{2} + (1 - p)d_{1}  - d_{2} ) ^{2} }  \] </p>
 
@@ -423,11 +482,27 @@
 
 <p>\[ = p \] </p>
 
-<p><strong>也就是说，\( P_{ max }( X \geq d_{2}) \) 这个最大值就刚好是我们想要求的\( P( X \geq d_{2}) \) ！</strong></p>
+<p><strong>也就是说，p的上界等于p本身 ！</strong></p>
+
+<p>总结一下。原始的切比雪夫不等式的one-tailed版本：</p>
 
 <p>\[ P _{  X \geq t } \leq \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \] </p>
 
-<p><strong>这里的\( \leq \) 刚好是\( = \)，不等式变成了等式。Amazing！</strong></p>
+<p>在VSM这个特殊场景下，不等式是：</p>
+
+<p>\[ P _{  X \geq d_{2} }  \leq \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} }  \]</p>
+
+<p>根据以下假设：</p>
+
+<p>\[ \mu = E(X) = E(d) = p d_{2} + (1 - p)d_{1} \]</p>
+
+<p>我们推出了p的上界等于p：</p>
+
+<p>\[   P _{  X \geq d_{2} }  \leq p_{max} (d_{2}) =  \frac { \sigma ^{2} }{ \sigma ^{2} + (t - \mu) ^{2} } =  P _{  X \geq d_{2} } \]</p>
+
+<p>这意味着我们直接算出了准确的p值，不等式变成了等式。Amazing！</p>
+
+<p>知道p的公式后有什么用呢？上文已经说了p的含义：<strong>fragment没有被遮挡的概率</strong>。这不就可以用来估算阴影强度了嘛。</p>
 
 <p>理论到此为止，剩下的就是工程问题了。</p>
 
@@ -441,61 +516,51 @@
 <div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// 32位高精度双通道纹理 用来存moment1和moment2</span>
 <span class="n">glTexImage2D</span><span class="p">(</span><span class="n">GL_TEXTURE_2D</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GL_RG32F</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GL_RG</span><span class="p">,</span> <span class="n">GL_FLOAT</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
 </code></pre></div>
-<p>然后修改shadow map着色器：</p>
+<p>然后修改shadow map shader（在light位置画一遍场景）：</p>
 
 <p>vs:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#version 410 core
-</span>
-<span class="n">layout</span> <span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="n">in</span> <span class="n">vec3</span> <span class="n">position</span><span class="p">;</span>
-
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">lightPV</span><span class="p">;</span>
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">model</span><span class="p">;</span>
-
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">v2f</span> <span class="nf">vert</span><span class="p">(</span><span class="n">appdata</span> <span class="n">v</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">lightPV</span> <span class="o">*</span> <span class="n">model</span> <span class="o">*</span> <span class="n">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
+    <span class="n">v2f</span> <span class="n">o</span><span class="p">;</span>
+    <span class="n">o</span><span class="p">.</span><span class="n">vertex</span> <span class="o">=</span> <span class="n">UnityObjectToClipPos</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">vertex</span><span class="p">);</span>
+    <span class="n">o</span><span class="p">.</span><span class="n">uv</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">uv</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">o</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">fixed4</span> <span class="n">frag</span><span class="p">(</span><span class="n">v2f</span> <span class="n">i</span><span class="p">)</span> <span class="o">:</span> <span class="n">SV_Target</span>
+<span class="p">{</span>
+    <span class="kt">float</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">.</span><span class="n">vertex</span><span class="p">.</span><span class="n">z</span><span class="p">;</span> <span class="c1">// DX11 reverse z范围是[1, 0], 这里自定义VSM depth范围到[0, 1]</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="n">i</span><span class="p">.</span><span class="n">vertex</span><span class="p">.</span><span class="n">z</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">moment1</span> <span class="o">=</span> <span class="n">depth</span><span class="p">;</span><span class="c1">// 一阶矩</span>
+    <span class="kt">float</span> <span class="n">moment2</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">depth</span><span class="p">;</span><span class="c1">// 二阶矩</span>
+    <span class="k">return</span> <span class="n">float4</span><span class="p">(</span><span class="n">moment1</span><span class="p">,</span> <span class="n">moment2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="p">}</span>
 
 </code></pre></div>
-<p>fs:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#version 410 core
-</span>
-<span class="n">in</span> <span class="n">vec4</span> <span class="n">v_position</span><span class="p">;</span>
-<span class="n">out</span> <span class="n">vec2</span> <span class="n">outColor</span><span class="p">;</span>
-
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>             
-    <span class="kt">float</span> <span class="n">depth</span> <span class="o">=</span> <span class="n">v_position</span><span class="p">.</span><span class="n">z</span> <span class="o">/</span> <span class="n">v_position</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
-    <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">*</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span><span class="c1">// TO NDC [0, 1]</span>
-
-    <span class="kt">float</span> <span class="n">moment1</span> <span class="o">=</span> <span class="n">depth</span><span class="p">;</span> <span class="c1">// 一阶矩</span>
-    <span class="kt">float</span> <span class="n">moment2</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">depth</span><span class="p">;</span> <span class="c1">// 二阶矩</span>
-
-    <span class="kt">float</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">dFdx</span><span class="p">(</span><span class="n">depth</span><span class="p">);</span>
-    <span class="kt">float</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">dFdy</span><span class="p">(</span><span class="n">depth</span><span class="p">);</span>
-    <span class="n">moment2</span> <span class="o">+=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">25</span> <span class="o">*</span> <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span><span class="p">);</span> <span class="c1">// 解决acne问题</span>
-    <span class="n">outColor</span> <span class="o">=</span> <span class="n">vec2</span><span class="p">(</span><span class="n">moment1</span><span class="p">,</span> <span class="n">moment2</span><span class="p">);</span>
-<span class="p">}</span>
-
-</code></pre></div>
-<p>可以渲染下Shadow Map是否正常:</p>
+<p>debug下VSM：</p>
 
 <p>rg通道一起输出：</p>
 
-<p><img src="../images/2017.11/2.png" alt="2.png"></p>
+<p><img src="../images/2022.3/111.png" alt="111.png"></p>
 
 <p>只有r通道(moment1):</p>
 
-<p><img src="../images/2017.11/3.png" alt="3.png"></p>
+<p><img src="../images/2022.3/112.png" alt="112.png"></p>
 
 <p>只有g通道(moment2):</p>
 
-<p><img src="../images/2017.11/4.png" alt="4.png"></p>
+<p><img src="../images/2022.3/113.png" alt="113.png"></p>
+
+<p>注意到背景是黑色的，实际上应该改成白色：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">//_shadowCam.backgroundColor = new Color(0, 0, 0, 0);</span>
+<span class="n">_shadowCam</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="n">new</span> <span class="nf">Color</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</code></pre></div>
+<p>为什么黑色和白色都能work的原因应该是那些区域没有被采样到，就没事。</p>
 
 <p>然后是应用的问题，需要修改lighting shader里的阴影计算代码：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// 只贴下核心代码：</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c">
+<span class="c1">// 我以前写的demo的代码</span>
 <span class="n">uniform</span> <span class="n">sampler2D</span> <span class="n">shadowMap</span><span class="p">;</span>
-
 <span class="c1">// 这个函数是用来算出上文说的Pmax</span>
 <span class="kt">float</span> <span class="nf">chebyshevUpperBound</span><span class="p">(</span><span class="n">sampler2D</span> <span class="n">shadowMap</span><span class="p">,</span> <span class="kt">float</span> <span class="n">d</span><span class="p">,</span> <span class="n">vec2</span> <span class="n">coord</span><span class="p">)</span>
 <span class="p">{</span>
@@ -529,12 +594,77 @@
     <span class="k">return</span> <span class="n">shadow</span><span class="p">;</span>
 <span class="p">}</span>
 
+<span class="c1">// 这是github demo的代码</span>
+<span class="n">fixed4</span> <span class="n">frag</span> <span class="p">(</span><span class="n">v2f</span> <span class="n">i</span><span class="p">)</span> <span class="o">:</span> <span class="n">COLOR</span>
+<span class="p">{</span>
+    <span class="c1">// COLOR</span>
+    <span class="n">float4</span> <span class="n">color</span><span class="p">;</span>
+    <span class="err">。。。</span>
+
+    <span class="c1">// SHADOWS</span>
+    <span class="c1">// get distance to lightPos</span>
+    <span class="n">float4</span> <span class="n">lightSpacePos</span> <span class="o">=</span> <span class="n">mul</span><span class="p">(</span><span class="n">_LightMatrix</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">wPos</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">depth</span> <span class="o">=</span> <span class="n">lightSpacePos</span><span class="p">.</span><span class="n">z</span> <span class="o">/</span> <span class="n">_ShadowTexScale</span><span class="p">.</span><span class="n">z</span><span class="p">;</span>
+
+    <span class="n">float2</span> <span class="n">uv</span><span class="p">;</span>
+    <span class="err">。。。</span>
+    <span class="n">float4</span> <span class="n">samp</span> <span class="o">=</span> <span class="n">tex2D</span><span class="p">(</span><span class="n">_ShadowTex</span><span class="p">,</span> <span class="n">uv</span><span class="p">);</span>
+
+    <span class="c1">// E(x) and E(x^2)</span>
+    <span class="kt">float</span> <span class="n">x</span> <span class="o">=</span> <span class="n">samp</span><span class="p">.</span><span class="n">r</span><span class="p">;</span> 
+    <span class="kt">float</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">samp</span><span class="p">.</span><span class="n">g</span><span class="p">;</span>
+
+    <span class="kt">float</span> <span class="n">var</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">;</span> 
+
+    <span class="c1">// calculate our initial probability based on the basic depths</span>
+    <span class="c1">// if our depth is closer than x, then the fragment has a 100%</span>
+    <span class="c1">// probability of being lit (p=1)</span>
+    <span class="kt">float</span> <span class="n">p</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="p">;</span> <span class="c1">// 这里有点问题，这个x已经是模糊后的</span>
+
+    <span class="kt">float</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">-</span> <span class="n">x</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">p_max</span> <span class="o">=</span> <span class="n">var</span> <span class="o">/</span> <span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="n">delta</span><span class="o">*</span><span class="n">delta</span><span class="p">);</span> <span class="c1">// 概率上界</span>
+
+    <span class="c1">// To alleviate the light bleeding, expand the shadows to fill in the gaps 处理漏光</span>
+    <span class="kt">float</span> <span class="n">amount</span> <span class="o">=</span> <span class="n">_VarianceShadowExpansion</span><span class="p">;</span>
+    <span class="n">p_max</span> <span class="o">=</span> <span class="n">clamp</span><span class="p">(</span> <span class="p">(</span><span class="n">p_max</span> <span class="o">-</span> <span class="n">amount</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">amount</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">shadowIntensity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">max</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p_max</span><span class="p">);</span> <span class="c1">// 1 - 没有被遮挡的概率 = 遮挡的概率 = 阴影强度</span>
+
+    <span class="n">color</span><span class="p">.</span><span class="n">xyz</span> <span class="o">*=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">shadowIntensity</span> <span class="o">*</span> <span class="n">_MaxShadowIntensity</span><span class="p">;</span> <span class="c1">// 阴影强度越接近1，color越接近黑色</span>
+    <span class="n">color</span><span class="p">.</span><span class="n">xyz</span> <span class="o">+=</span> <span class="n">UNITY_LIGHTMODEL_AMBIENT</span><span class="p">.</span><span class="n">xyz</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">color</span><span class="p">;</span>
+
+<span class="p">}</span>
+
 </code></pre></div>
-<p>最终效果:</p>
+<h2>最终demo效果</h2>
 
-<p><img src="../images/2017.11/5.png" alt="5.png"></p>
+<p>_VarianceShadowExpansion为0、关闭VSM blur：</p>
 
-<p>这里可以看到阴影边缘是变模糊了的，不过还是有锯齿。可以进一步对shadow map做blur来实现软化。</p>
+<p><img src="../images/2022.3/result1.png" alt="result1.png"></p>
+
+<p>_VarianceShadowExpansion为0、VSM做50次blur：</p>
+
+<p><img src="../images/2022.3/result2.png" alt="result1.png"></p>
+
+<p>_VarianceShadowExpansion为0.213、VSM做50次blur：</p>
+
+<p><img src="../images/2022.3/result3.png" alt="result1.png"></p>
+
+<p>可见_VarianceShadowExpansion值可以解决漏光问题。</p>
+
+<p>把</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">shadowIntensity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">max</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p_max</span><span class="p">);</span>
+</code></pre></div>
+<p>改为：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">shadowIntensity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span>  <span class="n">p_max</span><span class="p">;</span>
+</code></pre></div>
+<p>并把blur次数改为1，出现了acne：</p>
+
+<p><img src="../images/2022.3/result4.png" alt="result1.png"></p>
+
+<p>所以demo的float p = depth &lt;= x;可以解决acne问题。</p>
 
     </div>
     <div class="entry">
