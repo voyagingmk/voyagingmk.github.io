@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>球谐函数——数学基础 </title>
+
+        <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="" />
+    <meta property="og:description" content="" />
+    
+    <meta name="author" content="Wyman的原创技术博客" />
+
+    
+    <meta property="og:title" content="球谐函数——数学基础" />
+    <meta property="twitter:title" content="球谐函数——数学基础" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/sh/',
+		  'title': '球谐函数——数学基础'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的原创技术博客</a></h1>
+            <p class="site-description">恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
+    <div id="main" role="main" class="container">
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<h1>球谐函数——数学基础</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+<article class="post">
+    
+    <div class="entry">
+        <!--more-->
+
+<h1>三种坐标系</h1>
+
+<h2>矩坐标</h2>
+
+<p>矩坐标似乎是中文网络上才有的说法，正确叫法是<a href="https://en.wikipedia.org/wiki/Cartesian_coordinate_system">笛卡尔坐标系</a>。</p>
+
+<p><img src="../images/2022.3/103.png" alt="7.png"></p>
+
+<h2>柱坐标</h2>
+
+<p><a href="https://en.wikipedia.org/wiki/Cylindrical_coordinate_system">柱坐标</a>其实就是圆的定义的延伸。柱的横截面是圆，圆有一个半径r和角度φ，柱则还有一个厚度维度z。</p>
+
+<p><img src="../images/2022.3/102.png" alt="7.png"></p>
+
+<h2>球坐标</h2>
+
+<p><a href="https://en.wikipedia.org/wiki/Spherical_coordinate_system">球坐标</a>是极坐标的三维形式。</p>
+
+<p><img src="../images/2022.3/101.png" alt="7.png"></p>
+
+<h1>基函数和投影和重建</h1>
+
+<h2>基函数和正交</h2>
+
+<p>假设3D空间中有一个点P，记它的位置为函数f，f究竟是个什么东西呢？或者说怎么用数学描述f？</p>
+
+<p>答案是用坐标系，坐标系的本质就是一组<strong>正交的基函数(basis)</strong>。</p>
+
+<p>大家知道3D空间的笛卡尔坐标系有3个basis：(1,0,0)、(0,1,0)、(0,0,1)。这3个基向量是正交的。</p>
+
+<p>正交性有2个特点：</p>
+
+<ul>
+<li>任意2个不同的basis之间点积结果为0</li>
+<li>任意一个basis和它自己做点积，结果为常数c</li>
+</ul>
+
+<p>用积分式子表达这个正交关系：</p>
+
+<p><img src="../images/2022.3/104.png" alt="7.png"></p>
+
+<p>（当C为1时，其中的F称为正交基函数orthonormal basis functions）</p>
+
+<p>有了这个概念后，f这个事情就有了下一步的方向了：<strong>怎么用(1,0,0)、(0,1,0)、(0,0,1)描述f？</strong></p>
+
+<h2>投影</h2>
+
+<p>假设这个3D空间中有另一个参数物O，那么P究竟离O*<em>有多远呢</em>*</p>
+
+<p>假设没有其他工具、且人眼变成了一个正交相机，那么可以用三视角来判断P和O的距离：</p>
+
+<ul>
+<li>站在P的正面，观察P和O的相对位置，即得到P在xy平面的投影点</li>
+<li>站在P的侧面，观察P和O的相对位置，即得到P在yz平面的投影点</li>
+<li>站在P的头顶，观察P和O的相对位置，即得到P在xz平面的投影点</li>
+</ul>
+
+<p>平面上的投影点P&#39;，和O的关系又怎么办呢？因为我们已经通过三视图把三维问题降成了二维问题，同理也可以把二维问题降到一维，即继续把P投影到三个basis轴上得到P&#39;&#39;。P&#39;&#39;和O的距离就好办了，用尺子量。</p>
+
+<p>通过这个降维的办法，最终就能得到P在三个basis(1,0,0)、(0,1,0)、(0,0,1)上的投影距离x、y、z，一般也叫<strong>投影系数</strong>。也可记为：(x,0,0)、(0,y,0)、(0,0,z）。</p>
+
+<p>同时f可以记为f=(x,y,z)。f的投影过程可以数学描述了。</p>
+
+<p>记basis为\(\mathbf B_{i}\), f在\(\mathbf B_{i}\)投影系数记为\(C_{i}\)，并拓展f到任意维度、任意坐标系：</p>
+
+<p>\[ C_{i} = \mathbf f  \cdot \mathbf B_{i} \]</p>
+
+<p>验证：</p>
+
+<p>\[ (x,y,z) \cdot (1,0,0) = x \]
+\[ (x,y,z) \cdot (0,1,0) = y \]
+\[ (x,y,z) \cdot (0,0,1) = z \]</p>
+
+<p><strong>到了这里，f到三个basis的投影问题就解决了。接下来讨论的是怎么用basis和投影参数，重建f</strong>。</p>
+
+<h2>重建</h2>
+
+<p>很简单，f其实就是三个basis和三个投影系数分别相乘后的累加：</p>
+
+<p>\[ (1,0,0) * x =  (x,0,0) \]
+\[ (0,1,0) * y =  (x,y,0) \]
+\[ (0,0,1) * z =  (0,0,z) \]
+\[ f = (1,0,0) * x + (0,1,0) * y + (0,0,1) * z = (x,y,z)  \]</p>
+
+<p>也可以用矩阵的形式表达：</p>
+
+<p>\[  \mathbf f =  \left[ \begin{matrix} 1&amp;0&amp;0\\ 0&amp;1&amp;0\\ 0&amp;0&amp;1\\ \end{matrix} \right]  \left[ \begin{matrix} x\\ y\\ z\\ \end{matrix} \right]  \]</p>
+
+<p>更标准的描述：</p>
+
+<p>\[  \mathbf f = \sum_{i=1}^{n} \mathbf B_{i} C_{i} \]</p>
+
+<p>注意这里的\(\mathbf B_{i}\)基函数究竟是什么样的是不确定的，可能是上面的笛卡尔基函数，也可能是球坐标基函数，当然最重要的是下文会提到的球谐基函数。</p>
+
+<p>综上，当f未知而\(C_{i}\)已知时，我们可以用上述公式<strong>重建</strong>出f。</p>
+
+<h1>数学期望和蒙特卡洛积分</h1>
+
+<h2>数学期望</h2>
+
+<p>数学期望是随机变量输出值的加权平均，连续随机变量的数学期望公式如下：</p>
+
+<p><img src="../images/2022.3/e1.png" alt="7.png"></p>
+
+<p>其中的p是概率密度函数，p的积分需要等于1。</p>
+
+<p>举一个例子，求f(x) = 2 - x在定义域[0, 2]的数学期望值。需要先构造一个概率密度函数p，p显然等于1/2。于是有：</p>
+
+<p><img src="../images/2022.3/e2.png" alt="7.png"></p>
+
+<h2>蒙特卡洛积分</h2>
+
+<p>对于没有解析式或者不好算积分的f(x)，可以用离散采样f(x)并加权求平均的方法求数学期望：</p>
+
+<p><img src="../images/2022.3/e3.png" alt="7.png"></p>
+
+<p>再结合上一节的式子：</p>
+
+<p><img src="../images/2022.3/e1.png" alt="7.png"></p>
+
+<p>就可以用来算f(x)的积分了（不是数学期望！）：</p>
+
+<p><img src="../images/2022.3/e4.png" alt="7.png"></p>
+
+<p>这也就是所谓的蒙特卡洛积分了。</p>
+
+    </div>
+    <div class="entry">
+        (未经授权禁止转载)
+    </div>
+    <div class="date">
+        Written on March 16, 2022
+    </div>
+    <p>写作不易，您的支持是我写作的动力！</p>
+    <img src="../images/dashang1.jpeg" />
+    <img src="../images/dashang2.jpeg" />
+    
+    
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+
+      </section>
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

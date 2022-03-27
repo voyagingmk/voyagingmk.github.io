@@ -92,7 +92,7 @@ gcc版本: gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2)
       <section>  
         <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
 <script src="/main.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <h1>关于c++11的一些特性(2) 完美转发</h1>
  <h3>Tags: <a href="/tag/c%2B%2B/" rel="tag">c++</a></h3>
 <article class="post">
@@ -159,8 +159,8 @@ gcc版本: gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2)
 43
 44
 45
-</pre></td><td class="code"><pre><span class="cp">#include &lt;stdio.h&gt;
-#include &lt;vector&gt;
+</pre></td><td class="code"><pre><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp">
 </span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 
 
@@ -1388,7 +1388,7 @@ test_wrapper就编译通过了。(只需要注意编译结果的一致性，暂�
     <div class="date">
         Written on November  2, 2015
     </div>
-    <p>博主将十分感谢对本文章的任意金额的打赏^_^</p>
+    <p>写作不易，您的支持是我写作的动力！</p>
     <img src="../images/dashang1.jpeg" />
     <img src="../images/dashang2.jpeg" />
     
