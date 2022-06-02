@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>球谐函数——irradiance map </title>
+
+        <meta charset="utf-8" />
+    <meta http-equiv='content-language' content='zh-CN'>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name="baidu-site-verification" content="0OpfO1OtHA" />
+    
+    <meta name="description" content="球谐函数在图形学里最大的应用就是编码压缩irradiance map。
+" />
+    <meta property="og:description" content="球谐函数在图形学里最大的应用就是编码压缩irradiance map。
+" />
+    
+    <meta name="author" content="Wyman的原创技术博客" />
+
+    
+    <meta property="og:title" content="球谐函数——irradiance map" />
+    <meta property="twitter:title" content="球谐函数——irradiance map" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Wyman的原创技术博客 - 恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman" href="/feed.xml" />
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65954265-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/sh3/',
+		  'title': '球谐函数——irradiance map'
+		});
+	</script>
+	<!-- End Google Analytics -->
+	<!-- Baidu Analytics -->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?0dc968591d8c64196a37eca9ca4f86b3";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	<!-- End Baidu Analytics -->
+
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://www.qiujiawei.com/images/avatar.jpg" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Wyman的原创技术博客</a></h1>
+            <p class="site-description">恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <nav class="nav2">
+      <ul></ul>
+    </nav>
+
+    <div id="main" role="main" class="container">
+      <section>  
+        <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
+<script src="/main.js"></script>
+<script id="MathJax-script" async src="/mathjax/tex-chtml.js"></script>
+<h1>球谐函数——irradiance map</h1>
+ <h3>Tags: <a href="/tag/computer-graphics/" rel="tag">computer graphics</a></h3>
+<article class="post">
+    
+    <div class="entry">
+        <p>球谐函数在图形学里最大的应用就是编码压缩irradiance map。</p>
+
+<!--more-->
+
+<h1>从radiance map输出irradiance map</h1>
+
+<h2>radiance map是什么</h2>
+
+<p>wiki：<a href="https://en.wikipedia.org/wiki/Reflection_mapping">https://en.wikipedia.org/wiki/Reflection_mapping</a></p>
+
+<p>其实也就是hdr map、enviroment map。一般是一张全景照片。</p>
+
+<p>可想而知，这张图图片一般可以用cube map的方式存储，即6张方形图，这其实就是skybox的贴图了（天光）。</p>
+
+<p>为什么又叫hdr map，是因为为了得到pbr效果的话，这张radiance map的亮度范围要允许足够大，如果只是存0-255的亮度的话就不是pbr了，hdr map至少是32位float。</p>
+
+<h2>球形环境贴图</h2>
+
+<p>6张方形图虽然好理解，但是不利于计算。于是就有了球形环境贴图的存储方式，球形环境贴图一般宽度是高度的两倍，往中间切开的话，能得到2张1:1的方形图。</p>
+
+<h2>球形环境贴图的坐标理解</h2>
+
+<p>因为像素有面积，那么可设：</p>
+
+<ul>
+<li>每个pixel左下角的坐标为（x，y），则（x=0,y=0）代表图像左下的第一个像素，（x=w-1，y=h-1）代表右上的最后一个像素</li>
+<li>用（u，v）表示像素的单位化坐标，那么（ u=(x+0.5)/w，v=(y+0.5)/h ）就表示了像素（x,y）的中心点，（ u=0，v=0 ）代表图像左下的第一个像素的左下角，而（ u=(w-1+1)/w，v=(h-1 + 1)/h ），即（u=1，v=1） 表示右上的最后一个像素的右上角</li>
+</ul>
+
+<p>可见uv的取值范围是[0, 1]。我们此时已得到了像素坐标xy转成uv坐标的方法。</p>
+
+<p>再设球形环境贴图的横坐标轴为θ，纵坐标是φ（0到π），</p>
+
+<p>我们想要的θ、φ取值需要在指定范围，θ是-π到π，φ是0到π，θ相当于环绕y轴一整个圆圈，φ则相当于绕x轴半个圆圈。这样就覆盖了整个单位球的球面（记住这是3D空间的球）。</p>
+
+<p>θ是-π到π的好处是，能使得球形环境贴图是看起来是对称的。左半边的横坐标轴取值范围是-π到0，右半边的范围是0到π，纵轴一样是0到π。</p>
+
+<p>可以用以下公式把uv坐标转成θ、φ球坐标：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">float</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">);</span>
+<span class="kt">float</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">pi</span><span class="o">*</span><span class="n">uv</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+</code></pre></div>
+<p>有了θ、φ球坐标后，还可以转成3D笛卡尔坐标。</p>
+
+<p>\[ x = r * cos\theta sin \phi \]</p>
+
+<p>\[ y = r * sin\theta sin \phi \]</p>
+
+<p>\[ z = r * cos \phi \]</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">float</span> <span class="n">x</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">);</span>
+<span class="kt">float</span> <span class="n">y</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">);</span>
+<span class="kt">float</span> <span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">);</span> <span class="c1">// 这里故意对z取反，不影响变换正确性</span>
+</code></pre></div>
+<p>x、y、z做了一些调换。</p>
+
+<p><strong>此时我们就得到了从像素坐标到3D笛卡尔坐标的转换公式</strong>。在CPU计算irradiance map时，可以预先把这个转换关系烘焙到一个w*h大小的、元素为vector3的二维数组里，称之为directionImage。下文会用到这个directionImage。</p>
+
+<h2>什么是irradiance map</h2>
+
+<p>前面介绍了radiance map是一张场景全景图，那么当场景里有一个对象，要计算场景对该对象的光照影响时，并不是直接在这个对象的fragment shader里去采样radiance map，这是错误的。</p>
+
+<p>首先假设只考虑diffuse光照的情况。那么对象上的每一个着色点，都受到场景四面八方的环境光影响。所以每一个着色点应该是去采样整张环境贴图（假设没有遮挡），而不是环境贴图的一个点。</p>
+
+<p>用代码解释会更好理解，但需要回顾下什么是蒙特卡洛算法。因为采样整张环境贴图就是一次积分过程，于是可以用蒙特卡洛，把积分变成累加再求平均，以下是没有重要性采样的蒙特卡罗算irradiance map的算法：</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="c1">// m_directionImage包含了所有方向，direction是笛卡尔坐标系朝向，pixelPos是2D像素坐标</span>
+<span class="n">data</span><span class="p">.</span><span class="n">m_directionImage</span><span class="p">.</span><span class="n">parallelForPixels2D</span><span class="p">([</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">vec3</span><span class="o">&amp;</span> <span class="n">direction</span><span class="p">,</span> <span class="n">ivec2</span> <span class="n">pixelPos</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// basis是以该方向为法线的世界空间正交坐标系</span>
+    <span class="n">mat3</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">makeOrthogonalBasis</span><span class="p">(</span><span class="n">direction</span><span class="p">);</span> 
+    <span class="n">vec3</span> <span class="n">accum</span> <span class="o">=</span> <span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">);</span>
+
+    <span class="c1">// 迭代随机采样1000次，随机一个方向</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">u32</span> <span class="n">sampleIt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">sampleIt</span> <span class="o">&lt;</span> <span class="n">m_hemisphereSampleCount</span><span class="p">;</span> <span class="o">++</span><span class="n">sampleIt</span><span class="p">)</span>
+    <span class="p">{</span>
+
+        <span class="c1">// u等于sampleIt/m_hemisphereSampleCount，v随机</span>
+        <span class="n">vec2</span> <span class="n">sampleUv</span> <span class="o">=</span> <span class="n">sampleHammersley</span><span class="p">(</span><span class="n">sampleIt</span><span class="p">,</span> <span class="n">m_hemisphereSampleCount</span><span class="p">);</span>
+
+        <span class="c1">// uv转成球坐标再转成笛卡尔坐标，注意这是local坐标系的</span>
+        <span class="n">vec3</span> <span class="n">hemisphereDirection</span> <span class="o">=</span> <span class="n">sampleCosineHemisphere</span><span class="p">(</span><span class="n">sampleUv</span><span class="p">);</span>
+
+        <span class="c1">// 投影到该世界坐标系</span>
+        <span class="n">vec3</span> <span class="n">sampleDirection</span> <span class="o">=</span> <span class="n">basis</span> <span class="o">*</span> <span class="n">hemisphereDirection</span><span class="p">;</span>
+
+        <span class="c1">// 采样hdr map得到该方向对应的radiance只，加到accum</span>
+        <span class="n">accum</span> <span class="o">+=</span> <span class="p">(</span><span class="n">vec3</span><span class="p">)</span><span class="n">m_radianceImage</span><span class="p">.</span><span class="n">sampleNearest</span><span class="p">(</span><span class="n">cartesianToLatLongTexcoord</span><span class="p">(</span><span class="n">sampleDirection</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 求平均</span>
+    <span class="n">accum</span> <span class="o">/=</span> <span class="n">m_hemisphereSampleCount</span><span class="p">;</span>
+
+    <span class="c1">// 输出到irradiance map</span>
+    <span class="n">m_irradianceImage</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">pixelPos</span><span class="p">)</span> <span class="o">=</span> <span class="n">vec4</span><span class="p">(</span><span class="n">accum</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>其中m_irradianceImage是一个和m_radianceImage一样大的数组。</p>
+
+<p>有重要性采样的蒙特卡洛，同样采样数的前提下，精度会更高。因为涉及到复杂的pdf问题，这里不介绍了。</p>
+
+<h2>用球谐函数编码irradiance map</h2>
+
+<p>上一节的蒙特卡洛方法求出来的irradianceImage虽然非常准确，但是很占内存。这对于实时渲染是很糟糕的，意味着要让gpu缓存一张巨大的irradiance map贴图。</p>
+
+<p>记采样方向为θ、φ，以及f(θ, φ)表示该方向的环境光，因为f本质是一个积分，那么</p>
+
+<h2>球谐的基函数</h2>
+
+<h2>生成步骤</h2>
+
+    </div>
+    <div class="entry">
+        (未经授权禁止转载)
+    </div>
+    <div class="date">
+        Written on March 27, 2022
+    </div>
+    <p>写作不易，您的支持是我写作的动力！</p>
+    <img src="../images/dashang1.jpeg" />
+    <img src="../images/dashang2.jpeg" />
+    
+    
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'qiujiawei';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+
+
+      </section>
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:voyagingmk@gmail.com"><i class="svg-icon email"></i></a>
+
+
+<a href="http://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="http://twitter.com/voyagingmk"><i class="svg-icon twitter"></i></a>
+
+
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
