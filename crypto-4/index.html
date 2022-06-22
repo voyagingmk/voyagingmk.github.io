@@ -105,7 +105,7 @@
 <p>3, 执行make，等生成libcrypto.a、libssl.a；</p>
 
 <p>4, 创建一个my_demo目录，并创建一个test.c文件，代码如下：</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;openssl/ssl.h&gt;
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;openssl/ssl.h&gt;</span><span class="cp">
 </span>
 <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">OPENSSL_init_ssl</span><span class="p">(</span><span class="n">OPENSSL_INIT_ENGINE_ALL_BUILTIN</span>

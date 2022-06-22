@@ -450,11 +450,11 @@ in Microfacet-Based BRDFs</a>。这条公式的好处推导相当复杂，直接
 
 <p>\[ f = (1 - v\cdot h)^ 5 \]</p>
 
-<p>\[ F = f_{90}(1 - v\cdot h)^ 5 - f_{0}( 1 - (1 - v\cdot h)^ 5 ) \]</p>
+<p>\[ F = f_{90}(1 - v\cdot h)^ 5 + f_{0}( 1 - (1 - v\cdot h)^ 5 ) \]</p>
 
-<p>\[ = (1 - v\cdot h)^ 5 - f_{0}( 1 - (1 - v\cdot h)^ 5 ) \]</p>
+<p>\[ = (1 - v\cdot h)^ 5 + f_{0}( 1 - (1 - v\cdot h)^ 5 ) \]</p>
 
-<p>\[ = f - f_{0}( 1 - f ) \]</p>
+<p>\[ = f + f_{0}( 1 - f ) \]</p>
 <div class="highlight"><pre><code class="language-glsl" data-lang="glsl"><span class="kt">vec3</span> <span class="nf">F_Schlick</span><span class="p">(</span><span class="k">const</span> <span class="kt">vec3</span> <span class="n">f0</span><span class="p">,</span> <span class="kt">float</span> <span class="n">VoH</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">float</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="n">VoH</span><span class="p">,</span> <span class="mi">5</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
     <span class="k">return</span> <span class="n">f</span> <span class="o">+</span> <span class="n">f0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span> <span class="o">-</span> <span class="n">f</span><span class="p">);</span>
