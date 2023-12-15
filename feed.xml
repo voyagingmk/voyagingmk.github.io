@@ -3,8 +3,8 @@
   <channel>
     <title>Wyman的原创技术博客</title>
     <description>恭喜你发现我的小站，撩我请加QQ：234707482、Wechat：_Wyman</description>
-    <link>https://www.qiujiawei.com</link>
-    <atom:link href="https://www.qiujiawei.com/feed.xml" rel="self" type="application/rss+xml" />
+    <link>https://wyman1024.github.io</link>
+    <atom:link href="https://wyman1024.github.io/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
         <title>球谐函数——irradiance map</title>
@@ -117,8 +117,8 @@
 &lt;h2&gt;生成步骤&lt;/h2&gt;
 </description>
         <pubDate>Sun, 27 Mar 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/sh3/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/sh3/</guid>
+        <link>https://wyman1024.github.io/sh3/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/sh3/</guid>
       </item>
     
       <item>
@@ -164,8 +164,8 @@
 &lt;h1&gt;伴随勒让德多项式&lt;/h1&gt;
 </description>
         <pubDate>Sat, 26 Mar 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/sh2/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/sh2/</guid>
+        <link>https://wyman1024.github.io/sh2/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/sh2/</guid>
       </item>
     
       <item>
@@ -299,8 +299,8 @@
 &lt;p&gt;这也就是所谓的蒙特卡洛积分了。&lt;/p&gt;
 </description>
         <pubDate>Wed, 16 Mar 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/sh/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/sh/</guid>
+        <link>https://wyman1024.github.io/sh/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/sh/</guid>
       </item>
     
       <item>
@@ -593,8 +593,8 @@
 &lt;p&gt;&lt;a href=&quot;https://github.com/Friduric/voxel-cone-tracing&quot;&gt;https://github.com/Friduric/voxel-cone-tracing&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Thu, 10 Mar 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/voxel/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/voxel/</guid>
+        <link>https://wyman1024.github.io/voxel/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/voxel/</guid>
       </item>
     
       <item>
@@ -607,7 +607,7 @@
 
 &lt;h2&gt;Radiant flux 辐射通量&lt;/h2&gt;
 
-&lt;p&gt;在我之前的一篇文章有介绍：&lt;a href=&quot;https://www.qiujiawei.com/rendering-equation/#%E8%BE%90%E5%B0%84%E9%80%9A%E9%87%8F(Flux)&quot;&gt;辐射通量&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;在我之前的一篇文章有介绍：&lt;a href=&quot;https://wyman1024.github.io/rendering-equation/#%E8%BE%90%E5%B0%84%E9%80%9A%E9%87%8F(Flux)&quot;&gt;辐射通量&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;辐射通量可以客观衡量光源（如电灯泡）的功率。因为它描述了&lt;strong&gt;所有波段的电磁波&lt;/strong&gt;。&lt;/p&gt;
 
@@ -1073,15 +1073,15 @@
 &lt;p&gt;&lt;a href=&quot;https://pixelsandwanderlust.com/what-is-middle-grey-understanding-18-grey-reflectance/&quot;&gt;https://pixelsandwanderlust.com/what-is-middle-grey-understanding-18-grey-reflectance/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Thu, 20 Jan 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/pbr-lighting/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/pbr-lighting/</guid>
+        <link>https://wyman1024.github.io/pbr-lighting/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/pbr-lighting/</guid>
       </item>
     
       <item>
         <title>Filament中的anisotropic specular和isotropic specular</title>
         <description>&lt;!--more--&gt;
 
-&lt;p&gt;很久前总结了pbr公式内容：&lt;a href=&quot;https://www.qiujiawei.com/pbr-rendering/&quot;&gt;PBR渲染原理&lt;/a&gt;，但没有说到各向异性的问题。&lt;/p&gt;
+&lt;p&gt;很久前总结了pbr公式内容：&lt;a href=&quot;https://wyman1024.github.io/pbr-rendering/&quot;&gt;PBR渲染原理&lt;/a&gt;，但没有说到各向异性的问题。&lt;/p&gt;
 
 &lt;p&gt;最近发现&lt;a href=&quot;https://google.github.io/filament/Filament.html&quot;&gt;Filament&lt;/a&gt;详细介绍了pbr相关的知识，也有源码可读，可以好好学习一番。&lt;/p&gt;
 
@@ -1552,8 +1552,8 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 &lt;p&gt;各向异性的F项和各向同性的F项一样。&lt;/p&gt;
 </description>
         <pubDate>Tue, 18 Jan 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/pbr-specular/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/pbr-specular/</guid>
+        <link>https://wyman1024.github.io/pbr-specular/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/pbr-specular/</guid>
       </item>
     
       <item>
@@ -1579,7 +1579,7 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 
 &lt;p&gt;至于为什么要除以π才是diffuse物体的BSDF，得从渲染方程说起。&lt;/p&gt;
 
-&lt;p&gt;（在我的这篇 &lt;a href=&quot;https://www.qiujiawei.com/rendering-equation/&quot;&gt;渲染基础理论的介绍&lt;/a&gt; 文章中有介绍相关的公式推导 ）&lt;/p&gt;
+&lt;p&gt;（在我的这篇 &lt;a href=&quot;https://wyman1024.github.io/rendering-equation/&quot;&gt;渲染基础理论的介绍&lt;/a&gt; 文章中有介绍相关的公式推导 ）&lt;/p&gt;
 
 &lt;p&gt;先看下wiki里的渲染方程：&lt;/p&gt;
 
@@ -1672,8 +1672,8 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
         <pubDate>Tue, 18 Jan 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/pbr-diffuse/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/pbr-diffuse/</guid>
+        <link>https://wyman1024.github.io/pbr-diffuse/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/pbr-diffuse/</guid>
       </item>
     
       <item>
@@ -1951,8 +1951,8 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 &lt;p&gt;于是要引入轮盘赌：要么折射要么反射，没有光线分裂。并且利用了除以P的技巧，使得能量守恒。&lt;/p&gt;
 </description>
         <pubDate>Sat, 08 Jan 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/path-tracing/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/path-tracing/</guid>
+        <link>https://wyman1024.github.io/path-tracing/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/path-tracing/</guid>
       </item>
     
       <item>
@@ -2292,8 +2292,8 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 &lt;p&gt;在渲染中，根据材质的不同，对某些球面方向我们希望采样多一些，某些方向少一些，这就需要non-uniform pdf。&lt;/p&gt;
 </description>
         <pubDate>Fri, 07 Jan 2022 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/monte-carlo3/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/monte-carlo3/</guid>
+        <link>https://wyman1024.github.io/monte-carlo3/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/monte-carlo3/</guid>
       </item>
     
       <item>
@@ -2313,7 +2313,7 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 
 &lt;p&gt;每帧x、y方向抖动多少距离，不是完全随机的，而是要弄一个低差异序列。算出offset后，需要应用到投影矩阵，具体的数学原理看下面的文章：&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://www.qiujiawei.com/linear-algebra-12/&quot;&gt;线性代数之透视矩阵Perspective Matrix&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://wyman1024.github.io/linear-algebra-12/&quot;&gt;线性代数之透视矩阵Perspective Matrix&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;jitter后，如果什么都不做，只是显示当前帧到screen，会发现什么变化都没有，该锯齿还是锯齿（但这种子像素抖动不会导致整个屏幕抖动，如果是静态场景渲染，画面还是静止的）。&lt;/p&gt;
 
@@ -2766,8 +2766,8 @@ in Microfacet-Based BRDFs&lt;/a&gt;。这条公式的好处推导相当复杂，
 &lt;p&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/71173025&quot;&gt;https://zhuanlan.zhihu.com/p/71173025&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 07 Dec 2021 00:00:00 +0800</pubDate>
-        <link>https://www.qiujiawei.com/TAA/</link>
-        <guid isPermaLink="true">https://www.qiujiawei.com/TAA/</guid>
+        <link>https://wyman1024.github.io/TAA/</link>
+        <guid isPermaLink="true">https://wyman1024.github.io/TAA/</guid>
       </item>
     
   </channel>
